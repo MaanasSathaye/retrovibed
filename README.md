@@ -2,7 +2,10 @@
 
 retrovibe is a personal digital archiving and distribution platform built designed to make digital distribution
 user friendly and easy to manage. It provides the ability to manage and share content within a personal library
-with the world and has allows users to sign up for at cost cloud backup functionality.
+with the world and allows users to sign up for at cost cloud backup functionality.
+
+It allow supports community rss feeds of content, like linux ISOs, AI models, and public interest archives that you can subscribe
+to and donate your storage towards enabling distribution.
 
 #### install deb daemon
 
