@@ -2,9 +2,9 @@ package cmdopts
 
 import "log"
 
-func ReportError(err error) error {
-	if err != nil {
-		log.Println(err)
+func Fatal(err error) {
+	if err == nil {
+		return
 	}
-	return err
+	log.Fatalln(err)
 }

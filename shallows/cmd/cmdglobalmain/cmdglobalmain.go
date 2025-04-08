@@ -113,7 +113,7 @@ func Main(args ...string) {
 		log.Fatalln(err)
 	}
 
-	if err = cmdopts.ReportError(ctx.Run()); err != nil {
+	if err = errorsx.LogErr(ctx.Run()); err != nil {
 		shellCli.Shutdown()
 	}
 

@@ -33,6 +33,14 @@ func Log(err error) {
 	}
 }
 
+// print and return the error
+func LogErr(err error) error {
+	if err != nil {
+		log.Println(err)
+	}
+	return err
+}
+
 func Must[T any](v T, err error) T {
 	if err == nil {
 		return v
