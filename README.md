@@ -1,3 +1,12 @@
+### Notice
+
+```diff
+-this is early alpha software. its under active development and testing
+-not recommended you try to use it, if you're interested in helping test / use feel free to contact us.
+
+otherwise subscribe and check in periodicly! we're targetting a june release.
+```
+
 #### retrovibe
 
 retrovibe is a personal digital archiving and distribution platform built designed to make digital distribution
