@@ -8,8 +8,10 @@ import './meta.authz.pb.dart';
 export './meta.daemon.pb.dart';
 export './meta.authz.pb.dart';
 
-Future<http.Response> healthz() async {
-  return http.Client().get(Uri.https(httpx.host(), "/healthz"));
+Future<http.Response> healthz({String? host}) async {
+  return http.Client()
+      .get(Uri.https(host ?? httpx.host(), "/healthz"))
+      .then(httpx.auto_error);
 }
 
 Future<AuthzResponse> authz(Token current) {
@@ -69,6 +71,7 @@ abstract class daemons {
           Uri.https(httpx.host(), "/meta/d/latest"),
           headers: {"Authorization": httpx.auto_bearer()},
         )
+        .then(httpx.auto_error)
         .then((v) {
           return Future.value(
             DaemonLookupResponse.create()

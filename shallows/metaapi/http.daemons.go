@@ -157,8 +157,12 @@ func (t *HTTPDaemons) latest(w http.ResponseWriter, r *http.Request) {
 		v   meta.Daemon
 	)
 
-	if err = meta.DaemonFindByLatestUpdated(r.Context(), t.q).Scan(&v); err != nil {
-		log.Println(errorsx.Wrap(err, "unable to find record"))
+	if err = meta.DaemonFindByLatestUpdated(r.Context(), t.q).Scan(&v); sqlx.ErrNoRows(err) != nil {
+		log.Println(errorsx.Wrap(err, "no daemons known"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+		return
+	} else if err != nil {
+		log.Println(errorsx.Wrap(err, "failed to find record"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}

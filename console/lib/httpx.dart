@@ -61,3 +61,9 @@ Future<http.Response> auto_error(http.Response v) {
 
   return v.statusCode >= 300 ? Future.error(v) : Future.value(v);
 }
+
+class ErrorsTest {
+  static bool err404(Object obj) {
+    return obj is http.Response && obj.statusCode == 404;
+  }
+}

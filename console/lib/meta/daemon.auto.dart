@@ -19,12 +19,12 @@ class DaemonHttpOverrides extends HttpOverrides {
   }
 }
 
-class DaemonAuto extends StatefulWidget {
+class EndpointAuto extends StatefulWidget {
   final Widget child;
   final void Function(api.Daemon v)? onTap;
   final Future<api.DaemonLookupResponse> Function() latest;
 
-  const DaemonAuto(
+  const EndpointAuto(
     this.child, {
     super.key,
     this.latest = api.daemons.latest,
@@ -35,7 +35,7 @@ class DaemonAuto extends StatefulWidget {
   State<StatefulWidget> createState() => _DaemonAuto();
 }
 
-class _DaemonAuto extends State<DaemonAuto> {
+class _DaemonAuto extends State<EndpointAuto> {
   bool _loading = true;
   ds.Error? _cause = null;
   api.Daemon? _res;
@@ -48,6 +48,9 @@ class _DaemonAuto extends State<DaemonAuto> {
     widget
         .latest()
         .then((v) {
+          return api.healthz(host: v.daemon.hostname).then((value) => v);
+        })
+        .then((v) {
           setState(() {
             httpx.set(v.daemon.hostname);
             HttpOverrides.global = DaemonHttpOverrides(
@@ -58,6 +61,16 @@ class _DaemonAuto extends State<DaemonAuto> {
             _loading = false;
           });
         })
+        .catchError((e) {
+          setState(() {
+            _loading = false;
+          });
+        }, test: httpx.ErrorsTest.err404)
+        .catchError((e) {
+          setState(() {
+            _loading = false;
+          });
+        }, test: ds.ErrorTests.offline)
         .catchError((e) {
           setState(() {
             _cause = ds.Error.unknown(e);
@@ -76,7 +89,16 @@ class _DaemonAuto extends State<DaemonAuto> {
   @override
   Widget build(BuildContext context) {
     return ds.Loading(
-      child: _res == null ? mdns.MDNSDiscovery() : widget.child,
+      child:
+          _res == null
+              ? mdns.MDNSDiscovery(
+                daemon: (d) {
+                  setState(() {
+                    _res = d;
+                  });
+                },
+              )
+              : widget.child,
       cause: _cause,
       loading: _loading,
     );

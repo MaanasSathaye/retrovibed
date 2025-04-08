@@ -32,6 +32,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/torrentx"
 	"github.com/retrovibed/retrovibed/internal/userx"
 	"github.com/retrovibed/retrovibed/media"
+	"github.com/retrovibed/retrovibed/meta/identityssh"
 	"github.com/retrovibed/retrovibed/metaapi"
 
 	_ "github.com/marcboeker/go-duckdb/v2"
@@ -83,6 +84,10 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		return err
 	}
 	defer db.Close()
+
+	if err = identityssh.ImportPublicKey(dctx, db, id.PublicKey()); err != nil {
+		return errorsx.Wrap(err, "unable to import ssh identity")
+	}
 
 	go func() {
 		errorsx.Log(errorsx.Wrap(PrepareDefaultFeeds(dctx, db), "unable to initialize default rss feeds"))

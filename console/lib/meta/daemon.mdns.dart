@@ -8,7 +8,7 @@ import './api.dart' as api;
 
 class ManualConfiguration extends StatefulWidget {
   final void Function() retry;
-  final void Function(String) connect;
+  final void Function(api.Daemon) connect;
 
   ManualConfiguration({super.key, required this.retry, required this.connect});
 
@@ -60,7 +60,7 @@ class _ManualConfigurationView extends State<ManualConfiguration> {
                           ),
                         )
                         .then((d) {
-                          return widget.connect(d.daemon.hostname);
+                          return widget.connect(d.daemon);
                         });
                   },
                 ),
@@ -74,9 +74,9 @@ class _ManualConfigurationView extends State<ManualConfiguration> {
 }
 
 class MDNSDiscovery extends StatefulWidget {
-  // final UniqueKey id = UniqueKey();
+  final void Function(api.Daemon) daemon;
 
-  // MDNSDiscovery({super.key});
+  MDNSDiscovery({super.key, required this.daemon});
 
   static _MDNSDiscovery? of(BuildContext context) {
     return context.findAncestorStateOfType<_MDNSDiscovery>();
@@ -164,11 +164,11 @@ class _MDNSDiscovery extends State<MDNSDiscovery> {
             });
             this.discover();
           },
-          connect: (hostname) {
+          connect: (daemon) {
             setState(() {
-              httpx.set(hostname);
               _cause = null;
             });
+            widget.daemon(daemon);
           },
         ),
       ),

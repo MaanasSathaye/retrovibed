@@ -8,7 +8,18 @@ import (
 	"github.com/retrovibed/retrovibed/internal/sqlx"
 	"github.com/retrovibed/retrovibed/internal/sshx"
 	"github.com/retrovibed/retrovibed/meta"
+	"golang.org/x/crypto/ssh"
 )
+
+func ImportPublicKey(ctx context.Context, q sqlx.Queryer, pub ssh.PublicKey) (err error) {
+	var (
+		parsed = sshx.Parsed{
+			PublicKey: pub,
+		}
+	)
+
+	return ImportParsed(ctx, q, parsed)
+}
 
 func ImportParsed(ctx context.Context, q sqlx.Queryer, parsed sshx.Parsed) (err error) {
 	p := meta.Profile{

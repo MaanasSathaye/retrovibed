@@ -5,10 +5,13 @@ import './screens.dart' as screens;
 import "./theme.defaults.dart" as theming;
 
 final ECONNREFUSED = 111;
+final ENOROUTE = 113;
 
 class ErrorTests {
   static bool offline(Object obj) {
-    return obj is SocketException && obj.osError?.errorCode == ECONNREFUSED;
+    return obj is SocketException &&
+        (obj.osError?.errorCode == ECONNREFUSED ||
+            obj.osError?.errorCode == ENOROUTE);
   }
 
   static bool timeout(Object obj) {
@@ -110,14 +113,14 @@ class Error extends StatelessWidget {
   }
 
   // pushes the error to the nearest boundary widget.
-  static T Function(Object obj) boundary<T, Y>(
+  static Future<T> Function(Object obj) boundary<T, Y>(
     BuildContext context,
     T result,
     Error Function(Y) onErr,
   ) {
     return (Object e) {
       ErrorBoundary.of(context)?.onError(onErr(e as Y));
-      return result;
+      return Future.value(result);
     };
   }
 

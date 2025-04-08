@@ -14,8 +14,8 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
 
-  print("public key ${retro.public_key()}");
   retro.daemon();
+  // print("public key ${retro.public_key()}");
 
   runApp(const MyApp());
 }
@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
       themeMode: ThemeMode.dark,
       home: Material(
         child: ds.Full(
-          meta.DaemonAuto(
+          meta.EndpointAuto(
             auth.AuthzCache(
               media.Playlist(
                 DefaultTabController(
