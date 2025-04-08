@@ -4,7 +4,7 @@
 -this is early alpha software. its under active development and testing
 -not recommended you try to use it, if you're interested in helping test / use feel free to contact us.
 
-otherwise subscribe and check in periodicly! we're targetting a june release.
+otherwise subscribe and check in periodically! we're targetting a june release.
 ```
 
 #### retrovibe
