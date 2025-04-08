@@ -28,5 +28,13 @@ func IdentityInsertWithDefaults(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a Identity) NewIdentityScannerStaticRow,
 ) {
+	gql.Into("meta_sso_identity_ssh").Default("created_at", "updated_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, profile_id = EXCLUDED.profile_id")
+}
+
+// used to insert an identity for the oauth2 endpoint
+func IdentityInsertZeroWithDefaults(
+	gql genieql.Insert,
+	pattern func(ctx context.Context, q sqlx.Queryer, a Identity) NewIdentityScannerStaticRow,
+) {
 	gql.Into("meta_sso_identity_ssh").Default("created_at", "updated_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT")
 }

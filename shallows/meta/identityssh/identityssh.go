@@ -2,6 +2,7 @@ package identityssh
 
 import (
 	"context"
+	"log"
 
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/langx"
@@ -18,21 +19,24 @@ func ImportPublicKey(ctx context.Context, q sqlx.Queryer, pub ssh.PublicKey) (er
 		}
 	)
 
+	log.Println("importing public key")
 	return ImportParsed(ctx, q, parsed)
 }
 
 func ImportParsed(ctx context.Context, q sqlx.Queryer, parsed sshx.Parsed) (err error) {
 	p := meta.Profile{
+		ID:          sshx.FingerprintMD5(parsed.PublicKey),
 		Description: parsed.Comment,
 	}
-	if err = meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p); err != nil {
+	if err = meta.ProfileInsertWithID(ctx, q, p).Scan(&p); err != nil {
 		return errorsx.Wrap(err, "unable to create profile")
 	}
 
 	authz := langx.Clone(meta.Authz{
+		ID:        sshx.FingerprintMD5(parsed.PublicKey),
 		ProfileID: p.ID,
 	}, meta.AuthzOptionAdmin)
-	if err = meta.AuthzInsertWithDefaults(ctx, q, authz).Scan(&authz); err != nil {
+	if err = meta.AuthzInsertWithIDDefaults(ctx, q, authz).Scan(&authz); err != nil {
 		return errorsx.Wrap(err, "unable to setup authorizations")
 	}
 

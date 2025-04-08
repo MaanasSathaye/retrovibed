@@ -139,7 +139,7 @@ func (t *HTTPSSHOauth2) auth(w http.ResponseWriter, req *http.Request) {
 		ProfileID: uuid.Nil.String(),
 	}
 
-	err = identityssh.IdentityInsertWithDefaults(req.Context(), t.q, iden).Scan(&iden)
+	err = identityssh.IdentityInsertZeroWithDefaults(req.Context(), t.q, iden).Scan(&iden)
 	if err != nil {
 		log.Println("unable to register public key", err)
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
