@@ -2,7 +2,7 @@
 //  Generated code. Do not modify.
 //  source: meta.daemon.proto
 //
-// @dart = 2.12
+// @dart = 3.3
 
 // ignore_for_file: annotate_overrides, camel_case_types, comment_references
 // ignore_for_file: constant_identifier_names, library_prefixes
@@ -13,6 +13,8 @@ import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
+
+export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
 
 class Daemon extends $pb.GeneratedMessage {
   factory Daemon({
@@ -81,7 +83,7 @@ class Daemon extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool hasId() => $_has(0);
   @$pb.TagNumber(1)
-  void clearId() => clearField(1);
+  void clearId() => $_clearField(1);
 
   @$pb.TagNumber(2)
   $core.String get createdAt => $_getSZ(1);
@@ -90,7 +92,7 @@ class Daemon extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.bool hasCreatedAt() => $_has(1);
   @$pb.TagNumber(2)
-  void clearCreatedAt() => clearField(2);
+  void clearCreatedAt() => $_clearField(2);
 
   @$pb.TagNumber(3)
   $core.String get updatedAt => $_getSZ(2);
@@ -99,7 +101,7 @@ class Daemon extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.bool hasUpdatedAt() => $_has(2);
   @$pb.TagNumber(3)
-  void clearUpdatedAt() => clearField(3);
+  void clearUpdatedAt() => $_clearField(3);
 
   @$pb.TagNumber(4)
   $core.String get description => $_getSZ(3);
@@ -108,7 +110,7 @@ class Daemon extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $core.bool hasDescription() => $_has(3);
   @$pb.TagNumber(4)
-  void clearDescription() => clearField(4);
+  void clearDescription() => $_clearField(4);
 
   @$pb.TagNumber(5)
   $core.String get hostname => $_getSZ(4);
@@ -117,7 +119,7 @@ class Daemon extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   $core.bool hasHostname() => $_has(4);
   @$pb.TagNumber(5)
-  void clearHostname() => clearField(5);
+  void clearHostname() => $_clearField(5);
 }
 
 class DaemonSearchRequest extends $pb.GeneratedMessage {
@@ -177,7 +179,7 @@ class DaemonSearchRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool hasQuery() => $_has(0);
   @$pb.TagNumber(1)
-  void clearQuery() => clearField(1);
+  void clearQuery() => $_clearField(1);
 
   @$pb.TagNumber(2)
   $fixnum.Int64 get offset => $_getI64(1);
@@ -186,7 +188,7 @@ class DaemonSearchRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.bool hasOffset() => $_has(1);
   @$pb.TagNumber(2)
-  void clearOffset() => clearField(2);
+  void clearOffset() => $_clearField(2);
 
   @$pb.TagNumber(3)
   $fixnum.Int64 get limit => $_getI64(2);
@@ -195,7 +197,7 @@ class DaemonSearchRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.bool hasLimit() => $_has(2);
   @$pb.TagNumber(3)
-  void clearLimit() => clearField(3);
+  void clearLimit() => $_clearField(3);
 }
 
 class DaemonSearchResponse extends $pb.GeneratedMessage {
@@ -246,16 +248,16 @@ class DaemonSearchResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   DaemonSearchRequest get next => $_getN(0);
   @$pb.TagNumber(1)
-  set next(DaemonSearchRequest v) { setField(1, v); }
+  set next(DaemonSearchRequest v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasNext() => $_has(0);
   @$pb.TagNumber(1)
-  void clearNext() => clearField(1);
+  void clearNext() => $_clearField(1);
   @$pb.TagNumber(1)
   DaemonSearchRequest ensureNext() => $_ensure(0);
 
   @$pb.TagNumber(2)
-  $core.List<Daemon> get items => $_getList(1);
+  $pb.PbList<Daemon> get items => $_getList(1);
 }
 
 class DaemonCreateRequest extends $pb.GeneratedMessage {
@@ -301,11 +303,11 @@ class DaemonCreateRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Daemon get daemon => $_getN(0);
   @$pb.TagNumber(1)
-  set daemon(Daemon v) { setField(1, v); }
+  set daemon(Daemon v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasDaemon() => $_has(0);
   @$pb.TagNumber(1)
-  void clearDaemon() => clearField(1);
+  void clearDaemon() => $_clearField(1);
   @$pb.TagNumber(1)
   Daemon ensureDaemon() => $_ensure(0);
 }
@@ -353,11 +355,11 @@ class DaemonCreateResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Daemon get daemon => $_getN(0);
   @$pb.TagNumber(1)
-  set daemon(Daemon v) { setField(1, v); }
+  set daemon(Daemon v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasDaemon() => $_has(0);
   @$pb.TagNumber(1)
-  void clearDaemon() => clearField(1);
+  void clearDaemon() => $_clearField(1);
   @$pb.TagNumber(1)
   Daemon ensureDaemon() => $_ensure(0);
 }
@@ -437,11 +439,11 @@ class DaemonLookupResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Daemon get daemon => $_getN(0);
   @$pb.TagNumber(1)
-  set daemon(Daemon v) { setField(1, v); }
+  set daemon(Daemon v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasDaemon() => $_has(0);
   @$pb.TagNumber(1)
-  void clearDaemon() => clearField(1);
+  void clearDaemon() => $_clearField(1);
   @$pb.TagNumber(1)
   Daemon ensureDaemon() => $_ensure(0);
 }
@@ -489,11 +491,11 @@ class DaemonUpdateRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Daemon get daemon => $_getN(0);
   @$pb.TagNumber(1)
-  set daemon(Daemon v) { setField(1, v); }
+  set daemon(Daemon v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasDaemon() => $_has(0);
   @$pb.TagNumber(1)
-  void clearDaemon() => clearField(1);
+  void clearDaemon() => $_clearField(1);
   @$pb.TagNumber(1)
   Daemon ensureDaemon() => $_ensure(0);
 }
@@ -541,11 +543,11 @@ class DaemonUpdateResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Daemon get daemon => $_getN(0);
   @$pb.TagNumber(1)
-  set daemon(Daemon v) { setField(1, v); }
+  set daemon(Daemon v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasDaemon() => $_has(0);
   @$pb.TagNumber(1)
-  void clearDaemon() => clearField(1);
+  void clearDaemon() => $_clearField(1);
   @$pb.TagNumber(1)
   Daemon ensureDaemon() => $_ensure(0);
 }
@@ -593,11 +595,11 @@ class DaemonDisableRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Daemon get daemon => $_getN(0);
   @$pb.TagNumber(1)
-  set daemon(Daemon v) { setField(1, v); }
+  set daemon(Daemon v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasDaemon() => $_has(0);
   @$pb.TagNumber(1)
-  void clearDaemon() => clearField(1);
+  void clearDaemon() => $_clearField(1);
   @$pb.TagNumber(1)
   Daemon ensureDaemon() => $_ensure(0);
 }
@@ -645,11 +647,11 @@ class DaemonDisableResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Daemon get daemon => $_getN(0);
   @$pb.TagNumber(1)
-  set daemon(Daemon v) { setField(1, v); }
+  set daemon(Daemon v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasDaemon() => $_has(0);
   @$pb.TagNumber(1)
-  void clearDaemon() => clearField(1);
+  void clearDaemon() => $_clearField(1);
   @$pb.TagNumber(1)
   Daemon ensureDaemon() => $_ensure(0);
 }

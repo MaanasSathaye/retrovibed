@@ -2,7 +2,7 @@
 //  Generated code. Do not modify.
 //  source: media.proto
 //
-// @dart = 2.12
+// @dart = 3.3
 
 // ignore_for_file: annotate_overrides, camel_case_types, comment_references
 // ignore_for_file: constant_identifier_names, library_prefixes
@@ -13,6 +13,8 @@ import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
+
+export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
 
 class Media extends $pb.GeneratedMessage {
   factory Media({
@@ -96,7 +98,7 @@ class Media extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool hasId() => $_has(0);
   @$pb.TagNumber(1)
-  void clearId() => clearField(1);
+  void clearId() => $_clearField(1);
 
   @$pb.TagNumber(2)
   $core.String get description => $_getSZ(1);
@@ -105,7 +107,7 @@ class Media extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.bool hasDescription() => $_has(1);
   @$pb.TagNumber(2)
-  void clearDescription() => clearField(2);
+  void clearDescription() => $_clearField(2);
 
   @$pb.TagNumber(3)
   $core.String get mimetype => $_getSZ(2);
@@ -114,7 +116,7 @@ class Media extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.bool hasMimetype() => $_has(2);
   @$pb.TagNumber(3)
-  void clearMimetype() => clearField(3);
+  void clearMimetype() => $_clearField(3);
 
   @$pb.TagNumber(4)
   $core.String get image => $_getSZ(3);
@@ -123,7 +125,7 @@ class Media extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $core.bool hasImage() => $_has(3);
   @$pb.TagNumber(4)
-  void clearImage() => clearField(4);
+  void clearImage() => $_clearField(4);
 
   @$pb.TagNumber(5)
   $core.String get archiveId => $_getSZ(4);
@@ -132,7 +134,7 @@ class Media extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   $core.bool hasArchiveId() => $_has(4);
   @$pb.TagNumber(5)
-  void clearArchiveId() => clearField(5);
+  void clearArchiveId() => $_clearField(5);
 
   @$pb.TagNumber(6)
   $core.String get torrentId => $_getSZ(5);
@@ -141,7 +143,7 @@ class Media extends $pb.GeneratedMessage {
   @$pb.TagNumber(6)
   $core.bool hasTorrentId() => $_has(5);
   @$pb.TagNumber(6)
-  void clearTorrentId() => clearField(6);
+  void clearTorrentId() => $_clearField(6);
 
   @$pb.TagNumber(7)
   $core.String get createdAt => $_getSZ(6);
@@ -150,7 +152,7 @@ class Media extends $pb.GeneratedMessage {
   @$pb.TagNumber(7)
   $core.bool hasCreatedAt() => $_has(6);
   @$pb.TagNumber(7)
-  void clearCreatedAt() => clearField(7);
+  void clearCreatedAt() => $_clearField(7);
 
   @$pb.TagNumber(8)
   $core.String get updatedAt => $_getSZ(7);
@@ -159,7 +161,7 @@ class Media extends $pb.GeneratedMessage {
   @$pb.TagNumber(8)
   $core.bool hasUpdatedAt() => $_has(7);
   @$pb.TagNumber(8)
-  void clearUpdatedAt() => clearField(8);
+  void clearUpdatedAt() => $_clearField(8);
 }
 
 class MediaSearchRequest extends $pb.GeneratedMessage {
@@ -219,7 +221,7 @@ class MediaSearchRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool hasQuery() => $_has(0);
   @$pb.TagNumber(1)
-  void clearQuery() => clearField(1);
+  void clearQuery() => $_clearField(1);
 
   @$pb.TagNumber(900)
   $fixnum.Int64 get offset => $_getI64(1);
@@ -228,7 +230,7 @@ class MediaSearchRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(900)
   $core.bool hasOffset() => $_has(1);
   @$pb.TagNumber(900)
-  void clearOffset() => clearField(900);
+  void clearOffset() => $_clearField(900);
 
   @$pb.TagNumber(901)
   $fixnum.Int64 get limit => $_getI64(2);
@@ -237,7 +239,7 @@ class MediaSearchRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(901)
   $core.bool hasLimit() => $_has(2);
   @$pb.TagNumber(901)
-  void clearLimit() => clearField(901);
+  void clearLimit() => $_clearField(901);
 }
 
 class MediaSearchResponse extends $pb.GeneratedMessage {
@@ -288,16 +290,16 @@ class MediaSearchResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   MediaSearchRequest get next => $_getN(0);
   @$pb.TagNumber(1)
-  set next(MediaSearchRequest v) { setField(1, v); }
+  set next(MediaSearchRequest v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasNext() => $_has(0);
   @$pb.TagNumber(1)
-  void clearNext() => clearField(1);
+  void clearNext() => $_clearField(1);
   @$pb.TagNumber(1)
   MediaSearchRequest ensureNext() => $_ensure(0);
 
   @$pb.TagNumber(2)
-  $core.List<Media> get items => $_getList(1);
+  $pb.PbList<Media> get items => $_getList(1);
 }
 
 class MediaDeleteRequest extends $pb.GeneratedMessage {
@@ -375,11 +377,11 @@ class MediaDeleteResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Media get media => $_getN(0);
   @$pb.TagNumber(1)
-  set media(Media v) { setField(1, v); }
+  set media(Media v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasMedia() => $_has(0);
   @$pb.TagNumber(1)
-  void clearMedia() => clearField(1);
+  void clearMedia() => $_clearField(1);
   @$pb.TagNumber(1)
   Media ensureMedia() => $_ensure(0);
 }
@@ -427,11 +429,11 @@ class MediaUploadResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Media get media => $_getN(0);
   @$pb.TagNumber(1)
-  set media(Media v) { setField(1, v); }
+  set media(Media v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasMedia() => $_has(0);
   @$pb.TagNumber(1)
-  void clearMedia() => clearField(1);
+  void clearMedia() => $_clearField(1);
   @$pb.TagNumber(1)
   Media ensureMedia() => $_ensure(0);
 }
@@ -504,11 +506,11 @@ class Download extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Media get media => $_getN(0);
   @$pb.TagNumber(1)
-  set media(Media v) { setField(1, v); }
+  set media(Media v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasMedia() => $_has(0);
   @$pb.TagNumber(1)
-  void clearMedia() => clearField(1);
+  void clearMedia() => $_clearField(1);
   @$pb.TagNumber(1)
   Media ensureMedia() => $_ensure(0);
 
@@ -519,7 +521,7 @@ class Download extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.bool hasBytes() => $_has(1);
   @$pb.TagNumber(2)
-  void clearBytes() => clearField(2);
+  void clearBytes() => $_clearField(2);
 
   @$pb.TagNumber(3)
   $fixnum.Int64 get downloaded => $_getI64(2);
@@ -528,7 +530,7 @@ class Download extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.bool hasDownloaded() => $_has(2);
   @$pb.TagNumber(3)
-  void clearDownloaded() => clearField(3);
+  void clearDownloaded() => $_clearField(3);
 
   @$pb.TagNumber(4)
   $core.String get initiatedAt => $_getSZ(3);
@@ -537,7 +539,7 @@ class Download extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $core.bool hasInitiatedAt() => $_has(3);
   @$pb.TagNumber(4)
-  void clearInitiatedAt() => clearField(4);
+  void clearInitiatedAt() => $_clearField(4);
 
   @$pb.TagNumber(5)
   $core.String get pausedAt => $_getSZ(4);
@@ -546,7 +548,7 @@ class Download extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   $core.bool hasPausedAt() => $_has(4);
   @$pb.TagNumber(5)
-  void clearPausedAt() => clearField(5);
+  void clearPausedAt() => $_clearField(5);
 
   @$pb.TagNumber(6)
   $core.int get peers => $_getIZ(5);
@@ -555,7 +557,7 @@ class Download extends $pb.GeneratedMessage {
   @$pb.TagNumber(6)
   $core.bool hasPeers() => $_has(5);
   @$pb.TagNumber(6)
-  void clearPeers() => clearField(6);
+  void clearPeers() => $_clearField(6);
 }
 
 class DownloadSearchRequest extends $pb.GeneratedMessage {
@@ -615,7 +617,7 @@ class DownloadSearchRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool hasQuery() => $_has(0);
   @$pb.TagNumber(1)
-  void clearQuery() => clearField(1);
+  void clearQuery() => $_clearField(1);
 
   @$pb.TagNumber(900)
   $fixnum.Int64 get offset => $_getI64(1);
@@ -624,7 +626,7 @@ class DownloadSearchRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(900)
   $core.bool hasOffset() => $_has(1);
   @$pb.TagNumber(900)
-  void clearOffset() => clearField(900);
+  void clearOffset() => $_clearField(900);
 
   @$pb.TagNumber(901)
   $fixnum.Int64 get limit => $_getI64(2);
@@ -633,7 +635,7 @@ class DownloadSearchRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(901)
   $core.bool hasLimit() => $_has(2);
   @$pb.TagNumber(901)
-  void clearLimit() => clearField(901);
+  void clearLimit() => $_clearField(901);
 }
 
 class DownloadSearchResponse extends $pb.GeneratedMessage {
@@ -684,16 +686,16 @@ class DownloadSearchResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   DownloadSearchRequest get next => $_getN(0);
   @$pb.TagNumber(1)
-  set next(DownloadSearchRequest v) { setField(1, v); }
+  set next(DownloadSearchRequest v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasNext() => $_has(0);
   @$pb.TagNumber(1)
-  void clearNext() => clearField(1);
+  void clearNext() => $_clearField(1);
   @$pb.TagNumber(1)
   DownloadSearchRequest ensureNext() => $_ensure(0);
 
   @$pb.TagNumber(2)
-  $core.List<Download> get items => $_getList(1);
+  $pb.PbList<Download> get items => $_getList(1);
 }
 
 class DownloadBeginRequest extends $pb.GeneratedMessage {
@@ -771,11 +773,11 @@ class DownloadBeginResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Download get download => $_getN(0);
   @$pb.TagNumber(1)
-  set download(Download v) { setField(1, v); }
+  set download(Download v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasDownload() => $_has(0);
   @$pb.TagNumber(1)
-  void clearDownload() => clearField(1);
+  void clearDownload() => $_clearField(1);
   @$pb.TagNumber(1)
   Download ensureDownload() => $_ensure(0);
 }
@@ -855,11 +857,11 @@ class DownloadPauseResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Download get download => $_getN(0);
   @$pb.TagNumber(1)
-  set download(Download v) { setField(1, v); }
+  set download(Download v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasDownload() => $_has(0);
   @$pb.TagNumber(1)
-  void clearDownload() => clearField(1);
+  void clearDownload() => $_clearField(1);
   @$pb.TagNumber(1)
   Download ensureDownload() => $_ensure(0);
 }

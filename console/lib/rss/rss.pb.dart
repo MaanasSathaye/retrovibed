@@ -2,7 +2,7 @@
 //  Generated code. Do not modify.
 //  source: rss.proto
 //
-// @dart = 2.12
+// @dart = 3.3
 
 // ignore_for_file: annotate_overrides, camel_case_types, comment_references
 // ignore_for_file: constant_identifier_names, library_prefixes
@@ -13,6 +13,8 @@ import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
+
+export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
 
 class Feed extends $pb.GeneratedMessage {
   factory Feed({
@@ -101,7 +103,7 @@ class Feed extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool hasId() => $_has(0);
   @$pb.TagNumber(1)
-  void clearId() => clearField(1);
+  void clearId() => $_clearField(1);
 
   @$pb.TagNumber(2)
   $core.String get createdAt => $_getSZ(1);
@@ -110,7 +112,7 @@ class Feed extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.bool hasCreatedAt() => $_has(1);
   @$pb.TagNumber(2)
-  void clearCreatedAt() => clearField(2);
+  void clearCreatedAt() => $_clearField(2);
 
   @$pb.TagNumber(3)
   $core.String get updatedAt => $_getSZ(2);
@@ -119,7 +121,7 @@ class Feed extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.bool hasUpdatedAt() => $_has(2);
   @$pb.TagNumber(3)
-  void clearUpdatedAt() => clearField(3);
+  void clearUpdatedAt() => $_clearField(3);
 
   @$pb.TagNumber(4)
   $core.String get nextCheck => $_getSZ(3);
@@ -128,7 +130,7 @@ class Feed extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $core.bool hasNextCheck() => $_has(3);
   @$pb.TagNumber(4)
-  void clearNextCheck() => clearField(4);
+  void clearNextCheck() => $_clearField(4);
 
   @$pb.TagNumber(5)
   $core.String get description => $_getSZ(4);
@@ -137,7 +139,7 @@ class Feed extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   $core.bool hasDescription() => $_has(4);
   @$pb.TagNumber(5)
-  void clearDescription() => clearField(5);
+  void clearDescription() => $_clearField(5);
 
   @$pb.TagNumber(6)
   $core.String get url => $_getSZ(5);
@@ -146,7 +148,7 @@ class Feed extends $pb.GeneratedMessage {
   @$pb.TagNumber(6)
   $core.bool hasUrl() => $_has(5);
   @$pb.TagNumber(6)
-  void clearUrl() => clearField(6);
+  void clearUrl() => $_clearField(6);
 
   @$pb.TagNumber(7)
   $core.bool get autodownload => $_getBF(6);
@@ -155,7 +157,7 @@ class Feed extends $pb.GeneratedMessage {
   @$pb.TagNumber(7)
   $core.bool hasAutodownload() => $_has(6);
   @$pb.TagNumber(7)
-  void clearAutodownload() => clearField(7);
+  void clearAutodownload() => $_clearField(7);
 
   @$pb.TagNumber(8)
   $core.bool get autoarchive => $_getBF(7);
@@ -164,7 +166,7 @@ class Feed extends $pb.GeneratedMessage {
   @$pb.TagNumber(8)
   $core.bool hasAutoarchive() => $_has(7);
   @$pb.TagNumber(8)
-  void clearAutoarchive() => clearField(8);
+  void clearAutoarchive() => $_clearField(8);
 
   @$pb.TagNumber(9)
   $core.bool get contributing => $_getBF(8);
@@ -173,7 +175,7 @@ class Feed extends $pb.GeneratedMessage {
   @$pb.TagNumber(9)
   $core.bool hasContributing() => $_has(8);
   @$pb.TagNumber(9)
-  void clearContributing() => clearField(9);
+  void clearContributing() => $_clearField(9);
 }
 
 class FeedSearchRequest extends $pb.GeneratedMessage {
@@ -233,7 +235,7 @@ class FeedSearchRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool hasQuery() => $_has(0);
   @$pb.TagNumber(1)
-  void clearQuery() => clearField(1);
+  void clearQuery() => $_clearField(1);
 
   @$pb.TagNumber(900)
   $fixnum.Int64 get offset => $_getI64(1);
@@ -242,7 +244,7 @@ class FeedSearchRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(900)
   $core.bool hasOffset() => $_has(1);
   @$pb.TagNumber(900)
-  void clearOffset() => clearField(900);
+  void clearOffset() => $_clearField(900);
 
   @$pb.TagNumber(901)
   $fixnum.Int64 get limit => $_getI64(2);
@@ -251,7 +253,7 @@ class FeedSearchRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(901)
   $core.bool hasLimit() => $_has(2);
   @$pb.TagNumber(901)
-  void clearLimit() => clearField(901);
+  void clearLimit() => $_clearField(901);
 }
 
 class FeedSearchResponse extends $pb.GeneratedMessage {
@@ -302,16 +304,16 @@ class FeedSearchResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   FeedSearchRequest get next => $_getN(0);
   @$pb.TagNumber(1)
-  set next(FeedSearchRequest v) { setField(1, v); }
+  set next(FeedSearchRequest v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasNext() => $_has(0);
   @$pb.TagNumber(1)
-  void clearNext() => clearField(1);
+  void clearNext() => $_clearField(1);
   @$pb.TagNumber(1)
   FeedSearchRequest ensureNext() => $_ensure(0);
 
   @$pb.TagNumber(2)
-  $core.List<Feed> get items => $_getList(1);
+  $pb.PbList<Feed> get items => $_getList(1);
 }
 
 class FeedCreateRequest extends $pb.GeneratedMessage {
@@ -357,11 +359,11 @@ class FeedCreateRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Feed get feed => $_getN(0);
   @$pb.TagNumber(1)
-  set feed(Feed v) { setField(1, v); }
+  set feed(Feed v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasFeed() => $_has(0);
   @$pb.TagNumber(1)
-  void clearFeed() => clearField(1);
+  void clearFeed() => $_clearField(1);
   @$pb.TagNumber(1)
   Feed ensureFeed() => $_ensure(0);
 }
@@ -409,11 +411,11 @@ class FeedCreateResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Feed get feed => $_getN(0);
   @$pb.TagNumber(1)
-  set feed(Feed v) { setField(1, v); }
+  set feed(Feed v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasFeed() => $_has(0);
   @$pb.TagNumber(1)
-  void clearFeed() => clearField(1);
+  void clearFeed() => $_clearField(1);
   @$pb.TagNumber(1)
   Feed ensureFeed() => $_ensure(0);
 }
@@ -461,11 +463,11 @@ class FeedUpdateRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Feed get feed => $_getN(0);
   @$pb.TagNumber(1)
-  set feed(Feed v) { setField(1, v); }
+  set feed(Feed v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasFeed() => $_has(0);
   @$pb.TagNumber(1)
-  void clearFeed() => clearField(1);
+  void clearFeed() => $_clearField(1);
   @$pb.TagNumber(1)
   Feed ensureFeed() => $_ensure(0);
 }
@@ -513,11 +515,11 @@ class FeedUpdateResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Feed get feed => $_getN(0);
   @$pb.TagNumber(1)
-  set feed(Feed v) { setField(1, v); }
+  set feed(Feed v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasFeed() => $_has(0);
   @$pb.TagNumber(1)
-  void clearFeed() => clearField(1);
+  void clearFeed() => $_clearField(1);
   @$pb.TagNumber(1)
   Feed ensureFeed() => $_ensure(0);
 }
@@ -597,11 +599,11 @@ class FeedDeleteResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Feed get feed => $_getN(0);
   @$pb.TagNumber(1)
-  set feed(Feed v) { setField(1, v); }
+  set feed(Feed v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasFeed() => $_has(0);
   @$pb.TagNumber(1)
-  void clearFeed() => clearField(1);
+  void clearFeed() => $_clearField(1);
   @$pb.TagNumber(1)
   Feed ensureFeed() => $_ensure(0);
 }

@@ -2,7 +2,7 @@
 //  Generated code. Do not modify.
 //  source: meta.authz.proto
 //
-// @dart = 2.12
+// @dart = 3.3
 
 // ignore_for_file: annotate_overrides, camel_case_types, comment_references
 // ignore_for_file: constant_identifier_names, library_prefixes
@@ -13,6 +13,8 @@ import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
+
+export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
 
 class Bearer extends $pb.GeneratedMessage {
   factory Bearer({
@@ -92,7 +94,7 @@ class Bearer extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool hasId() => $_has(0);
   @$pb.TagNumber(1)
-  void clearId() => clearField(1);
+  void clearId() => $_clearField(1);
 
   @$pb.TagNumber(2)
   $core.String get issuer => $_getSZ(1);
@@ -101,7 +103,7 @@ class Bearer extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.bool hasIssuer() => $_has(1);
   @$pb.TagNumber(2)
-  void clearIssuer() => clearField(2);
+  void clearIssuer() => $_clearField(2);
 
   @$pb.TagNumber(3)
   $core.String get profileId => $_getSZ(2);
@@ -110,7 +112,7 @@ class Bearer extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.bool hasProfileId() => $_has(2);
   @$pb.TagNumber(3)
-  void clearProfileId() => clearField(3);
+  void clearProfileId() => $_clearField(3);
 
   @$pb.TagNumber(4)
   $core.String get sessionId => $_getSZ(3);
@@ -119,7 +121,7 @@ class Bearer extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $core.bool hasSessionId() => $_has(3);
   @$pb.TagNumber(4)
-  void clearSessionId() => clearField(4);
+  void clearSessionId() => $_clearField(4);
 
   @$pb.TagNumber(5)
   $fixnum.Int64 get issued => $_getI64(4);
@@ -128,7 +130,7 @@ class Bearer extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   $core.bool hasIssued() => $_has(4);
   @$pb.TagNumber(5)
-  void clearIssued() => clearField(5);
+  void clearIssued() => $_clearField(5);
 
   @$pb.TagNumber(6)
   $fixnum.Int64 get expires => $_getI64(5);
@@ -137,7 +139,7 @@ class Bearer extends $pb.GeneratedMessage {
   @$pb.TagNumber(6)
   $core.bool hasExpires() => $_has(5);
   @$pb.TagNumber(6)
-  void clearExpires() => clearField(6);
+  void clearExpires() => $_clearField(6);
 
   @$pb.TagNumber(7)
   $fixnum.Int64 get notBefore => $_getI64(6);
@@ -146,7 +148,7 @@ class Bearer extends $pb.GeneratedMessage {
   @$pb.TagNumber(7)
   $core.bool hasNotBefore() => $_has(6);
   @$pb.TagNumber(7)
-  void clearNotBefore() => clearField(7);
+  void clearNotBefore() => $_clearField(7);
 }
 
 class Token extends $pb.GeneratedMessage {
@@ -232,7 +234,7 @@ class Token extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool hasId() => $_has(0);
   @$pb.TagNumber(1)
-  void clearId() => clearField(1);
+  void clearId() => $_clearField(1);
 
   @$pb.TagNumber(2)
   $core.String get issuer => $_getSZ(1);
@@ -241,7 +243,7 @@ class Token extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.bool hasIssuer() => $_has(1);
   @$pb.TagNumber(2)
-  void clearIssuer() => clearField(2);
+  void clearIssuer() => $_clearField(2);
 
   @$pb.TagNumber(3)
   $core.String get profileId => $_getSZ(2);
@@ -250,7 +252,7 @@ class Token extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.bool hasProfileId() => $_has(2);
   @$pb.TagNumber(3)
-  void clearProfileId() => clearField(3);
+  void clearProfileId() => $_clearField(3);
 
   @$pb.TagNumber(4)
   $core.String get sessionId => $_getSZ(3);
@@ -259,7 +261,7 @@ class Token extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $core.bool hasSessionId() => $_has(3);
   @$pb.TagNumber(4)
-  void clearSessionId() => clearField(4);
+  void clearSessionId() => $_clearField(4);
 
   @$pb.TagNumber(5)
   $fixnum.Int64 get issued => $_getI64(4);
@@ -268,7 +270,7 @@ class Token extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   $core.bool hasIssued() => $_has(4);
   @$pb.TagNumber(5)
-  void clearIssued() => clearField(5);
+  void clearIssued() => $_clearField(5);
 
   @$pb.TagNumber(6)
   $fixnum.Int64 get expires => $_getI64(5);
@@ -277,7 +279,7 @@ class Token extends $pb.GeneratedMessage {
   @$pb.TagNumber(6)
   $core.bool hasExpires() => $_has(5);
   @$pb.TagNumber(6)
-  void clearExpires() => clearField(6);
+  void clearExpires() => $_clearField(6);
 
   @$pb.TagNumber(7)
   $fixnum.Int64 get notBefore => $_getI64(6);
@@ -286,7 +288,7 @@ class Token extends $pb.GeneratedMessage {
   @$pb.TagNumber(7)
   $core.bool hasNotBefore() => $_has(6);
   @$pb.TagNumber(7)
-  void clearNotBefore() => clearField(7);
+  void clearNotBefore() => $_clearField(7);
 
   @$pb.TagNumber(1000)
   $core.bool get usermanagement => $_getBF(7);
@@ -295,7 +297,7 @@ class Token extends $pb.GeneratedMessage {
   @$pb.TagNumber(1000)
   $core.bool hasUsermanagement() => $_has(7);
   @$pb.TagNumber(1000)
-  void clearUsermanagement() => clearField(1000);
+  void clearUsermanagement() => $_clearField(1000);
 }
 
 class AuthzRequest extends $pb.GeneratedMessage {
@@ -382,16 +384,16 @@ class AuthzResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool hasBearer() => $_has(0);
   @$pb.TagNumber(1)
-  void clearBearer() => clearField(1);
+  void clearBearer() => $_clearField(1);
 
   @$pb.TagNumber(2)
   Token get token => $_getN(1);
   @$pb.TagNumber(2)
-  set token(Token v) { setField(2, v); }
+  set token(Token v) { $_setField(2, v); }
   @$pb.TagNumber(2)
   $core.bool hasToken() => $_has(1);
   @$pb.TagNumber(2)
-  void clearToken() => clearField(2);
+  void clearToken() => $_clearField(2);
   @$pb.TagNumber(2)
   Token ensureToken() => $_ensure(1);
 }
@@ -439,11 +441,11 @@ class AuthzGrantRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Token get token => $_getN(0);
   @$pb.TagNumber(1)
-  set token(Token v) { setField(1, v); }
+  set token(Token v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasToken() => $_has(0);
   @$pb.TagNumber(1)
-  void clearToken() => clearField(1);
+  void clearToken() => $_clearField(1);
   @$pb.TagNumber(1)
   Token ensureToken() => $_ensure(0);
 }
@@ -491,11 +493,11 @@ class AuthzGrantResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Token get token => $_getN(0);
   @$pb.TagNumber(1)
-  set token(Token v) { setField(1, v); }
+  set token(Token v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasToken() => $_has(0);
   @$pb.TagNumber(1)
-  void clearToken() => clearField(1);
+  void clearToken() => $_clearField(1);
   @$pb.TagNumber(1)
   Token ensureToken() => $_ensure(0);
 }
@@ -543,11 +545,11 @@ class AuthzRevokeRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Token get token => $_getN(0);
   @$pb.TagNumber(1)
-  set token(Token v) { setField(1, v); }
+  set token(Token v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasToken() => $_has(0);
   @$pb.TagNumber(1)
-  void clearToken() => clearField(1);
+  void clearToken() => $_clearField(1);
   @$pb.TagNumber(1)
   Token ensureToken() => $_ensure(0);
 }
@@ -595,11 +597,11 @@ class AuthzRevokeResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Token get token => $_getN(0);
   @$pb.TagNumber(1)
-  set token(Token v) { setField(1, v); }
+  set token(Token v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasToken() => $_has(0);
   @$pb.TagNumber(1)
-  void clearToken() => clearField(1);
+  void clearToken() => $_clearField(1);
   @$pb.TagNumber(1)
   Token ensureToken() => $_ensure(0);
 }
@@ -651,7 +653,7 @@ class AuthzProfileRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool hasProfileId() => $_has(0);
   @$pb.TagNumber(1)
-  void clearProfileId() => clearField(1);
+  void clearProfileId() => $_clearField(1);
 }
 
 class AuthzProfileResponse extends $pb.GeneratedMessage {
@@ -697,11 +699,11 @@ class AuthzProfileResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Token get token => $_getN(0);
   @$pb.TagNumber(1)
-  set token(Token v) { setField(1, v); }
+  set token(Token v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasToken() => $_has(0);
   @$pb.TagNumber(1)
-  void clearToken() => clearField(1);
+  void clearToken() => $_clearField(1);
   @$pb.TagNumber(1)
   Token ensureToken() => $_ensure(0);
 }

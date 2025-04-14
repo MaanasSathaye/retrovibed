@@ -2,7 +2,7 @@
 //  Generated code. Do not modify.
 //  source: meta.profile.proto
 //
-// @dart = 2.12
+// @dart = 3.3
 
 // ignore_for_file: annotate_overrides, camel_case_types, comment_references
 // ignore_for_file: constant_identifier_names, library_prefixes
@@ -13,6 +13,8 @@ import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
+
+export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
 
 class Profile extends $pb.GeneratedMessage {
   factory Profile({
@@ -106,7 +108,7 @@ class Profile extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool hasId() => $_has(0);
   @$pb.TagNumber(1)
-  void clearId() => clearField(1);
+  void clearId() => $_clearField(1);
 
   @$pb.TagNumber(2)
   $core.String get accountId => $_getSZ(1);
@@ -115,7 +117,7 @@ class Profile extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.bool hasAccountId() => $_has(1);
   @$pb.TagNumber(2)
-  void clearAccountId() => clearField(2);
+  void clearAccountId() => $_clearField(2);
 
   @$pb.TagNumber(3)
   $core.String get sessionWatermark => $_getSZ(2);
@@ -124,7 +126,7 @@ class Profile extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.bool hasSessionWatermark() => $_has(2);
   @$pb.TagNumber(3)
-  void clearSessionWatermark() => clearField(3);
+  void clearSessionWatermark() => $_clearField(3);
 
   @$pb.TagNumber(4)
   $core.String get createdAt => $_getSZ(3);
@@ -133,7 +135,7 @@ class Profile extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $core.bool hasCreatedAt() => $_has(3);
   @$pb.TagNumber(4)
-  void clearCreatedAt() => clearField(4);
+  void clearCreatedAt() => $_clearField(4);
 
   @$pb.TagNumber(5)
   $core.String get updatedAt => $_getSZ(4);
@@ -142,7 +144,7 @@ class Profile extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   $core.bool hasUpdatedAt() => $_has(4);
   @$pb.TagNumber(5)
-  void clearUpdatedAt() => clearField(5);
+  void clearUpdatedAt() => $_clearField(5);
 
   @$pb.TagNumber(6)
   $core.String get disabledAt => $_getSZ(5);
@@ -151,7 +153,7 @@ class Profile extends $pb.GeneratedMessage {
   @$pb.TagNumber(6)
   $core.bool hasDisabledAt() => $_has(5);
   @$pb.TagNumber(6)
-  void clearDisabledAt() => clearField(6);
+  void clearDisabledAt() => $_clearField(6);
 
   @$pb.TagNumber(7)
   $core.String get disabledManuallyAt => $_getSZ(6);
@@ -160,7 +162,7 @@ class Profile extends $pb.GeneratedMessage {
   @$pb.TagNumber(7)
   $core.bool hasDisabledManuallyAt() => $_has(6);
   @$pb.TagNumber(7)
-  void clearDisabledManuallyAt() => clearField(7);
+  void clearDisabledManuallyAt() => $_clearField(7);
 
   @$pb.TagNumber(8)
   $core.String get disabledPendingApprovalAt => $_getSZ(7);
@@ -169,7 +171,7 @@ class Profile extends $pb.GeneratedMessage {
   @$pb.TagNumber(8)
   $core.bool hasDisabledPendingApprovalAt() => $_has(7);
   @$pb.TagNumber(8)
-  void clearDisabledPendingApprovalAt() => clearField(8);
+  void clearDisabledPendingApprovalAt() => $_clearField(8);
 
   @$pb.TagNumber(9)
   $core.String get display => $_getSZ(8);
@@ -178,7 +180,7 @@ class Profile extends $pb.GeneratedMessage {
   @$pb.TagNumber(9)
   $core.bool hasDisplay() => $_has(8);
   @$pb.TagNumber(9)
-  void clearDisplay() => clearField(9);
+  void clearDisplay() => $_clearField(9);
 
   @$pb.TagNumber(10)
   $core.String get email => $_getSZ(9);
@@ -187,7 +189,7 @@ class Profile extends $pb.GeneratedMessage {
   @$pb.TagNumber(10)
   $core.bool hasEmail() => $_has(9);
   @$pb.TagNumber(10)
-  void clearEmail() => clearField(10);
+  void clearEmail() => $_clearField(10);
 }
 
 class ProfileSearchRequest extends $pb.GeneratedMessage {
@@ -252,7 +254,7 @@ class ProfileSearchRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool hasQuery() => $_has(0);
   @$pb.TagNumber(1)
-  void clearQuery() => clearField(1);
+  void clearQuery() => $_clearField(1);
 
   @$pb.TagNumber(2)
   $fixnum.Int64 get offset => $_getI64(1);
@@ -261,7 +263,7 @@ class ProfileSearchRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.bool hasOffset() => $_has(1);
   @$pb.TagNumber(2)
-  void clearOffset() => clearField(2);
+  void clearOffset() => $_clearField(2);
 
   @$pb.TagNumber(3)
   $fixnum.Int64 get limit => $_getI64(2);
@@ -270,7 +272,7 @@ class ProfileSearchRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.bool hasLimit() => $_has(2);
   @$pb.TagNumber(3)
-  void clearLimit() => clearField(3);
+  void clearLimit() => $_clearField(3);
 
   @$pb.TagNumber(4)
   $core.int get status => $_getIZ(3);
@@ -279,7 +281,7 @@ class ProfileSearchRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $core.bool hasStatus() => $_has(3);
   @$pb.TagNumber(4)
-  void clearStatus() => clearField(4);
+  void clearStatus() => $_clearField(4);
 }
 
 class ProfileSearchResponse extends $pb.GeneratedMessage {
@@ -330,16 +332,16 @@ class ProfileSearchResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   ProfileSearchRequest get next => $_getN(0);
   @$pb.TagNumber(1)
-  set next(ProfileSearchRequest v) { setField(1, v); }
+  set next(ProfileSearchRequest v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasNext() => $_has(0);
   @$pb.TagNumber(1)
-  void clearNext() => clearField(1);
+  void clearNext() => $_clearField(1);
   @$pb.TagNumber(1)
   ProfileSearchRequest ensureNext() => $_ensure(0);
 
   @$pb.TagNumber(2)
-  $core.List<Profile> get items => $_getList(1);
+  $pb.PbList<Profile> get items => $_getList(1);
 }
 
 class ProfileCreateRequest extends $pb.GeneratedMessage {
@@ -385,11 +387,11 @@ class ProfileCreateRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Profile get profile => $_getN(0);
   @$pb.TagNumber(1)
-  set profile(Profile v) { setField(1, v); }
+  set profile(Profile v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasProfile() => $_has(0);
   @$pb.TagNumber(1)
-  void clearProfile() => clearField(1);
+  void clearProfile() => $_clearField(1);
   @$pb.TagNumber(1)
   Profile ensureProfile() => $_ensure(0);
 }
@@ -437,11 +439,11 @@ class ProfileCreateResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Profile get profile => $_getN(0);
   @$pb.TagNumber(1)
-  set profile(Profile v) { setField(1, v); }
+  set profile(Profile v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasProfile() => $_has(0);
   @$pb.TagNumber(1)
-  void clearProfile() => clearField(1);
+  void clearProfile() => $_clearField(1);
   @$pb.TagNumber(1)
   Profile ensureProfile() => $_ensure(0);
 }
@@ -521,11 +523,11 @@ class ProfileLookupResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Profile get profile => $_getN(0);
   @$pb.TagNumber(1)
-  set profile(Profile v) { setField(1, v); }
+  set profile(Profile v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasProfile() => $_has(0);
   @$pb.TagNumber(1)
-  void clearProfile() => clearField(1);
+  void clearProfile() => $_clearField(1);
   @$pb.TagNumber(1)
   Profile ensureProfile() => $_ensure(0);
 }
@@ -573,11 +575,11 @@ class ProfileUpdateRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Profile get profile => $_getN(0);
   @$pb.TagNumber(1)
-  set profile(Profile v) { setField(1, v); }
+  set profile(Profile v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasProfile() => $_has(0);
   @$pb.TagNumber(1)
-  void clearProfile() => clearField(1);
+  void clearProfile() => $_clearField(1);
   @$pb.TagNumber(1)
   Profile ensureProfile() => $_ensure(0);
 }
@@ -625,11 +627,11 @@ class ProfileUpdateResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Profile get profile => $_getN(0);
   @$pb.TagNumber(1)
-  set profile(Profile v) { setField(1, v); }
+  set profile(Profile v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasProfile() => $_has(0);
   @$pb.TagNumber(1)
-  void clearProfile() => clearField(1);
+  void clearProfile() => $_clearField(1);
   @$pb.TagNumber(1)
   Profile ensureProfile() => $_ensure(0);
 }
@@ -677,11 +679,11 @@ class ProfileDisableRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Profile get profile => $_getN(0);
   @$pb.TagNumber(1)
-  set profile(Profile v) { setField(1, v); }
+  set profile(Profile v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasProfile() => $_has(0);
   @$pb.TagNumber(1)
-  void clearProfile() => clearField(1);
+  void clearProfile() => $_clearField(1);
   @$pb.TagNumber(1)
   Profile ensureProfile() => $_ensure(0);
 }
@@ -729,11 +731,11 @@ class ProfileDisableResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Profile get profile => $_getN(0);
   @$pb.TagNumber(1)
-  set profile(Profile v) { setField(1, v); }
+  set profile(Profile v) { $_setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasProfile() => $_has(0);
   @$pb.TagNumber(1)
-  void clearProfile() => clearField(1);
+  void clearProfile() => $_clearField(1);
   @$pb.TagNumber(1)
   Profile ensureProfile() => $_ensure(0);
 }
