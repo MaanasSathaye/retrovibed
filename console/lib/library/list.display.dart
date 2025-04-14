@@ -1,6 +1,6 @@
+import 'package:console/design.kit/file.drop.well.dart';
 import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:flutter/material.dart';
-import 'package:desktop_drop/desktop_drop.dart';
 import 'package:console/designkit.dart' as ds;
 import 'package:console/media.dart' as media;
 import 'package:console/mimex.dart' as mimex;
@@ -65,7 +65,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
 
   @override
   Widget build(BuildContext context) {
-    final upload = (DropDoneDetails v) {
+    final upload = (FilesEvent v) {
       setState(() {
         _loading = true;
       });
@@ -131,10 +131,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
           empty: fixnum.Int64(_res.items.length) < _res.next.limit,
           trailing: ds.FileDropWell(
             upload,
-            child: IconButton(
-              onPressed: () {},
-              icon: Icon(Icons.file_upload_outlined),
-            ),
+            child: IgnorePointer(child: Icon(Icons.file_upload_outlined)),
           ),
           autofocus: true,
         ),

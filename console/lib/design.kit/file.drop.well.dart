@@ -1,12 +1,22 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:console/designkit.dart' as ds;
 import 'package:console/mimex.dart' as mimex;
 import 'package:desktop_drop/desktop_drop.dart';
+import 'package:file_selector/file_selector.dart';
+
+class FilesEvent {
+  final List<DropItemFile> files;
+  const FilesEvent({required this.files});
+}
 
 class FileDropWell extends StatefulWidget {
   final Widget child;
   final Function()? onTap;
-  final Future<Widget?> Function(DropDoneDetails i) onDropped;
+  final Future<Widget?> Function(FilesEvent i) onDropped;
+  final List<String> mimetypes;
+  final List<String> extensions;
+
   const FileDropWell(
     this.onDropped, {
     super.key,
@@ -20,6 +30,8 @@ class FileDropWell extends StatefulWidget {
         ],
       ),
     ),
+    this.mimetypes = const [],
+    this.extensions = const [],
     this.onTap,
   });
 
@@ -34,12 +46,15 @@ class _FileDropWell extends State<FileDropWell> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final loading = (bool b) {
+      setState(() {
+        _loading = b;
+      });
+    };
 
     return DropTarget(
       onDragDone: (evt) {
-        setState(() {
-          _loading = true;
-        });
+        loading(true);
         Future.wait(
           evt.files.map((c) {
             return c
@@ -56,15 +71,9 @@ class _FileDropWell extends State<FileDropWell> {
                 });
           }),
         ).then((files) {
-          final resolved = DropDoneDetails(
-            files: files,
-            localPosition: evt.localPosition,
-            globalPosition: evt.globalPosition,
-          );
+          final resolved = FilesEvent(files: files);
           widget.onDropped(resolved).whenComplete(() {
-            setState(() {
-              _loading = false;
-            });
+            loading(false);
           });
         });
       },
@@ -80,12 +89,48 @@ class _FileDropWell extends State<FileDropWell> {
       },
       child: Container(
         color: _dragging ? theme.highlightColor : null,
-        child: ds.Loading(
-          loading: _loading,
+        child: TextButton(
+          onPressed: () {
+            final XTypeGroup filter = XTypeGroup(
+              extensions: widget.extensions,
+              mimeTypes: widget.mimetypes,
+            );
+
+            loading(true);
+            openFiles(acceptedTypeGroups: [filter])
+                .then((files) {
+                  final eventfiles =
+                      files.map((f) {
+                        return File(f.path)
+                            .openSync()
+                            .read(mimex.defaultMagicNumbersMaxLength)
+                            .then((v) => v.toList())
+                            .then((bits) {
+                              return new DropItemFile(
+                                f.path,
+                                name: f.name,
+                                mimeType:
+                                    mimex
+                                        .fromFile(f.name, magicbits: bits)
+                                        .toString(),
+                              );
+                            });
+                      }).toList();
+                  Future.wait(eventfiles).then((files) {
+                    final resolved = FilesEvent(files: files);
+                    widget.onDropped(resolved).whenComplete(() {
+                      loading(false);
+                    });
+                  });
+                })
+                .whenComplete(() {
+                  loading(false);
+                });
+          },
           child: Row(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [widget.child],
+            children: [ds.Loading(loading: _loading, child: widget.child)],
           ),
         ),
       ),

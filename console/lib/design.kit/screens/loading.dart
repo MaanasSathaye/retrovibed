@@ -12,7 +12,6 @@ class Loading extends StatelessWidget {
     this.child,
     this.overlay = const Center(
       child: CircularProgressIndicator(
-        padding: EdgeInsets.all(32.0),
         backgroundColor: Color.fromARGB(0, 0, 0, 0),
         semanticsLabel: 'Linear progress indicator',
       ),
