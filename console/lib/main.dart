@@ -15,7 +15,6 @@ void main() {
   MediaKit.ensureInitialized();
 
   retro.daemon();
-  // print("public key ${retro.public_key()}");
 
   runApp(const MyApp());
 }

@@ -2,76 +2,9 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:multicast_dns/multicast_dns.dart';
 import 'package:console/designkit.dart' as ds;
-import 'package:console/design.kit/forms.dart' as forms;
 import 'package:console/httpx.dart' as httpx;
 import './api.dart' as api;
-
-class ManualConfiguration extends StatefulWidget {
-  final void Function() retry;
-  final void Function(api.Daemon) connect;
-
-  ManualConfiguration({super.key, required this.retry, required this.connect});
-
-  @override
-  State<ManualConfiguration> createState() => _ManualConfigurationView();
-}
-
-class _ManualConfigurationView extends State<ManualConfiguration> {
-  String _hostname = '';
-
-  @override
-  Widget build(BuildContext context) {
-    return forms.Container(
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SelectableText(
-              textAlign: TextAlign.center,
-              "unable to locate retrovibed on your local network, ensure a retrovibed is running or provide the details to a remote instance.",
-            ),
-            forms.Field(
-              label: SelectableText("hostname"),
-              input: TextFormField(
-                autofocus: true,
-                decoration: new InputDecoration(
-                  hintText: "example.com:9998",
-                  helperText: "hostname and port for the retrovibed instance",
-                ),
-                keyboardType: TextInputType.number,
-                onChanged: (v) {
-                  setState(() {
-                    _hostname = v;
-                  });
-                },
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextButton(child: Text("retry"), onPressed: widget.retry),
-                TextButton(
-                  child: Text("connect"),
-                  onPressed: () {
-                    api.daemons
-                        .create(
-                          api.DaemonCreateRequest(
-                            daemon: api.Daemon(hostname: _hostname),
-                          ),
-                        )
-                        .then((d) {
-                          return widget.connect(d.daemon);
-                        });
-                  },
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+import './daemon.manual.dart';
 
 class MDNSDiscovery extends StatefulWidget {
   final void Function(api.Daemon) daemon;
@@ -156,20 +89,28 @@ class _MDNSDiscovery extends State<MDNSDiscovery> {
       loading: _loading,
       child: ConstrainedBox(
         constraints: BoxConstraints(maxHeight: 256, maxWidth: 512),
-        child: ManualConfiguration(
-          retry: () {
-            setState(() {
-              _loading = true;
-              _cause = null;
-            });
-            this.discover();
-          },
-          connect: (daemon) {
-            setState(() {
-              _cause = null;
-            });
-            widget.daemon(daemon);
-          },
+        child: Column(
+          children: [
+            SelectableText(
+              textAlign: TextAlign.center,
+              "unable to locate retrovibed on your local network, ensure a retrovibed is running or provide the details to a remote instance.",
+            ),
+            ManualConfiguration(
+              retry: () {
+                setState(() {
+                  _loading = true;
+                  _cause = null;
+                });
+                this.discover();
+              },
+              connect: (daemon) {
+                setState(() {
+                  _cause = null;
+                });
+                widget.daemon(daemon);
+              },
+            ),
+          ],
         ),
       ),
     );

@@ -31,6 +31,10 @@ class EndpointAuto extends StatefulWidget {
     this.onTap,
   });
 
+  static _DaemonAuto? of(BuildContext context) {
+    return context.findAncestorStateOfType<_DaemonAuto>();
+  }
+
   @override
   State<StatefulWidget> createState() => _DaemonAuto();
 }
@@ -40,24 +44,28 @@ class _DaemonAuto extends State<EndpointAuto> {
   ds.Error? _cause = null;
   api.Daemon? _res;
 
-  void refresh() {
+  void setdaemon(api.Daemon? d) {
+    if (d == null) return;
+    refresh(Future.value(d));
+  }
+
+  void refresh(Future<api.Daemon> pending) {
     setState(() {
       _loading = true;
     });
 
-    widget
-        .latest()
+    pending
         .then((v) {
-          return api.healthz(host: v.daemon.hostname).then((value) => v);
+          return api.healthz(host: v.hostname).then((value) => v);
         })
         .then((v) {
           setState(() {
-            httpx.set(v.daemon.hostname);
+            httpx.set(v.hostname);
             HttpOverrides.global = DaemonHttpOverrides(
-              ips: [v.daemon.hostname.split(":").first],
+              ips: [v.hostname.split(":").first],
             );
 
-            _res = v.daemon;
+            _res = v;
             _loading = false;
           });
         })
@@ -83,7 +91,7 @@ class _DaemonAuto extends State<EndpointAuto> {
   void initState() {
     super.initState();
     HttpOverrides.global = DaemonHttpOverrides();
-    refresh();
+    refresh(this.widget.latest().then((r) => r.daemon));
   }
 
   @override

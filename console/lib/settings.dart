@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:console/designkit.dart' as ds;
 import 'package:console/rss.dart' as rss;
 import 'package:console/torrents.dart' as torrents;
+import 'package:console/meta.dart' as meta;
 
 class Display extends StatelessWidget {
   const Display({super.key});
@@ -17,6 +18,17 @@ class Display extends StatelessWidget {
           content: Container(
             padding: defaults.padding,
             child: rss.ListSearchable(),
+          ),
+        ),
+        ds.Accordion(
+          description: Text("Servers"),
+          content: Container(
+            padding: defaults.padding,
+            child: meta.DaemonList(
+              onTap: (d) {
+                meta.EndpointAuto.of(context)?.setdaemon(d);
+              },
+            ),
           ),
         ),
         ds.Accordion(
