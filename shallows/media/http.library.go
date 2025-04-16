@@ -160,12 +160,12 @@ func (t *HTTPLibrary) upload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	lmd := library.Metadata{
-		ID:          md5x.FormatUUID(mhash),
-		Description: fh.Filename,
-		Bytes:       *copied.Result,
-		Mimetype:    fh.Header.Get("Content-Type"),
-	}
+	lmd := library.NewMetadata(
+		md5x.FormatUUID(mhash),
+		library.MetadataOptionBytes(*copied.Result),
+		library.MetadataOptionDescription(fh.Filename),
+		library.MetadataOptionMimetype(fh.Header.Get("Content-Type")),
+	)
 
 	if err = library.MetadataInsertWithDefaults(r.Context(), t.q, lmd).Scan(&lmd); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to record library metadata record"))
