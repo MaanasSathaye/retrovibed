@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart' as mediakit;
 import 'package:console/mimex.dart' as mimex;
+import 'package:console/httpx.dart' as httpx;
 import './api.dart' as api;
 import './media.pb.dart';
 import './player.dart';
@@ -12,6 +13,7 @@ mediakit.Media PlayableMedia(Media current) {
       "id": current.id,
       "title": current.description,
     }),
+    httpHeaders: <String, String>{"Authorization": httpx.auto_bearer()},
   );
 }
 
