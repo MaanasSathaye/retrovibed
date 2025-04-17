@@ -3,7 +3,7 @@
 .eg.runtime
 .flatpak-builder
 flatpak.build.*
-./torrent
+.torrent
 *.log
 notes*.md
 .torrent.bolt.db
