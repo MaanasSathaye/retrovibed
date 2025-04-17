@@ -6,6 +6,7 @@ import (
 	"embed"
 	"io/fs"
 	"strings"
+	"sync"
 
 	_ "github.com/marcboeker/go-duckdb/v2"
 
@@ -38,7 +39,12 @@ func Database(ctx context.Context) (db *sql.DB, err error) {
 	return db, InitializeDatabase(ctx, db)
 }
 
+var m sync.Mutex
+
 func InitializeDatabase(ctx context.Context, db *sql.DB) (err error) {
+	m.Lock()
+	defer m.Unlock()
+
 	mprov, err := goose.NewProvider("", db, errorsx.Must(fs.Sub(embedsqlite, ".migrations")), goose.WithStore(goosex.DuckdbStore{}))
 	if err != nil {
 		return errorsx.Wrap(err, "unable to build migration provider")
