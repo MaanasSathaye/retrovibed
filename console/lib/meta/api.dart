@@ -65,6 +65,21 @@ abstract class daemons {
         });
   }
 
+  static Future<DaemonDisableResponse> delete(String id) async {
+    return http.Client()
+        .delete(
+          Uri.https(httpx.host(), "/meta/d/${id}"),
+          headers: {"Authorization": httpx.auto_bearer()},
+        )
+        .then(httpx.auto_error)
+        .then((v) {
+          return Future.value(
+            DaemonDisableResponse.create()
+              ..mergeFromProto3Json(jsonDecode(v.body)),
+          );
+        });
+  }
+
   static Future<DaemonLookupResponse> latest() async {
     return http.Client()
         .get(

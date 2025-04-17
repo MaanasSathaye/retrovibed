@@ -86,6 +86,28 @@ final $typed_data.Uint8List daemonCreateResponseDescriptor = $convert.base64Deco
     'ChREYWVtb25DcmVhdGVSZXNwb25zZRIkCgZkYWVtb24YASABKAsyDC5tZXRhLkRhZW1vblIGZG'
     'FlbW9u');
 
+@$core.Deprecated('Use daemonDeleteRequestDescriptor instead')
+const DaemonDeleteRequest$json = {
+  '1': 'DaemonDeleteRequest',
+};
+
+/// Descriptor for `DaemonDeleteRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List daemonDeleteRequestDescriptor = $convert.base64Decode(
+    'ChNEYWVtb25EZWxldGVSZXF1ZXN0');
+
+@$core.Deprecated('Use daemonDeleteResponseDescriptor instead')
+const DaemonDeleteResponse$json = {
+  '1': 'DaemonDeleteResponse',
+  '2': [
+    {'1': 'daemon', '3': 1, '4': 1, '5': 11, '6': '.meta.Daemon', '10': 'daemon'},
+  ],
+};
+
+/// Descriptor for `DaemonDeleteResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List daemonDeleteResponseDescriptor = $convert.base64Decode(
+    'ChREYWVtb25EZWxldGVSZXNwb25zZRIkCgZkYWVtb24YASABKAsyDC5tZXRhLkRhZW1vblIGZG'
+    'FlbW9u');
+
 @$core.Deprecated('Use daemonLookupRequestDescriptor instead')
 const DaemonLookupRequest$json = {
   '1': 'DaemonLookupRequest',

@@ -21,7 +21,7 @@ class Display extends StatelessWidget {
           ),
         ),
         ds.Accordion(
-          description: Text("Servers"),
+          description: Text("Devices"),
           content: Container(
             padding: defaults.padding,
             child: meta.DaemonList(

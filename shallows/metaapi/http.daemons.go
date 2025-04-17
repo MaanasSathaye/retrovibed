@@ -67,6 +67,12 @@ func (t *HTTPDaemons) Bind(r *mux.Router) {
 		httpauth.AuthenticateWithToken(t.jwtsecret),
 		httpx.Timeout2s(),
 	).ThenFunc(t.latest))
+
+	r.Path("/{id}").Methods(http.MethodDelete).Handler(alice.New(
+		httpx.ContextBufferPool512(),
+		httpauth.AuthenticateWithToken(t.jwtsecret),
+		httpx.Timeout2s(),
+	).ThenFunc(t.delete))
 }
 
 func (t *HTTPDaemons) search(w http.ResponseWriter, r *http.Request) {
@@ -168,6 +174,27 @@ func (t *HTTPDaemons) latest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &DaemonLookupResponse{
+		Daemon: errorsx.Must(NewDaemonFromMetaDaemon(v)),
+	}); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to write response"))
+		return
+	}
+}
+
+func (t *HTTPDaemons) delete(w http.ResponseWriter, r *http.Request) {
+	var (
+		err error
+		v   meta.Daemon
+		id  = mux.Vars(r)["id"]
+	)
+
+	if err = meta.DaemonDeleteByID(r.Context(), t.q, id).Scan(&v); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to delete record"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &DaemonDeleteResponse{
 		Daemon: errorsx.Must(NewDaemonFromMetaDaemon(v)),
 	}); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))

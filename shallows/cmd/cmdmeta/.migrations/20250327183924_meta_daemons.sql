@@ -4,7 +4,7 @@ CREATE TABLE meta_daemons (
     id UUID PRIMARY KEY NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    hostname UNIQUE TEXT NOT NULL,
+    hostname TEXT NOT NULL UNIQUE,
     description TEXT NOT NULL DEFAULT ''
 );
 -- +goose StatementEnd

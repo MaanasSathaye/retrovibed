@@ -2,6 +2,7 @@ package metaapi_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"testing"
 	"time"
@@ -15,6 +16,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/httpx"
 	"github.com/retrovibed/retrovibed/internal/jwtx"
 	"github.com/retrovibed/retrovibed/internal/sqltestx"
+	"github.com/retrovibed/retrovibed/internal/sqlx"
 	"github.com/retrovibed/retrovibed/internal/testx"
 	"github.com/retrovibed/retrovibed/internal/timex"
 	"github.com/retrovibed/retrovibed/meta"
@@ -146,6 +148,48 @@ func TestHTTPDaemonCreateUpdate(t *testing.T) {
 	require.Equal(t, v.ID, result.Daemon.Id)
 	require.Equal(t, v.Hostname, result.Daemon.Hostname)
 	require.NotEqual(t, v.UpdatedAt, testx.Must(time.Parse(time.RFC3339Nano, result.Daemon.UpdatedAt))(t))
+}
+
+func TestHTTPDaemonCreateDelete(t *testing.T) {
+	var (
+		v      meta.Daemon
+		result metaapi.DaemonCreateResponse
+		claims jwt.RegisteredClaims
+	)
+
+	ctx, done := testx.Context(t)
+	defer done()
+
+	q := sqltestx.Metadatabase(t)
+	defer q.Close()
+
+	require.NoError(t, testx.Fake(&v, meta.DaemonOptionTestDefaults, meta.DaemonOptionMaybeID, timex.UTCEncodeOption))
+	require.NoError(t, meta.DaemonInsertWithDefaults(ctx, q, v).Scan(&v))
+
+	routes := mux.NewRouter()
+
+	metaapi.NewHTTPDaemons(
+		q,
+		metaapi.HTTPDaemonsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+	).Bind(routes.PathPrefix("/").Subrouter())
+
+	b := testx.Must(json.Marshal(&metaapi.DaemonCreateRequest{
+		Daemon: testx.Must(metaapi.NewDaemonFromMetaDaemon(v))(t),
+	}))(t)
+
+	claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+
+	resp, req, err := httptestx.BuildRequest(http.MethodDelete, fmt.Sprintf("/%s", v.ID), b, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
+	require.NoError(t, err)
+
+	routes.ServeHTTP(resp, req)
+
+	require.NoError(t, httpx.ErrorCode(resp.Result()))
+	require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+
+	require.Equal(t, v.ID, result.Daemon.Id)
+	require.Equal(t, v.Hostname, result.Daemon.Hostname)
+	require.Equal(t, 0, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM meta_daemons"))(t))
 }
 
 func TestHTTPDaemonLatest(t *testing.T) {

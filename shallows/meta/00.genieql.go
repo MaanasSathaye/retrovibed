@@ -65,6 +65,13 @@ func DaemonFindByLatestUpdated(
 	gql = gql.Query(`SELECT ` + DaemonScannerStaticColumns + ` FROM meta_daemons ORDER BY updated_at DESC LIMIT 1`)
 }
 
+func DaemonDeleteByID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewDaemonScannerStaticRow,
+) {
+	gql = gql.Query(`DELETE FROM meta_daemons WHERE "id" = {id} RETURNING ` + DaemonScannerStaticColumns)
+}
+
 func ConsumedToken(gql genieql.Structure) {
 	gql.From(
 		gql.Table("meta_consumed_tokens"),

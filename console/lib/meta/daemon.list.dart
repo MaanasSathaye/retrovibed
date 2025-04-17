@@ -7,10 +7,16 @@ import './daemon.manual.dart';
 
 class DaemonList extends StatefulWidget {
   final void Function(api.Daemon v)? onTap;
+  final void Function(api.Daemon d)? onRemove;
   final Future<api.DaemonSearchResponse> Function(api.DaemonSearchRequest)
   search;
 
-  const DaemonList({super.key, this.search = api.daemons.search, this.onTap});
+  const DaemonList({
+    super.key,
+    this.search = api.daemons.search,
+    this.onTap,
+    this.onRemove,
+  });
 
   @override
   State<StatefulWidget> createState() => _DaemonList();
@@ -127,6 +133,13 @@ class _DaemonList extends State<DaemonList> {
           hostname: current,
           current: v,
           onTap: widget.onTap == null ? null : () => widget.onTap!(v),
+          onRemove: (api.Daemon d) {
+            return api.daemons.delete(d.id).then((v) {
+              _res.next.offset = _res.next.offset - 1;
+              refresh(_res.next);
+              return v.daemon;
+            });
+          },
         ),
       ),
     );
@@ -137,10 +150,13 @@ class _RowDisplay extends StatelessWidget {
   final String hostname;
   final api.Daemon current;
   final void Function()? onTap;
+  final Future<api.Daemon> Function(api.Daemon d)? onRemove;
+
   const _RowDisplay({
     required this.current,
     required this.hostname,
     this.onTap = ds.defaulttap,
+    this.onRemove,
   });
 
   @override
@@ -159,6 +175,13 @@ class _RowDisplay extends StatelessWidget {
             Expanded(
               child: Text(current.description, overflow: TextOverflow.ellipsis),
             ),
+            if (onRemove != null)
+              IconButton(
+                onPressed: () {
+                  onRemove!(current);
+                },
+                icon: Icon(Icons.remove),
+              ),
           ],
         ),
       ),

@@ -364,6 +364,90 @@ class DaemonCreateResponse extends $pb.GeneratedMessage {
   Daemon ensureDaemon() => $_ensure(0);
 }
 
+class DaemonDeleteRequest extends $pb.GeneratedMessage {
+  factory DaemonDeleteRequest() => create();
+  DaemonDeleteRequest._() : super();
+  factory DaemonDeleteRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory DaemonDeleteRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DaemonDeleteRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  DaemonDeleteRequest clone() => DaemonDeleteRequest()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  DaemonDeleteRequest copyWith(void Function(DaemonDeleteRequest) updates) => super.copyWith((message) => updates(message as DaemonDeleteRequest)) as DaemonDeleteRequest;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static DaemonDeleteRequest create() => DaemonDeleteRequest._();
+  DaemonDeleteRequest createEmptyInstance() => create();
+  static $pb.PbList<DaemonDeleteRequest> createRepeated() => $pb.PbList<DaemonDeleteRequest>();
+  @$core.pragma('dart2js:noInline')
+  static DaemonDeleteRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DaemonDeleteRequest>(create);
+  static DaemonDeleteRequest? _defaultInstance;
+}
+
+class DaemonDeleteResponse extends $pb.GeneratedMessage {
+  factory DaemonDeleteResponse({
+    Daemon? daemon,
+  }) {
+    final $result = create();
+    if (daemon != null) {
+      $result.daemon = daemon;
+    }
+    return $result;
+  }
+  DaemonDeleteResponse._() : super();
+  factory DaemonDeleteResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory DaemonDeleteResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DaemonDeleteResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
+    ..aOM<Daemon>(1, _omitFieldNames ? '' : 'daemon', subBuilder: Daemon.create)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  DaemonDeleteResponse clone() => DaemonDeleteResponse()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  DaemonDeleteResponse copyWith(void Function(DaemonDeleteResponse) updates) => super.copyWith((message) => updates(message as DaemonDeleteResponse)) as DaemonDeleteResponse;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static DaemonDeleteResponse create() => DaemonDeleteResponse._();
+  DaemonDeleteResponse createEmptyInstance() => create();
+  static $pb.PbList<DaemonDeleteResponse> createRepeated() => $pb.PbList<DaemonDeleteResponse>();
+  @$core.pragma('dart2js:noInline')
+  static DaemonDeleteResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DaemonDeleteResponse>(create);
+  static DaemonDeleteResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Daemon get daemon => $_getN(0);
+  @$pb.TagNumber(1)
+  set daemon(Daemon v) { $_setField(1, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasDaemon() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearDaemon() => $_clearField(1);
+  @$pb.TagNumber(1)
+  Daemon ensureDaemon() => $_ensure(0);
+}
+
 class DaemonLookupRequest extends $pb.GeneratedMessage {
   factory DaemonLookupRequest() => create();
   DaemonLookupRequest._() : super();

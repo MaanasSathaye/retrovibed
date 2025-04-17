@@ -23,6 +23,9 @@ message DaemonSearchResponse {
 message DaemonCreateRequest { Daemon daemon = 1 [ json_name = "daemon" ]; }
 message DaemonCreateResponse { Daemon daemon = 1 [ json_name = "daemon" ]; }
 
+message DaemonDeleteRequest {}
+message DaemonDeleteResponse { Daemon daemon = 1 [ json_name = "daemon" ]; }
+
 message DaemonLookupRequest {}
 message DaemonLookupResponse { Daemon daemon = 1 [ json_name = "daemon" ]; }
 
