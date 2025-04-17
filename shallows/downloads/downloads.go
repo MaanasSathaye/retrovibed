@@ -24,7 +24,7 @@ import (
 )
 
 type downloader interface {
-	Start(t torrent.Metadata) (dl torrent.Torrent, added bool, err error)
+	Start(t torrent.Metadata, options ...torrent.Tuner) (dl torrent.Torrent, added bool, err error)
 }
 
 func NewDirectoryWatcher(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, dl downloader, s storage.ClientImpl) (d Directory, err error) {
@@ -109,7 +109,7 @@ func (t Directory) download(ctx context.Context, path string) {
 		return
 	}
 
-	log.Println("wait for torrent info", meta.InfoHash)
+	log.Println("wait for torrent info", meta.ID)
 	select {
 	case <-dl.GotInfo():
 	case <-ctx.Done():
@@ -120,7 +120,7 @@ func (t Directory) download(ctx context.Context, path string) {
 	if err = tracking.MetadataInsertWithDefaults(
 		ctx,
 		t.q,
-		tracking.NewMetadata(langx.Autoptr(dl.Metadata().InfoHash),
+		tracking.NewMetadata(langx.Autoptr(dl.Metadata().ID),
 			tracking.MetadataOptionFromInfo(dl.Info()),
 			tracking.MetadataOptionTrackers(slicesx.Flatten(meta.Trackers...)...),
 		),

@@ -2,6 +2,8 @@
 .eg.cache
 .eg.runtime
 .flatpak-builder
+flatpak.build.*
+torrent
 *.log
 notes*.md
 .torrent.bolt.db

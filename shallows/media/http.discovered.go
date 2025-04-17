@@ -42,7 +42,7 @@ func HTTPDiscoveredOptionJWTSecret(j jwtx.SecretSource) HTTPDiscoveredOption {
 }
 
 type download interface {
-	Start(t torrent.Metadata) (dl torrent.Torrent, added bool, err error)
+	Start(t torrent.Metadata, options ...torrent.Tuner) (dl torrent.Torrent, added bool, err error)
 	Stop(t torrent.Metadata) (err error)
 }
 
