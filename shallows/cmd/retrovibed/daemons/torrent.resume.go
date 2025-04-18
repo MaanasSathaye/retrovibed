@@ -29,19 +29,24 @@ func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual
 	err := sqlxx.ScanEach(tracking.MetadataSearch(ctx, db, q), func(md *tracking.Metadata) error {
 		infopath := rootstore.Path("torrent", fmt.Sprintf("%s.torrent", metainfo.Hash(md.Infohash).HexString()))
 
-		metadata, err := torrent.New(metainfo.Hash(md.Infohash), torrent.OptionStorage(tstore), torrent.OptionTrackers([]string{md.Tracker}), torrentx.OptionInfoFromFile(infopath))
+		metadata, err := torrent.New(metainfo.Hash(md.Infohash), torrent.OptionStorage(tstore), torrent.OptionTrackers(md.Tracker), torrentx.OptionInfoFromFile(infopath), torrent.OptionTrackers(tracking.PublicTrackers()...))
 		if err != nil {
 			return errorsx.Wrapf(err, "unable to create metadata from %s - %s", md.ID, infopath)
 		}
 
-		t, _, err := tclient.Start(metadata)
+		t, added, err := tclient.Start(metadata)
 		if err != nil {
 			log.Println(errorsx.Wrapf(err, "unable to start download %s - %s", md.ID, infopath))
 			return nil
 		}
 
+		if !added {
+			log.Printf("torrent already running %s - %s\n", md.ID, infopath)
+			return nil
+		}
+
 		go func(infopath string, md *tracking.Metadata, dl torrent.Torrent) {
-			errorsx.Log(errorsx.Wrap(tracking.Verify(ctx, dl), "failed to verify data"))
+			// errorsx.Log(errorsx.Wrap(tracking.Verify(ctx, dl), "failed to verify data"))
 			errorsx.Log(errorsx.Wrap(tracking.Download(ctx, db, rootstore, md, dl), "resume failed"))
 			torrentx.RecordInfo(infopath, dl.Metadata())
 		}(infopath, md, t)

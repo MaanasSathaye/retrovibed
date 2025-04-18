@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/fs"
 	"iter"
+	"log"
 	"os"
 	"path/filepath"
 	"sync"
@@ -44,6 +45,10 @@ func TransferedFromPath(path string) (*Transfered, error) {
 }
 
 func ImportSymlinkFile(vfs fsx.Virtual) ImportOp {
+	if err := os.MkdirAll(vfs.Path(), 0700); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to ensure directory"))
+	}
+
 	return func(ctx context.Context, path string) (*Transfered, error) {
 		tx, err := TransferedFromPath(path)
 		if err != nil {

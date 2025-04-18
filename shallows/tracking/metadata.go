@@ -3,12 +3,14 @@ package tracking
 import (
 	"context"
 	"crypto/md5"
+	"encoding/hex"
 	"log"
 	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/anacrolix/missinggo/pubsub"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/metainfo"
@@ -20,8 +22,10 @@ import (
 	"github.com/retrovibed/retrovibed/internal/slicesx"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
 	"github.com/retrovibed/retrovibed/internal/squirrelx"
+	"github.com/retrovibed/retrovibed/internal/stringsx"
 	"github.com/retrovibed/retrovibed/internal/timex"
 	"github.com/retrovibed/retrovibed/library"
+	"golang.org/x/time/rate"
 )
 
 func MetadataOptionNoop(*Metadata) {}
@@ -110,18 +114,18 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 	// update the progress.
 	go DownloadProgress(pctx, q, md, t)
 
+	mediavfs := fsx.DirVirtual(vfs.Path("media"))
+	torrentvfs := fsx.DirVirtual(vfs.Path("torrent"))
+
 	// just copying as we receive data to block until done.
 	if downloaded, err = torrent.DownloadInto(ctx, mhash, t); err != nil {
 		return errorsx.Wrap(err, "download failed")
 	}
 
-	mediavfs := fsx.DirVirtual(vfs.Path("media"))
+	log.Println("content transfer to library initiated", t.Metadata().ID.HexString())
+	defer log.Println("content transfer to library completed", t.Metadata().ID.HexString())
 
-	log.Println("content transfer to library initiated")
-	defer log.Println("content transfer to library completed")
-	// need to get the path to the torrent media.
-
-	for tx, cause := range library.ImportFilesystem(ctx, library.ImportSymlinkFile(mediavfs), vfs.Path("torrent", t.Metadata().Metainfo().HashInfoBytes().HexString())) {
+	for tx, cause := range library.ImportFilesystem(ctx, library.ImportSymlinkFile(mediavfs), torrentvfs.Path(t.Metadata().ID.HexString())) {
 		if cause != nil {
 			log.Println(cause)
 			err = errorsx.Compact(err, cause)
@@ -130,7 +134,7 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 
 		lmd := library.NewMetadata(
 			md5x.FormatUUID(tx.MD5),
-			library.MetadataOptionDescription(filepath.Base(tx.Path)),
+			library.MetadataOptionDescription(stringsx.FirstNonBlank(md.Description, filepath.Base(tx.Path))),
 			library.MetadataOptionBytes(tx.Bytes),
 			library.MetadataOptionTorrentID(md.ID),
 			library.MetadataOptionMimetype(tx.Mimetype.String()),
@@ -156,43 +160,52 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 }
 
 func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torrent.Torrent) {
-	// const (
-	// 	statsfreq = 10 * time.Second
-	// )
+	const (
+		statsfreq = 10 * time.Second
+	)
+
+	var (
+		sub pubsub.Subscription
+	)
 
 	log.Println("monitoring download progress initiated", md.ID, md.Description, md.Tracker)
 	defer log.Println("monitoring download progress completed", md.ID, md.Description, md.Tracker)
 	// Revisit once resume is working.
-	// sub := dl.SubscribePieceStateChanges()
-	// defer sub.Close()
+	if err := dl.Tune(torrent.TuneSubscribe(&sub)); err != nil {
+		log.Println("unable to subscribe", err)
+		return
+	}
+	defer sub.Close()
 
-	// statst := time.NewTimer(statsfreq)
-	// l := rate.NewLimiter(rate.Every(time.Second), 1)
-	// for {
-	// 	select {
-	// 	case <-statst.C:
-	// 		stats := dl.Stats()
-	// 		log.Printf("%s - %s: seeding(%t), peers(%d:%d:%d) pieces(%d:%d:%d:%d)\n", md.ID, hex.EncodeToString(md.Infohash), stats.Seeding, stats.ActivePeers, stats.PendingPeers, stats.TotalPeers, stats.Missing, stats.Outstanding, stats.Unverified, stats.Completed)
-	// 	case <-sub.Values:
-	// 		if !l.Allow() {
-	// 			continue
-	// 		}
+	statst := time.NewTimer(statsfreq)
+	l := rate.NewLimiter(rate.Every(time.Second), 1)
+	for {
+		select {
+		case <-statst.C:
+			stats := dl.Stats()
+			log.Printf("%s - %s: seeding(%t), peers(%d:%d:%d) pieces(%d:%d:%d:%d)\n", md.ID, hex.EncodeToString(md.Infohash), stats.Seeding, stats.ActivePeers, stats.PendingPeers, stats.TotalPeers, stats.Missing, stats.Outstanding, stats.Unverified, stats.Completed)
 
-	// 		statst.Reset(statsfreq)
+			log.Println("DERP", spew.Sdump(stats))
+		case <-sub.Values:
+			if !l.Allow() {
+				continue
+			}
 
-	// 		current := uint64(dl.BytesCompleted())
-	// 		if md.Downloaded == current {
-	// 			continue
-	// 		}
+			statst.Reset(statsfreq)
 
-	// 		stats := dl.Stats()
-	// 		log.Printf("%s: peers(%d:%d:%d) pieces(%d:%d:%d:%d)\n", dl.Metainfo().HashInfoBytes().HexString(), stats.ActivePeers, stats.PendingPeers, stats.TotalPeers, stats.Missing, stats.Outstanding, stats.Unverified, stats.Completed)
+			current := uint64(dl.BytesCompleted())
+			if md.Downloaded == current {
+				continue
+			}
 
-	// 		if err := MetadataProgressByID(ctx, q, md.ID, uint16(stats.ActivePeers), current).Scan(md); err != nil {
-	// 			log.Println("failed to update progress", err)
-	// 		}
-	// 	case <-ctx.Done():
-	// 		return
-	// 	}
-	// }
+			stats := dl.Stats()
+			log.Printf("%s: peers(%d:%d:%d) pieces(%d:%d:%d:%d)\n", dl.Metadata().ID.HexString(), stats.ActivePeers, stats.PendingPeers, stats.TotalPeers, stats.Missing, stats.Outstanding, stats.Unverified, stats.Completed)
+
+			if err := MetadataProgressByID(ctx, q, md.ID, uint16(stats.ActivePeers), current).Scan(md); err != nil {
+				log.Println("failed to update progress", err)
+			}
+		case <-ctx.Done():
+			return
+		}
+	}
 }

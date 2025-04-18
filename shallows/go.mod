@@ -7,6 +7,7 @@ toolchain go1.24.1
 require (
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/alecthomas/kong v1.9.0
+	github.com/anacrolix/missinggo v1.3.0
 	github.com/anacrolix/utp v0.2.0
 	github.com/benbjohnson/immutable v0.4.3
 	github.com/charmbracelet/huh v0.6.0
@@ -20,7 +21,7 @@ require (
 	github.com/gorilla/schema v1.4.1
 	github.com/hashicorp/mdns v1.0.6
 	github.com/james-lawrence/genieql v0.0.0-20250306161027-bb1395f5f457
-	github.com/james-lawrence/torrent v0.0.0-20250417193930-b3876f1a100b
+	github.com/james-lawrence/torrent v0.0.0-20250418005727-37d35cfdb88e
 	github.com/justinas/alice v1.2.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/marcboeker/go-duckdb/v2 v2.1.0
@@ -44,7 +45,6 @@ require (
 	github.com/anacrolix/chansync v0.6.0 // indirect
 	github.com/anacrolix/generics v0.0.3-0.20240902042256-7fb2702ef0ca // indirect
 	github.com/anacrolix/log v0.16.0 // indirect
-	github.com/anacrolix/missinggo v1.3.0 // indirect
 	github.com/anacrolix/missinggo/perf v1.0.0 // indirect
 	github.com/anacrolix/missinggo/v2 v2.8.0 // indirect
 	github.com/anacrolix/multiless v0.4.0 // indirect

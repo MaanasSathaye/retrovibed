@@ -16,7 +16,6 @@ import (
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/fsx"
 	"github.com/retrovibed/retrovibed/internal/langx"
-	"github.com/retrovibed/retrovibed/internal/slicesx"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
 	"github.com/retrovibed/retrovibed/internal/torrentx"
 	"github.com/retrovibed/retrovibed/internal/userx"
@@ -96,7 +95,7 @@ func (t Directory) download(ctx context.Context, path string) {
 	}
 
 	if info, err := meta.Metainfo().UnmarshalInfo(); err == nil && !langx.Autoderef(info.Private) {
-		meta = meta.Merge(torrent.OptionTrackers(tracking.PublicTrackers()))
+		meta = meta.Merge(torrent.OptionTrackers(tracking.PublicTrackers()...))
 	}
 
 	var (
@@ -122,7 +121,7 @@ func (t Directory) download(ctx context.Context, path string) {
 		t.q,
 		tracking.NewMetadata(langx.Autoptr(dl.Metadata().ID),
 			tracking.MetadataOptionFromInfo(dl.Info()),
-			tracking.MetadataOptionTrackers(slicesx.Flatten(meta.Trackers...)...),
+			tracking.MetadataOptionTrackers(meta.Trackers...),
 		),
 	).Scan(&md); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to insert metadata"))
@@ -137,7 +136,7 @@ func (t Directory) download(ctx context.Context, path string) {
 	pctx, done := context.WithCancel(ctx)
 	defer done()
 
-	if err := dl.Tune(torrent.TuneTrackers(slicesx.Flatten(meta.Trackers...))); err != nil {
+	if err := dl.Tune(torrent.TuneTrackers(meta.Trackers...)); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to tune torrent"))
 		return
 	} else {
