@@ -21,6 +21,7 @@ class DaemonHttpOverrides extends HttpOverrides {
 
 class EndpointAuto extends StatefulWidget {
   final Widget child;
+  final List<String> defaultips;
   final void Function(api.Daemon v)? onTap;
   final Future<api.DaemonLookupResponse> Function() latest;
 
@@ -29,6 +30,7 @@ class EndpointAuto extends StatefulWidget {
     super.key,
     this.latest = api.daemons.latest,
     this.onTap,
+    this.defaultips = const [],
   });
 
   static _DaemonAuto? of(BuildContext context) {
@@ -90,7 +92,7 @@ class _DaemonAuto extends State<EndpointAuto> {
   @override
   void initState() {
     super.initState();
-    HttpOverrides.global = DaemonHttpOverrides();
+    HttpOverrides.global = DaemonHttpOverrides(ips: widget.defaultips);
     refresh(this.widget.latest().then((r) => r.daemon));
   }
 

@@ -36,7 +36,7 @@ abstract class daemons {
     return http.Client()
         .get(
           Uri.https(
-            httpx.host(),
+            httpx.localhost(),
             "/meta/d/",
             jsonDecode(jsonEncode(req.toProto3Json())),
           ),
@@ -52,7 +52,7 @@ abstract class daemons {
   static Future<DaemonCreateResponse> create(DaemonCreateRequest req) async {
     return http.Client()
         .post(
-          Uri.https(httpx.host(), "/meta/d/"),
+          Uri.https(httpx.localhost(), "/meta/d/"),
           headers: {"Authorization": httpx.auto_bearer()},
           body: jsonEncode(req.toProto3Json()),
         )
@@ -68,7 +68,7 @@ abstract class daemons {
   static Future<DaemonDisableResponse> delete(String id) async {
     return http.Client()
         .delete(
-          Uri.https(httpx.host(), "/meta/d/${id}"),
+          Uri.https(httpx.localhost(), "/meta/d/${id}"),
           headers: {"Authorization": httpx.auto_bearer()},
         )
         .then(httpx.auto_error)
@@ -83,7 +83,7 @@ abstract class daemons {
   static Future<DaemonLookupResponse> latest() async {
     return http.Client()
         .get(
-          Uri.https(httpx.host(), "/meta/d/latest"),
+          Uri.https(httpx.localhost(), "/meta/d/latest"),
           headers: {"Authorization": httpx.auto_bearer()},
         )
         .then(httpx.auto_error)

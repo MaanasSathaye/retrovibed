@@ -14,13 +14,15 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
 
+  final ips = retro.ips();
   retro.daemon();
 
-  runApp(const MyApp());
+  runApp(MyApp(ips));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final List<String> ips;
+  MyApp(this.ips, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +69,7 @@ class MyApp extends StatelessWidget {
                 ),
               ),
             ),
+            defaultips: ips,
           ),
         ),
       ),

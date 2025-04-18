@@ -8,6 +8,10 @@ String host() {
   return _host;
 }
 
+String localhost() {
+  return "localhost:9998";
+}
+
 void set(String uri) {
   _host = uri;
 }
