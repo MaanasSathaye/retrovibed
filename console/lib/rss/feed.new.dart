@@ -42,6 +42,17 @@ class FeedNew extends StatelessWidget {
               ],
             ),
           ),
+          forms.Field(
+            label: Text("autoarchive"),
+            input: forms.Checkbox(
+              value: current.autoarchive,
+              onChanged: (v) {
+                onChange?.call(
+                  current..autoarchive = (v ?? current.autoarchive),
+                );
+              },
+            ),
+          ),
         ],
       ),
     );
