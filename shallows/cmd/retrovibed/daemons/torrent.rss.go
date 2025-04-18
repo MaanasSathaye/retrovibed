@@ -17,6 +17,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/fsx"
 	"github.com/retrovibed/retrovibed/internal/httpx"
+	"github.com/retrovibed/retrovibed/internal/langx"
 	"github.com/retrovibed/retrovibed/internal/md5x"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
 	"github.com/retrovibed/retrovibed/internal/stringsx"
@@ -48,6 +49,7 @@ func PrepareDefaultFeeds(ctx context.Context, q sqlx.Queryer) error {
 
 // retrieve torrents from rss feeds.
 func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, tclient *torrent.Client, tstore storage.ClientImpl) (err error) {
+	const defaultttl = 1440 // 1 day in minutes
 	queryfeeds := func(ctx context.Context, done context.CancelCauseFunc) iter.Seq[tracking.RSS] {
 		return func(yield func(tracking.RSS) bool) {
 			query := tracking.RSSSearchBuilder().Where(
@@ -110,7 +112,7 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Vir
 			resp, err := httpx.AsError(c.Do(req))
 			if err != nil {
 				log.Println("unable to retrieve feed", feed.ID, err)
-				if err = tracking.RSSCooldownByID(fctx, q, feed.ID, 10).Scan(&feed); err != nil {
+				if err = tracking.RSSCooldownByID(fctx, q, feed.ID, defaultttl).Scan(&feed); err != nil {
 					log.Println("unable to mark rss feed for cooldown", err)
 				}
 				continue
@@ -175,7 +177,7 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Vir
 					continue
 				}
 			} else {
-				if err = tracking.RSSCooldownByID(fctx, q, feed.ID, channel.TTL).Scan(&feed); err != nil {
+				if err = tracking.RSSCooldownByID(fctx, q, feed.ID, langx.DefaultIfZero(defaultttl, channel.TTL)).Scan(&feed); err != nil {
 					log.Println("unable to mark rss feed for cooldown", err)
 					continue
 				}

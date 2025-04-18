@@ -53,7 +53,6 @@ class SearchableView extends State<ListSearchable> {
   }
 
   void resetleading() => setState(() {
-    print("UPDATING FEED CREATION");
     _overlay = null;
     _loading = false;
     _created = api.Feed();
