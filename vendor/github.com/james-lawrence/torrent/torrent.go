@@ -16,7 +16,6 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/pkg/errors"
-	"golang.org/x/time/rate"
 
 	"github.com/anacrolix/missinggo/pubsub"
 	"github.com/anacrolix/missinggo/slices"
@@ -181,7 +180,6 @@ func TunePublicTrackers(trackers ...string) Tuner {
 
 // force new connections to be found
 func TuneNewConns(t *torrent) {
-	log.Println("dht servers", len(t.cln.dhtServers))
 	t.maybeNewConns()
 }
 
@@ -193,6 +191,21 @@ func TuneAutoDownload(t *torrent) {
 	}
 
 	t.chunks.missing.AddRange(0, uint64(t.chunks.cmaximum))
+}
+
+// Announce to trackers looking for at least one successful request that returns peers.
+func TuneAnnounceOnce(t *torrent) {
+	go func() {
+		for {
+			peers, err := TrackerAnnounceOnce(context.Background(), t)
+			if err == nil {
+				t.addPeers(peers)
+				return
+			}
+
+			log.Println("announce failed", err)
+		}
+	}()
 }
 
 // Verify the entirety of the torrent. will block
@@ -227,10 +240,8 @@ func DownloadInto(ctx context.Context, dst io.Writer, m Torrent, options ...Tune
 		return 0, err
 	}
 
-	log.Println("waiting for info")
 	select {
 	case <-m.GotInfo():
-		log.Println("received info")
 	case <-ctx.Done():
 		return 0, errorsx.Compact(context.Cause(ctx), ctx.Err())
 	}
@@ -1140,12 +1151,11 @@ func (t *torrent) seeding() bool {
 // Adds peers revealed in an announce until the announce ends, or we have
 // enough peers.
 func (t *torrent) consumeDhtAnnouncePeers(pvs <-chan dht.PeersValues) {
-	defer log.Println("done receiving peers")
-	l := rate.NewLimiter(rate.Every(time.Minute), 1)
+	// l := rate.NewLimiter(rate.Every(time.Minute), 1)
 	for v := range pvs {
-		if len(v.Peers) > 0 && l.Allow() {
-			log.Println("received peers", t.md.ID, len(v.Peers))
-		}
+		// if len(v.Peers) > 0 || l.Allow() {
+		// 	log.Println("received peers", t.md.ID, len(v.Peers))
+		// }
 		for _, cp := range v.Peers {
 			if cp.Port() == 0 {
 				// Can't do anything with this.
@@ -1164,8 +1174,7 @@ func (t *torrent) consumeDhtAnnouncePeers(pvs <-chan dht.PeersValues) {
 func (t *torrent) announceToDht(impliedPort bool, s *dht.Server) error {
 	ctx, done := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer done()
-	log.Println("announcing to dht initiated", t.md.ID.HexString())
-	defer log.Println("announcing to dht completed", t.md.ID.HexString())
+
 	ps, err := s.AnnounceTraversal(ctx, t.md.ID, dht.AnnouncePeer(impliedPort, t.cln.incomingPeerPort()))
 	if err != nil {
 		return err

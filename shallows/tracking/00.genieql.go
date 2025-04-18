@@ -150,6 +150,13 @@ func RSSInsertWithDefaults(
 	gql.Into("torrents_feed_rss").Default("created_at", "updated_at", "next_check", "disabled_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, autodownload = EXCLUDED.autodownload, autoarchive = EXCLUDED.autoarchive, url = EXCLUDED.url, description = EXCLUDED.description")
 }
 
+func RSSInsertDefaultFeed(
+	gql genieql.Insert,
+	pattern func(ctx context.Context, q sqlx.Queryer, a RSS) NewRSSScannerStaticRow,
+) {
+	gql.Into("torrents_feed_rss").Default("created_at", "updated_at", "next_check", "disabled_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT")
+}
+
 func RSSCooldown(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a RSS) NewRSSScannerStaticRow,

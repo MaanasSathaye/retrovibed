@@ -62,8 +62,9 @@ func MetadataOptionJSONSafeEncode(p *Metadata) {
 
 func NewMetadata(md *metainfo.Hash, options ...func(*Metadata)) (m Metadata) {
 	r := langx.Clone(Metadata{
-		ID:       HashUID(md),
-		Infohash: md.Bytes(),
+		ID:          HashUID(md),
+		Infohash:    md.Bytes(),
+		InitiatedAt: timex.Inf(),
 	}, options...)
 	return r
 }
@@ -118,7 +119,7 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 	torrentvfs := fsx.DirVirtual(vfs.Path("torrent"))
 
 	// just copying as we receive data to block until done.
-	if downloaded, err = torrent.DownloadInto(ctx, mhash, t); err != nil {
+	if downloaded, err = torrent.DownloadInto(ctx, mhash, t, torrent.TuneAnnounceOnce, torrent.TuneNewConns); err != nil {
 		return errorsx.Wrap(err, "download failed")
 	}
 
@@ -182,10 +183,13 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 	for {
 		select {
 		case <-statst.C:
+
 			stats := dl.Stats()
 			log.Printf("%s - %s: seeding(%t), peers(%d:%d:%d) pieces(%d:%d:%d:%d)\n", md.ID, hex.EncodeToString(md.Infohash), stats.Seeding, stats.ActivePeers, stats.PendingPeers, stats.TotalPeers, stats.Missing, stats.Outstanding, stats.Unverified, stats.Completed)
-
-			log.Println("DERP", spew.Sdump(stats))
+			if err := dl.Tune(torrent.TuneNewConns); err != nil {
+				log.Println("unable to request new connections", err)
+				continue
+			}
 		case <-sub.Values:
 			if !l.Allow() {
 				continue

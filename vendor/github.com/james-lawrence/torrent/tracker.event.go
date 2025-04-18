@@ -2,6 +2,9 @@ package torrent
 
 import (
 	"context"
+	"fmt"
+	"log"
+	"time"
 
 	"github.com/james-lawrence/torrent/dht/int160"
 
@@ -39,4 +42,21 @@ func TrackerEvent(ctx context.Context, l Torrent) (ret *tracker.AnnounceResponse
 	res, err := announcer.Do(ctx, req)
 
 	return &res, err
+}
+
+func TrackerAnnounceOnce(ctx context.Context, l Torrent) (peers Peers, err error) {
+	ctx, done := context.WithTimeout(ctx, 30*time.Second)
+	defer done()
+
+	announced, err := TrackerEvent(ctx, l)
+	if err != nil {
+		log.Println("announce failed", err)
+		return nil, err
+	}
+
+	if len(announced.Peers) == 0 {
+		return nil, fmt.Errorf("failed to locate any peers for torrent")
+	}
+
+	return peers.AppendFromTracker(announced.Peers), nil
 }

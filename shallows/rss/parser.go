@@ -4,7 +4,10 @@ import (
 	"context"
 	"encoding/xml"
 	"io"
+	"log"
 	"net/url"
+
+	"github.com/davecgh/go-spew/spew"
 )
 
 func Parse(ctx context.Context, r io.Reader) (*channel, []Item, error) {
@@ -20,7 +23,8 @@ func parseData(data io.Reader, originURL string) (*channel, []Item, error) {
 
 	rssItems := make([]Item, 0, len(r.Channel.Items))
 	for _, item := range r.Channel.Items {
-		if item.Title == "" || item.Link == "" || item.Description == "" {
+		if item.Title == "" && item.Link == "" && item.Description == "" {
+			log.Println("skipping item", spew.Sdump(item))
 			continue
 		}
 
@@ -28,6 +32,7 @@ func parseData(data io.Reader, originURL string) (*channel, []Item, error) {
 			Title:       item.Title,
 			Description: item.Description,
 			Link:        item.Link,
+			Enclosures:  item.Enclosures,
 		}
 
 		if item.PubDate.hasValue {
@@ -56,4 +61,18 @@ func extractSource(urlRaw string) string {
 	}
 
 	return u.Hostname()
+}
+
+func FindEnclosureURLByMimetype(mimetype string, items ...Item) (urls []string) {
+	for _, i := range items {
+		for _, i := range i.Enclosures {
+			if i.Mimetype != mimetype {
+				continue
+			}
+
+			urls = append(urls, i.URL)
+		}
+	}
+
+	return urls
 }

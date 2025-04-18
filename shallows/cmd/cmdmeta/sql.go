@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"embed"
 	"io/fs"
+	"os"
 	"strings"
 	"sync"
 
@@ -25,6 +26,10 @@ import (
 var embedsqlite embed.FS
 
 func Database(ctx context.Context) (db *sql.DB, err error) {
+	if err := os.MkdirAll(userx.DefaultConfigDir(userx.DefaultRelRoot()), 0700); err != nil {
+		return nil, err
+	}
+
 	if db, err = sql.Open("duckdb", userx.DefaultConfigDir(userx.DefaultRelRoot(), "meta.db")); err != nil {
 		return nil, errorsx.Wrap(err, "unable to open db")
 	}

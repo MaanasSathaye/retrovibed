@@ -9,6 +9,7 @@ CREATE TABLE torrents_feed_rss (
     autodownload boolean NOT NULL DEFAULT 'false',
     autoarchive boolean NOT NULL DEFAULT 'false',
     contributing boolean NOT NULL DEFAULT 'false',
+    ttl INTERVAL NOT NULL DEFAULT INTERVAL '0 seconds',
     description VARCHAR NOT NULL,
     url VARCHAR NOT NULL,
 );

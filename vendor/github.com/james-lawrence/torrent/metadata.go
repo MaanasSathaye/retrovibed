@@ -1,7 +1,6 @@
 package torrent
 
 import (
-	"log"
 	"math/rand/v2"
 	"time"
 
@@ -88,12 +87,10 @@ type Metadata struct {
 func (t Metadata) Announce() string {
 	max := len(t.Trackers)
 	if max == 0 {
-		log.Println("NO TRACKERS", t.Trackers)
 		return ""
 	}
 
-	idx := rand.IntN(max)
-	return t.Trackers[idx]
+	return t.Trackers[rand.IntN(max)]
 }
 
 // Merge Metadata options into the current metadata.

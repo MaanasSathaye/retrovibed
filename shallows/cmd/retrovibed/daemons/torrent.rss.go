@@ -19,6 +19,8 @@ import (
 	"github.com/retrovibed/retrovibed/internal/httpx"
 	"github.com/retrovibed/retrovibed/internal/langx"
 	"github.com/retrovibed/retrovibed/internal/md5x"
+	"github.com/retrovibed/retrovibed/internal/mimex"
+	"github.com/retrovibed/retrovibed/internal/slicesx"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
 	"github.com/retrovibed/retrovibed/internal/stringsx"
 	"github.com/retrovibed/retrovibed/rss"
@@ -35,7 +37,7 @@ func PrepareDefaultFeeds(ctx context.Context, q sqlx.Queryer) error {
 			Contributing: true,
 		}
 
-		if err = tracking.RSSInsertWithDefaults(ctx, q, feed).Scan(&feed); err != nil {
+		if err = tracking.RSSInsertDefaultFeed(ctx, q, feed).Scan(&feed); err != nil {
 			return errorsx.Wrapf(err, "feed creation failed: %s - %s", description, url)
 		}
 
@@ -124,11 +126,6 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Vir
 				continue
 			}
 
-			autodownload := tracking.MetadataOptionNoop
-			if feed.Autodownload {
-				autodownload = tracking.MetadataOptionInitiate
-			}
-
 			for _, item := range items {
 				var (
 					meta tracking.Metadata
@@ -139,7 +136,9 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Vir
 					continue
 				}
 
-				req, err := http.NewRequestWithContext(ctx, http.MethodGet, item.Link, nil)
+				uri := slicesx.FirstOrDefault(item.Link, rss.FindEnclosureURLByMimetype(mimex.Bittorrent, item)...)
+
+				req, err := http.NewRequestWithContext(ctx, http.MethodGet, uri, nil)
 				if err != nil {
 					log.Println("unable to build torrent request", feed.ID, err)
 					continue
@@ -151,22 +150,36 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Vir
 					continue
 				}
 
-				mi, err := metainfo.NewFromReader(resp.Body)
-				if err != nil {
-					log.Println("unable to read metainfo from response", feed.ID, err)
-					continue
-				}
-				md, err := torrent.NewFromInfo(*mi)
+				md, err := metainfo.Load(resp.Body)
 				if err != nil {
 					log.Println("unable to read metainfo from response", feed.ID, err)
 					continue
 				}
 
-				if err = tracking.MetadataInsertWithDefaults(ctx, q, tracking.NewMetadata(&md.ID, tracking.MetadataOptionFromInfo(mi), tracking.MetadataOptionDescription(item.Title), autodownload)).Scan(&meta); err != nil {
+				mi, err := md.UnmarshalInfo()
+				if err != nil {
+					log.Println("unable to read info from metadata", feed.ID, err)
+					continue
+				}
+
+				if err = tracking.MetadataInsertWithDefaults(
+					ctx, q, tracking.NewMetadata(
+						langx.Autoptr(md.HashInfoBytes()),
+						tracking.MetadataOptionFromInfo(&mi),
+						tracking.MetadataOptionDescription(stringsx.FirstNonBlank(mi.Name, item.Title)),
+						tracking.MetadataOptionTrackers(md.Announce),
+					)).Scan(&meta); err != nil {
 					log.Println("unable to record torrent metadata", feed.ID, err)
 					continue
 				}
 
+				if feed.Autodownload {
+					// log.Println("marking torrent to be automatically downloaded", meta.Description, feed.Autodownload)
+					if err = tracking.MetadataDownloadByID(ctx, q, meta.ID).Scan(&meta); err != nil {
+						log.Println("unable to mark torrent for automatic download", err)
+						continue
+					}
+				}
 				// log.Println("recorded", feed.ID, meta.ID, meta.Description)
 			}
 
@@ -183,6 +196,7 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Vir
 				}
 			}
 
+			// log.Println("starting any downloads", feed.Description)
 			// begin any torrent provided by this feed
 			ResumeDownloads(ctx, q, rootstore, tclient, tstore)
 		}
