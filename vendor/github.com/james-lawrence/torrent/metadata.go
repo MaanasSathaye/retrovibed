@@ -1,6 +1,8 @@
 package torrent
 
 import (
+	"log"
+	"math/rand/v2"
 	"time"
 
 	"github.com/james-lawrence/torrent/bencode"
@@ -82,13 +84,16 @@ type Metadata struct {
 	Storage   storage.ClientImpl
 }
 
-// grabs first tracker avalable.
+// grabs random tracker from available.
 func (t Metadata) Announce() string {
-	for _, tr := range t.Trackers {
-		return tr
+	max := len(t.Trackers)
+	if max == 0 {
+		log.Println("NO TRACKERS", t.Trackers)
+		return ""
 	}
 
-	return ""
+	idx := rand.IntN(max)
+	return t.Trackers[idx]
 }
 
 // Merge Metadata options into the current metadata.
