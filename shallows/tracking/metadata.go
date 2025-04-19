@@ -62,9 +62,10 @@ func MetadataOptionJSONSafeEncode(p *Metadata) {
 
 func NewMetadata(md *metainfo.Hash, options ...func(*Metadata)) (m Metadata) {
 	r := langx.Clone(Metadata{
-		ID:          HashUID(md),
-		Infohash:    md.Bytes(),
-		InitiatedAt: timex.Inf(),
+		ID:             HashUID(md),
+		Infohash:       md.Bytes(),
+		InitiatedAt:    timex.Inf(),
+		NextAnnounceAt: timex.Inf(),
 	}, options...)
 	return r
 }
