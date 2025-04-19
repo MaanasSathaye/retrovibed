@@ -182,12 +182,14 @@ func (t *HTTPDiscovered) upload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	metadata, err := torrent.New(metainfo.Hash(lmd.Infohash), torrent.OptionStorage(t.c), torrent.OptionNodes(meta.NodeList()...), torrent.OptionTrackers(slicesx.Flatten(meta.AnnounceList...)...), torrent.OptionWebseeds(meta.UrlList))
+	metadata, err := torrent.New(metainfo.Hash(lmd.Infohash), torrent.OptionStorage(t.c), torrent.OptionNodes(meta.NodeList()...), torrent.OptionTrackers(lmd.Tracker), torrent.OptionWebseeds(meta.UrlList))
 	if err != nil {
 		log.Println(errorsx.Wrapf(err, "unable to create torrent from metadata %s", lmd.ID))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
+
+	log.Println("DERP DERP", lmd.Tracker)
 
 	if dl, _, err = t.d.Start(metadata); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to start download"))
