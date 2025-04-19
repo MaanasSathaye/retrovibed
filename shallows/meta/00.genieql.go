@@ -65,6 +65,13 @@ func DaemonFindByLatestUpdated(
 	gql = gql.Query(`SELECT ` + DaemonScannerStaticColumns + ` FROM meta_daemons ORDER BY updated_at DESC LIMIT 1`)
 }
 
+func DaemonTouch(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewDaemonScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE meta_daemons SET updated_at = NOW() WHERE "id" = {id} RETURNING ` + DaemonScannerStaticColumns)
+}
+
 func DaemonDeleteByID(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewDaemonScannerStaticRow,

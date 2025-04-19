@@ -49,6 +49,12 @@ type HTTPDaemons struct {
 func (t *HTTPDaemons) Bind(r *mux.Router) {
 	r.StrictSlash(false)
 
+	r.Path("/latest").Methods(http.MethodGet).Handler(alice.New(
+		httpx.ContextBufferPool512(),
+		httpauth.AuthenticateWithToken(t.jwtsecret),
+		httpx.Timeout2s(),
+	).ThenFunc(t.latest))
+
 	r.Path("/").Methods(http.MethodGet).Handler(alice.New(
 		httpx.ContextBufferPool512(),
 		httpx.ParseForm,
@@ -62,11 +68,11 @@ func (t *HTTPDaemons) Bind(r *mux.Router) {
 		httpx.Timeout2s(),
 	).ThenFunc(t.create))
 
-	r.Path("/latest").Methods(http.MethodGet).Handler(alice.New(
+	r.Path("/{id}").Methods(http.MethodPut).Handler(alice.New(
 		httpx.ContextBufferPool512(),
 		httpauth.AuthenticateWithToken(t.jwtsecret),
 		httpx.Timeout2s(),
-	).ThenFunc(t.latest))
+	).ThenFunc(t.touch))
 
 	r.Path("/{id}").Methods(http.MethodDelete).Handler(alice.New(
 		httpx.ContextBufferPool512(),
@@ -164,6 +170,31 @@ func (t *HTTPDaemons) latest(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err = meta.DaemonFindByLatestUpdated(r.Context(), t.q).Scan(&v); sqlx.ErrNoRows(err) != nil {
+		log.Println(errorsx.Wrap(err, "no daemons known"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+		return
+	} else if err != nil {
+		log.Println(errorsx.Wrap(err, "failed to find record"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &DaemonLookupResponse{
+		Daemon: errorsx.Must(NewDaemonFromMetaDaemon(v)),
+	}); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to write response"))
+		return
+	}
+}
+
+func (t *HTTPDaemons) touch(w http.ResponseWriter, r *http.Request) {
+	var (
+		err error
+		v   meta.Daemon
+		id  = mux.Vars(r)["id"]
+	)
+
+	if err = meta.DaemonTouch(r.Context(), t.q, id).Scan(&v); sqlx.ErrNoRows(err) != nil {
 		log.Println(errorsx.Wrap(err, "no daemons known"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
 		return

@@ -105,6 +105,43 @@ func TestHTTPDaemonCreateNew(t *testing.T) {
 	require.Equal(t, v.Hostname, result.Daemon.Hostname)
 }
 
+func TestHTTPDaemonTouch(t *testing.T) {
+	var (
+		v      meta.Daemon
+		result metaapi.DaemonLookupResponse
+		claims jwt.RegisteredClaims
+	)
+
+	ctx, done := testx.Context(t)
+	defer done()
+
+	q := sqltestx.Metadatabase(t)
+	defer q.Close()
+
+	require.NoError(t, testx.Fake(&v, meta.DaemonOptionTestDefaults, meta.DaemonOptionMaybeID, timex.UTCEncodeOption))
+	require.NoError(t, meta.DaemonInsertWithDefaults(ctx, q, v).Scan(&v))
+
+	routes := mux.NewRouter()
+
+	metaapi.NewHTTPDaemons(
+		q,
+		metaapi.HTTPDaemonsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+	).Bind(routes.PathPrefix("/").Subrouter())
+
+	claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+
+	resp, req, err := httptestx.BuildRequest(http.MethodPut, fmt.Sprintf("/%s", v.ID), nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
+	require.NoError(t, err)
+
+	routes.ServeHTTP(resp, req)
+
+	require.NoError(t, httpx.ErrorCode(resp.Result()))
+	require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+
+	require.Equal(t, v.ID, result.Daemon.Id)
+	require.Equal(t, v.Hostname, result.Daemon.Hostname)
+}
+
 func TestHTTPDaemonCreateUpdate(t *testing.T) {
 	var (
 		v      meta.Daemon

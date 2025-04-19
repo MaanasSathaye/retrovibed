@@ -128,7 +128,7 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 	torrentvfs := fsx.DirVirtual(vfs.Path("torrent"))
 
 	// just copying as we receive data to block until done.
-	if downloaded, err = torrent.DownloadInto(ctx, mhash, t /* torrent.TuneAnnounceOnce,*/, torrent.TuneNewConns); err != nil {
+	if downloaded, err = torrent.DownloadInto(ctx, mhash, t, torrent.TuneAnnounceOnce, torrent.TuneNewConns); err != nil {
 		return errorsx.Wrap(err, "download failed")
 	}
 
@@ -190,7 +190,6 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 	statst := time.NewTicker(statsfreq)
 	l := rate.NewLimiter(rate.Every(time.Second), 1)
 	for {
-		log.Println("progress event pending")
 		select {
 		case <-statst.C:
 			stats := dl.Stats()
@@ -212,6 +211,7 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 			}
 
 			stats := dl.Stats()
+
 			log.Printf("%s: peers(%d:%d:%d) pieces(%d:%d:%d:%d)\n", dl.Metadata().ID.HexString(), stats.ActivePeers, stats.PendingPeers, stats.TotalPeers, stats.Missing, stats.Outstanding, stats.Unverified, stats.Completed)
 
 			if err := MetadataProgressByID(ctx, q, md.ID, uint16(stats.ActivePeers), current).Scan(md); err != nil {
