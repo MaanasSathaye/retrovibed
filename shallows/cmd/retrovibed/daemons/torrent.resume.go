@@ -52,7 +52,6 @@ func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual
 		}
 
 		go func(infopath string, md *tracking.Metadata, dl torrent.Torrent) {
-
 			// errorsx.Log(errorsx.Wrap(tracking.Verify(ctx, dl), "failed to verify data"))
 			errorsx.Log(errorsx.Wrap(tracking.Download(ctx, db, rootstore, md, dl), "resume failed"))
 			torrentx.RecordInfo(infopath, dl.Metadata())
@@ -63,4 +62,48 @@ func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual
 	})
 
 	errorsx.Log(errorsx.Wrap(err, "failed to resume all downloads"))
+}
+
+func SeedTorrents(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual, tclient *torrent.Client, tstore storage.ClientImpl) {
+	q := tracking.MetadataSearchBuilder().Where(
+		squirrel.And{
+			tracking.MetadataQuerySeeding(),
+		},
+	)
+
+	err := sqlxx.ScanEach(tracking.MetadataSearch(ctx, db, q), func(md *tracking.Metadata) error {
+		log.Println("seeding", md.ID, md.Description, md.Private)
+		infopath := rootstore.Path("torrent", fmt.Sprintf("%s.torrent", metainfo.Hash(md.Infohash).HexString()))
+
+		autotrackers := torrent.OptionNoop
+		if !md.Private {
+			autotrackers = torrent.OptionTrackers(tracking.PublicTrackers()...)
+		}
+
+		metadata, err := torrent.New(metainfo.Hash(md.Infohash), torrent.OptionStorage(tstore), torrent.OptionTrackers(md.Tracker), torrentx.OptionInfoFromFile(infopath), autotrackers)
+		if err != nil {
+			return errorsx.Wrapf(err, "unable to create metadata from %s - %s", md.ID, infopath)
+		}
+
+		t, added, err := tclient.Start(metadata)
+		if err != nil {
+			log.Println(errorsx.Wrapf(err, "unable to start download %s - %s", md.ID, infopath))
+			return nil
+		}
+
+		if !added {
+			log.Printf("torrent already running %s - %s\n", md.ID, infopath)
+			return nil
+		}
+
+		go func(infopath string, md *tracking.Metadata, dl torrent.Torrent) {
+			log.Println("seeding not yet implemented", md.ID)
+			// errorsx.Log(errorsx.Wrap(tracking.Verify(ctx, dl), "failed to verify data"))
+		}(infopath, md, t)
+
+		log.Println("seeding", md.ID)
+		return nil
+	})
+
+	errorsx.Log(errorsx.Wrap(err, "failed to seed torrents"))
 }

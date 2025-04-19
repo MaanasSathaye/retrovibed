@@ -85,6 +85,10 @@ func MetadataQueryNotPaused() squirrel.Sqlizer {
 	return squirrel.Expr("torrents_metadata.paused_at = 'infinity'")
 }
 
+func MetadataQuerySeeding() squirrel.Sqlizer {
+	return squirrel.Expr("torrents_metadata.seeding")
+}
+
 func MetadataSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) MetadataScanner {
 	return NewMetadataScannerStatic(b.RunWith(q).QueryContext(ctx))
 }

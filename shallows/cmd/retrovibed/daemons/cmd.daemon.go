@@ -184,6 +184,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		}
 	}()
 
+	go SeedTorrents(dctx, db, rootstore, tclient, tstore)
 	go ResumeDownloads(dctx, db, rootstore, tclient, tstore)
 
 	httpmux := mux.NewRouter()
