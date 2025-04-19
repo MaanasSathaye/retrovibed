@@ -78,6 +78,12 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, 
 	pid := int160.FromByteArray(tclient.PeerID())
 
 	for {
+		select {
+		case <-ctx.Done():
+			return
+		default:
+		}
+
 		var seeded []tracking.Metadata
 
 		query := tracking.MetadataSearchBuilder().Where(
