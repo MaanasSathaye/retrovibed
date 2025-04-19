@@ -189,8 +189,6 @@ func (t *HTTPDiscovered) upload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println("DERP DERP", lmd.Tracker)
-
 	if dl, _, err = t.d.Start(metadata); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to start download"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
@@ -263,11 +261,13 @@ func (t *HTTPDiscovered) pause(w http.ResponseWriter, r *http.Request) {
 
 func (t *HTTPDiscovered) download(w http.ResponseWriter, r *http.Request) {
 	var (
-		md tracking.Metadata
-		id = mux.Vars(r)["id"]
+		meta  tracking.Metadata
+		id    = mux.Vars(r)["id"]
+		dl    torrent.Torrent
+		added bool
 	)
 
-	if err := tracking.MetadataFindByID(r.Context(), t.q, id).Scan(&md); sqlx.ErrNoRows(err) != nil {
+	if err := tracking.MetadataFindByID(r.Context(), t.q, id).Scan(&meta); sqlx.ErrNoRows(err) != nil {
 		log.Println(errorsx.Wrap(err, "unable to find metadata"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
 		return
@@ -277,20 +277,26 @@ func (t *HTTPDiscovered) download(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	metadata, err := torrent.New(metainfo.Hash(md.Infohash), torrent.OptionStorage(t.c))
+	metadata, err := torrent.New(metainfo.Hash(meta.Infohash), torrent.OptionStorage(t.c), torrent.OptionTrackers(meta.Tracker))
 	if err != nil {
-		log.Println(errorsx.Wrapf(err, "unable to create metadata from metadata %s", md.ID))
+		log.Println(errorsx.Wrapf(err, "unable to create metadata from metadata %s", meta.ID))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
-	if _, _, err := t.d.Start(metadata); err != nil {
+	if dl, added, err = t.d.Start(metadata); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to start download"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
-	if err := tracking.MetadataDownloadByID(r.Context(), t.q, id).Scan(&md); err != nil {
+	if added {
+		go func() {
+			errorsx.Log(tracking.Download(context.Background(), t.q, t.mediastorage, &meta, dl))
+		}()
+	}
+
+	if err := tracking.MetadataDownloadByID(r.Context(), t.q, id).Scan(&meta); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to track download"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
@@ -300,7 +306,7 @@ func (t *HTTPDiscovered) download(w http.ResponseWriter, r *http.Request) {
 		Download: langx.Autoptr(
 			langx.Clone(
 				Download{},
-				DownloadOptionFromTorrentMetadata(langx.Clone(md, tracking.MetadataOptionJSONSafeEncode))),
+				DownloadOptionFromTorrentMetadata(langx.Clone(meta, tracking.MetadataOptionJSONSafeEncode))),
 		),
 	}); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
