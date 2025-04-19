@@ -7,11 +7,13 @@ import (
 	"time"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/james-lawrence/torrent/tracker"
+	"github.com/retrovibed/retrovibed/internal/backoffx"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/fsx"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
@@ -100,7 +102,7 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, 
 				tracker.AnnounceOptionUploaded(int64(i.Uploaded)),
 			)
 
-			announced, err := announcer.ChangeTracker(i.Tracker).Do(ctx, req)
+			announced, err := announcer.ForTracker(i.Tracker).Do(ctx, req)
 			if err != nil {
 				log.Println("failed to announce seeded torrent", err)
 				continue
@@ -127,8 +129,9 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, 
 			)
 
 			if nextts, err = sqlx.Timestamp(ctx, q, "SELECT next_announce_at FROM torrents_metadata WHERE next_announce_at < infinity"); err != nil {
-				log.Println("unable to determine next timestamp, defaulting to an hour", err)
-				nextts = nextts.Add(time.Hour)
+				delay := backoffx.DynamicHash15m(uuid.Must(uuid.NewV4()).String())
+				log.Printf("unable to determine next timestamp, next check will be in %v - %v", delay, err)
+				nextts = nextts.Add(delay)
 			}
 
 			time.Sleep(time.Until(nextts))
