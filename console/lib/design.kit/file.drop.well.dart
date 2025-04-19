@@ -47,6 +47,10 @@ class _FileDropWell extends State<FileDropWell> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final loading = (bool b) {
+      if (!mounted) {
+        return;
+      }
+
       setState(() {
         _loading = b;
       });
