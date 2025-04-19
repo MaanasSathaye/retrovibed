@@ -128,7 +128,7 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, 
 				nextts time.Time
 			)
 
-			if nextts, err = sqlx.Timestamp(ctx, q, "SELECT next_announce_at FROM torrents_metadata WHERE next_announce_at < infinity"); err != nil {
+			if nextts, err = sqlx.Timestamp(ctx, q, "SELECT next_announce_at FROM torrents_metadata WHERE next_announce_at < 'infinity'"); err != nil {
 				delay := backoffx.DynamicHash15m(uuid.Must(uuid.NewV4()).String())
 				log.Printf("unable to determine next timestamp, next check will be in %v - %v", delay, err)
 				nextts = nextts.Add(delay)
