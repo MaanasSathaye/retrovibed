@@ -173,7 +173,7 @@ func (t *HTTPDiscovered) upload(w http.ResponseWriter, r *http.Request) {
 
 	lmd := tracking.NewMetadata(langx.Autoptr(meta.HashInfoBytes()),
 		tracking.MetadataOptionFromInfo(&info),
-		tracking.MetadataOptionTrackers(slicesx.Flatten(meta.AnnounceList...)...),
+		tracking.MetadataOptionTrackers(slicesx.Flatten(meta.UpvertedAnnounceList()...)...),
 	)
 
 	if err = tracking.MetadataInsertWithDefaults(r.Context(), t.q, lmd).Scan(&lmd); err != nil {
