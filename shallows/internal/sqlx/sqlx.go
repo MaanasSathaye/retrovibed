@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"strings"
+	"time"
 	"unicode"
 
 	"github.com/retrovibed/retrovibed/internal/errorsx"
@@ -89,6 +90,11 @@ func Count(ctx context.Context, q Queryer, query string) (count int, err error) 
 
 func String(ctx context.Context, q Queryer, query string) (s string, err error) {
 	err = NewValueRowScanner[string](q.QueryRowContext(ctx, query)).Scan(&s)
+	return s, err
+}
+
+func Timestamp(ctx context.Context, q Queryer, query string) (s time.Time, err error) {
+	err = NewValueRowScanner[time.Time](q.QueryRowContext(ctx, query)).Scan(&s)
 	return s, err
 }
 

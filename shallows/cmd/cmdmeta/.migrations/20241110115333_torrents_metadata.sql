@@ -13,6 +13,7 @@ CREATE TABLE torrents_metadata (
     tracker VARCHAR NOT NULL, -- will convert this to an array later.
     bytes UBIGINT NOT NULL DEFAULT 0,
     downloaded UBIGINT NOT NULL DEFAULT 0,
+    uploaded UBIGINT NOT NULL DEFAULT 0,
     peers USMALLINT NOT NULL DEFAULT 0,
     description STRING NOT NULL DEFAULT '',
     infohash BINARY NOT NULL

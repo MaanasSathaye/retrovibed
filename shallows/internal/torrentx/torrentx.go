@@ -15,7 +15,18 @@ import (
 	"github.com/james-lawrence/torrent/dht/krpc"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/sockets"
+	"github.com/james-lawrence/torrent/tracker"
 )
+
+func AnnouncerFromClient(c *torrent.Client) tracker.Announce {
+	cfg := c.Config()
+
+	return tracker.Announce{
+		UserAgent: cfg.HTTPUserAgent,
+		ClientIp4: krpc.NewNodeAddrFromIPPort(cfg.PublicIP4, 0),
+		ClientIp6: krpc.NewNodeAddrFromIPPort(cfg.PublicIP6, 0),
+	}
+}
 
 func Autosocket(p int) (_ torrent.Binder, err error) {
 	var (

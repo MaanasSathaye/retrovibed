@@ -5,6 +5,7 @@ package tracking
 
 import (
 	"context"
+	"time"
 
 	genieql "github.com/james-lawrence/genieql/ginterp"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
@@ -68,6 +69,13 @@ func MetadataProgressByID(
 	pattern func(ctx context.Context, q sqlx.Queryer, id string, peers uint16, completed uint64) NewMetadataScannerStaticRow,
 ) {
 	gql = gql.Query(`UPDATE torrents_metadata SET updated_at = NOW(), downloaded = {completed}, peers = {peers}, seeding = (bytes == {completed}) WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
+}
+
+func MetadataAnnounced(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string, nextts time.Time) NewMetadataScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE torrents_metadata SET updated_at = NOW(), next_announce_at = {nextts} WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
 }
 
 //easyjson:json
