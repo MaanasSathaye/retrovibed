@@ -159,10 +159,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	go PrintStatistics(dctx, db)
 
 	go timex.NowAndEvery(gctx.Context, time.Minute, func(ctx context.Context) error {
-		_, err := db.ExecContext(ctx, "PRAGMA create_fts_index('library_metadata', 'id', 'description', overwrite = 1);")
-		if err != nil {
-			log.Println("failed to refresh library_metadata fts index", err)
-		}
+		errorsx.Log(cmdmeta.RefreshFTS(ctx, db))
 		return nil
 	})
 

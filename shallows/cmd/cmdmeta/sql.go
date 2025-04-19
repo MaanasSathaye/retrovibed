@@ -62,6 +62,18 @@ func InitializeDatabase(ctx context.Context, db *sql.DB) (err error) {
 	return nil
 }
 
+func RefreshFTS(ctx context.Context, db *sql.DB) (err error) {
+	if _, err := db.ExecContext(ctx, "PRAGMA create_fts_index('library_metadata', 'id', 'description', overwrite = 1);"); err != nil {
+		return errorsx.Wrap(err, "failed to refresh library_metadata fts index")
+	}
+
+	if _, err := db.ExecContext(ctx, "PRAGMA create_fts_index('torrents_metadata', 'id', 'description', overwrite = 1);"); err != nil {
+		return errorsx.Wrap(err, "failed to refresh torrents_metadata fts index")
+	}
+
+	return nil
+}
+
 func Hostnames(ctx context.Context, q sqlx.Queryer) ([]string, error) {
 	var (
 		results []meta.Daemon

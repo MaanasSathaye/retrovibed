@@ -17,5 +17,6 @@ func Metadatabase(t testing.TB) *sql.DB {
 	db, err := sql.Open("duckdb", "")
 	require.NoError(t, err)
 	require.NoError(t, cmdmeta.InitializeDatabase(ctx, db))
+	require.NoError(t, cmdmeta.RefreshFTS(ctx, db))
 	return db
 }
