@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/go-playground/form/v4"
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
