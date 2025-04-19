@@ -3,6 +3,7 @@ package media
 import (
 	"context"
 	"crypto/md5"
+	"fmt"
 	"io"
 	"log"
 	"mime/multipart"
@@ -38,6 +39,12 @@ type HTTPDiscoveredOption func(*HTTPDiscovered)
 func HTTPDiscoveredOptionJWTSecret(j jwtx.SecretSource) HTTPDiscoveredOption {
 	return func(t *HTTPDiscovered) {
 		t.jwtsecret = j
+	}
+}
+
+func HTTPDiscoveredOptionTorrentStorage(vfs fsx.Virtual) HTTPDiscoveredOption {
+	return func(t *HTTPDiscovered) {
+		t.mediastorage = vfs
 	}
 }
 
@@ -178,6 +185,12 @@ func (t *HTTPDiscovered) upload(w http.ResponseWriter, r *http.Request) {
 
 	if err = tracking.MetadataInsertWithDefaults(r.Context(), t.q, lmd).Scan(&lmd); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to record metadata record"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err = os.Rename(tmp.Name(), t.mediastorage.Path(fmt.Sprintf("%s.torrent", metainfo.Hash(lmd.Infohash).HexString()))); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to failed to record torrent file"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
