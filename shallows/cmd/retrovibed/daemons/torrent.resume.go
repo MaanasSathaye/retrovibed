@@ -106,9 +106,11 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, 
 				tracker.AnnounceOptionKey,
 				tracker.AnnounceOptionDownloaded(int64(i.Downloaded)),
 				tracker.AnnounceOptionUploaded(int64(i.Uploaded)),
-				tracker.AnnounceOptionEventCompleted,
+				// tracker.AnnounceOptionEventCompleted,
+				tracker.AnnounceOptionSeeding,
 			)
 
+			log.Println("announcing", i.ID, int160.FromBytes(i.Infohash).String())
 			announced, err := announcer.ForTracker(i.Tracker).Do(ctx, req)
 			if err != nil {
 				log.Println("failed to announce seeded torrent", err)
