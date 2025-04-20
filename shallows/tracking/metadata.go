@@ -161,8 +161,9 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 		return errorsx.Wrap(err, "failed to transfer files into library")
 	}
 
+	stats := t.Stats()
 	log.Println("download completed", md.ID, md.Description, downloaded)
-	if err := MetadataProgressByID(ctx, q, md.ID, 0, uint64(downloaded)).Scan(md); err != nil {
+	if err := MetadataCompleteByID(ctx, q, md.ID, 0, uint64(downloaded), stats.BytesWrittenData.Uint64()).Scan(md); err != nil {
 		return errorsx.Wrap(err, "progress update failed")
 	}
 
