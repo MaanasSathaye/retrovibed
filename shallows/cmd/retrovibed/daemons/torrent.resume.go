@@ -82,6 +82,7 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, 
 		case <-ctx.Done():
 			return
 		default:
+			log.Println("running announcements")
 		}
 
 		var seeded []tracking.Metadata
@@ -138,10 +139,11 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, 
 
 			if nextts, err = sqlx.Timestamp(ctx, q, "SELECT next_announce_at FROM torrents_metadata WHERE next_announce_at < 'infinity'"); err != nil {
 				delay := backoffx.DynamicHash15m(uuid.Must(uuid.NewV4()).String())
-				log.Printf("unable to determine next timestamp, next check will be in %v - %v", delay, err)
-				nextts = nextts.Add(delay)
+				log.Printf("unable to determine next timestamp - %v", err)
+				nextts = time.Now().Add(delay)
 			}
 
+			log.Printf("announce - next will be %v\n", nextts)
 			time.Sleep(time.Until(nextts))
 		}
 	}
