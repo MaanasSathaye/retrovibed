@@ -114,7 +114,6 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, 
 			announced, err := announcer.ForTracker(i.Tracker).Do(ctx, req)
 			if err != nil {
 				log.Println("failed to announce seeded torrent", i.ID, int160.FromBytes(i.Infohash).String(), err)
-				continue
 			}
 
 			nextts := time.Now().Add(timex.DurationMax(time.Duration(announced.Interval)*time.Second, time.Hour))
