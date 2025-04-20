@@ -117,6 +117,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 				torrent.ClientConfigInfoLogger(log.New(io.Discard, "[torrent] ", log.Flags())),
 				torrent.ClientConfigMuxer(tm),
 				torrent.ClientConfigBucketLimit(32),
+				torrent.ClientConfigHTTPUserAgent("retrovibed/0.0"),
 				bootstrap,
 			),
 		),

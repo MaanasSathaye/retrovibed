@@ -403,7 +403,7 @@ github.com/james-lawrence/genieql/internal/userx
 github.com/james-lawrence/genieql/internal/wasidialect
 github.com/james-lawrence/genieql/internal/wasix/ffierrors
 github.com/james-lawrence/genieql/internal/wasix/ffiguest
-# github.com/james-lawrence/torrent v0.0.0-20250420183555-9b657c319ff3
+# github.com/james-lawrence/torrent v0.0.0-20250420210626-a1bbc07fd5d5
 ## explicit; go 1.23.2
 github.com/james-lawrence/torrent
 github.com/james-lawrence/torrent/bencode
