@@ -106,7 +106,6 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, 
 				tracker.AnnounceOptionKey,
 				tracker.AnnounceOptionDownloaded(int64(i.Downloaded)),
 				tracker.AnnounceOptionUploaded(int64(i.Uploaded)),
-				// tracker.AnnounceOptionEventCompleted,
 				tracker.AnnounceOptionSeeding,
 			)
 
