@@ -128,7 +128,7 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 	torrentvfs := fsx.DirVirtual(vfs.Path("torrent"))
 
 	// just copying as we receive data to block until done.
-	if downloaded, err = torrent.DownloadInto(ctx, mhash, t, torrent.TuneAnnounceOnce, torrent.TuneNewConns); err != nil {
+	if downloaded, err = torrent.DownloadInto(ctx, mhash, t, torrent.TuneAnnounceUntilComplete, torrent.TuneNewConns); err != nil {
 		return errorsx.Wrap(err, "download failed")
 	}
 
