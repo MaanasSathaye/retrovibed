@@ -118,6 +118,5 @@ func Main(args ...string) {
 	}
 
 	shellCli.Cleanup.Wait()
-	time.Sleep(10 * time.Second)
 	ctx.FatalIfErrorf(err)
 }

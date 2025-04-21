@@ -1,10 +1,8 @@
 package duckdbx
 
 import (
-	"github.com/Masterminds/squirrel"
-	"github.com/retrovibed/retrovibed/internal/squirrelx"
+	"fmt"
 
-	"github.com/grindlemire/go-lucene"
 	"github.com/grindlemire/go-lucene/pkg/driver"
 	"github.com/grindlemire/go-lucene/pkg/lucene/expr"
 )
@@ -15,7 +13,9 @@ type Lucene struct {
 
 func NewLucene() Lucene {
 	fns := map[expr.Operator]driver.RenderFN{
-		// expr.Equals: myEquals,
+		expr.Equals: func(left, right string) (string, error) {
+			return fmt.Sprintf("%s ILIKE '%%' || %s || '%%'", left, right), nil
+		},
 	}
 
 	// iterate over the existing base render functions and swap out any that you want to
@@ -32,15 +32,4 @@ func NewLucene() Lucene {
 			RenderFNs: fns,
 		},
 	}
-}
-
-func LuceneQuery(s string) squirrel.Sqlizer {
-	return squirrelx.SqlizerFn(func() (sql string, args []interface{}, err error) {
-		ast, err := lucene.Parse(s)
-		if err != nil {
-			return "", nil, err
-		}
-
-		return Lucene{}.RenderParam(ast)
-	})
 }

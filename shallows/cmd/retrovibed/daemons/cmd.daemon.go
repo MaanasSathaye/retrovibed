@@ -14,6 +14,7 @@ import (
 
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/krpc"
+	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
@@ -34,6 +35,7 @@ import (
 	"github.com/retrovibed/retrovibed/media"
 	"github.com/retrovibed/retrovibed/meta/identityssh"
 	"github.com/retrovibed/retrovibed/metaapi"
+	"github.com/retrovibed/retrovibed/tracking"
 
 	_ "github.com/marcboeker/go-duckdb/v2"
 
@@ -118,8 +120,14 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 				torrent.ClientConfigMuxer(tm),
 				torrent.ClientConfigBucketLimit(32),
 				torrent.ClientConfigHTTPUserAgent("retrovibed/0.0"),
-				torrent.ClientConfigConnectionClosed(func(t *torrent.torrent, stats torrent.ConnStats) {
-
+				torrent.ClientConfigConnectionClosed(func(ih metainfo.Hash, stats torrent.ConnStats) {
+					var md tracking.Metadata
+					ictx, done := context.WithTimeout(context.Background(), 3*time.Second)
+					defer done()
+					if err := tracking.MetadataUploadedByID(ictx, db, ih.Bytes(), stats.BytesWrittenData.Uint64()).Scan(&md); err != nil {
+						log.Println(errorsx.Wrapf(err, "%s: unable to record uploaded metrics", ih.HexString()))
+						return
+					}
 				}),
 				// func(t *torrent, stats ConnStats) {
 				// log.Println("connection closed", t.md.ID.HexString(), stats.BytesReadUsefulData.Int64(), stats.BytesWrittenData.Int64())

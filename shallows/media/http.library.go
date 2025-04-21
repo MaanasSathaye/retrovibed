@@ -214,11 +214,12 @@ func (t *HTTPLibrary) search(w http.ResponseWriter, r *http.Request) {
 	msg.Next.Limit = numericx.Min(msg.Next.Limit, 100)
 
 	q := library.MetadataSearchBuilder().Where(squirrel.And{
-		library.MetadataQueryVisible(),
-		lucenex.Query(t.fts, msg.Next.Query, lucenex.WithDefaultField("description")),
+		// library.MetadataQueryVisible(),
+		lucenex.Query(t.fts, msg.Next.Query, lucenex.WithDefaultField("auto_description")),
 	}).OrderBy("description ASC").Offset(msg.Next.Offset * msg.Next.Limit).Limit(msg.Next.Limit)
 
-	err = sqlxx.ScanEach(library.MetadataSearch(r.Context(), t.q, q), func(p *library.Metadata) error {
+	err = sqlxx.ScanEach(library.MetadataSearch(r.Context(), sqlx.Debug(t.q), q), func(p *library.Metadata) error {
+		log.Println("WAAAAT", p.ID)
 		tmp := langx.Clone(Media{}, MediaOptionFromLibraryMetadata(langx.Clone(*p, library.MetadataOptionJSONSafeEncode)))
 		msg.Items = append(msg.Items, &tmp)
 		return nil

@@ -91,6 +91,10 @@ func MetadataQueryShared() squirrel.Sqlizer {
 	return squirrel.Expr("library_metadata.torrent_id != '00000000-0000-0000-0000-000000000000'")
 }
 
+func MetadataQueryNotIndexed() squirrel.Sqlizer {
+	return squirrel.Expr("library_metadata.auto_description == ''")
+}
+
 func MetadataSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) MetadataScanner {
 	return NewMetadataScannerStatic(b.RunWith(q).QueryContext(ctx))
 }
