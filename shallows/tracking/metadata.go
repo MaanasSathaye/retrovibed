@@ -90,8 +90,16 @@ func MetadataQuerySeeding() squirrel.Sqlizer {
 	return squirrel.Expr("torrents_metadata.seeding")
 }
 
+func MetadataQueryHasTracker() squirrel.Sqlizer {
+	return squirrel.Expr("torrents_metadata.tracker != ''")
+}
+
 func MetadataQueryNeedsAnnounce() squirrel.Sqlizer {
-	return squirrel.Expr("torrents_metadata.next_announce_at < NOW() AND tracker != ''")
+	return squirrel.Expr("torrents_metadata.next_announce_at < NOW()")
+}
+
+func MetadataQueryAnnounceable() squirrel.Sqlizer {
+	return squirrel.Expr("torrents_metadata.next_announce_at < 'infinity'")
 }
 
 func MetadataSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) MetadataScanner {

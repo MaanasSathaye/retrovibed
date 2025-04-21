@@ -90,6 +90,7 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, 
 		query := tracking.MetadataSearchBuilder().Where(
 			squirrel.And{
 				tracking.MetadataQuerySeeding(),
+				tracking.MetadataQueryHasTracker(),
 				tracking.MetadataQueryNeedsAnnounce(),
 			},
 		).Limit(limit)
@@ -134,15 +135,26 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, 
 			var (
 				err    error
 				nextts time.Time
+				delay  time.Duration
 			)
+			query, args, err := tracking.MetadataSearchBuilder().RemoveColumns().Columns("next_announce_at").Where(
+				squirrel.And{
+					tracking.MetadataQuerySeeding(),
+					tracking.MetadataQueryHasTracker(),
+					tracking.MetadataQueryAnnounceable(),
+				},
+			).OrderBy("next_announce_at ASC").Limit(limit).ToSql()
+			if err != nil {
+				panic(errorsx.Wrap(err, "failed to generate announce query"))
+			}
 
-			if nextts, err = sqlx.Timestamp(ctx, q, "SELECT next_announce_at FROM torrents_metadata WHERE next_announce_at < 'infinity'"); err != nil {
-				delay := backoffx.DynamicHash15m(uuid.Must(uuid.NewV4()).String())
+			if nextts, err = sqlx.Timestamp(ctx, q, query, args...); err != nil {
+				delay = backoffx.DynamicHash15m(uuid.Must(uuid.NewV4()).String())
 				log.Printf("unable to determine next timestamp - %v", err)
 				nextts = time.Now().Add(delay)
 			}
 
-			log.Printf("announce - next will be %v\n", nextts)
+			log.Printf("announce - next will be %v %v\n", delay, nextts)
 			time.Sleep(time.Until(nextts))
 		}
 	}
