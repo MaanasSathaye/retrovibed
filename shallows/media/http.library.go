@@ -91,7 +91,7 @@ func (t *HTTPLibrary) Bind(r *mux.Router) {
 	r.Path("/{id}").Methods(http.MethodGet).Handler(alice.New(
 		httpauth.AuthenticateWithToken(t.jwtsecret),
 		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
-		httpx.TimeoutRollingWrite(3*time.Second),
+		httpx.Timeout10s(),
 	).Then(http.FileServerFS(fsx.VirtualAsFSWithRewrite(t.mediastorage, func(s string) string {
 		return strings.TrimPrefix(s, "m/")
 	}))))

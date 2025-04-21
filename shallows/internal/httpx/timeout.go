@@ -3,6 +3,7 @@ package httpx
 import (
 	"context"
 	"io"
+	"log"
 	"net/http"
 	"time"
 )
@@ -66,14 +67,44 @@ func TimeoutRollingRead(max time.Duration) func(http.Handler) http.Handler {
 func TimeoutRollingWrite(max time.Duration) func(http.Handler) http.Handler {
 	return func(original http.Handler) http.Handler {
 		return http.HandlerFunc(func(resp http.ResponseWriter, req *http.Request) {
-			// TODO:
-			// ctx, cancel := context.WithCancel(req.Context())
-			// defer cancel()
-			// req.Body = newTimeoutReader(cancel, max, req.Body)
-			// original.ServeHTTP(resp, req.WithContext(ctx))
-			original.ServeHTTP(resp, req)
+			ctx, cancel := context.WithCancel(req.Context())
+			defer cancel()
+
+			resp = newTimeoutWriter(cancel, max, resp)
+			original.ServeHTTP(resp, req.WithContext(ctx))
 		})
 	}
+}
+
+func newTimeoutWriter(cancel context.CancelFunc, d time.Duration, r http.ResponseWriter) *timeoutresponse {
+	return &timeoutresponse{
+		ResponseWriter: r,
+		cancel:         cancel,
+		d:              d,
+		timer:          time.NewTimer(d),
+	}
+}
+
+type timeoutresponse struct {
+	http.ResponseWriter
+	cancel context.CancelFunc
+	d      time.Duration
+	timer  *time.Timer
+}
+
+func (t *timeoutresponse) Write(b []byte) (n int, err error) {
+	n, err = t.ResponseWriter.Write(b)
+
+	select {
+	case <-t.timer.C:
+		t.cancel()
+		return 0, context.DeadlineExceeded
+	default:
+	}
+	log.Println("checkpoint 1")
+	t.timer.Reset(t.d)
+
+	return n, err
 }
 
 func newTimeoutReader(cancel context.CancelFunc, d time.Duration, r io.ReadCloser) *timeoutreader {
