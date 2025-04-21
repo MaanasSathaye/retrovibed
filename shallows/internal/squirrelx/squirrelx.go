@@ -46,3 +46,21 @@ func QueryNonZero[T comparable](expr string, s T) squirrel.Sqlizer {
 
 	return squirrel.Expr(expr, s)
 }
+
+func Error(cause error) squirrel.Sqlizer {
+	return err{cause: cause}
+}
+
+type err struct {
+	cause error
+}
+
+func (t err) ToSql() (sql string, args []interface{}, err error) {
+	return "", nil, t.cause
+}
+
+type SqlizerFn func() (sql string, args []interface{}, err error)
+
+func (t SqlizerFn) ToSql() (sql string, args []interface{}, err error) {
+	return t()
+}

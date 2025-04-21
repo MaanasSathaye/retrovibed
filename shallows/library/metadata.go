@@ -20,6 +20,12 @@ func MetadataOptionDescription(d string) MetadataOption {
 	}
 }
 
+func MetadataOptionAutoDescription(d string) MetadataOption {
+	return func(m *Metadata) {
+		m.AutoDescription = d
+	}
+}
+
 func MetadataOptionTorrentID(d string) MetadataOption {
 	return func(m *Metadata) {
 		m.TorrentID = d

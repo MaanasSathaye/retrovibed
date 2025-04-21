@@ -7,6 +7,7 @@ CREATE TABLE library_metadata (
     hidden_at TIMESTAMPTZ NOT NULL DEFAULT 'infinity',
     tombstoned_at TIMESTAMPTZ NOT NULL DEFAULT 'infinity',
     description STRING NOT NULL DEFAULT '',
+    auto_description STRING NOT NULL DEFAULT '', -- application managed description
     mimetype STRING NOT NULL DEFAULT 'application/octet-stream',
     image STRING NOT NULL DEFAULT '',
     bytes UBIGINT NOT NULL,

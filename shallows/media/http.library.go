@@ -16,6 +16,7 @@ import (
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/httpauth"
 	"github.com/retrovibed/retrovibed/internal/bytesx"
+	"github.com/retrovibed/retrovibed/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/internal/env"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/formx"
@@ -24,6 +25,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/iox"
 	"github.com/retrovibed/retrovibed/internal/jwtx"
 	"github.com/retrovibed/retrovibed/internal/langx"
+	"github.com/retrovibed/retrovibed/internal/lucenex"
 	"github.com/retrovibed/retrovibed/internal/md5x"
 	"github.com/retrovibed/retrovibed/internal/numericx"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
@@ -45,6 +47,7 @@ func NewHTTPLibrary(q sqlx.Queryer, s fsx.Virtual, options ...HTTPLibraryOption)
 		jwtsecret:    env.JWTSecret,
 		decoder:      formx.NewDecoder(),
 		mediastorage: s,
+		fts:          duckdbx.NewLucene(),
 	}, options...)
 
 	return &svc
@@ -55,6 +58,7 @@ type HTTPLibrary struct {
 	jwtsecret    jwtx.SecretSource
 	decoder      *form.Decoder
 	mediastorage fsx.Virtual
+	fts          lucenex.Driver
 }
 
 func (t *HTTPLibrary) Bind(r *mux.Router) {
@@ -211,7 +215,7 @@ func (t *HTTPLibrary) search(w http.ResponseWriter, r *http.Request) {
 
 	q := library.MetadataSearchBuilder().Where(squirrel.And{
 		library.MetadataQueryVisible(),
-		library.MetadataQuerySearch(msg.Next.Query, "description"),
+		lucenex.Query(t.fts, msg.Next.Query, lucenex.WithDefaultField("description")),
 	}).OrderBy("description ASC").Offset(msg.Next.Offset * msg.Next.Limit).Limit(msg.Next.Limit)
 
 	err = sqlxx.ScanEach(library.MetadataSearch(r.Context(), t.q, q), func(p *library.Metadata) error {

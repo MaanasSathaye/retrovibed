@@ -403,7 +403,7 @@ func DiscoverDHTMetadata(ctx context.Context, db sqlx.Queryer, s *dht.Server, tc
 }
 
 func PrintStatistics(ctx context.Context, q sqlx.Queryer) {
-	timex.Every(30*time.Second, func() {
+	timex.Every(5*time.Minute, func() {
 		type stats struct {
 			Pending   int
 			Available int
