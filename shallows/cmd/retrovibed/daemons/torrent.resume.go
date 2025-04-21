@@ -113,7 +113,10 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, 
 
 			log.Println("announcing", i.ID, int160.FromBytes(i.Infohash).String())
 			announced, err := announcer.ForTracker(i.Tracker).Do(ctx, req)
-			if err != nil {
+			if err == tracker.ErrMissingInfoHash {
+				errorsx.Log(errorsx.Wrapf(tracking.MetadataDisableAnnounced(ctx, q, i.ID).Scan(&i), "unable to disable announcements for torrent: %s", i.ID))
+				continue
+			} else if err != nil {
 				log.Println("failed to announce seeded torrent", i.ID, int160.FromBytes(i.Infohash).String(), err)
 			}
 
