@@ -6,6 +6,7 @@ import (
 	"github.com/grindlemire/go-lucene/pkg/lucene/expr"
 	"github.com/retrovibed/retrovibed/internal/langx"
 	"github.com/retrovibed/retrovibed/internal/squirrelx"
+	"github.com/retrovibed/retrovibed/internal/stringsx"
 )
 
 type Driver interface {
@@ -24,6 +25,10 @@ func WithDefaultField(s string) Option {
 	}
 }
 func Query(d Driver, s string, options ...Option) squirrel.Sqlizer {
+	if stringsx.Blank(s) {
+		return squirrelx.Noop{}
+	}
+
 	cfg := langx.Clone(config{}, options...)
 	return squirrelx.SqlizerFn(func() (sql string, args []interface{}, err error) {
 		ast, err := lucene.Parse(s, lucene.WithDefaultField(cfg.DefaultField))

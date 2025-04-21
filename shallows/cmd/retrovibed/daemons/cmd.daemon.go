@@ -118,6 +118,12 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 				torrent.ClientConfigMuxer(tm),
 				torrent.ClientConfigBucketLimit(32),
 				torrent.ClientConfigHTTPUserAgent("retrovibed/0.0"),
+				torrent.ClientConfigConnectionClosed(func(t *torrent.torrent, stats torrent.ConnStats) {
+
+				}),
+				// func(t *torrent, stats ConnStats) {
+				// log.Println("connection closed", t.md.ID.HexString(), stats.BytesReadUsefulData.Int64(), stats.BytesWrittenData.Int64())
+				// }
 				bootstrap,
 			),
 		),
