@@ -168,6 +168,7 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Vir
 						tracking.MetadataOptionFromInfo(&mi),
 						tracking.MetadataOptionDescription(stringsx.FirstNonBlank(mi.Name, item.Title)),
 						tracking.MetadataOptionTrackers(md.Announce),
+						tracking.MetadataOptionAutoDescription,
 					)).Scan(&meta); err != nil {
 					log.Println("unable to record torrent metadata", feed.ID, err)
 					continue

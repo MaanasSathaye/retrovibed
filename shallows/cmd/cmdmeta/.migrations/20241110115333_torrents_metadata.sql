@@ -16,6 +16,7 @@ CREATE TABLE torrents_metadata (
     uploaded UBIGINT NOT NULL DEFAULT 0,
     peers USMALLINT NOT NULL DEFAULT 0,
     description STRING NOT NULL DEFAULT '',
+    auto_description STRING NOT NULL DEFAULT '', -- application managed description
     infohash BINARY NOT NULL
 );
 -- +goose StatementEnd

@@ -19,6 +19,7 @@ import (
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/internal/bytesx"
+	"github.com/retrovibed/retrovibed/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/internal/env"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/formx"
@@ -27,6 +28,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/iox"
 	"github.com/retrovibed/retrovibed/internal/jwtx"
 	"github.com/retrovibed/retrovibed/internal/langx"
+	"github.com/retrovibed/retrovibed/internal/lucenex"
 	"github.com/retrovibed/retrovibed/internal/numericx"
 	"github.com/retrovibed/retrovibed/internal/slicesx"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
@@ -61,6 +63,7 @@ func NewHTTPDiscovered(q sqlx.Queryer, d download, c storage.ClientImpl, options
 		jwtsecret:    env.JWTSecret,
 		decoder:      formx.NewDecoder(),
 		mediastorage: fsx.DirVirtual(os.TempDir()),
+		fts:          duckdbx.NewLucene(),
 	}, options...)
 
 	return &svc
@@ -73,6 +76,7 @@ type HTTPDiscovered struct {
 	jwtsecret    jwtx.SecretSource
 	decoder      *form.Decoder
 	mediastorage fsx.Virtual
+	fts          lucenex.Driver
 }
 
 func (t *HTTPDiscovered) Bind(r *mux.Router) {
@@ -181,6 +185,7 @@ func (t *HTTPDiscovered) upload(w http.ResponseWriter, r *http.Request) {
 	lmd := tracking.NewMetadata(langx.Autoptr(meta.HashInfoBytes()),
 		tracking.MetadataOptionFromInfo(&info),
 		tracking.MetadataOptionTrackers(slicesx.Flatten(meta.UpvertedAnnounceList()...)...),
+		tracking.MetadataOptionAutoDescription,
 	)
 
 	if err = tracking.MetadataInsertWithDefaults(r.Context(), t.q, lmd).Scan(&lmd); err != nil {
@@ -389,7 +394,8 @@ func (t *HTTPDiscovered) search(w http.ResponseWriter, r *http.Request) {
 
 	q := tracking.MetadataSearchBuilder().Where(squirrel.And{
 		tracking.MetadataQueryNotInitiated(),
-		tracking.MetadataQuerySearch(msg.Next.Query, "description"),
+		// tracking.MetadataQuerySearch(msg.Next.Query, "description"),
+		lucenex.Query(t.fts, msg.Next.Query, lucenex.WithDefaultField("auto_description")),
 	}).OrderBy("created_at DESC").Offset(msg.Next.Offset * msg.Next.Limit).Limit(msg.Next.Limit)
 
 	err = sqlxx.ScanEach(tracking.MetadataSearch(r.Context(), t.q, q), func(p *tracking.Metadata) error {

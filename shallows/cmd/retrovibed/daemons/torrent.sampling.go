@@ -311,7 +311,7 @@ func DiscoverDHTMetadata(ctx context.Context, db sqlx.Queryer, s *dht.Server, tc
 			return errorsx.Wrapf(err, "unable to download metadata for infohash %s", unk.ID)
 		}
 
-		if err = tracking.MetadataInsertWithDefaults(ctx, db, tracking.NewMetadata(&metadata.ID, tracking.MetadataOptionFromInfo(info))).Scan(&md); err != nil {
+		if err = tracking.MetadataInsertWithDefaults(ctx, db, tracking.NewMetadata(&metadata.ID, tracking.MetadataOptionFromInfo(info), tracking.MetadataOptionAutoDescription)).Scan(&md); err != nil {
 			return errorsx.Wrap(err, "unable to insert metadata")
 		}
 

@@ -214,7 +214,7 @@ func (t *HTTPLibrary) search(w http.ResponseWriter, r *http.Request) {
 	msg.Next.Limit = numericx.Min(msg.Next.Limit, 100)
 
 	q := library.MetadataSearchBuilder().Where(squirrel.And{
-		// library.MetadataQueryVisible(),
+		library.MetadataQueryVisible(),
 		lucenex.Query(t.fts, msg.Next.Query, lucenex.WithDefaultField("auto_description")),
 	}).OrderBy("description ASC").Offset(msg.Next.Offset * msg.Next.Limit).Limit(msg.Next.Limit)
 

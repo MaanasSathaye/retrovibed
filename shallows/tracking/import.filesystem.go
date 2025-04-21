@@ -59,7 +59,7 @@ func ImportTorrent(q sqlx.Queryer, mvfs, tvfs fsx.Virtual) library.ImportOp {
 			return nil, errorsx.Wrap(err, "unable to extract info")
 		}
 
-		if err = MetadataInsertWithDefaults(ctx, q, NewMetadata(&md.ID, MetadataOptionFromInfo(&info))).Scan(&tmd); err != nil {
+		if err = MetadataInsertWithDefaults(ctx, q, NewMetadata(&md.ID, MetadataOptionFromInfo(&info), MetadataOptionAutoDescription)).Scan(&tmd); err != nil {
 			return nil, errorsx.Wrap(err, "unable to insert metadata")
 		}
 

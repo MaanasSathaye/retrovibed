@@ -60,6 +60,10 @@ func MetadataOptionJSONSafeEncode(p *Metadata) {
 	p.UpdatedAt = timex.RFC3339NanoEncode(p.UpdatedAt)
 }
 
+func MetadataOptionAutoDescription(m *Metadata) {
+	m.AutoDescription = NormalizedDescription(m.Description)
+}
+
 func NewMetadata(md *metainfo.Hash, options ...func(*Metadata)) (m Metadata) {
 	r := langx.Clone(Metadata{
 		ID:             HashUID(md),

@@ -122,6 +122,7 @@ func (t Directory) download(ctx context.Context, path string) {
 		tracking.NewMetadata(langx.Autoptr(dl.Metadata().ID),
 			tracking.MetadataOptionFromInfo(dl.Info()),
 			tracking.MetadataOptionTrackers(meta.Trackers...),
+			tracking.MetadataOptionAutoDescription,
 		),
 	).Scan(&md); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to insert metadata"))
