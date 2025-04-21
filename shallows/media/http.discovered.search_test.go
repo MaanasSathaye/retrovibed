@@ -54,7 +54,7 @@ func TestDiscoveredSearchTorrents(t *testing.T) {
 	encoder := formx.NewEncoder()
 	query, err := encoder.Encode(media.MediaSearchRequest{
 		Limit: 100,
-		Query: "[FnP]",
+		Query: "FnP",
 	})
 	require.NoError(t, err)
 
