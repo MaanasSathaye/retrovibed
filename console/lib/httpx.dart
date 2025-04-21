@@ -67,6 +67,10 @@ Future<http.Response> auto_error(http.Response v) {
 }
 
 class ErrorsTest {
+  static bool unauthorized(Object obj) {
+    return obj is http.Response && obj.statusCode == 401;
+  }
+
   static bool err404(Object obj) {
     return obj is http.Response && obj.statusCode == 404;
   }

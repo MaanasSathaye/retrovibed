@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:console/designkit.dart' as ds;
 import 'package:console/media.dart' as media;
 import 'package:console/mimex.dart' as mimex;
+import 'package:console/httpx.dart' as httpx;
 import './search.row.dart';
 
 class AvailableListDisplay extends StatefulWidget {
@@ -31,6 +32,12 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
     next: media.media.request(limit: 32),
   );
 
+  void reseterr() {
+    setState(() {
+      _cause = null;
+    });
+  }
+
   void refresh(media.MediaSearchRequest req) {
     widget
         .search(req)
@@ -49,9 +56,15 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
             );
           });
         })
+        .catchError((cause) {
+          setState(() {
+            _cause = ds.Error.unauthorized(cause, onTap: reseterr);
+            _loading = false;
+          });
+        }, test: httpx.ErrorsTest.unauthorized)
         .catchError((e) {
           setState(() {
-            _cause = ds.Error.unknown(e);
+            _cause = ds.Error.unknown(e, onTap: reseterr);
             _loading = false;
           });
         });
@@ -90,14 +103,16 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                       })
                       .catchError((cause) {
                         setState(() {
-                          _cause = ds.Error.unknown(cause);
+                          _cause = ds.Error.unknown(cause, onTap: reseterr);
                         });
                       });
                 });
               }),
             )
             .then((v) => ds.NullWidget)
-            .catchError(ds.Error.unknown)
+            .catchError((cause) {
+              return ds.Error.unknown(cause, onTap: reseterr);
+            })
             .whenComplete(
               () => setState(() {
                 _loading = false;

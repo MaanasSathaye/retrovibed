@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math/rand/v2"
 	"time"
 
 	"github.com/Masterminds/squirrel"
@@ -120,7 +121,7 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, 
 				log.Println("failed to announce seeded torrent", i.ID, int160.FromBytes(i.Infohash).String(), err)
 			}
 
-			nextts := time.Now().Add(timex.DurationMax(time.Duration(announced.Interval)*time.Second, time.Hour))
+			nextts := time.Now().Add(timex.DurationMax(time.Duration(announced.Interval)*time.Second, time.Hour) + time.Duration(rand.Int64N(int64(time.Minute))))
 			if err := tracking.MetadataAnnounced(ctx, q, i.ID, nextts).Scan(&i); err != nil {
 				log.Println("failed to record announcement", err)
 				continue

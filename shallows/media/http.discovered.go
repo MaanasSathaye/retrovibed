@@ -18,6 +18,7 @@ import (
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/justinas/alice"
+	"github.com/retrovibed/retrovibed/httpauth"
 	"github.com/retrovibed/retrovibed/internal/bytesx"
 	"github.com/retrovibed/retrovibed/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/internal/env"
@@ -101,7 +102,7 @@ func (t *HTTPDiscovered) Bind(r *mux.Router) {
 	r.Path("/downloading").Methods(http.MethodGet).Handler(alice.New(
 		httpx.ContextBufferPool512(),
 		httpx.ParseForm,
-		// httpauth.AuthenticateWithToken(t.jwtsecret),
+		httpauth.AuthenticateWithToken(t.jwtsecret),
 		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
 		httpx.Timeout2s(),
 	).ThenFunc(t.downloading))
@@ -109,7 +110,7 @@ func (t *HTTPDiscovered) Bind(r *mux.Router) {
 	r.Path("/{id}").Methods(http.MethodPost).Handler(alice.New(
 		httpx.ContextBufferPool512(),
 		httpx.ParseForm,
-		// httpauth.AuthenticateWithToken(t.jwtsecret),
+		httpauth.AuthenticateWithToken(t.jwtsecret),
 		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
 		httpx.Timeout2s(),
 	).ThenFunc(t.download))
@@ -117,7 +118,7 @@ func (t *HTTPDiscovered) Bind(r *mux.Router) {
 	r.Path("/{id}").Methods(http.MethodDelete).Handler(alice.New(
 		httpx.ContextBufferPool512(),
 		httpx.ParseForm,
-		// httpauth.AuthenticateWithToken(t.jwtsecret),
+		httpauth.AuthenticateWithToken(t.jwtsecret),
 		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
 		httpx.Timeout2s(),
 	).ThenFunc(t.pause))

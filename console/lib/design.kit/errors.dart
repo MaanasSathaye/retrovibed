@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import './screens.dart' as screens;
 import "./theme.defaults.dart" as theming;
 
+final EDNSRESOLUTION = -2;
 final ECONNREFUSED = 111;
 final ENOROUTE = 113;
 
@@ -12,6 +13,10 @@ class ErrorTests {
     return obj is SocketException &&
         (obj.osError?.errorCode == ECONNREFUSED ||
             obj.osError?.errorCode == ENOROUTE);
+  }
+
+  static bool dnsresolution(Object obj) {
+    return obj is SocketException && (obj.osError?.errorCode == EDNSRESOLUTION);
   }
 
   static bool timeout(Object obj) {
@@ -69,8 +74,9 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
 class Error extends StatelessWidget {
   final Object? cause;
   final Widget child;
+  final void Function()? onTap;
 
-  const Error({super.key, required this.child, this.cause = null});
+  const Error({super.key, required this.child, this.cause = null, this.onTap});
 
   @override
   StatelessElement createElement() {
@@ -80,35 +86,48 @@ class Error extends StatelessWidget {
     return super.createElement();
   }
 
-  static Error text(String text) => Error(child: SelectableText(text));
-  static Error unknown(Object obj) {
+  static Error text(String text, {void Function()? onTap}) =>
+      Error(child: SelectableText(text), onTap: onTap);
+
+  static Error unknown(Object obj, {void Function()? onTap}) {
     return Error(
       child: SelectableText("an unexpected problem has occurred"),
       cause: obj,
+      onTap: onTap,
     );
   }
 
-  static Error? maybeErr(Object? obj) {
-    if (obj == null) return null;
-    if (obj is Error) return obj;
-    return unknown(obj);
+  static Error unauthorized(Object obj, {void Function()? onTap}) {
+    return Error(
+      child: SelectableText("you lack sufficient permissions"),
+      cause: obj,
+      onTap: onTap,
+    );
   }
 
-  static Error offline(SocketException obj) {
+  static Error? maybeErr(Object? obj, {void Function()? onTap}) {
+    if (obj == null) return null;
+    if (obj is Error) return obj;
+    return unknown(obj, onTap: onTap);
+  }
+
+  static Error offline(SocketException obj, {void Function()? onTap}) {
     return Error(
       child: SelectableText(
         "unable to connect to daemon, is it running? check ${obj.address?.address}:${obj.port}.",
       ),
       cause: obj,
+      onTap: onTap,
     );
   }
 
-  static Error timeout(Object obj) {
+  static Error timeout(Object obj, {void Function()? onTap}) {
     return Error(
       child: SelectableText(
         "timeout error: unable to complete within the expected timeframe",
       ),
       cause: obj,
+      onTap: onTap,
     );
   }
 
@@ -127,9 +146,12 @@ class Error extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final defaults = theming.Defaults.of(context);
-    return Container(
-      decoration: BoxDecoration(color: defaults.danger),
-      child: Center(child: child),
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(color: defaults.danger),
+        child: Center(child: child),
+      ),
     );
   }
 }

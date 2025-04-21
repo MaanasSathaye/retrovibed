@@ -56,6 +56,12 @@ class _DaemonAuto extends State<EndpointAuto> {
       _loading = true;
     });
 
+    final reseterr = () {
+      setState(() {
+        _cause = null;
+      });
+    };
+
     pending
         .then((v) {
           return api.healthz(host: v.hostname).then((value) => v);
@@ -83,7 +89,12 @@ class _DaemonAuto extends State<EndpointAuto> {
         }, test: ds.ErrorTests.offline)
         .catchError((e) {
           setState(() {
-            _cause = ds.Error.unknown(e);
+            _loading = false;
+          });
+        }, test: ds.ErrorTests.dnsresolution)
+        .catchError((e) {
+          setState(() {
+            _cause = ds.Error.unknown(e, onTap: reseterr);
             _loading = false;
           });
         });
