@@ -121,6 +121,10 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 				torrent.ClientConfigBucketLimit(32),
 				torrent.ClientConfigHTTPUserAgent("retrovibed/0.0"),
 				torrent.ClientConfigConnectionClosed(func(ih metainfo.Hash, stats torrent.ConnStats) {
+					if stats.BytesWrittenData.Uint64() == 0 {
+						return
+					}
+
 					var md tracking.Metadata
 					ictx, done := context.WithTimeout(context.Background(), 3*time.Second)
 					defer done()
