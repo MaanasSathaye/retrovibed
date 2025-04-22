@@ -4,11 +4,9 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"math/rand/v2"
 	"time"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
@@ -121,7 +119,8 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, 
 				log.Println("failed to announce seeded torrent", i.ID, int160.FromBytes(i.Infohash).String(), err)
 			}
 
-			nextts := time.Now().Add(timex.DurationMax(time.Duration(announced.Interval)*time.Second, time.Hour) + time.Duration(rand.Int64N(int64(time.Minute))))
+			nextts := time.Now().Add(timex.DurationMax(time.Duration(announced.Interval)*time.Second, time.Hour)).Add(backoffx.Random(time.Minute))
+
 			if err := tracking.MetadataAnnounced(ctx, q, i.ID, nextts).Scan(&i); err != nil {
 				log.Println("failed to record announcement", err)
 				continue
@@ -139,8 +138,9 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, 
 			var (
 				err    error
 				nextts time.Time
-				delay  time.Duration
+				delay  time.Duration = backoffx.Random(5 * time.Minute)
 			)
+
 			query, args, err := tracking.MetadataSearchBuilder().RemoveColumns().Columns("next_announce_at").Where(
 				squirrel.And{
 					tracking.MetadataQuerySeeding(),
@@ -153,10 +153,11 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, 
 			}
 
 			if nextts, err = sqlx.Timestamp(ctx, q, query, args...); err != nil {
-				delay = backoffx.DynamicHash15m(uuid.Must(uuid.NewV4()).String())
 				log.Printf("unable to determine next timestamp - %v", err)
-				nextts = time.Now().Add(delay)
+				nextts = time.Now().Add(10 * time.Minute)
 			}
+
+			nextts = nextts.Add(delay)
 
 			log.Printf("announce - next will be %v %v\n", delay, nextts)
 			time.Sleep(time.Until(nextts))

@@ -144,6 +144,11 @@ func Attempt(d Strategy, do func(int) int) {
 	}
 }
 
+// random backoff within the specified range.
+func Random(d time.Duration) time.Duration {
+	return time.Duration(rand.Int63n(int64(d)))
+}
+
 // generate a *consistent* duration based on the input i within the
 // provided window. this isn't the best location for these functions.
 // but the lack of a better location.
