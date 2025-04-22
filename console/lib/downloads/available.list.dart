@@ -82,7 +82,9 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
               }),
             )
             .then((v) => ds.NullWidget)
-            .catchError(ds.Error.unknown)
+            .catchError((cause) {
+              return ds.Error.unknown(cause);
+            })
             .whenComplete(
               () => setState(() {
                 _loading = false;
