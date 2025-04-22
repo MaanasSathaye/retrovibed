@@ -16,12 +16,13 @@ func AuthenticateWithToken(p jwtx.SecretSource) func(http.Handler) http.Handler 
 	return func(original http.Handler) http.Handler {
 		return http.HandlerFunc(func(resp http.ResponseWriter, req *http.Request) {
 			var (
-				err error
-				b   jwt.RegisteredClaims
+				err     error
+				b       jwt.RegisteredClaims
+				encoded = authn.Bearer(req)
 			)
 
-			if err = jwtx.Validate(p, authn.Bearer(req), &b); err != nil {
-				httpx.Unauthorized(resp, errorsx.Wrap(err, "failed to decode token"))
+			if err = jwtx.Validate(p, encoded, &b); err != nil {
+				httpx.Unauthorized(resp, errorsx.Wrapf(err, "failed to decode token: %s", encoded))
 				return
 			}
 
