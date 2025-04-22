@@ -22,7 +22,7 @@ func AuthenticateWithToken(p jwtx.SecretSource) func(http.Handler) http.Handler 
 			)
 
 			if err = jwtx.Validate(p, encoded, &b); err != nil {
-				httpx.Unauthorized(resp, errorsx.Wrapf(err, "failed to decode token: %s", encoded))
+				httpx.Unauthorized(resp, errorsx.Wrapf(err, "failed to verify token: %s", encoded))
 				return
 			}
 
