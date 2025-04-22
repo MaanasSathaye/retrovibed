@@ -208,7 +208,9 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 		select {
 		case <-statst.C:
 			stats := dl.Stats()
-			log.Printf("%s - %s: seeding(%t), peers(%d:%d:%d) pieces(%d:%d:%d:%d)\n", md.ID, hex.EncodeToString(md.Infohash), stats.Seeding, stats.ActivePeers, stats.PendingPeers, stats.TotalPeers, stats.Missing, stats.Outstanding, stats.Unverified, stats.Completed)
+			info := dl.Info()
+
+			log.Printf("%s - %s: info(%t) seeding(%t), peers(%d:%d:%d) pieces(%d:%d:%d:%d)\n", md.ID, hex.EncodeToString(md.Infohash), info != nil, stats.Seeding, stats.ActivePeers, stats.PendingPeers, stats.TotalPeers, stats.Missing, stats.Outstanding, stats.Unverified, stats.Completed)
 			if err := dl.Tune(torrent.TuneNewConns); err != nil {
 				log.Println("unable to request new connections", err)
 				continue

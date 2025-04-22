@@ -3,7 +3,6 @@ package httpx
 import (
 	"context"
 	"io"
-	"log"
 	"net/http"
 	"time"
 )
@@ -101,7 +100,7 @@ func (t *timeoutresponse) Write(b []byte) (n int, err error) {
 		return 0, context.DeadlineExceeded
 	default:
 	}
-	log.Println("checkpoint 1")
+
 	t.timer.Reset(t.d)
 
 	return n, err
