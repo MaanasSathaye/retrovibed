@@ -13,7 +13,7 @@ mediakit.Media PlayableMedia(Media current) {
       "id": current.id,
       "title": current.description,
     }),
-    httpHeaders: <String, String>{"Authorization": httpx.auto_bearer()},
+    httpHeaders: <String, String>{"Authorization": httpx.auto_bearer_host()},
   );
 }
 
