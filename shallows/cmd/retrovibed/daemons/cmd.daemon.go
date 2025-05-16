@@ -109,11 +109,21 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		bootstrap = torrent.ClientConfigBootstrapGlobal
 	}
 
+	rootstore := fsx.DirVirtual(userx.DefaultDataDirectory(userx.DefaultRelRoot()))
+	mediastore := fsx.DirVirtual(env.MediaDir())
+	torrentstore := fsx.DirVirtual(env.TorrentDir())
+
+	// tstore := blockcache.NewTorrentFromVirtualFS(mediastore)
+	torrentdir := env.TorrentDir()
+	tstore := storage.NewFile(torrentdir, storage.FileOptionPathMakerInfohash)
+
 	tm := dht.DefaultMuxer().
 		Method(bep0051.Query, bep0051.NewEndpoint(bep0051.EmptySampler{}))
 	tclient, err := tnetwork.Bind(
 		torrent.NewClient(
 			torrent.NewDefaultClientConfig(
+				torrent.NewMetadataCache(torrentstore.Path()),
+				tstore,
 				torrent.ClientConfigPeerID(string(peerid[:])),
 				torrent.ClientConfigSeed(true),
 				torrent.ClientConfigInfoLogger(log.New(io.Discard, "[torrent] ", log.Flags())),
@@ -143,14 +153,6 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	if err != nil {
 		return errorsx.Wrap(err, "unable to setup torrent client")
 	}
-
-	rootstore := fsx.DirVirtual(userx.DefaultDataDirectory(userx.DefaultRelRoot()))
-	mediastore := fsx.DirVirtual(env.MediaDir())
-	torrentstore := fsx.DirVirtual(env.TorrentDir())
-
-	// tstore := blockcache.NewTorrentFromVirtualFS(mediastore)
-	torrentdir := env.TorrentDir()
-	tstore := storage.NewFile(torrentdir, storage.FileOptionPathMakerInfohash)
 
 	dwatcher, err := downloads.NewDirectoryWatcher(dctx, db, rootstore, tclient, tstore)
 	if err != nil {

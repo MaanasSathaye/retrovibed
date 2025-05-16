@@ -6,15 +6,15 @@ toolchain go1.24.1
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
-	github.com/alecthomas/kong v1.9.0
+	github.com/alecthomas/kong v1.11.0
 	github.com/anacrolix/missinggo v1.3.0
 	github.com/anacrolix/utp v0.2.0
 	github.com/benbjohnson/immutable v0.4.3
-	github.com/charmbracelet/huh v0.6.0
-	github.com/fsnotify/fsnotify v1.8.0
-	github.com/gabriel-vasile/mimetype v1.4.8
+	github.com/charmbracelet/huh v0.7.0
+	github.com/fsnotify/fsnotify v1.9.0
+	github.com/gabriel-vasile/mimetype v1.4.9
 	github.com/go-playground/form/v4 v4.2.2
-	github.com/gofrs/uuid/v5 v5.3.1
+	github.com/gofrs/uuid/v5 v5.3.2
 	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/mux v1.8.1
@@ -22,10 +22,10 @@ require (
 	github.com/grindlemire/go-lucene v0.0.20
 	github.com/hashicorp/mdns v1.0.6
 	github.com/james-lawrence/genieql v0.0.0-20250306161027-bb1395f5f457
-	github.com/james-lawrence/torrent v0.0.0-20250421151305-90f59315e023
+	github.com/james-lawrence/torrent v0.0.0-20250516191035-6ee8e441b8ed
 	github.com/justinas/alice v1.2.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
-	github.com/marcboeker/go-duckdb/v2 v2.1.0
+	github.com/marcboeker/go-duckdb/v2 v2.2.1
 	github.com/mattn/go-isatty v0.0.20
 	github.com/onsi/ginkgo/v2 v2.23.3
 	github.com/onsi/gomega v1.36.3
@@ -33,9 +33,9 @@ require (
 	github.com/pressly/goose/v3 v3.24.1
 	github.com/stretchr/testify v1.10.0
 	github.com/willabides/kongplete v0.4.0
-	golang.org/x/crypto v0.37.0
+	golang.org/x/crypto v0.38.0
 	golang.org/x/oauth2 v0.28.0
-	golang.org/x/text v0.24.0
+	golang.org/x/text v0.25.0
 	golang.org/x/time v0.11.0
 	google.golang.org/protobuf v1.36.5
 )
@@ -59,7 +59,7 @@ require (
 	github.com/bits-and-blooms/bloom/v3 v3.7.0 // indirect
 	github.com/bradfitz/iter v0.0.0-20191230175014-e8f45d346db8 // indirect
 	github.com/catppuccin/go v0.3.0 // indirect
-	github.com/charmbracelet/bubbles v0.20.0 // indirect
+	github.com/charmbracelet/bubbles v0.21.0 // indirect
 	github.com/charmbracelet/bubbletea v1.3.4 // indirect
 	github.com/charmbracelet/colorprofile v0.2.3-0.20250311203215-f60798e515dc // indirect
 	github.com/charmbracelet/lipgloss v1.1.0 // indirect
@@ -68,12 +68,12 @@ require (
 	github.com/charmbracelet/x/exp/strings v0.0.0-20250313150240-c09addb0e197 // indirect
 	github.com/charmbracelet/x/term v0.2.1 // indirect
 	github.com/csnewman/flutter-go-bridge v0.2.0 // indirect
-	github.com/duckdb/duckdb-go-bindings v0.1.13 // indirect
-	github.com/duckdb/duckdb-go-bindings/darwin-amd64 v0.1.8 // indirect
-	github.com/duckdb/duckdb-go-bindings/darwin-arm64 v0.1.8 // indirect
-	github.com/duckdb/duckdb-go-bindings/linux-amd64 v0.1.8 // indirect
-	github.com/duckdb/duckdb-go-bindings/linux-arm64 v0.1.8 // indirect
-	github.com/duckdb/duckdb-go-bindings/windows-amd64 v0.1.8 // indirect
+	github.com/duckdb/duckdb-go-bindings v0.1.14 // indirect
+	github.com/duckdb/duckdb-go-bindings/darwin-amd64 v0.1.9 // indirect
+	github.com/duckdb/duckdb-go-bindings/darwin-arm64 v0.1.9 // indirect
+	github.com/duckdb/duckdb-go-bindings/linux-amd64 v0.1.9 // indirect
+	github.com/duckdb/duckdb-go-bindings/linux-arm64 v0.1.9 // indirect
+	github.com/duckdb/duckdb-go-bindings/windows-amd64 v0.1.9 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/edsrzf/mmap-go v1.2.0 // indirect
 	github.com/erikgeiser/coninput v0.0.0-20211004153227-1c3628e74d0f // indirect
@@ -100,8 +100,8 @@ require (
 	github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0 // indirect
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
-	github.com/marcboeker/go-duckdb/arrowmapping v0.0.6 // indirect
-	github.com/marcboeker/go-duckdb/mapping v0.0.6 // indirect
+	github.com/marcboeker/go-duckdb/arrowmapping v0.0.7 // indirect
+	github.com/marcboeker/go-duckdb/mapping v0.0.7 // indirect
 	github.com/mattn/go-localereader v0.0.1 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/mfridman/interpolate v0.0.2 // indirect
@@ -127,7 +127,7 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/exp v0.0.0-20250408133849-7e4ce0ab07d0 // indirect
 	golang.org/x/mod v0.24.0 // indirect
-	golang.org/x/sync v0.13.0 // indirect
+	golang.org/x/sync v0.14.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 )
 
@@ -144,7 +144,7 @@ require (
 	github.com/posener/complete v1.2.3 // indirect
 	github.com/riywo/loginshell v0.0.0-20200815045211-7d26008be1ab // indirect
 	golang.org/x/net v0.39.0 // indirect
-	golang.org/x/sys v0.32.0 // indirect
+	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/tools v0.32.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
