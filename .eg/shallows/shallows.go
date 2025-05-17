@@ -5,6 +5,7 @@ import (
 	"eg/compute/flatpakmods"
 	"eg/compute/tarballs"
 	"strings"
+	"time"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
@@ -28,7 +29,7 @@ func Generate(ctx context.Context, _ eg.Op) error {
 	gruntime := shellruntime()
 	return shell.Run(
 		ctx,
-		gruntime.New("go generate ./... && go fmt ./..."),
+		gruntime.New("go generate ./... && go fmt ./...").Timeout(10*time.Minute),
 	)
 }
 

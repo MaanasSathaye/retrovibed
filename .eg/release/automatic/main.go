@@ -59,12 +59,13 @@ func main() {
 			),
 			release.Release,
 		),
-		eg.Module(
-			ctx, deb.OptionLiteral("--privileged"),
-			eg.Parallel(
-				console.FlatpakBuild,
-			),
-		),
+		// BROKEN - hangs
+		// eg.Module(
+		// 	ctx, deb.OptionLiteral("--privileged"),
+		// 	eg.Parallel(
+		// 		console.FlatpakBuild,
+		// 	),
+		// ),
 	)
 
 	if err != nil {

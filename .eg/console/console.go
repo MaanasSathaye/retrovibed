@@ -113,10 +113,11 @@ func flatpak(final egflatpak.Module) *egflatpak.Builder {
 
 // build ensures that the flatpak has all the necessary componentry for the generated manifest.
 func FlatpakBuild(ctx context.Context, op eg.Op) error {
-	// builddir := egenv.WorkingDirectory("console", "build", egfs.FindFirst(os.DirFS(egenv.WorkingDirectory("console", "build")), "bundle"))
 	return egflatpak.Build(ctx, shell.Runtime().Timeout(30*time.Minute), flatpak(
-		egflatpak.ModuleTarball(egtarball.GithubDownloadURL(tarballs.Retrovibed()), egtarball.SHA256(tarballs.Retrovibed())),
-	// egflatpak.ModuleCopy(builddir),
+		egflatpak.ModuleTarball(
+			egtarball.GithubDownloadURL(tarballs.Retrovibed()),
+			egtarball.SHA256(tarballs.Retrovibed()),
+		),
 	))
 }
 
