@@ -57,12 +57,14 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
           });
         })
         .catchError((cause) {
+          if(!super.mounted) return;
           setState(() {
             _cause = ds.Error.unauthorized(cause, onTap: reseterr);
             _loading = false;
           });
         }, test: httpx.ErrorsTest.unauthorized)
         .catchError((e) {
+          if(!super.mounted) return;
           setState(() {
             _cause = ds.Error.unknown(e, onTap: reseterr);
             _loading = false;
@@ -157,7 +159,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
             media: v,
             leading: [Icon(mimex.icon(v.mimetype))],
             trailing: [media.ButtonShare(current: v)],
-            onTap: media.PlayAction(context, v),
+            onTap: media.PlayAction(context, v, _res),
           ),
         ),
         empty: ds.FileDropWell(upload),

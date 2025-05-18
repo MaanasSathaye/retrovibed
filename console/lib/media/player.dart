@@ -22,7 +22,8 @@ class _VideoState extends State<VideoScreen> {
 
   // Create a [VideoController] to handle video output from [Player].
   late final controller = VideoController(widget.player);
-  late final StreamSubscription<bool> subscription;
+  late final StreamSubscription<bool> sub0;
+  late final StreamSubscription<bool> sub1;
 
   void add(Media m) {
     widget.player.add(m).then((v) {
@@ -33,9 +34,15 @@ class _VideoState extends State<VideoScreen> {
   @override
   void initState() {
     super.initState();
-    subscription = widget.player.stream.playing.listen((state) {
-      Widget resumew = SizedBox();
+    sub0 = widget.player.stream.completed.listen((completed) {
+      setState(() {
+        if (!super.mounted) return;
+        _resume = SizedBox();
+      });
+    });
 
+    sub1 = widget.player.stream.playing.listen((state) {
+      Widget resumew = SizedBox();
       if (widget.player.state.playlist.medias.length > 0) {
         final _m =
             widget.player.state.playlist.medias[widget
@@ -67,7 +74,8 @@ class _VideoState extends State<VideoScreen> {
 
   @override
   void dispose() {
-    subscription.cancel();
+    sub0.cancel();
+    sub1.cancel();
     super.dispose();
   }
 
