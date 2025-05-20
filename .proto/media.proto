@@ -52,6 +52,11 @@ message DownloadSearchResponse {
   repeated Download items = 2 [ json_name = "items" ];
 }
 
+message DownloadMetadataRequest {}
+message DownloadMetadataResponse {
+  Download download = 1 [ json_name = "download" ];
+}
+
 message DownloadBeginRequest {}
 message DownloadBeginResponse {
   Download download = 1 [ json_name = "download" ];

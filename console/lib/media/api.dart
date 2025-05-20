@@ -183,6 +183,20 @@ abstract class discovered {
         });
   }
 
+  static Future<DownloadMetadataResponse> get(String id) async {
+    final client = http.Client();
+    return client
+        .get(
+          Uri.https(httpx.host(), "/d/${id}", null),
+          headers: {"Authorization": httpx.auto_bearer_host()},
+        )
+        .then(httpx.auto_error)
+        .then((v) {
+          return DownloadMetadataResponse.create()
+            ..mergeFromProto3Json(jsonDecode(v.body));
+        });
+  }
+
   static Future<DownloadPauseResponse> pause(String id) async {
     final client = http.Client();
     return client

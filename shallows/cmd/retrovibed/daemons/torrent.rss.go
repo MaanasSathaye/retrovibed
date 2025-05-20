@@ -3,9 +3,11 @@ package daemons
 import (
 	"context"
 	"errors"
+	"fmt"
 	"iter"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/Masterminds/squirrel"
@@ -159,6 +161,17 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Vir
 				mi, err := md.UnmarshalInfo()
 				if err != nil {
 					log.Println("unable to read info from metadata", feed.ID, err)
+					continue
+				}
+
+				encoded, err := metainfo.Encode(md)
+				if err != nil {
+					log.Println("unable to encode torrent for persistence", feed.ID, err)
+					continue
+				}
+
+				if err = os.WriteFile(rootstore.Path("torrent", fmt.Sprintf("%s.torrent", md.HashInfoBytes().HexString())), encoded, 0600); err != nil {
+					log.Println("unable to persist torrent to disk", feed.ID, err)
 					continue
 				}
 

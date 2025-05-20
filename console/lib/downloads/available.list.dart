@@ -29,12 +29,14 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
     widget
         .search(_res.next)
         .then((v) {
+          if(!super.mounted) return;
           setState(() {
             _res = v;
             _loading = false;
           });
         })
         .catchError((e) {
+          if(!super.mounted) return;
           setState(() {
             _cause = ds.Error.unknown(e);
             _loading = false;
@@ -165,6 +167,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                   .download(v.id)
                   .then((v) {
                     refresh();
+                    ds.RefreshBoundary.of(context)?.reset();
                   })
                   .catchError((cause) {
                     ScaffoldMessenger.of(context).showSnackBar(

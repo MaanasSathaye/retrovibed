@@ -34,6 +34,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/slicesx"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
 	"github.com/retrovibed/retrovibed/internal/sqlxx"
+	"github.com/retrovibed/retrovibed/internal/torrentx"
 	"github.com/retrovibed/retrovibed/tracking"
 )
 
@@ -106,6 +107,14 @@ func (t *HTTPDiscovered) Bind(r *mux.Router) {
 		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
 		httpx.Timeout2s(),
 	).ThenFunc(t.downloading))
+
+	r.Path("/{id}").Methods(http.MethodGet).Handler(alice.New(
+		httpx.ContextBufferPool512(),
+		httpx.ParseForm,
+		httpauth.AuthenticateWithToken(t.jwtsecret),
+		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
+		httpx.Timeout2s(),
+	).ThenFunc(t.metadata))
 
 	r.Path("/{id}").Methods(http.MethodPost).Handler(alice.New(
 		httpx.ContextBufferPool512(),
@@ -201,7 +210,7 @@ func (t *HTTPDiscovered) upload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	metadata, err := torrent.New(metainfo.Hash(lmd.Infohash), torrent.OptionStorage(t.c), torrent.OptionNodes(meta.NodeList()...), torrent.OptionTrackers(lmd.Tracker), torrent.OptionWebseeds(meta.UrlList))
+	metadata, err := torrent.New(metainfo.Hash(lmd.Infohash), torrent.OptionStorage(t.c), torrent.OptionNodes(meta.NodeList()...), torrentx.OptionTracker(lmd.Tracker), torrent.OptionWebseeds(meta.UrlList), torrent.OptionPublicTrackers(lmd.Private, tracking.PublicTrackers()...))
 	if err != nil {
 		log.Println(errorsx.Wrapf(err, "unable to create torrent from metadata %s", lmd.ID))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
@@ -296,7 +305,7 @@ func (t *HTTPDiscovered) download(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	metadata, err := torrent.New(metainfo.Hash(meta.Infohash), torrent.OptionStorage(t.c), torrent.OptionTrackers(meta.Tracker))
+	metadata, err := torrent.New(metainfo.Hash(meta.Infohash), torrent.OptionStorage(t.c), torrent.OptionTrackers(meta.Tracker), torrent.OptionPublicTrackers(meta.Private, tracking.PublicTrackers()...))
 	if err != nil {
 		log.Println(errorsx.Wrapf(err, "unable to create metadata from metadata %s", meta.ID))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
@@ -322,6 +331,34 @@ func (t *HTTPDiscovered) download(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &DownloadBeginResponse{
+		Download: langx.Autoptr(
+			langx.Clone(
+				Download{},
+				DownloadOptionFromTorrentMetadata(langx.Clone(meta, tracking.MetadataOptionJSONSafeEncode))),
+		),
+	}); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to write response"))
+		return
+	}
+}
+
+func (t *HTTPDiscovered) metadata(w http.ResponseWriter, r *http.Request) {
+	var (
+		meta tracking.Metadata
+		id   = mux.Vars(r)["id"]
+	)
+
+	if err := tracking.MetadataFindByID(r.Context(), t.q, id).Scan(&meta); sqlx.ErrNoRows(err) != nil {
+		log.Println(errorsx.Wrap(err, "unable to find metadata"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+		return
+	} else if err != nil {
+		log.Println(errorsx.Wrap(err, "unable to find metadata"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &DownloadMetadataResponse{
 		Download: langx.Autoptr(
 			langx.Clone(
 				Download{},

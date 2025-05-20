@@ -4,6 +4,8 @@ import 'downloading.list.dart';
 import 'available.list.dart';
 
 class Display extends StatelessWidget {
+  final TextEditingController controller = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
@@ -13,7 +15,7 @@ class Display extends StatelessWidget {
       child: ds.RefreshBoundary(
         ListView(
           children: [
-            ds.PeriodicBoundary(ds.RefreshBoundary(DownloadingListDisplay())),
+            DownloadingListDisplay(),
             AvailableListDisplay(),
           ],
         ),

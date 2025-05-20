@@ -109,18 +109,22 @@ func (cl *Client) MaybeStart(t Metadata, failed error, options ...Tuner) (dl Tor
 func (cl *Client) start(md Metadata, options ...Tuner) (dlt *torrent, added bool, err error) {
 	dlt, cached, err := cl.torrents.Load(cl, int160.FromByteArray(md.ID))
 	if err != nil && !errors.Is(err, fs.ErrNotExist) {
+		log.Println("checkpoint 1")
 		return nil, false, err
 	}
 
 	if cached {
+		log.Println("checkpoint 2")
 		return dlt, false, dlt.Tune(tuneMerge(md), langx.Compose(options...))
 	}
 
 	if dlt, err = cl.torrents.Insert(cl, md); err != nil {
+		log.Println("checkpoint 3")
 		return nil, false, err
 	}
 
 	if err = dlt.Tune(tuneMerge(md), langx.Compose(options...)); err != nil {
+		log.Println("checkpoint 4")
 		return nil, false, err
 	}
 

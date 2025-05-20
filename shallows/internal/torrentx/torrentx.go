@@ -9,6 +9,7 @@ import (
 
 	"github.com/james-lawrence/torrent"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
+	"github.com/retrovibed/retrovibed/internal/stringsx"
 
 	"github.com/anacrolix/utp"
 	"github.com/james-lawrence/torrent/dht"
@@ -71,6 +72,14 @@ func OptionInfoFromFile(path string) torrent.Option {
 	}
 
 	return torrent.OptionNoop
+}
+
+func OptionTracker(tracker string) torrent.Option {
+	if stringsx.Blank(tracker) {
+		return torrent.OptionNoop
+	}
+
+	return torrent.OptionTrackers(tracker)
 }
 
 func RecordInfo(infopath string, dl torrent.Metadata) {

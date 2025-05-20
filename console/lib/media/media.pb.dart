@@ -698,6 +698,90 @@ class DownloadSearchResponse extends $pb.GeneratedMessage {
   $pb.PbList<Download> get items => $_getList(1);
 }
 
+class DownloadMetadataRequest extends $pb.GeneratedMessage {
+  factory DownloadMetadataRequest() => create();
+  DownloadMetadataRequest._() : super();
+  factory DownloadMetadataRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory DownloadMetadataRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DownloadMetadataRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'media'), createEmptyInstance: create)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  DownloadMetadataRequest clone() => DownloadMetadataRequest()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  DownloadMetadataRequest copyWith(void Function(DownloadMetadataRequest) updates) => super.copyWith((message) => updates(message as DownloadMetadataRequest)) as DownloadMetadataRequest;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static DownloadMetadataRequest create() => DownloadMetadataRequest._();
+  DownloadMetadataRequest createEmptyInstance() => create();
+  static $pb.PbList<DownloadMetadataRequest> createRepeated() => $pb.PbList<DownloadMetadataRequest>();
+  @$core.pragma('dart2js:noInline')
+  static DownloadMetadataRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DownloadMetadataRequest>(create);
+  static DownloadMetadataRequest? _defaultInstance;
+}
+
+class DownloadMetadataResponse extends $pb.GeneratedMessage {
+  factory DownloadMetadataResponse({
+    Download? download,
+  }) {
+    final $result = create();
+    if (download != null) {
+      $result.download = download;
+    }
+    return $result;
+  }
+  DownloadMetadataResponse._() : super();
+  factory DownloadMetadataResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory DownloadMetadataResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DownloadMetadataResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'media'), createEmptyInstance: create)
+    ..aOM<Download>(1, _omitFieldNames ? '' : 'download', subBuilder: Download.create)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  DownloadMetadataResponse clone() => DownloadMetadataResponse()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  DownloadMetadataResponse copyWith(void Function(DownloadMetadataResponse) updates) => super.copyWith((message) => updates(message as DownloadMetadataResponse)) as DownloadMetadataResponse;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static DownloadMetadataResponse create() => DownloadMetadataResponse._();
+  DownloadMetadataResponse createEmptyInstance() => create();
+  static $pb.PbList<DownloadMetadataResponse> createRepeated() => $pb.PbList<DownloadMetadataResponse>();
+  @$core.pragma('dart2js:noInline')
+  static DownloadMetadataResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DownloadMetadataResponse>(create);
+  static DownloadMetadataResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Download get download => $_getN(0);
+  @$pb.TagNumber(1)
+  set download(Download v) { $_setField(1, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasDownload() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearDownload() => $_clearField(1);
+  @$pb.TagNumber(1)
+  Download ensureDownload() => $_ensure(0);
+}
+
 class DownloadBeginRequest extends $pb.GeneratedMessage {
   factory DownloadBeginRequest() => create();
   DownloadBeginRequest._() : super();

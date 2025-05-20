@@ -35,12 +35,7 @@ func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual
 		log.Println("resuming", md.ID, md.Description, md.Private)
 		infopath := rootstore.Path("torrent", fmt.Sprintf("%s.torrent", metainfo.Hash(md.Infohash).HexString()))
 
-		autotrackers := torrent.OptionNoop
-		if !md.Private {
-			autotrackers = torrent.OptionTrackers(tracking.PublicTrackers()...)
-		}
-
-		metadata, err := torrent.New(metainfo.Hash(md.Infohash), torrent.OptionStorage(tstore), torrent.OptionTrackers(md.Tracker), torrentx.OptionInfoFromFile(infopath), autotrackers)
+		metadata, err := torrent.New(metainfo.Hash(md.Infohash), torrent.OptionStorage(tstore), torrentx.OptionTracker(md.Tracker), torrentx.OptionInfoFromFile(infopath), torrent.OptionPublicTrackers(md.Private, tracking.PublicTrackers()...))
 		if err != nil {
 			return errorsx.Wrapf(err, "unable to create metadata from %s - %s", md.ID, infopath)
 		}

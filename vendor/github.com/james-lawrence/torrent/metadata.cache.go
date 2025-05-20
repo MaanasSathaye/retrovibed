@@ -3,6 +3,7 @@ package torrent
 import (
 	"fmt"
 	"iter"
+	"log"
 	"os"
 	"path/filepath"
 	"sync"
@@ -73,6 +74,7 @@ func (t *memoryseeding) Insert(cl *Client, md Metadata) (*torrent, error) {
 	}
 
 	if err := t.MetadataStore.Write(md); err != nil {
+		log.Println("checkpoint z")
 		return nil, err
 	}
 
@@ -120,6 +122,10 @@ func (t *memoryseeding) Metadata(id int160.T) (md Metadata, err error) {
 }
 
 func NewMetadataCache(root string) metadatafilestore {
+	if err := os.MkdirAll(root, 0700); err != nil {
+		log.Println("unable to ensure metadata cache root directory", err)
+	}
+
 	return metadatafilestore{
 		root: root,
 	}
@@ -134,6 +140,7 @@ func (t metadatafilestore) path(id int160.T) string {
 }
 
 func (t metadatafilestore) Read(id int160.T) (Metadata, error) {
+	log.Println("DERP", t.path(id))
 	return NewFromMetaInfoFile(t.path(id))
 }
 
@@ -143,7 +150,9 @@ func (t metadatafilestore) Write(md Metadata) error {
 		return err
 	}
 
-	return os.WriteFile(t.path(int160.FromByteArray(md.ID)), encoded, 0600)
+	path := t.path(int160.FromByteArray(md.ID))
+
+	return os.WriteFile(path, encoded, 0600)
 }
 
 func (t metadatafilestore) Each() iter.Seq[int160.T] {
