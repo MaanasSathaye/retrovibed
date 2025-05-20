@@ -74,7 +74,6 @@ func (t *memoryseeding) Insert(cl *Client, md Metadata) (*torrent, error) {
 	}
 
 	if err := t.MetadataStore.Write(md); err != nil {
-		log.Println("checkpoint z")
 		return nil, err
 	}
 
@@ -140,7 +139,6 @@ func (t metadatafilestore) path(id int160.T) string {
 }
 
 func (t metadatafilestore) Read(id int160.T) (Metadata, error) {
-	log.Println("DERP", t.path(id))
 	return NewFromMetaInfoFile(t.path(id))
 }
 
@@ -150,9 +148,7 @@ func (t metadatafilestore) Write(md Metadata) error {
 		return err
 	}
 
-	path := t.path(int160.FromByteArray(md.ID))
-
-	return os.WriteFile(path, encoded, 0600)
+	return os.WriteFile(t.path(int160.FromByteArray(md.ID)), encoded, 0600)
 }
 
 func (t metadatafilestore) Each() iter.Seq[int160.T] {
