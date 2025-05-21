@@ -60,12 +60,12 @@ func main() {
 			release.Release,
 		),
 		// BROKEN - hangs
-		// eg.Module(
-		// 	ctx, deb.OptionLiteral("--privileged"),
-		// 	eg.Parallel(
-		// 		console.FlatpakBuild,
-		// 	),
-		// ),
+		eg.Module(
+			ctx, deb.OptionLiteral("--privileged"),
+			eg.Parallel(
+				console.FlatpakBuild,
+			),
+		),
 	)
 
 	if err != nil {
