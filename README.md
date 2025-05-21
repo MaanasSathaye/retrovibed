@@ -62,8 +62,8 @@ mkdir retrovibe
 curl -L -o retrovibed.client.yml https://github.com/retrovibed/retrovibed/releases/latest/download/flatpak.client.yml
 flatpak remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 flatpak-builder --user --install-deps-from=flathub --install --ccache --force-clean retrovibe retrovibed.client.yml
-flatpak run --user space.retrovibe.Client
-flatpak run --command=sh --user space.retrovibe.Client
+flatpak run --user space.retrovibe.Console
+flatpak run --command=sh --user space.retrovibe.Console # for debugging the runtime
 ```
 
 ### determine ssh public key for client side
