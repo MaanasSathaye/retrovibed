@@ -22,7 +22,7 @@ require (
 	github.com/grindlemire/go-lucene v0.0.21
 	github.com/hashicorp/mdns v1.0.6
 	github.com/james-lawrence/genieql v0.0.0-20250306161027-bb1395f5f457
-	github.com/james-lawrence/torrent v0.0.0-20250520170540-a260e43f2c89
+	github.com/james-lawrence/torrent v0.0.0-20250520171206-3c24ee5cab2e
 	github.com/justinas/alice v1.2.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/marcboeker/go-duckdb/v2 v2.2.1
