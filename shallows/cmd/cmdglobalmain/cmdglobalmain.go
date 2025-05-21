@@ -90,6 +90,7 @@ func Main(args ...string) {
 			"env_auto_bootstrap":     env.AutoBootstrap,
 			"env_auto_discovery":     env.AutoDiscovery,
 			"env_self_signed_hosts":  env.SelfSignedHosts,
+			"env_daemon_socket":      env.DaemonSocket,
 		},
 		kong.UsageOnError(),
 		kong.Bind(

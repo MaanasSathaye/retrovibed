@@ -14,7 +14,6 @@ import (
 
 	"github.com/pressly/goose/v3"
 	"github.com/retrovibed/retrovibed/internal/debugx"
-	"github.com/retrovibed/retrovibed/internal/envx"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/goosex"
 	"github.com/retrovibed/retrovibed/internal/slicesx"
@@ -28,7 +27,6 @@ import (
 var embedsqlite embed.FS
 
 func Database(ctx context.Context) (db *sql.DB, err error) {
-	envx.Debug(os.Environ()...)
 	log.Println("database path", userx.DefaultConfigDir(userx.DefaultRelRoot(), "meta.db"))
 
 	if err := os.MkdirAll(userx.DefaultConfigDir(userx.DefaultRelRoot()), 0700); err != nil {

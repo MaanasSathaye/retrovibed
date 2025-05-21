@@ -18,6 +18,8 @@ const (
 
 	// TLS pem location.
 	DaemonTLSPEM = "RETROVIBED_TLS_PEM"
+	DaemonSocket = "RETROVIBED_DAEMON_SOCKET" // specify the socket/port to listen on in the form: tcp://:9998
+
 	// JWTSharedSecret shared secret between the applications, used to encrypt data.
 	// and sign messages.
 	JWTSharedSecret = "RETROVIBED_JWT_SECRET"
@@ -27,6 +29,7 @@ const (
 	AutoDiscovery   = "RETROVIBED_TORRENT_AUTO_DISCOVERY" // enable/disable automatically discovering torrents from peers.
 	AutoBootstrap   = "RETROVIBED_TORRENT_AUTO_BOOTSTRAP" // enable/disable the predefined set of public swarms to bootstrap from
 	SelfSignedHosts = "RETROVIBED_SELF_SIGNED_HOSTS"      // list of hosts to add to the self signed certificate.
+
 )
 
 var v = sync.OnceValue(func() []byte {
