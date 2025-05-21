@@ -78,9 +78,10 @@ func Install(ctx context.Context, op eg.Op) error {
 	return shell.Run(
 		ctx,
 		runtime.Newf("mkdir -p %s", dstdir),
-		runtime.Newf("cp -R %s/* %s", bundledir, dstdir),
-		runtime.Newf("cp -R %s/* %s/lib", libdir, dstdir),
-		// runtime.Newf("tree %s", dstdir),
+		runtime.Newf("cp --verbose -R %s/* %s", bundledir, dstdir),
+		runtime.Newf("echo cp -R %s/* %s/lib", libdir, dstdir),
+		runtime.Newf("cp --verbose -R %s/* %s/lib", libdir, dstdir),
+		runtime.Newf("tree %s", dstdir),
 	)
 }
 
