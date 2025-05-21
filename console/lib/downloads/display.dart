@@ -16,7 +16,7 @@ class Display extends StatelessWidget {
         ListView(
           children: [
             DownloadingListDisplay(),
-            AvailableListDisplay(),
+            AvailableListDisplay(searchController: controller),
           ],
         ),
       ),

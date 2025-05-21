@@ -8,10 +8,12 @@ import 'package:console/mimex.dart' as mimex;
 class AvailableListDisplay extends StatefulWidget {
   final media.FnMediaSearch search;
   final media.FnUploadRequest upload;
+  final TextEditingController? searchController;
   const AvailableListDisplay({
     super.key,
     this.search = media.discovered.available,
     this.upload = media.discovered.upload,
+    this.searchController,
   });
 
   @override
@@ -71,8 +73,8 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                         return req;
                       })
                       .then((uploaded) {
-                        setState(() {
-                          _res.items.add(uploaded.media);
+                        return media.discovered.download(uploaded.media.id).then((_) {
+                          ds.RefreshBoundary.of(context)?.reset();
                         });
                       })
                       .catchError((cause) {
@@ -107,6 +109,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
             children: [
               Expanded(
                 child: TextField(
+                  controller: widget.searchController,
                   decoration: InputDecoration(
                     hintText: "search available content",
                   ),
