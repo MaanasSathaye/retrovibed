@@ -39,22 +39,6 @@ retrovibed identity bootstrap authorized-file /root/.ssh/authorized_keys
 systemctl enable --now retrovibed.service
 ```
 
-#### install flatpak daemon
-
-```bash
-mkdir retrovibe
-curl -L -o retrovibed.daemon.yml https://github.com/retrovibed/retrovibed/releases/latest/download/flatpak.daemon.yml
-flatpak remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-flatpak-builder --user --install-deps-from=flathub --install --ccache --force-clean retrovibe retrovibed.daemon.yml
-flatpak run --user space.retrovibe.Daemon
-```
-
-### install daemon from source
-
-```bash
-go install github.com/retrovibed/retrovibed/shallows/cmd/retrovibed/...
-```
-
 #### install flatpak gui
 
 ```bash
@@ -70,4 +54,10 @@ flatpak run --command=sh --user space.retrovibe.Console # for debugging the runt
 
 ```bash
 retrovibed identity show
+```
+
+### install daemon from source
+
+```bash
+go install github.com/retrovibed/retrovibed/shallows/cmd/retrovibed/...
 ```
