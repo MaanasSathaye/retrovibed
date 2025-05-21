@@ -6,6 +6,7 @@ import (
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
+	"github.com/egdaemon/eg/runtime/x/wasi/eggithub"
 	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
 )
 
@@ -21,7 +22,7 @@ func Tarball(ctx context.Context, op eg.Op) error {
 func Release(ctx context.Context, op eg.Op) error {
 	return eg.Perform(
 		ctx,
-		egtarball.Github(
+		eggithub.Release(
 			egtarball.Archive(tarballs.Retrovibed()),
 			egenv.CacheDirectory("flatpak.client.yml"),
 			egenv.CacheDirectory("flatpak.daemon.yml"),

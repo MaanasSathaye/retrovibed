@@ -13,6 +13,7 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/shell"
 	"github.com/egdaemon/eg/runtime/x/wasi/egflatpak"
 	"github.com/egdaemon/eg/runtime/x/wasi/egfs"
+	"github.com/egdaemon/eg/runtime/x/wasi/eggithub"
 	"github.com/egdaemon/eg/runtime/x/wasi/eggolang"
 	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
 )
@@ -116,7 +117,7 @@ func flatpak(final egflatpak.Module) *egflatpak.Builder {
 func FlatpakBuild(ctx context.Context, op eg.Op) error {
 	return egflatpak.Build(ctx, shell.Runtime().Timeout(30*time.Minute), flatpak(
 		egflatpak.ModuleTarball(
-			egtarball.GithubDownloadURL(tarballs.Retrovibed()),
+			eggithub.GithubDownloadURL(tarballs.Retrovibed()),
 			egtarball.SHA256(tarballs.Retrovibed()),
 		),
 	))
@@ -125,7 +126,7 @@ func FlatpakBuild(ctx context.Context, op eg.Op) error {
 // Manifest generates the manifest for distribution.
 func FlatpakManifest(ctx context.Context, o eg.Op) error {
 	return egflatpak.ManifestOp(egenv.CacheDirectory("flatpak.client.yml"), flatpak(
-		moduleTarball(egtarball.GithubDownloadURL(tarballs.Retrovibed()), egtarball.SHA256(tarballs.Retrovibed())),
+		moduleTarball(eggithub.GithubDownloadURL(tarballs.Retrovibed()), egtarball.SHA256(tarballs.Retrovibed())),
 	))(ctx, o)
 }
 

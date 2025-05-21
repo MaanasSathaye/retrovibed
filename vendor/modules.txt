@@ -173,7 +173,7 @@ github.com/dustin/go-humanize
 # github.com/edsrzf/mmap-go v1.2.0
 ## explicit; go 1.17
 github.com/edsrzf/mmap-go
-# github.com/egdaemon/eg v0.0.0-20250327150141-05cc8bfb2efe
+# github.com/egdaemon/eg v0.0.0-20250521180154-789ccbe91f39
 ## explicit; go 1.24
 github.com/egdaemon/eg
 github.com/egdaemon/eg/backoff
@@ -217,6 +217,7 @@ github.com/egdaemon/eg/runtime/x/wasi/egccache
 github.com/egdaemon/eg/runtime/x/wasi/egdebuild
 github.com/egdaemon/eg/runtime/x/wasi/egflatpak
 github.com/egdaemon/eg/runtime/x/wasi/egfs
+github.com/egdaemon/eg/runtime/x/wasi/eggithub
 github.com/egdaemon/eg/runtime/x/wasi/eggolang
 github.com/egdaemon/eg/runtime/x/wasi/egmd5x
 github.com/egdaemon/eg/runtime/x/wasi/egsha256x
