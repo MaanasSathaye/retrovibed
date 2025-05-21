@@ -125,6 +125,13 @@ func FlatpakBuild(ctx context.Context, op eg.Op) error {
 // Manifest generates the manifest for distribution.
 func FlatpakManifest(ctx context.Context, o eg.Op) error {
 	return egflatpak.ManifestOp(egenv.CacheDirectory("flatpak.client.yml"), flatpak(
-		egflatpak.ModuleTarball(egtarball.GithubDownloadURL(tarballs.Retrovibed()), egtarball.SHA256(tarballs.Retrovibed())),
+		moduleTarball(egtarball.GithubDownloadURL(tarballs.Retrovibed()), egtarball.SHA256(tarballs.Retrovibed())),
 	))(ctx, o)
+}
+
+func moduleTarball(url, sha256d string) egflatpak.Module {
+	return egflatpak.NewModule("tarball", "simple", egflatpak.ModuleOptions().Commands(
+		"cp -r . /app/bin",
+		"mv /app/bin/lib /app/lib",
+	).Sources(egflatpak.SourceTarball(url, sha256d))...)
 }

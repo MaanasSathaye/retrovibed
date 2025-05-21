@@ -88,6 +88,7 @@ func Libbs2b() egflatpak.Module {
 // pulled from: https://github.com/flathub/io.mpv.Mpv/blob/d895bc41c09a17d0bdca40cd57f77340e44fdca5/io.mpv.Mpv.yml
 func Libffmpeg() egflatpak.Module {
 	return egflatpak.NewModule("libffmpeg", "autotools", egflatpak.ModuleOptions().ConfigOptions(
+		"--env=CFLAGS=\"-Wno-incompatible-pointer-types\"",
 		"--disable-debug",
 		"--disable-doc",
 		"--disable-static",
