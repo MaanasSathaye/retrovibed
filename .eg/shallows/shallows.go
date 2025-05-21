@@ -11,6 +11,7 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
 	"github.com/egdaemon/eg/runtime/x/wasi/egflatpak"
+	"github.com/egdaemon/eg/runtime/x/wasi/eggithub"
 	"github.com/egdaemon/eg/runtime/x/wasi/eggolang"
 	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
 )
@@ -77,7 +78,7 @@ func FlatpakManifest(ctx context.Context, o eg.Op) error {
 					"cp -r . /app/bin",
 				).Sources(
 					egflatpak.SourceTarball(
-						egtarball.GithubDownloadURL(tarballs.Retrovibed()), egtarball.SHA256(tarballs.Retrovibed()),
+						eggithub.DownloadURL(tarballs.Retrovibed()), egtarball.SHA256(tarballs.Retrovibed()),
 						egflatpak.SourceOptions().Destination("retrovibed.tar.xz")...,
 					),
 				)...),

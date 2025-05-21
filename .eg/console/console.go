@@ -91,6 +91,7 @@ func flatpak(final egflatpak.Module) *egflatpak.Builder {
 		"space.retrovibe.Console", "console",
 		egflatpak.Option().SDK("org.gnome.Sdk", "47").Runtime("org.gnome.Platform", "47").
 			Modules(
+				flatpakmods.Libduckdb(),
 				flatpakmods.Libass(),
 				flatpakmods.Libbs2b(),
 				flatpakmods.Libplacebo(),
@@ -110,6 +111,7 @@ func flatpak(final egflatpak.Module) *egflatpak.Builder {
 			"--socket=pulseaudio",                // for mpv
 			"--env=LC_NUMERIC=C",                 // for mpv
 			"--filesystem=xdg-run/pipewire-0:ro", // for mpv
+			"--filesystem=~/.duckdb:create",      // for duckdb
 		)...)
 }
 
@@ -117,7 +119,7 @@ func flatpak(final egflatpak.Module) *egflatpak.Builder {
 func FlatpakBuild(ctx context.Context, op eg.Op) error {
 	return egflatpak.Build(ctx, shell.Runtime().Timeout(30*time.Minute), flatpak(
 		egflatpak.ModuleTarball(
-			eggithub.GithubDownloadURL(tarballs.Retrovibed()),
+			eggithub.DownloadURL(tarballs.Retrovibed()),
 			egtarball.SHA256(tarballs.Retrovibed()),
 		),
 	))
@@ -126,13 +128,13 @@ func FlatpakBuild(ctx context.Context, op eg.Op) error {
 // Manifest generates the manifest for distribution.
 func FlatpakManifest(ctx context.Context, o eg.Op) error {
 	return egflatpak.ManifestOp(egenv.CacheDirectory("flatpak.client.yml"), flatpak(
-		moduleTarball(eggithub.GithubDownloadURL(tarballs.Retrovibed()), egtarball.SHA256(tarballs.Retrovibed())),
+		moduleTarball(eggithub.DownloadURL(tarballs.Retrovibed()), egtarball.SHA256(tarballs.Retrovibed())),
 	))(ctx, o)
 }
 
 func moduleTarball(url, sha256d string) egflatpak.Module {
 	return egflatpak.NewModule("tarball", "simple", egflatpak.ModuleOptions().Commands(
 		"cp -r . /app/bin",
-		"mv /app/bin/lib /app/lib",
+		"cp /app/bin/lib/retrovibed.so /app/lib",
 	).Sources(egflatpak.SourceTarball(url, sha256d))...)
 }

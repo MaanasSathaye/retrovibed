@@ -5,10 +5,17 @@ import 'package:ffi/ffi.dart' as ffi;
 import 'package:console/retrovibed/gen.dart' as lib;
 
 String _path() {
-  final files = [File("build/nativelib/retrovibed.so"), File("/app/bin/lib/retrovibed.so"), File("/app/lib/retrovibed.so")];
+  final files = [File("build/nativelib/retrovibed.so"), File("/app/lib/retrovibed.so"), File("/app/bin/lib/retrovibed.so")];
   final found = files.firstWhere(
-    (v) => v.existsSync(),
-    orElse: () => File("lib/retrovibed.so"),
+    (v) {
+      print("checking ${v.path}");
+      try {
+        return v.existsSync();
+      } catch (_) {
+        return false;
+      }
+    },
+    orElse: () => File("/app/lib/retrovibed.so"),
   );
   return found.path;
 }

@@ -24,13 +24,13 @@ func archiveName(pattern string) string {
 }
 
 // generate the github download url
-func GithubDownloadURL(pattern string) string {
+func DownloadURL(pattern string) string {
 	version := PatternVersion()
 	archive := archiveName(pattern)
-	canon := eggit.EnvCanonicalURI()                                                                     // git@github.com:james-lawrence/deeppool.git
-	canon = strings.ReplaceAll(canon, ".git", fmt.Sprintf("/releases/download/%s/%s", version, archive)) // git@github.com:james-lawrence/deeppool/releases/download/%release%/%archive%
-	canon = strings.ReplaceAll(canon, ":", "/")                                                          // git@github.com/james-lawrence/deeppool/releases/download/%release%/%archive%
-	canon = strings.ReplaceAll(canon, "git@", "https://")                                                // https://github.com:james-lawrence/deeppool/releases/download/%release%/%archive%
+	canon := eggit.EnvCanonicalURI()                                                                     // git@github.com:egdaemon/eg.git
+	canon = strings.ReplaceAll(canon, ".git", fmt.Sprintf("/releases/download/%s/%s", version, archive)) // git@github.com:egdaemon/eg/releases/download/%release%/%archive%
+	canon = strings.ReplaceAll(canon, ":", "/")                                                          // git@github.com/egdaemon/eg/releases/download/%release%/%archive%
+	canon = strings.ReplaceAll(canon, "git@", "https://")                                                // https://github.com:egdaemon/eg/releases/download/%release%/%archive%
 
 	return canon
 }
@@ -52,7 +52,7 @@ func Release(patterns ...string) eg.OpFn {
 
 		return shell.Run(
 			ctx,
-			runtime.Newf("gh release delete -y %s", version),
+			runtime.Newf("gh release delete -y %s", version).Lenient(true),
 			runtime.Newf("gh release create --target %s %s %s", c.Hash.String(), version, strings.Join(patterns, " ")),
 		)
 	}
