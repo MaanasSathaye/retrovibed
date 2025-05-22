@@ -75,6 +75,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
   @override
   void initState() {
     super.initState();
+    _res.next..query = widget.controller?.text ?? "";
     refresh(_res.next);
   }
 
