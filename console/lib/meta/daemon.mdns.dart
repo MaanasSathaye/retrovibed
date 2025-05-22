@@ -8,8 +8,9 @@ import './daemon.manual.dart';
 
 class MDNSDiscovery extends StatefulWidget {
   final void Function(api.Daemon) daemon;
+  final Widget Function(void Function(api.Daemon) connect, {void Function()? retry}) preamble;
 
-  MDNSDiscovery({super.key, required this.daemon});
+  MDNSDiscovery({super.key, required this.daemon, required this.preamble});
 
   static _MDNSDiscovery? of(BuildContext context) {
     return context.findAncestorStateOfType<_MDNSDiscovery>();
@@ -64,7 +65,6 @@ class _MDNSDiscovery extends State<MDNSDiscovery> {
         }, test: ds.ErrorTests.timeout)
         .catchError((cause) {
           setState(() {
-            _loading = false;
             _cause = ds.Error.unknown(cause);
           });
         })
@@ -87,32 +87,79 @@ class _MDNSDiscovery extends State<MDNSDiscovery> {
     return ds.Loading(
       cause: _cause,
       loading: _loading,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: 256, maxWidth: 512),
-        child: Column(
-          children: [
-            SelectableText(
-              textAlign: TextAlign.center,
-              "unable to locate retrovibed on your local network, ensure a retrovibed is running or provide the details to a remote instance.",
-            ),
-            ManualConfiguration(
-              retry: () {
-                setState(() {
-                  _loading = true;
-                  _cause = null;
-                });
-                this.discover();
-              },
-              connect: (daemon) {
-                setState(() {
-                  _cause = null;
-                });
-                widget.daemon(daemon);
-              },
-            ),
-          ],
+      child: Center(
+        child: SizedBox.fromSize(
+          size: Size(768, 512),
+          child: widget.preamble(
+            (daemon) {
+              setState(() {
+                _cause = null;
+              });
+              widget.daemon(daemon);
+            },
+            retry: () {
+              setState(() {
+                _loading = true;
+                _cause = null;
+              });
+              this.discover();
+            },
+          ),
         ),
       ),
+    );
+  }
+}
+
+class NoLocalService extends StatelessWidget {
+  final TextEditingController controller = TextEditingController();
+  final void Function()? retry;
+  final void Function(api.Daemon) connect;
+
+  NoLocalService({super.key, this.retry, required this.connect});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: [
+          SelectableText(
+            textAlign: TextAlign.center,
+            "unable to locate retrovibed on your local network, ensure a retrovibed is running or provide the details to a remote instance.",
+          ),
+          ManualConfiguration(
+            retry: retry,
+            connect: connect,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class InitialSetup extends StatelessWidget {
+  final TextEditingController controller = TextEditingController();
+  final void Function()? retry;
+  final void Function(api.Daemon) connect;
+
+  InitialSetup({super.key, this.retry, required this.connect});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SelectableText(
+          textAlign: TextAlign.center,
+          "Welcome to retrovibed",
+        ),
+        SelectableText(
+          textAlign: TextAlign.center,
+          "provide a server address or click connect to use your current device",
+        ),
+        ManualConfiguration(
+          connect: connect,
+        ),
+      ],
     );
   }
 }

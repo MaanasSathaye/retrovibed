@@ -132,7 +132,10 @@ class _DaemonList extends State<DaemonList> {
         (v) => _RowDisplay(
           hostname: current,
           current: v,
-          onTap: widget.onTap == null ? null : () => widget.onTap!(v),
+          onTap: widget.onTap == null ? null : () {
+            widget.onTap!(v);
+            setState(() {});
+          },
           onRemove: (api.Daemon d) {
             return api.daemons.delete(d.id).then((v) {
               _res.next.offset = _res.next.offset - 1;

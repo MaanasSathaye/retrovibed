@@ -75,8 +75,9 @@ class Error extends StatelessWidget {
   final Object? cause;
   final Widget child;
   final void Function()? onTap;
+  final Color? color;
 
-  const Error({super.key, required this.child, this.cause = null, this.onTap});
+  const Error({super.key, required this.child, this.cause, this.onTap, this.color});
 
   @override
   StatelessElement createElement() {
@@ -97,11 +98,12 @@ class Error extends StatelessWidget {
     );
   }
 
-  static Error unauthorized(Object obj, {void Function()? onTap}) {
+  static Error unauthorized(Object obj, {void Function()? onTap, Widget? message, Color? color }) {
     return Error(
-      child: SelectableText("you lack sufficient permissions"),
+      child: message ?? SelectableText("you lack sufficient permissions"),
       cause: obj,
       onTap: onTap,
+      color: color,
     );
   }
 
@@ -148,9 +150,14 @@ class Error extends StatelessWidget {
     final defaults = theming.Defaults.of(context);
     return InkWell(
       onTap: onTap,
+      onLongPress: onTap,
       child: Container(
-        decoration: BoxDecoration(color: defaults.danger),
-        child: Center(child: child),
+        decoration: BoxDecoration(color: color ?? defaults.danger),
+        child: Center(
+          child: SelectionArea(
+            child: child,
+          ),
+        ),
       ),
     );
   }

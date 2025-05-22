@@ -90,9 +90,12 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
               return ds.Error.unknown(cause);
             })
             .whenComplete(
-              () => setState(() {
-                _loading = false;
-              }),
+              () {
+                if (!super.mounted) return;
+                setState(() {
+                  _loading = false;
+                });
+              },
             );
       });
     };

@@ -22,8 +22,9 @@ String auto_bearer() {
 }
 
 // return a identity token from the currently connected host.
-String auto_bearer_host() {
-  return "bearer ${retro.bearer_token_host("https://${_host}")}";
+String auto_bearer_host({String? host}) {
+  final token = retro.bearer_token_host("https://${host ?? _host}");
+  return token.isEmpty ? "" : "bearer ${token}";
 }
 
 abstract class mimetypes {
@@ -67,8 +68,16 @@ Future<http.Response> auto_error(http.Response v) {
 }
 
 class ErrorsTest {
+  static bool badrequest(Object obj) {
+    return obj is http.Response && obj.statusCode == 400;
+  }
+
   static bool unauthorized(Object obj) {
     return obj is http.Response && obj.statusCode == 401;
+  }
+
+  static bool forbidden(Object obj) {
+    return obj is http.Response && obj.statusCode == 403;
   }
 
   static bool err404(Object obj) {

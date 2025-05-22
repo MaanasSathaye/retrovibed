@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:console/designkit.dart' as ds;
 import 'package:console/httpx.dart' as httpx;
+import 'package:console/retrovibed.dart' as retro;
 import './api.dart' as api;
 import './daemon.mdns.dart' as mdns;
 
@@ -42,9 +43,10 @@ class EndpointAuto extends StatefulWidget {
 }
 
 class _DaemonAuto extends State<EndpointAuto> {
-  bool _loading = true;
+  Widget? _loading = ds.Loading.Icon;
   ds.Error? _cause = null;
   api.Daemon? _res;
+  Widget Function(void Function(api.Daemon) connect, {void Function()? retry}) _preamble = (connect, {retry}) => mdns.NoLocalService(connect: connect, retry: retry);
 
   void setdaemon(api.Daemon? d) {
     if (d == null) return;
@@ -53,7 +55,7 @@ class _DaemonAuto extends State<EndpointAuto> {
 
   void refresh(Future<api.Daemon> pending) {
     setState(() {
-      _loading = true;
+       _loading = ds.Loading.Icon;
     });
 
     final reseterr = () {
@@ -64,38 +66,57 @@ class _DaemonAuto extends State<EndpointAuto> {
 
     pending
         .then((v) {
+          final ips = [...widget.defaultips, v.hostname.split(":").first];
+          HttpOverrides.global = DaemonHttpOverrides(
+            ips: ips,
+          );
           return api.healthz(host: v.hostname).then((value) => v);
+        })
+        .then((v) {
+          return api.authz(host: v.hostname).then((value) => v);
         })
         .then((v) {
           setState(() {
             httpx.set(v.hostname);
-            HttpOverrides.global = DaemonHttpOverrides(
-              ips: [v.hostname.split(":").first],
-            );
-
             _res = v;
-            _loading = false;
           });
         })
         .catchError((e) {
+          // no service known
           setState(() {
-            _loading = false;
+            _preamble = (connect, {retry}) => mdns.InitialSetup(connect: (d) => refresh(Future.value(d)), retry: retry);
           });
         }, test: httpx.ErrorsTest.err404)
         .catchError((e) {
           setState(() {
-            _loading = false;
+            _cause = ds.Error.unauthorized(e, onTap: reseterr, color: Color.fromRGBO(0, 0, 0, 0.80), message: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SelectableText("you've attempted to access a system you havent been granted access to yet."),
+                SelectableText("provide the system's administrator with the following to be granted access:"),
+                SelectableText(retro.public_key()),
+              ],
+            ));
           });
-        }, test: ds.ErrorTests.offline)
+        }, test: httpx.ErrorsTest.unauthorized)
         .catchError((e) {
           setState(() {
-            _loading = false;
+            _cause = ds.Error.unauthorized(e, onTap: reseterr, message: SelectableText("you've attempted to access a service you havent been granted access to yet."));
           });
+        }, test: httpx.ErrorsTest.forbidden)
+        .catchError((e) {
+          // fallback to manual setup.
+        }, test: ds.ErrorTests.offline)
+        .catchError((e) {
+          // fallback to manual setup.
         }, test: ds.ErrorTests.dnsresolution)
         .catchError((e) {
           setState(() {
             _cause = ds.Error.unknown(e, onTap: reseterr);
-            _loading = false;
+          });
+        }).whenComplete(() {
+          setState(() {
+            _loading = null;
           });
         });
   }
@@ -104,24 +125,21 @@ class _DaemonAuto extends State<EndpointAuto> {
   void initState() {
     super.initState();
     HttpOverrides.global = DaemonHttpOverrides(ips: widget.defaultips);
-    refresh(this.widget.latest().then((r) => r.daemon));
+    refresh(widget.latest().then((r) => r.daemon));
   }
 
   @override
   Widget build(BuildContext context) {
-    return ds.Loading(
-      child:
-          _res == null
-              ? mdns.MDNSDiscovery(
-                daemon: (d) {
-                  setState(() {
-                    _res = d;
-                  });
-                },
-              )
-              : widget.child,
-      cause: _cause,
-      loading: _loading,
+    return ds.Overlay(
+      child: _res == null ? mdns.MDNSDiscovery(
+        daemon: (d) {
+          setState(() {
+            _res = d;
+          });
+        },
+        preamble: _preamble,
+      ) : widget.child,
+      overlay: _cause ?? _loading,
     );
   }
 }

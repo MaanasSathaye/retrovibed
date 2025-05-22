@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:console/design.kit/forms.dart' as forms;
+import 'package:console/httpx.dart' as httpx;
 import './api.dart' as api;
 
 class ManualConfiguration extends StatefulWidget {
@@ -13,6 +14,7 @@ class ManualConfiguration extends StatefulWidget {
 }
 
 class _ManualConfigurationView extends State<ManualConfiguration> {
+  final String defaultLocalhost = httpx.localhost();
   String _hostname = '';
 
   @override
@@ -27,7 +29,7 @@ class _ManualConfigurationView extends State<ManualConfiguration> {
               input: TextFormField(
                 autofocus: true,
                 decoration: new InputDecoration(
-                  hintText: "example.com:9998",
+                  hintText: defaultLocalhost,
                   helperText: "hostname and port for the retrovibed instance",
                 ),
                 keyboardType: TextInputType.number,
@@ -49,11 +51,12 @@ class _ManualConfigurationView extends State<ManualConfiguration> {
                     api.daemons
                         .create(
                           api.DaemonCreateRequest(
-                            daemon: api.Daemon(hostname: _hostname),
+                            daemon: api.Daemon(hostname: _hostname.isEmpty ? defaultLocalhost : _hostname),
                           ),
-                        )
-                        .then((d) {
+                        ).then((d) {
                           return widget.connect(d.daemon);
+                        }).catchError((cause) {
+                          print("failed ${cause}");
                         });
                   },
                 ),

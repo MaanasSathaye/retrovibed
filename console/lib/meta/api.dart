@@ -14,11 +14,12 @@ Future<http.Response> healthz({String? host}) async {
       .then(httpx.auto_error);
 }
 
-Future<AuthzResponse> authz(Token current) {
+Future<AuthzResponse> authz({String? host}) {
+  final _host = host ?? httpx.host();
   return http.Client()
       .get(
-        Uri.https(httpx.host(), "/meta/authz/"),
-        headers: {"Authorization": httpx.auto_bearer_host()},
+        Uri.https(_host, "/meta/authz/"),
+        headers: {"Authorization": httpx.auto_bearer_host(host: _host)},
       )
       .then(httpx.auto_error)
       .then((v) {

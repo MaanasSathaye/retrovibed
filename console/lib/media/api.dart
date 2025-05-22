@@ -32,13 +32,14 @@ Future<MediaSearchResponse> recent() async {
 }
 
 abstract class media {
-  static final client = http.Client();
   static MediaSearchRequest request({int limit = 0}) =>
       MediaSearchRequest(limit: fixnum.Int64(limit));
   static MediaSearchResponse response({MediaSearchRequest? next}) =>
       MediaSearchResponse(next: next ?? request(limit: 100), items: []);
 
   static Future<MediaSearchResponse> get(MediaSearchRequest req) async {
+    final client = http.Client();
+
     return client
         .get(
           Uri.https(
@@ -62,6 +63,7 @@ abstract class media {
   }
 
   static Future<MediaDeleteResponse> delete(String id) async {
+    final client = http.Client();
     return client
         .delete(
           Uri.https(httpx.host(), "/m/${id}"),
@@ -87,6 +89,7 @@ abstract class media {
   static Future<MediaUploadResponse> upload(
     http.MultipartRequest Function(http.MultipartRequest req) mkreq,
   ) async {
+    final client = http.Client();
     final req = mkreq(
       http.MultipartRequest("POST", Uri.https(httpx.host(), "/m/")),
     );
