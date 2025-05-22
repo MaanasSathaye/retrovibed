@@ -1,16 +1,23 @@
 import 'dart:io';
+import 'dart:core';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:console/retrovibed.dart' as retro;
 
-var _host = Platform.environment["RETROVIBED_DAEMON_SOCKET"] ?? "localhost:9998";
+var _host = localhost();
 
 String host() {
   return _host;
 }
 
+String? normalizeuri(String? s) {
+  if (s == null) return s;
+  final uri = Uri.parse(s);
+  return "${uri.host}:${uri.port}";
+}
+
 String localhost() {
-  return Platform.environment["RETROVIBED_DAEMON_SOCKET"] ?? "localhost:9998";
+  return normalizeuri(Platform.environment["RETROVIBED_DAEMON_SOCKET"]) ?? "localhost:9998";
 }
 
 void set(String uri) {
