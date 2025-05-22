@@ -296,6 +296,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.5.4"
+  language_code:
+    dependency: "direct main"
+    description:
+      name: language_code
+      sha256: "3993948ea689ec3bc4d3d9286fade89a9f865da38d94d34b5d06d268d4f32fa5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.5.5"
   leak_tracker:
     dependency: transitive
     description:

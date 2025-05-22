@@ -70,6 +70,7 @@ class _MDNSDiscovery extends State<MDNSDiscovery> {
         })
         .whenComplete(() {
           _client.stop();
+          if (!super.mounted) return;
           setState(() {
             _loading = false;
           });
