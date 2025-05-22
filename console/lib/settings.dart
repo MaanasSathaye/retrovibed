@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:console/designkit.dart' as ds;
-import 'package:console/rss.dart' as rss;
-import 'package:console/torrents.dart' as torrents;
-import 'package:console/meta.dart' as meta;
+import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/rss.dart' as rss;
+import 'package:retrovibed/torrents.dart' as torrents;
+import 'package:retrovibed/meta.dart' as meta;
 
 class Display extends StatelessWidget {
   const Display({super.key});

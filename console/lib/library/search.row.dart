@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fixnum/fixnum.dart' as fixnum;
-import 'package:console/designkit.dart' as ds;
+import 'package:retrovibed/designkit.dart' as ds;
 
 class SearchTray extends StatelessWidget {
   final Widget trailing;

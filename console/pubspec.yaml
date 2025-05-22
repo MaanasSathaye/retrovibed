@@ -1,4 +1,4 @@
-name: console
+name: retrovibed
 description: "a personal digital archive"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -56,7 +56,9 @@ dependency_overrides:
       ref: james.lawrence/focus-fix
       path: media_kit_video
 
+# rsvg-convert -w 1024 -h 1024 -o console/icons/application.png .dist/linux/usr/share/icons/hicolor/scalable/apps/retrovibed.svg
 dev_dependencies:
+  # flutter_launcher_icons: "^0.14.3"
   flutter_test:
     sdk: flutter
 
@@ -68,6 +70,13 @@ dev_dependencies:
   flutter_lints: ^5.0.0
   ffigen: ^18.0.0
 
+# flutter_launcher_icons:
+#   image_path: "icons/application.png"
+#   windows:
+#     generate: true
+#   linux:
+#     generate: true
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
@@ -78,10 +87,9 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
-  # To add assets to your application, add an assets section, like this:
+  # # To add assets to your application, add an assets section, like this:
   # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+  #   - icons/application.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

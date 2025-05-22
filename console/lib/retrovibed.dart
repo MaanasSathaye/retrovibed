@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
 import 'package:ffi/ffi.dart' as ffi;
-import 'package:console/retrovibed/gen.dart' as lib;
+import 'package:retrovibed/retrovibed/gen.dart' as lib;
 
 String _path() {
   final files = [File("/app/lib/retrovibed.so"), File("/app/bin/lib/retrovibed.so"), File("build/nativelib/retrovibed.so")];

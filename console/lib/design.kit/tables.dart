@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:console/designkit.dart' as ds;
+import 'package:retrovibed/designkit.dart' as ds;
 
 class Table<T> extends StatelessWidget {
   static Widget Function(List<T> i) expanded<T>(Widget Function(T i) render) {

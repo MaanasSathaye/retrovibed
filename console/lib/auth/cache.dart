@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:console/meta.dart' as _meta;
-import 'package:console/authz.dart' as authz;
+import 'package:retrovibed/meta.dart' as _meta;
+import 'package:retrovibed/authz.dart' as authz;
 
 class AuthzCache extends StatefulWidget {
   final Widget child;

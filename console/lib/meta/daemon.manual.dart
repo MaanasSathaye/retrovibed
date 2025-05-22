@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:console/design.kit/forms.dart' as forms;
-import 'package:console/httpx.dart' as httpx;
+import 'package:retrovibed/design.kit/forms.dart' as forms;
+import 'package:retrovibed/httpx.dart' as httpx;
 import './api.dart' as api;
 
 class ManualConfiguration extends StatefulWidget {

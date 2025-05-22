@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:console/designkit.dart' as ds;
+import 'package:retrovibed/designkit.dart' as ds;
 import 'card.display.dart';
-import 'package:console/media.dart' as media;
+import 'package:retrovibed/media.dart' as media;
 
 Future<List<Widget>> data() {
   // var f1 = media.recent().then(

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:multicast_dns/multicast_dns.dart';
-import 'package:console/designkit.dart' as ds;
-import 'package:console/httpx.dart' as httpx;
+import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/httpx.dart' as httpx;
 import './api.dart' as api;
 import './daemon.manual.dart';
 

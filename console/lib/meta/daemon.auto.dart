@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:console/designkit.dart' as ds;
-import 'package:console/httpx.dart' as httpx;
-import 'package:console/retrovibed.dart' as retro;
+import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/httpx.dart' as httpx;
+import 'package:retrovibed/retrovibed.dart' as retro;
 import './api.dart' as api;
 import './daemon.mdns.dart' as mdns;
 

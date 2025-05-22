@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:console/design.kit/forms.dart' as forms;
+import 'package:retrovibed/design.kit/forms.dart' as forms;
 
 class SettingsLeech extends StatefulWidget {
   SettingsLeech({super.key});

@@ -134,6 +134,12 @@ func FlatpakManifest(ctx context.Context, o eg.Op) error {
 
 func moduleTarball(url, sha256d string) egflatpak.Module {
 	return egflatpak.NewModule("tarball", "simple", egflatpak.ModuleOptions().Commands(
+		"ls -lha .",
+		"mv usr/share/applications/retrovibed.desktop /app/share/applications/space.retrovibe.Console.desktop",
+		"mv usr/share/icons/hicolor/scalable/apps/retrovibed.svg /app/share/icons/hicolor/scalable/apps/space.retrovibe.Console.svg",
+		"rm -rf usr",
+		"rm -rf etc",
+		"ls -lha .",
 		"cp -r . /app/bin",
 		"cp /app/bin/lib/retrovibed.so /app/lib",
 	).Sources(egflatpak.SourceTarball(url, sha256d))...)

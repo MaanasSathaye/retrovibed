@@ -1,3 +1,3 @@
-export 'package:console/meta/api.dart';
-export 'package:console/meta/daemon.list.dart';
-export 'package:console/meta/daemon.auto.dart';
+export 'package:retrovibed/meta/api.dart';
+export 'package:retrovibed/meta/daemon.list.dart';
+export 'package:retrovibed/meta/daemon.auto.dart';

@@ -1,1 +1,1 @@
-export 'package:console/torrents/settings.torrents.dart';
+export 'package:retrovibed/torrents/settings.torrents.dart';

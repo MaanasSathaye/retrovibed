@@ -1,4 +1,4 @@
-import 'package:console/design.kit/theme.defaults.dart' as theming;
+import 'package:retrovibed/design.kit/theme.defaults.dart' as theming;
 import 'package:flutter/material.dart' as m;
 
 class Container extends m.Container {

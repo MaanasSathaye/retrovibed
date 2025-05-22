@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:console/designkit.dart' as ds;
+import 'package:retrovibed/designkit.dart' as ds;
 import 'package:fixnum/fixnum.dart';
 import 'package:protobuf/protobuf.dart';
 import './list.dart';

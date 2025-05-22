@@ -1,4 +1,4 @@
-export 'package:console/rss/feed.edit.dart';
-export 'package:console/rss/rss.pb.dart';
-export 'package:console/rss/list.searchable.dart';
-export 'package:console/rss/api.dart';
+export 'package:retrovibed/rss/feed.edit.dart';
+export 'package:retrovibed/rss/rss.pb.dart';
+export 'package:retrovibed/rss/list.searchable.dart';
+export 'package:retrovibed/rss/api.dart';

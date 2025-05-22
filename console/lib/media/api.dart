@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:fixnum/fixnum.dart' as fixnum;
-import 'package:console/media/media.pb.dart';
+import 'package:retrovibed/media/media.pb.dart';
 import 'package:http/http.dart' as http;
-import 'package:console/httpx.dart' as httpx;
+import 'package:retrovibed/httpx.dart' as httpx;
 
-export 'package:console/media/media.pb.dart';
+export 'package:retrovibed/media/media.pb.dart';
 
 typedef FnMediaSearch =
     Future<MediaSearchResponse> Function(MediaSearchRequest req);

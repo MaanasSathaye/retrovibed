@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:http/http.dart' as http;
-import 'package:console/httpx.dart' as httpx;
+import 'package:retrovibed/httpx.dart' as httpx;
 import './meta.daemon.pb.dart';
 import './meta.authz.pb.dart';
 

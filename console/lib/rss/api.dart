@@ -1,5 +1,5 @@
 import 'package:http/http.dart' as http;
-import 'package:console/httpx.dart' as httpx;
+import 'package:retrovibed/httpx.dart' as httpx;
 import 'dart:convert';
 import './rss.pb.dart';
 export './rss.pb.dart';

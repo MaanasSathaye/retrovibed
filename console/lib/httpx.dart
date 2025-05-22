@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:core';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
-import 'package:console/retrovibed.dart' as retro;
+import 'package:retrovibed/retrovibed.dart' as retro;
 
 var _host = localhost();
 

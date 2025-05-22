@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:console/designkit.dart' as ds;
-import 'package:console/mimex.dart' as mimex;
+import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:file_selector/file_selector.dart';
 

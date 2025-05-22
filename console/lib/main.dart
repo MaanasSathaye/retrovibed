@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart'; // Provides [Player], [Media], [Playlist] etc.
-import 'package:console/auth.dart' as auth;
-import 'package:console/downloads.dart' as downloads;
-import 'package:console/settings.dart' as settings;
-import 'package:console/media.dart' as media;
-import 'package:console/library.dart' as medialib;
-import 'package:console/designkit.dart' as ds;
-import 'package:console/meta.dart' as meta;
-import 'package:console/retrovibed.dart' as retro;
-import 'package:console/design.kit/theme.defaults.dart' as theming;
+import 'package:retrovibed/auth.dart' as auth;
+import 'package:retrovibed/downloads.dart' as downloads;
+import 'package:retrovibed/settings.dart' as settings;
+import 'package:retrovibed/media.dart' as media;
+import 'package:retrovibed/library.dart' as medialib;
+import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/meta.dart' as meta;
+import 'package:retrovibed/retrovibed.dart' as retro;
+import 'package:retrovibed/design.kit/theme.defaults.dart' as theming;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

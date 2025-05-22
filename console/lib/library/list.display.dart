@@ -1,10 +1,10 @@
-import 'package:console/design.kit/file.drop.well.dart';
+import 'package:retrovibed/design.kit/file.drop.well.dart';
 import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:flutter/material.dart';
-import 'package:console/designkit.dart' as ds;
-import 'package:console/media.dart' as media;
-import 'package:console/mimex.dart' as mimex;
-import 'package:console/httpx.dart' as httpx;
+import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/media.dart' as media;
+import 'package:retrovibed/mimex.dart' as mimex;
+import 'package:retrovibed/httpx.dart' as httpx;
 import './search.row.dart';
 
 class AvailableListDisplay extends StatefulWidget {

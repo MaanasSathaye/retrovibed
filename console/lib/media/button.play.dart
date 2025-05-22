@@ -1,9 +1,9 @@
 import 'dart:math';
-import 'package:console/media.dart';
+import 'package:retrovibed/media.dart';
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart' as mediakit;
-import 'package:console/mimex.dart' as mimex;
-import 'package:console/httpx.dart' as httpx;
+import 'package:retrovibed/mimex.dart' as mimex;
+import 'package:retrovibed/httpx.dart' as httpx;
 import './api.dart' as api;
 
 mediakit.Media PlayableMedia(Media current) {

@@ -6,11 +6,13 @@ import (
 	"eg/compute/maintainer"
 	"eg/compute/release"
 	"eg/compute/shallows"
+	"eg/compute/tarballs"
 	"log"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/eggit"
+	"github.com/egdaemon/eg/runtime/wasi/shell"
 	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
 )
 
@@ -23,26 +25,22 @@ func main() {
 		ctx,
 		eggit.AutoClone,
 		eg.Build(deb.BuildFromFile(".eg/Containerfile")),
-		eg.Parallel(
-			eg.Module(
-				ctx,
-				deb,
+		eg.Module(
+			ctx,
+			deb,
+			eg.Parallel(
+				shallows.Generate,
 				console.Generate,
 			),
-			eg.Module(
-				ctx,
-				deb,
-				shallows.Generate,
+			eg.Parallel(
+				eg.Sequential(console.GenerateBinding, console.Build),
+				shallows.Compile(),
 			),
-		),
-		eg.Module(ctx, deb, eg.Parallel(
-			eg.Sequential(console.GenerateBinding, console.Build),
-			shallows.Compile(),
-		)),
-		eg.Parallel(
-			eg.Module(ctx, deb, console.Tests),
-			eg.Module(ctx, deb, console.Linting),
-			eg.Module(ctx, deb, shallows.Test()),
+			eg.Parallel(
+				console.Tests,
+				console.Linting,
+				shallows.Test(),
+			),
 		),
 		egtarball.Clean(
 			eg.Module(
@@ -50,6 +48,10 @@ func main() {
 				eg.Parallel(
 					console.Install,
 					shallows.Install,
+					shell.Op(
+						shell.Newf("cp --verbose -R .dist/linux/* %s", egtarball.Path(tarballs.Retrovibed())),
+						shell.Newf("tree -L 3 %s", egtarball.Path(tarballs.Retrovibed())),
+					),
 				),
 				release.Tarball,
 				eg.Parallel(
@@ -59,13 +61,12 @@ func main() {
 			),
 			release.Release,
 		),
-		// BROKEN - hangs
-		eg.Module(
-			ctx, deb.OptionLiteral("--privileged"),
-			eg.Parallel(
-				console.FlatpakBuild,
-			),
-		),
+		// eg.Module(
+		// 	ctx, deb.OptionLiteral("--privileged"),
+		// 	eg.Parallel(
+		// 		console.FlatpakBuild,
+		// 	),
+		// ),
 	)
 
 	if err != nil {

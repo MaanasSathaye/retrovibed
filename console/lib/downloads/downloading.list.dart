@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:console/designkit.dart' as ds;
-import 'package:console/media.dart' as media;
+import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/media.dart' as media;
 
 class DownloadingListDisplay extends StatelessWidget {
   final media.FnDownloadSearch search;

@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:console/designkit.dart' as ds;
-import 'package:console/httpx.dart' as httpx;
+import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/httpx.dart' as httpx;
 import './api.dart' as api;
 import './download.row.controls.dart';
 
