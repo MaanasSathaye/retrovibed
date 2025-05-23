@@ -26,6 +26,7 @@ func Build(ctx context.Context, _ eg.Op) error {
 	runtime := flutterRuntime()
 	return shell.Run(
 		ctx,
+		runtime.New("rm -rf build/linux/x64/debug").Lenient(true),
 		runtime.New("flutter build linux --release lib/main.dart"),
 	)
 }
@@ -93,10 +94,12 @@ func Install(ctx context.Context, op eg.Op) error {
 	return shell.Run(
 		ctx,
 		runtime.Newf("mkdir -p %s", dstdir),
-		runtime.Newf("cp --verbose -R %s/* %s", bundledir, dstdir),
-		runtime.Newf("echo cp -R %s/* %s/lib", libdir, dstdir),
-		runtime.Newf("cp --verbose -R %s/* %s/lib", libdir, dstdir),
-		runtime.Newf("tree %s", dstdir),
+		runtime.Newf("mv %s/retrovibed %s/console", bundledir, bundledir),
+		runtime.Newf("ls -lha %s", bundledir),
+		runtime.Newf("echo cp -R %s/* %s", bundledir, dstdir),
+		runtime.Newf("cp -R %s/* %s", bundledir, dstdir),
+		runtime.Newf("cp -R %s/* %s/lib", libdir, dstdir),
+		// runtime.Newf("tree %s", dstdir),
 	)
 }
 

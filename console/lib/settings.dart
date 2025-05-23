@@ -53,13 +53,12 @@ class Display extends StatelessWidget {
             content: Column(children: [torrents.SettingsLeech()]),
           ),
           ds.Accordion(
-            // disabled: Text("coming soon"),
-            description: Row(children: [Text("VPN - wireguard")]),
-            content: ds.Debug(Container(
+            description: Row(children: [Text("VPN - wireguard")
+          ]),
+            content: Container(
               constraints: BoxConstraints(maxHeight: 512),
-              padding: defaults.padding,
               child: wg.ListDisplay(),
-            )),
+            ),
           ),
           ds.Accordion(
             disabled: Text("coming soon - opt in premium features"),

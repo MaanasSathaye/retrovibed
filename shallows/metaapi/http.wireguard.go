@@ -8,6 +8,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"path/filepath"
 
 	"github.com/go-playground/form/v4"
 	"github.com/gorilla/mux"
@@ -115,6 +116,10 @@ func (t *HTTPWireguard) search(w http.ResponseWriter, r *http.Request) {
 			return nil
 		}
 
+		if path == wireguardx.Current {
+			return nil
+		}
+
 		if d.IsDir() {
 			return nil
 		}
@@ -205,13 +210,20 @@ func (t *HTTPWireguard) create(w http.ResponseWriter, r *http.Request) {
 
 func (t *HTTPWireguard) current(w http.ResponseWriter, r *http.Request) {
 	var (
-		err error
-		cfg *wireguardx.Config
+		err      error
+		cfg      *wireguardx.Config
+		realpath = errorsx.Zero(filepath.EvalSymlinks(t.dir.Path(wireguardx.Current)))
 	)
 
-	encoded, err := os.ReadFile(t.dir.Path("_current"))
+	if filepath.Base(realpath) == "." {
+		log.Println("no wireguard configuration activated")
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+		return
+	}
+
+	encoded, err := os.ReadFile(realpath)
 	if err != nil {
-		log.Println(errorsx.Wrap(err, "failed to read configuration"))
+		log.Println(errorsx.Wrapf(err, "failed to read configuration: %s", realpath))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}
@@ -224,7 +236,7 @@ func (t *HTTPWireguard) current(w http.ResponseWriter, r *http.Request) {
 	_ = cfg
 
 	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &WireguardCurrentResponse{
-		Wireguard: &Wireguard{Id: "_current"},
+		Wireguard: &Wireguard{Id: filepath.Base(realpath)},
 	}); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
 		return
@@ -238,17 +250,19 @@ func (t *HTTPWireguard) touch(w http.ResponseWriter, r *http.Request) {
 		id  = mux.Vars(r)["id"]
 	)
 
-	if err = os.Remove(t.dir.Path("_current")); fsx.IgnoreIsNotExist(err) != nil {
+	if err = os.RemoveAll(t.dir.Path(wireguardx.Current)); fsx.IgnoreIsNotExist(err) != nil {
 		log.Println(errorsx.Wrap(err, "failed to remove old config"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}
 
-	if err = os.Symlink(t.dir.Path(id), t.dir.Path("_current")); err != nil {
+	if err = os.Symlink(t.dir.Path(id), t.dir.Path(wireguardx.Current)); err != nil {
 		log.Println(errorsx.Wrap(err, "failed to symlink"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}
+
+	errorsx.Log(errorsx.Wrap(os.Chmod(t.dir.Path(wireguardx.Current), 0600), "failed to touch configuration"))
 
 	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &WireguardTouchResponse{}); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))

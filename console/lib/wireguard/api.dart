@@ -82,4 +82,37 @@ abstract class wireguard {
       });
     });
   }
+
+  // activate the specified wireguard configuration.
+  static Future<WireguardTouchResponse> touch(String id) async {
+    final client = http.Client();
+    return client
+        .put(
+          Uri.https(httpx.host(), "/wireguard/${id}"),
+          headers: {"Authorization": httpx.auto_bearer_host()},
+        )
+        .then(httpx.auto_error)
+        .then((v) {
+          return Future.value(
+            WireguardTouchResponse.create()
+              ..mergeFromProto3Json(jsonDecode(v.body)),
+          );
+        });
+  }
+
+  static Future<WireguardCurrentResponse> current() async {
+    final client = http.Client();
+    return client
+        .get(
+          Uri.https(httpx.host(), "/wireguard/current"),
+          headers: {"Authorization": httpx.auto_bearer_host()},
+        )
+        .then(httpx.auto_error)
+        .then((v) {
+          return Future.value(
+            WireguardCurrentResponse.create()
+              ..mergeFromProto3Json(jsonDecode(v.body)),
+          );
+        });
+  }
 }

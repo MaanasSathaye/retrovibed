@@ -13,6 +13,10 @@ import (
 	"golang.org/x/text/encoding/unicode"
 )
 
+const (
+	Current = "_current"
+)
+
 type ParseError struct {
 	why      string
 	offender string
@@ -174,7 +178,7 @@ func ConfigDirectory(rels ...string) string {
 }
 
 func Latest() string {
-	return ConfigDirectory("current")
+	return ConfigDirectory(Current)
 }
 
 func Parse(path string) (*Config, error) {

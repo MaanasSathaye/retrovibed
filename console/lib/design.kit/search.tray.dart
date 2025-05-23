@@ -3,6 +3,8 @@ import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:retrovibed/designkit.dart' as ds;
 
 class SearchTray extends StatelessWidget {
+  static fixnum.Int64 Zero = fixnum.Int64.ZERO;
+
   static refocus(TextEditingController? controller) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (controller == null) return;
@@ -18,6 +20,7 @@ class SearchTray extends StatelessWidget {
   final fixnum.Int64 current;
   final bool empty;
   final bool autofocus;
+  final bool disabled;
   final TextEditingController? controller;
   final FocusNode? focus;
   final InputDecoration? inputDecoration;
@@ -30,6 +33,7 @@ class SearchTray extends StatelessWidget {
     required this.empty,
     this.trailing = const SizedBox(),
     this.autofocus = false,
+    this.disabled = false,
     this.controller,
     this.focus,
     this.inputDecoration,
@@ -50,6 +54,7 @@ class SearchTray extends StatelessWidget {
               autofocus: autofocus,
               focusNode: focus,
               onSubmitted: onSubmitted,
+              enabled: !disabled,
             ),
           ),
           IconButton(

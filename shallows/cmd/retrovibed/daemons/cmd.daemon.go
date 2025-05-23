@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/fsnotify/fsnotify"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/justinas/alice"
 	"golang.org/x/crypto/ssh"
@@ -25,7 +24,6 @@ import (
 	"github.com/retrovibed/retrovibed/internal/env"
 	"github.com/retrovibed/retrovibed/internal/envx"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
-	"github.com/retrovibed/retrovibed/internal/fsnotifyx"
 	"github.com/retrovibed/retrovibed/internal/fsx"
 	"github.com/retrovibed/retrovibed/internal/httpx"
 	"github.com/retrovibed/retrovibed/internal/jwtx"
@@ -108,7 +106,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 
 		log.Println("loaded wireguard configuration", path)
 
-		if _, err = torrentx.WireguardSocket(wcfg); err != nil {
+		if tnetwork, err = torrentx.WireguardSocket(wcfg); err != nil {
 			return errorsx.Wrap(err, "unable to setup wireguard torrent socket")
 		}
 	} else {
@@ -230,33 +228,10 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	go AnnounceSeeded(dctx, db, rootstore, tclient, tstore)
 	go ResumeDownloads(dctx, db, rootstore, tclient, tstore)
 
-	err = fsnotifyx.OnceAndOnChange(dctx, userx.DefaultConfigDir(userx.DefaultRelRoot(), "wireguard.d", "_current"), func(ictx context.Context, evt fsnotify.Event) error {
-		log.Println("wireguard configuration event initiated", evt.Name, evt.Op)
-		defer log.Println("wireguard configuration event completed", evt.Name, evt.Op)
-
-		switch evt.Op {
-		case fsnotify.Chmod:
-		case fsnotify.Remove:
-		default:
-			wcfg, err := wireguardx.Parse(evt.Name)
-			if err != nil {
-				return errorsx.Wrap(err, "unable to parse wireguard config")
-			}
-
-			if tnetwork, err = torrentx.WireguardSocket(wcfg); err != nil {
-				return errorsx.Wrap(err, "unable to setup wireguard torrent socket")
-			}
-			nclient, err := tnetwork.Bind(torrent.NewClient(torconfig))
-			if err != nil {
-				return errorsx.Wrap(err, "unable to setup torrent client")
-			}
-			tclient.Close()
-			tclient = nclient
-		}
-		return nil
-	})
-	if err != nil {
-		return errorsx.Wrap(err, "unable setup wireguard monitoring")
+	if err = ReloadVPN(dctx, tnetwork, tclient, torconfig); err != nil {
+		return err
+	} else {
+		log.Println("wireguard watching", wireguardx.Latest())
 	}
 
 	httpmux := mux.NewRouter()

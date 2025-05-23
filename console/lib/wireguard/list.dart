@@ -1,10 +1,11 @@
 import 'package:retrovibed/design.kit/file.drop.well.dart';
-import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
+import 'package:retrovibed/wireguard/meta.wireguard.pb.dart';
 import './api.dart' as api;
 import './list.row.dart';
+import './icon.checkmark.dart';
 
 class ListDisplay extends StatefulWidget {
   final api.FnWireguardSearch search;
@@ -20,12 +21,13 @@ class ListDisplay extends StatefulWidget {
   });
 
   @override
-  State<StatefulWidget> createState() => _AvailableListDisplay();
+  State<StatefulWidget> createState() => _ListDisplay();
 }
 
-class _AvailableListDisplay extends State<ListDisplay> {
+class _ListDisplay extends State<ListDisplay> {
   bool _loading = true;
   ds.Error? _cause = null;
+  Wireguard _current = Wireguard();
   api.WireguardSearchResponse _res = api.wireguard.response(
     next: api.wireguard.request(limit: 32),
   );
@@ -49,7 +51,6 @@ class _AvailableListDisplay extends State<ListDisplay> {
           ds.SearchTray.refocus(widget.controller);
         })
         .catchError((cause) {
-          print("DERP 0");
           if(!super.mounted) return;
           setState(() {
             _cause = ds.Error.unauthorized(cause, onTap: reseterr);
@@ -57,7 +58,6 @@ class _AvailableListDisplay extends State<ListDisplay> {
           });
         }, test: httpx.ErrorsTest.unauthorized)
         .catchError((e) {
-          print("DERP 1");
           if(!super.mounted) return;
           setState(() {
             _cause = ds.Error.unknown(e, onTap: reseterr);
@@ -71,6 +71,13 @@ class _AvailableListDisplay extends State<ListDisplay> {
     super.initState();
     _res.next..query = widget.controller?.text ?? "";
     refresh(_res.next);
+    api.wireguard.current().then((r) => setState(() {
+      setState(() {
+        _current = r.wireguard;
+      });
+    })).catchError((cause) {
+      print("failed to load current vpn settings ${cause}");
+    }).ignore();
   }
 
   @override
@@ -124,10 +131,11 @@ class _AvailableListDisplay extends State<ListDisplay> {
         leading: ds.SearchTray(
           controller: widget.controller,
           focus: widget.focus,
+          disabled: true,
           onSubmitted: (v) {
             setState(() {
               _res.next.query = v;
-              _res.next.offset = fixnum.Int64(0);
+              _res.next.offset = ds.SearchTray.Zero;
             });
             refresh(_res.next);
           },
@@ -138,7 +146,7 @@ class _AvailableListDisplay extends State<ListDisplay> {
             refresh(_res.next);
           },
           current: _res.next.offset,
-          empty: fixnum.Int64(_res.items.length) < _res.next.limit,
+          empty: _res.items.length < _res.next.limit.toInt(),
           trailing: ds.FileDropWell(
             upload,
             child: IgnorePointer(child: Icon(Icons.file_upload_outlined)),
@@ -150,8 +158,17 @@ class _AvailableListDisplay extends State<ListDisplay> {
         ds.Table.expanded<api.Wireguard>(
           (v) => RowDisplay(
             current: v,
+            leading: [
+              IconCheckmark(_current.id == v.id, onTap: () {
+                return api.wireguard.touch(v.id).then((r) {
+                  setState(() {
+                    _current = v;
+                  });
+                });
+              }),
+            ],
+            ),
           ),
-        ),
         empty: ds.FileDropWell(upload),
     );
   }
