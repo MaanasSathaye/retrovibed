@@ -10,5 +10,6 @@ export 'design.kit/tables.dart';
 export 'design.kit/debug.dart';
 export 'design.kit/file.drop.well.dart';
 export 'design.kit/inputs.dart';
+export 'design.kit/search.tray.dart';
 
 const Widget? NullWidget = null;

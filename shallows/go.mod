@@ -22,7 +22,7 @@ require (
 	github.com/grindlemire/go-lucene v0.0.21
 	github.com/hashicorp/mdns v1.0.6
 	github.com/james-lawrence/genieql v0.0.0-20250306161027-bb1395f5f457
-	github.com/james-lawrence/torrent v0.0.0-20250520171206-3c24ee5cab2e
+	github.com/james-lawrence/torrent v0.0.0-20250523151231-72a7f8983f3a
 	github.com/justinas/alice v1.2.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/marcboeker/go-duckdb/v2 v2.2.1
@@ -37,6 +37,7 @@ require (
 	golang.org/x/oauth2 v0.28.0
 	golang.org/x/text v0.25.0
 	golang.org/x/time v0.11.0
+	golang.zx2c4.com/wireguard v0.0.0-20250521234502-f333402bd9cb
 	google.golang.org/protobuf v1.36.5
 )
 
@@ -44,13 +45,13 @@ require (
 	github.com/RoaringBitmap/roaring v1.9.4 // indirect
 	github.com/alecthomas/atomic v0.1.0-alpha2 // indirect
 	github.com/anacrolix/chansync v0.6.0 // indirect
-	github.com/anacrolix/generics v0.0.3-0.20240902042256-7fb2702ef0ca // indirect
+	github.com/anacrolix/generics v0.0.3-0.20250516050331-55beb7b24e76 // indirect
 	github.com/anacrolix/log v0.16.0 // indirect
 	github.com/anacrolix/missinggo/perf v1.0.0 // indirect
 	github.com/anacrolix/missinggo/v2 v2.8.0 // indirect
 	github.com/anacrolix/multiless v0.4.0 // indirect
 	github.com/anacrolix/stm v0.5.0 // indirect
-	github.com/anacrolix/sync v0.5.3 // indirect
+	github.com/anacrolix/sync v0.5.4 // indirect
 	github.com/anacrolix/upnp v0.1.4 // indirect
 	github.com/apache/arrow-go/v18 v18.2.0 // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
@@ -126,10 +127,12 @@ require (
 	github.com/zieckey/goini v0.0.0-20240615065340-08ee21c836fb // indirect
 	go.uber.org/automaxprocs v1.6.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/exp v0.0.0-20250408133849-7e4ce0ab07d0 // indirect
+	golang.org/x/exp v0.0.0-20250506013437-ce4c2cf36ca6 // indirect
 	golang.org/x/mod v0.24.0 // indirect
 	golang.org/x/sync v0.14.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
+	golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2 // indirect
+	gvisor.dev/gvisor v0.0.0-20250503011706-39ed1f5ac29c // indirect
 )
 
 require (
@@ -144,9 +147,9 @@ require (
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/posener/complete v1.2.3 // indirect
 	github.com/riywo/loginshell v0.0.0-20200815045211-7d26008be1ab // indirect
-	golang.org/x/net v0.39.0 // indirect
+	golang.org/x/net v0.40.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
-	golang.org/x/tools v0.32.0 // indirect
+	golang.org/x/tools v0.33.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 

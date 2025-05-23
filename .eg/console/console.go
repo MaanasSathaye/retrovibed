@@ -55,18 +55,32 @@ func GenerateBinding(ctx context.Context, _ eg.Op) error {
 	)
 }
 
-func Generate(ctx context.Context, _ eg.Op) error {
+func Generate(ctx context.Context, op eg.Op) error {
+	return eg.Sequential(
+		GenerateFlutter,
+		GenerateProtocol,
+	)(ctx, op)
+}
+
+func GenerateFlutter(ctx context.Context, _ eg.Op) error {
 	runtime := flutterRuntime()
 	return shell.Run(
 		ctx,
 		// runtime.New("flutter clean"),
 		runtime.New("flutter create --platforms=linux ."),
 		runtime.New("flutter pub get"),
+	)
+}
+
+func GenerateProtocol(ctx context.Context, _ eg.Op) error {
+	return shell.Run(
+		ctx,
 		shell.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/media -I.proto .proto/media.proto"),
 		shell.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/rss -I.proto .proto/rss.proto"),
 		shell.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/meta -I.proto .proto/meta.daemon.proto"),
 		shell.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/meta -I.proto .proto/meta.profile.proto"),
 		shell.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/meta -I.proto .proto/meta.authz.proto"),
+		shell.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/wireguard -I.proto .proto/meta.wireguard.proto"),
 	)
 }
 

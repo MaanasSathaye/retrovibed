@@ -3,6 +3,7 @@ package httptestx
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -35,11 +36,14 @@ func ReadRequest(path string) (resp *httptest.ResponseRecorder, req *http.Reques
 
 type RequestOption func(*http.Request)
 
-// BuildRequest ...
 func BuildRequest(method string, uri string, body []byte, options ...RequestOption) (recorder *httptest.ResponseRecorder, req *http.Request, err error) {
+	return BuildRequestContext(context.Background(), method, uri, body, options...)
+}
 
+// BuildRequest ...
+func BuildRequestContext(ctx context.Context, method string, uri string, body []byte, options ...RequestOption) (recorder *httptest.ResponseRecorder, req *http.Request, err error) {
 	recorder = httptest.NewRecorder()
-	if req, err = http.NewRequest(strings.ToUpper(method), uri, bytes.NewBuffer(body)); err != nil {
+	if req, err = http.NewRequestWithContext(ctx, strings.ToUpper(method), uri, bytes.NewBuffer(body)); err != nil {
 		return recorder, req, err
 	}
 

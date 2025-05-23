@@ -22,11 +22,12 @@ func main() {
 		ctx,
 		eggit.AutoClone,
 		eg.Build(deb.BuildFromFile(".eg/Containerfile")),
-		eg.Parallel(
-			eg.Module(ctx, deb, console.Generate),
-			eg.Module(ctx, deb, shallows.Generate),
+		eg.Module(
+			ctx,
+			deb,
+			eg.Parallel(console.Generate, shallows.Generate),
+			console.GenerateBinding,
 		),
-		eg.Module(ctx, deb, console.GenerateBinding),
 	)
 
 	if err != nil {

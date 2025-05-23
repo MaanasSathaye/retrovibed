@@ -26,11 +26,32 @@ func shellruntime() shell.Command {
 	return eggolang.Runtime().Directory(rootdir())
 }
 
-func Generate(ctx context.Context, _ eg.Op) error {
+func Generate(ctx context.Context, op eg.Op) error {
+	return eg.Sequential(
+		GenerateProtocol,
+		GenerateGogen,
+	)(ctx, op)
+}
+
+func GenerateGogen(ctx context.Context, _ eg.Op) error {
 	gruntime := shellruntime()
 	return shell.Run(
 		ctx,
 		gruntime.New("go generate ./... && go fmt ./...").Timeout(10*time.Minute),
+	)
+}
+
+func GenerateProtocol(ctx context.Context, op eg.Op) error {
+	gruntime := shellruntime()
+	return shell.Run(
+		ctx,
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta.authz.proto=github.com/retrovibed/retrovibed/metaapi --go_opt=paths=source_relative --go_out=metaapi meta.authz.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta.profile.proto=github.com/retrovibed/retrovibed/metaapi --go_opt=paths=source_relative --go_out=metaapi meta.profile.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta.daemon.proto=github.com/retrovibed/retrovibed/metaapi --go_opt=paths=source_relative --go_out=metaapi meta.daemon.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta.wireguard.proto=github.com/retrovibed/retrovibed/metaapi --go_opt=paths=source_relative --go_out=metaapi meta.wireguard.proto"),
+		// media
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmedia.proto=github.com/retrovibed/retrovibed/media --go_opt=paths=source_relative --go_out=media media.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mrss.proto=github.com/retrovibed/retrovibed/rss --go_opt=paths=source_relative --go_out=rss rss.proto"),
 	)
 }
 

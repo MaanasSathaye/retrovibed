@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/fsnotify/fsnotify"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/justinas/alice"
 	"golang.org/x/crypto/ssh"
@@ -24,6 +25,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/env"
 	"github.com/retrovibed/retrovibed/internal/envx"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
+	"github.com/retrovibed/retrovibed/internal/fsnotifyx"
 	"github.com/retrovibed/retrovibed/internal/fsx"
 	"github.com/retrovibed/retrovibed/internal/httpx"
 	"github.com/retrovibed/retrovibed/internal/jwtx"
@@ -32,6 +34,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/tlsx"
 	"github.com/retrovibed/retrovibed/internal/torrentx"
 	"github.com/retrovibed/retrovibed/internal/userx"
+	"github.com/retrovibed/retrovibed/internal/wireguardx"
 	"github.com/retrovibed/retrovibed/media"
 	"github.com/retrovibed/retrovibed/meta/identityssh"
 	"github.com/retrovibed/retrovibed/metaapi"
@@ -60,6 +63,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		torrentpeers                            = userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "torrent.peers")
 		peerid                                  = krpc.IdFromString(ssh.FingerprintSHA256(id.PublicKey()))
 		bootstrap    torrent.ClientConfigOption = torrent.ClientConfigNoop
+		tnetwork     torrent.Binder
 	)
 
 	// envx.Debug(os.Environ()...)
@@ -96,9 +100,25 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		errorsx.Log(errorsx.Wrap(PrepareDefaultFeeds(dctx, db), "unable to initialize default rss feeds"))
 	}()
 
-	tnetwork, err := torrentx.Autosocket(0)
-	if err != nil {
-		return errorsx.Wrap(err, "unable to setup torrent socket")
+	if path := wireguardx.Latest(); fsx.Exists(path) {
+		wcfg, err := wireguardx.Parse(path)
+		if err != nil {
+			return errorsx.Wrapf(err, "unable to parse wireguard configuration: %s", path)
+		}
+
+		log.Println("loaded wireguard configuration", path)
+
+		if _, err = torrentx.WireguardSocket(wcfg); err != nil {
+			return errorsx.Wrap(err, "unable to setup wireguard torrent socket")
+		}
+	} else {
+		log.Println("no wireguard configuration found at", path)
+	}
+
+	if tnetwork == nil {
+		if tnetwork, err = torrentx.Autosocket(0); err != nil {
+			return errorsx.Wrap(err, "unable to setup torrent socket")
+		}
 	}
 
 	if fsx.IsRegularFile(torrentpeers) {
@@ -120,37 +140,36 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 
 	tm := dht.DefaultMuxer().
 		Method(bep0051.Query, bep0051.NewEndpoint(bep0051.EmptySampler{}))
-	tclient, err := tnetwork.Bind(
-		torrent.NewClient(
-			torrent.NewDefaultClientConfig(
-				torrent.NewMetadataCache(torrentstore.Path()),
-				tstore,
-				torrent.ClientConfigPeerID(string(peerid[:])),
-				torrent.ClientConfigSeed(true),
-				torrent.ClientConfigInfoLogger(log.New(io.Discard, "[torrent] ", log.Flags())),
-				torrent.ClientConfigMuxer(tm),
-				torrent.ClientConfigBucketLimit(32),
-				torrent.ClientConfigHTTPUserAgent("retrovibed/0.0"),
-				torrent.ClientConfigConnectionClosed(func(ih metainfo.Hash, stats torrent.ConnStats) {
-					if stats.BytesWrittenData.Uint64() == 0 {
-						return
-					}
 
-					var md tracking.Metadata
-					ictx, done := context.WithTimeout(context.Background(), 3*time.Second)
-					defer done()
-					if err := tracking.MetadataUploadedByID(ictx, db, ih.Bytes(), stats.BytesWrittenData.Uint64()).Scan(&md); err != nil {
-						log.Println(errorsx.Wrapf(err, "%s: unable to record uploaded metrics", ih.HexString()))
-						return
-					}
-				}),
-				// func(t *torrent, stats ConnStats) {
-				// log.Println("connection closed", t.md.ID.HexString(), stats.BytesReadUsefulData.Int64(), stats.BytesWrittenData.Int64())
-				// }
-				bootstrap,
-			),
-		),
+	torconfig := torrent.NewDefaultClientConfig(
+		torrent.NewMetadataCache(torrentstore.Path()),
+		tstore,
+		torrent.ClientConfigPeerID(string(peerid[:])),
+		torrent.ClientConfigSeed(true),
+		torrent.ClientConfigInfoLogger(log.New(io.Discard, "[torrent] ", log.Flags())),
+		torrent.ClientConfigMuxer(tm),
+		torrent.ClientConfigBucketLimit(32),
+		torrent.ClientConfigHTTPUserAgent("retrovibed/0.0"),
+		torrent.ClientConfigConnectionClosed(func(ih metainfo.Hash, stats torrent.ConnStats) {
+			if stats.BytesWrittenData.Uint64() == 0 {
+				return
+			}
+
+			var md tracking.Metadata
+			ictx, done := context.WithTimeout(context.Background(), 3*time.Second)
+			defer done()
+			if err := tracking.MetadataUploadedByID(ictx, db, ih.Bytes(), stats.BytesWrittenData.Uint64()).Scan(&md); err != nil {
+				log.Println(errorsx.Wrapf(err, "%s: unable to record uploaded metrics", ih.HexString()))
+				return
+			}
+		}),
+		// func(t *torrent, stats ConnStats) {
+		// log.Println("connection closed", t.md.ID.HexString(), stats.BytesReadUsefulData.Int64(), stats.BytesWrittenData.Int64())
+		// }
+		bootstrap,
 	)
+
+	tclient, err := tnetwork.Bind(torrent.NewClient(torconfig))
 	if err != nil {
 		return errorsx.Wrap(err, "unable to setup torrent client")
 	}
@@ -211,6 +230,35 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	go AnnounceSeeded(dctx, db, rootstore, tclient, tstore)
 	go ResumeDownloads(dctx, db, rootstore, tclient, tstore)
 
+	err = fsnotifyx.OnceAndOnChange(dctx, userx.DefaultConfigDir(userx.DefaultRelRoot(), "wireguard.d", "_current"), func(ictx context.Context, evt fsnotify.Event) error {
+		log.Println("wireguard configuration event initiated", evt.Name, evt.Op)
+		defer log.Println("wireguard configuration event completed", evt.Name, evt.Op)
+
+		switch evt.Op {
+		case fsnotify.Chmod:
+		case fsnotify.Remove:
+		default:
+			wcfg, err := wireguardx.Parse(evt.Name)
+			if err != nil {
+				return errorsx.Wrap(err, "unable to parse wireguard config")
+			}
+
+			if tnetwork, err = torrentx.WireguardSocket(wcfg); err != nil {
+				return errorsx.Wrap(err, "unable to setup wireguard torrent socket")
+			}
+			nclient, err := tnetwork.Bind(torrent.NewClient(torconfig))
+			if err != nil {
+				return errorsx.Wrap(err, "unable to setup torrent client")
+			}
+			tclient.Close()
+			tclient = nclient
+		}
+		return nil
+	})
+	if err != nil {
+		return errorsx.Wrap(err, "unable setup wireguard monitoring")
+	}
+
 	httpmux := mux.NewRouter()
 	httpmux.NotFoundHandler = httpx.NotFound(alice.New())
 	httpmux.Use(
@@ -235,6 +283,8 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	metaapi.NewSSHOauth2(db).Bind(oauth2mux.PathPrefix("/ssh").Subrouter())
 
 	metamux := httpmux.PathPrefix("/meta").Subrouter()
+
+	metaapi.NewHTTPWireguard(wireguardx.ConfigDirectory()).Bind(httpmux.PathPrefix("/wireguard").Subrouter())
 	metaapi.NewHTTPUsermanagement(db).Bind(metamux.PathPrefix("/u12t").Subrouter())
 	metaapi.NewHTTPDaemons(db).Bind(metamux.PathPrefix("/d").Subrouter())
 	metaapi.NewHTTPAuthz(db).Bind(metamux.PathPrefix("/authz").Subrouter())

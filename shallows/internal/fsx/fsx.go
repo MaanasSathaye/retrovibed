@@ -71,6 +71,11 @@ func IsRegularFile(path string) bool {
 	return true
 }
 
+func Exists(path string) bool {
+	_, err := os.Stat(path)
+	return ErrIsNotExist(err) == nil
+}
+
 func RemoveSymlink(path string) error {
 	info, err := os.Stat(path)
 	if ErrIsNotExist(err) != nil {

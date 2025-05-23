@@ -5,7 +5,6 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/httpx.dart' as httpx;
-import './search.row.dart';
 
 class AvailableListDisplay extends StatefulWidget {
   final media.FnMediaSearch search;
@@ -129,7 +128,8 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
       child: ds.Table(
         loading: _loading,
         cause: _cause,
-        leading: SearchTray(
+        leading: ds.SearchTray(
+          inputDecoration: InputDecoration(hintText: "search the library"),
           controller: widget.controller,
           focus: widget.focus,
           onSubmitted: (v) {

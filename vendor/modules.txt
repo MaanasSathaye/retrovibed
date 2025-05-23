@@ -16,7 +16,7 @@ github.com/alecthomas/kong
 ## explicit; go 1.16
 github.com/anacrolix/chansync
 github.com/anacrolix/chansync/events
-# github.com/anacrolix/generics v0.0.3-0.20240902042256-7fb2702ef0ca
+# github.com/anacrolix/generics v0.0.3-0.20250516050331-55beb7b24e76
 ## explicit; go 1.18
 github.com/anacrolix/generics
 # github.com/anacrolix/log v0.16.0
@@ -46,8 +46,8 @@ github.com/anacrolix/multiless
 # github.com/anacrolix/stm v0.5.0
 ## explicit; go 1.18
 github.com/anacrolix/stm
-# github.com/anacrolix/sync v0.5.3
-## explicit; go 1.13
+# github.com/anacrolix/sync v0.5.4
+## explicit; go 1.18
 github.com/anacrolix/sync
 # github.com/anacrolix/upnp v0.1.4
 ## explicit; go 1.12
@@ -410,7 +410,7 @@ github.com/james-lawrence/genieql/internal/userx
 github.com/james-lawrence/genieql/internal/wasidialect
 github.com/james-lawrence/genieql/internal/wasix/ffierrors
 github.com/james-lawrence/genieql/internal/wasix/ffiguest
-# github.com/james-lawrence/torrent v0.0.0-20250520171206-3c24ee5cab2e
+# github.com/james-lawrence/torrent v0.0.0-20250523151231-72a7f8983f3a
 ## explicit; go 1.23.2
 github.com/james-lawrence/torrent
 github.com/james-lawrence/torrent/bencode
@@ -638,15 +638,18 @@ go.uber.org/automaxprocs/maxprocs
 go.uber.org/multierr
 # golang.org/x/crypto v0.38.0
 ## explicit; go 1.23.0
+golang.org/x/crypto/blake2s
 golang.org/x/crypto/blowfish
 golang.org/x/crypto/chacha20
+golang.org/x/crypto/chacha20poly1305
 golang.org/x/crypto/curve25519
 golang.org/x/crypto/internal/alias
 golang.org/x/crypto/internal/poly1305
 golang.org/x/crypto/pbkdf2
+golang.org/x/crypto/poly1305
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
-# golang.org/x/exp v0.0.0-20250408133849-7e4ce0ab07d0
+# golang.org/x/exp v0.0.0-20250506013437-ce4c2cf36ca6
 ## explicit; go 1.23.0
 golang.org/x/exp/constraints
 # golang.org/x/mod v0.24.0
@@ -655,9 +658,10 @@ golang.org/x/mod/internal/lazyregexp
 golang.org/x/mod/modfile
 golang.org/x/mod/module
 golang.org/x/mod/semver
-# golang.org/x/net v0.39.0
+# golang.org/x/net v0.40.0
 ## explicit; go 1.23.0
 golang.org/x/net/bpf
+golang.org/x/net/dns/dnsmessage
 golang.org/x/net/html
 golang.org/x/net/html/atom
 golang.org/x/net/html/charset
@@ -715,7 +719,7 @@ golang.org/x/text/width
 # golang.org/x/time v0.11.0
 ## explicit; go 1.23.0
 golang.org/x/time/rate
-# golang.org/x/tools v0.32.0
+# golang.org/x/tools v0.33.0
 ## explicit; go 1.23.0
 golang.org/x/tools/cmd/goimports
 golang.org/x/tools/cmd/stringer
@@ -749,6 +753,22 @@ golang.org/x/tools/internal/versions
 ## explicit; go 1.18
 golang.org/x/xerrors
 golang.org/x/xerrors/internal
+# golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2
+## explicit; go 1.17
+golang.zx2c4.com/wintun
+# golang.zx2c4.com/wireguard v0.0.0-20250521234502-f333402bd9cb
+## explicit; go 1.23.1
+golang.zx2c4.com/wireguard/conn
+golang.zx2c4.com/wireguard/conn/winrio
+golang.zx2c4.com/wireguard/device
+golang.zx2c4.com/wireguard/ipc
+golang.zx2c4.com/wireguard/ipc/namedpipe
+golang.zx2c4.com/wireguard/ratelimiter
+golang.zx2c4.com/wireguard/replay
+golang.zx2c4.com/wireguard/rwcancel
+golang.zx2c4.com/wireguard/tai64n
+golang.zx2c4.com/wireguard/tun
+golang.zx2c4.com/wireguard/tun/netstack
 # google.golang.org/genproto/googleapis/rpc v0.0.0-20250313205543-e70fdf4c4cb4
 ## explicit; go 1.23.0
 google.golang.org/genproto/googleapis/rpc/status
@@ -854,3 +874,48 @@ google.golang.org/protobuf/types/known/timestamppb
 # gopkg.in/yaml.v3 v3.0.1
 ## explicit
 gopkg.in/yaml.v3
+# gvisor.dev/gvisor v0.0.0-20250503011706-39ed1f5ac29c
+## explicit; go 1.23.1
+gvisor.dev/gvisor/pkg/atomicbitops
+gvisor.dev/gvisor/pkg/bits
+gvisor.dev/gvisor/pkg/buffer
+gvisor.dev/gvisor/pkg/context
+gvisor.dev/gvisor/pkg/cpuid
+gvisor.dev/gvisor/pkg/gohacks
+gvisor.dev/gvisor/pkg/goid
+gvisor.dev/gvisor/pkg/linewriter
+gvisor.dev/gvisor/pkg/log
+gvisor.dev/gvisor/pkg/rand
+gvisor.dev/gvisor/pkg/refs
+gvisor.dev/gvisor/pkg/sleep
+gvisor.dev/gvisor/pkg/state
+gvisor.dev/gvisor/pkg/state/wire
+gvisor.dev/gvisor/pkg/sync
+gvisor.dev/gvisor/pkg/sync/locking
+gvisor.dev/gvisor/pkg/tcpip
+gvisor.dev/gvisor/pkg/tcpip/adapters/gonet
+gvisor.dev/gvisor/pkg/tcpip/checksum
+gvisor.dev/gvisor/pkg/tcpip/hash/jenkins
+gvisor.dev/gvisor/pkg/tcpip/header
+gvisor.dev/gvisor/pkg/tcpip/header/parse
+gvisor.dev/gvisor/pkg/tcpip/internal/tcp
+gvisor.dev/gvisor/pkg/tcpip/link/channel
+gvisor.dev/gvisor/pkg/tcpip/network/hash
+gvisor.dev/gvisor/pkg/tcpip/network/internal/fragmentation
+gvisor.dev/gvisor/pkg/tcpip/network/internal/ip
+gvisor.dev/gvisor/pkg/tcpip/network/internal/multicast
+gvisor.dev/gvisor/pkg/tcpip/network/ipv4
+gvisor.dev/gvisor/pkg/tcpip/network/ipv6
+gvisor.dev/gvisor/pkg/tcpip/ports
+gvisor.dev/gvisor/pkg/tcpip/seqnum
+gvisor.dev/gvisor/pkg/tcpip/stack
+gvisor.dev/gvisor/pkg/tcpip/transport
+gvisor.dev/gvisor/pkg/tcpip/transport/icmp
+gvisor.dev/gvisor/pkg/tcpip/transport/internal/network
+gvisor.dev/gvisor/pkg/tcpip/transport/internal/noop
+gvisor.dev/gvisor/pkg/tcpip/transport/packet
+gvisor.dev/gvisor/pkg/tcpip/transport/raw
+gvisor.dev/gvisor/pkg/tcpip/transport/tcp
+gvisor.dev/gvisor/pkg/tcpip/transport/tcpconntrack
+gvisor.dev/gvisor/pkg/tcpip/transport/udp
+gvisor.dev/gvisor/pkg/waiter

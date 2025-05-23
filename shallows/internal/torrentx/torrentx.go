@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/netip"
 	"os"
 
 	"github.com/james-lawrence/torrent"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
+	"github.com/retrovibed/retrovibed/internal/slicesx"
 	"github.com/retrovibed/retrovibed/internal/stringsx"
+	"github.com/retrovibed/retrovibed/internal/wireguardx"
 
 	"github.com/anacrolix/utp"
 	"github.com/james-lawrence/torrent/dht"
@@ -17,6 +20,10 @@ import (
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/sockets"
 	"github.com/james-lawrence/torrent/tracker"
+
+	"golang.zx2c4.com/wireguard/conn"
+	"golang.zx2c4.com/wireguard/device"
+	"golang.zx2c4.com/wireguard/tun/netstack"
 )
 
 func AnnouncerFromClient(c *torrent.Client) tracker.Announce {
@@ -47,6 +54,54 @@ func Autosocket(p int) (_ torrent.Binder, err error) {
 			return nil, errorsx.Wrap(err, "unable to open tcp socket")
 		}
 		s2 = sockets.New(s, &net.Dialer{})
+	}
+
+	return torrent.NewSocketsBind(s1, s2), nil
+}
+
+func WireguardSocket(wcfg *wireguardx.Config) (_ torrent.Binder, err error) {
+	var (
+		s1, s2    sockets.Socket
+		utpsocket *utp.Socket
+	)
+
+	tun, tnet, err := netstack.CreateNetTUN(
+		slicesx.MapTransform(func(n netip.Prefix) netip.Addr { return n.Addr() }, wcfg.Interface.Addresses...),
+		wcfg.Interface.DNS,
+		int(wcfg.Interface.MTU),
+	)
+	if err != nil {
+		return nil, errorsx.Wrap(err, "checkpoint 0")
+	}
+
+	dev := device.NewDevice(tun, conn.NewDefaultBind(), device.NewLogger(device.LogLevelVerbose, ""))
+
+	for _, ipcset := range wireguardx.FormatIPCSet(wcfg) {
+		if err = dev.IpcSet(ipcset); err != nil {
+			return nil, errorsx.Wrap(err, "invalid ipcset for peer")
+		}
+	}
+
+	if err = dev.Up(); err != nil {
+		return nil, errorsx.Wrap(err, "checkpoint 1")
+	}
+
+	conn, err := tnet.ListenUDP(&net.UDPAddr{Port: int(wcfg.Interface.ListenPort)})
+	if err != nil {
+		return nil, errorsx.Wrap(err, "checkpoint 2")
+	}
+
+	if utpsocket, err = utp.NewSocketFromPacketConn(conn); err != nil {
+		return nil, errorsx.Wrap(err, "checkpoint 3")
+	}
+
+	s1 = sockets.New(utpsocket, utpsocket)
+	if addr, ok := utpsocket.Addr().(*net.UDPAddr); ok {
+		s, err := tnet.ListenTCP(&net.TCPAddr{Port: addr.Port})
+		if err != nil {
+			return nil, errorsx.Wrap(err, "unable to open tcp socket")
+		}
+		s2 = sockets.New(s, tnet)
 	}
 
 	return torrent.NewSocketsBind(s1, s2), nil

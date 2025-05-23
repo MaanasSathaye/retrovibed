@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package meta;
+
+message Wireguard {
+  string id = 1 [ json_name = "id" ];
+}
+
+message WireguardSearchRequest {
+  string query = 1 [ json_name = "query" ];
+  uint64 offset = 2 [ json_name = "offset" ];
+  uint64 limit = 3 [ json_name = "limit" ];
+  uint32 status = 4 [ json_name = "status" ];
+}
+message WireguardSearchResponse {
+  WireguardSearchRequest next = 1 [ json_name = "next" ];
+  repeated Wireguard items = 2 [ json_name = "items" ];
+}
+
+message WireguardTouchRequest {}
+message WireguardTouchResponse {}
+
+message WireguardUploadRequest {}
+message WireguardUploadResponse { Wireguard Wireguard = 1 [ json_name = "wireguard" ]; }
+
+message WireguardCurrentRequest {}
+message WireguardCurrentResponse { Wireguard Wireguard = 1 [ json_name = "wireguard" ]; }
+
+message WireguardDeleteRequest {}
+message WireguardDeleteResponse {
+  Wireguard Wireguard = 1 [ json_name = "wireguard" ];
+}
