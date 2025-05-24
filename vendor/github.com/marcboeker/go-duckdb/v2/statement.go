@@ -232,16 +232,6 @@ func (s *Stmt) bindTime(val driver.NamedValue, t Type, n int) (mapping.State, er
 	return state, nil
 }
 
-func (s *Stmt) bindJSON(val driver.NamedValue, n int) (mapping.State, error) {
-	switch v := val.Value.(type) {
-	case []byte:
-		return mapping.BindVarchar(*s.preparedStmt, mapping.IdxT(n+1), string(v)), nil
-	case string:
-		return mapping.BindVarchar(*s.preparedStmt, mapping.IdxT(n+1), v), nil
-	}
-	return mapping.StateError, addIndexToError(unsupportedTypeError("JSON interface, need []byte or string"), n+1)
-}
-
 // Used for binding Array, List, Struct. In the future, also Map and Union
 func (s *Stmt) bindCompositeValue(val driver.NamedValue, n int) (mapping.State, error) {
 	lt, err := s.paramLogicalType(n + 1)
@@ -270,7 +260,20 @@ func (s *Stmt) tryBindComplexValue(val driver.NamedValue, t Type, n int) (mappin
 	return mapping.StateError, addIndexToError(unsupportedTypeError(name), n+1)
 }
 
-func (s *Stmt) bindComplexValue(val driver.NamedValue, n int, t Type, name string) (mapping.State, error) {
+func (s *Stmt) bindComplexValue(val driver.NamedValue, n int) (mapping.State, error) {
+	// For some queries, we cannot resolve the parameter type when preparing the query.
+	// E.g., for "SELECT * FROM (VALUES (?, ?)) t(a, b)", we cannot know the parameter types from the SQL statement alone.
+	// For these cases, ParamType returns TYPE_INVALID.
+	t, err := s.ParamType(n + 1)
+	if err != nil {
+		return mapping.StateError, err
+	}
+
+	name, ok := unsupportedTypeToStringMap[t]
+	if ok && t != TYPE_INVALID {
+		return mapping.StateError, addIndexToError(unsupportedTypeError(name), n+1)
+	}
+
 	// We could not resolve this parameter when binding the query.
 	// Fall back to the Go type.
 	if t == TYPE_INVALID {
@@ -289,37 +292,13 @@ func (s *Stmt) bindComplexValue(val driver.NamedValue, n int, t Type, name strin
 	case TYPE_MAP, TYPE_ENUM, TYPE_UNION:
 		// FIXME: for other types: duckdb_param_logical_type once available, then create duckdb_value + duckdb_bind_value
 		// FIXME: for other types: use NamedValueChecker to support.
+		name = typeToStringMap[t]
 		return mapping.StateError, addIndexToError(unsupportedTypeError(name), n+1)
 	}
 	return mapping.StateError, addIndexToError(unsupportedTypeError(unknownTypeErrMsg), n+1)
 }
 
 func (s *Stmt) bindValue(val driver.NamedValue, n int) (mapping.State, error) {
-	// For some queries, we cannot resolve the parameter type when preparing the query.
-	// E.g., for "SELECT * FROM (VALUES (?, ?)) t(a, b)", we cannot know the parameter types from the SQL statement alone.
-	// For these cases, ParamType returns TYPE_INVALID.
-	t, err := s.ParamType(n + 1)
-	if err != nil {
-		return mapping.StateError, err
-	}
-
-	name, ok := unsupportedTypeToStringMap[t]
-	if ok && t != TYPE_INVALID {
-		return mapping.StateError, addIndexToError(unsupportedTypeError(name), n+1)
-	}
-
-	if t != TYPE_INVALID {
-		lt, e := s.paramLogicalType(n + 1)
-		if e != nil {
-			return mapping.StateError, e
-		}
-		alias := mapping.LogicalTypeGetAlias(lt)
-		switch alias {
-		case aliasJSON:
-			return s.bindJSON(val, n)
-		}
-	}
-
 	switch v := val.Value.(type) {
 	case bool:
 		return mapping.BindBoolean(*s.preparedStmt, mapping.IdxT(n+1), v), nil
@@ -361,7 +340,7 @@ func (s *Stmt) bindValue(val driver.NamedValue, n int) (mapping.State, error) {
 	case nil:
 		return mapping.BindNull(*s.preparedStmt, mapping.IdxT(n+1)), nil
 	}
-	return s.bindComplexValue(val, n, t, name)
+	return s.bindComplexValue(val, n)
 }
 
 func (s *Stmt) bind(args []driver.NamedValue) error {

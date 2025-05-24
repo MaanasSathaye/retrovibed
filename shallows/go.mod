@@ -25,7 +25,7 @@ require (
 	github.com/james-lawrence/torrent v0.0.0-20250524174139-97459d0ec733
 	github.com/justinas/alice v1.2.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
-	github.com/marcboeker/go-duckdb/v2 v2.3.0
+	github.com/marcboeker/go-duckdb/v2 v2.2.1
 	github.com/mattn/go-isatty v0.0.20
 	github.com/onsi/ginkgo/v2 v2.23.4
 	github.com/onsi/gomega v1.37.0

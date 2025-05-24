@@ -26,7 +26,6 @@ import (
 	"github.com/james-lawrence/torrent/internal/errorsx"
 	"github.com/james-lawrence/torrent/internal/langx"
 	"github.com/james-lawrence/torrent/internal/netx"
-	"github.com/james-lawrence/torrent/internal/x/bitmapx"
 	"github.com/james-lawrence/torrent/tracker"
 
 	"github.com/james-lawrence/torrent/bencode"
@@ -222,7 +221,11 @@ func TuneVerifyFull(t *torrent) {
 
 // Mark the entirety of the torrent as unverified. used when loading from disk
 func TuneUnverified(t *torrent) {
-	t.chunks.MergeIntoUnverified(bitmapx.Range(0, uint64(t.chunks.cmaximum)))
+	log.Println("disabled - unverifed")
+	// // t.chunks.MergeIntoUnverified(bitmapx.Range(0, uint64(t.chunks.cmaximum)))
+	// for i := 0; i < t.numPieces(); i++ {
+	// 	t.digests.Enqueue(i)
+	// }
 }
 
 func TuneSeeding(t *torrent) {
@@ -845,7 +848,7 @@ func (t *torrent) BytesMissing() int64 {
 
 func (t *torrent) bytesLeft() (left int64) {
 	s := t.chunks.Snapshot(&Stats{})
-	return t.info.TotalLength() - ((int64(s.Unverified) * int64(t.chunks.clength)) + (int64(s.Completed) * int64(t.info.PieceLength)))
+	return t.info.TotalLength() - (int64(s.Completed) * int64(t.info.PieceLength))
 }
 
 func (t *torrent) usualPieceSize() int {

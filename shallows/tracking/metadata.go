@@ -220,7 +220,10 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 			stats := dl.Stats()
 			info := dl.Info()
 
-			log.Printf("%s - %s: info(%t) seeding(%t), peers(%d:%d:%d) pieces(%d:%d:%d:%d)\n", md.ID, hex.EncodeToString(md.Infohash), info != nil, stats.Seeding, stats.ActivePeers, stats.PendingPeers, stats.TotalPeers, stats.Missing, stats.Outstanding, stats.Unverified, stats.Completed)
+			log.Printf(
+				"%s - %s: info(%t) seeding(%t), peers(%d:%d:%d) pieces(m%d:o%d:u%d:c%d - f%d)\n", md.ID, hex.EncodeToString(md.Infohash), info != nil, stats.Seeding, stats.ActivePeers, stats.PendingPeers, stats.TotalPeers,
+				stats.Missing, stats.Outstanding, stats.Unverified, stats.Completed, stats.Failed,
+			)
 			if err := dl.Tune(torrent.TuneNewConns); err != nil {
 				log.Println("unable to request new connections", err)
 				continue
