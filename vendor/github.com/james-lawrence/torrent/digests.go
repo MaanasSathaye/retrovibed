@@ -5,13 +5,10 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
-	"log"
 	"runtime"
 	"sync"
 	"sync/atomic"
 
-	"github.com/gofrs/uuid/v5"
-	"github.com/james-lawrence/torrent/internal/errorsx"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/pkg/errors"
 )
@@ -26,8 +23,6 @@ func newDigestsFromTorrent(t *torrent) digests {
 
 			t.event.Broadcast()
 			t.cln.event.Broadcast() // cause the client to detect completed torrents.
-			// t.cln.config.debug().Println("publishing digested chunk", idx, cause)
-			log.Println("publishing digested chunk", idx, cause)
 			t.pieceStateChanges.Publish(idx)
 		},
 	)
@@ -77,17 +72,12 @@ func (t *digests) Wait() {
 }
 
 func (t *digests) verify() {
-	log.Println("verify invoked")
-	if c := atomic.AddInt64(&t.reaping, 1); c > int64(runtime.NumCPU()) {
+	if atomic.AddInt64(&t.reaping, 1) > int64(runtime.NumCPU()) {
 		atomic.AddInt64(&t.reaping, -1)
 		return
 	}
 
 	go func() {
-		id := errorsx.Must(uuid.NewV4()).String()
-		log.Println("digester initiated", id)
-		defer log.Println("digester completed", id)
-
 		for idx, ok := t.pending.Pop(); ok; idx, ok = t.pending.Pop() {
 			t.check(idx)
 		}

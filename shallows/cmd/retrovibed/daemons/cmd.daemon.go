@@ -29,6 +29,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/httpx"
 	"github.com/retrovibed/retrovibed/internal/jwtx"
 	"github.com/retrovibed/retrovibed/internal/slicesx"
+	"github.com/retrovibed/retrovibed/internal/sqlx"
 	"github.com/retrovibed/retrovibed/internal/timex"
 	"github.com/retrovibed/retrovibed/internal/tlsx"
 	"github.com/retrovibed/retrovibed/internal/torrentx"
@@ -138,7 +139,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 			var md tracking.Metadata
 			ictx, done := context.WithTimeout(context.Background(), 3*time.Second)
 			defer done()
-			if err := tracking.MetadataUploadedByID(ictx, db, ih.Bytes(), stats.BytesWrittenData.Uint64()).Scan(&md); err != nil {
+			if err := tracking.MetadataUploadedByID(ictx, sqlx.Debug(db), ih.Bytes(), stats.BytesWrittenData.Uint64()).Scan(&md); err != nil {
 				log.Println(errorsx.Wrapf(err, "%s: unable to record uploaded metrics", ih.HexString()))
 				return
 			}
