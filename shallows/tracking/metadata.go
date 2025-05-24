@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
-	"fmt"
 	"log"
 	"path/filepath"
 	"strings"
@@ -191,8 +190,7 @@ func DescriptionFromPath(md *Metadata, path string) string {
 		tmp = ""
 	}
 
-	fmt.Println("DERP DERP", md.ID, hex.EncodeToString(md.Infohash), spew.Sdump(path), "tmp:", tmp)
-	return stringsx.FirstNonBlank(tmp, md.Description)
+	return NormalizedDescription(stringsx.FirstNonBlank(tmp, md.Description))
 }
 
 func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torrent.Torrent) {

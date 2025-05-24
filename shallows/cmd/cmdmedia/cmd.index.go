@@ -2,15 +2,15 @@ package cmdmedia
 
 import (
 	"database/sql"
-	"log"
-	"path/filepath"
+	"os"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/internal/env"
-	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/fsx"
+	"github.com/retrovibed/retrovibed/internal/sqlx"
 	"github.com/retrovibed/retrovibed/internal/sqlxx"
 	"github.com/retrovibed/retrovibed/internal/squirrelx"
 	"github.com/retrovibed/retrovibed/library"
@@ -47,16 +47,29 @@ func (t reindex) Run(gctx *cmdopts.Global) (err error) {
 	)
 
 	return sqlxx.ScanEach(library.MetadataSearch(gctx.Context, db, query), func(md *library.Metadata) error {
-		log.Println("reindexing", md.ID)
-		log.Println("path", errorsx.Zero(filepath.EvalSymlinks(mediastore.Path(md.ID))))
+		if md.TorrentID != uuid.Nil.String() {
+			// JAL 2025-05-24: this if statement can be removed once v0 is out.
+			var tmd tracking.Metadata
+
+			if err = tracking.MetadataFindByID(gctx.Context, db, md.TorrentID).Scan(&tmd); sqlx.ErrNoRows(err) != nil {
+				return nil
+			} else if err != nil {
+				return err
+			}
+
+			resolved, err := os.Readlink(mediastore.Path(md.ID))
+			if err != nil {
+				return nil
+			}
+
+			if err = library.MetadataUpdateDescriptionByID(gctx.Context, db, md.ID, tracking.DescriptionFromPath(&tmd, tracking.DescriptionFromPath(&tmd, resolved))).Scan(md); err != nil {
+				return err
+			}
+		}
+
 		if err = library.MetadataUpdateAutodescriptionByID(gctx.Context, db, md.ID, tracking.NormalizedDescription(md.Description)).Scan(md); err != nil {
 			return err
 		}
-
-		if err = library.MetadataUpdateDescriptionByID(gctx.Context, db, md.ID, tracking.DescriptionFromPath(&tracking.Metadata{ID: md.TorrentID}, errorsx.Zero(filepath.EvalSymlinks(mediastore.Path(md.ID))))).Scan(md); err != nil {
-			return err
-		}
-
 		return nil
 	})
 }

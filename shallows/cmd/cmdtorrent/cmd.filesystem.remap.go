@@ -4,7 +4,6 @@ import (
 	"io/fs"
 	"log"
 	"os"
-	"path/filepath"
 
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/internal/env"
@@ -18,6 +17,7 @@ type remap struct {
 func (t remap) Run(gctx *cmdopts.Global) (err error) {
 	tvfs := fsx.DirVirtual(env.TorrentDir())
 
+	log.Println("attempting to remap", tvfs.Path())
 	return fs.WalkDir(os.DirFS(tvfs.Path()), ".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return nil
@@ -27,7 +27,7 @@ func (t remap) Run(gctx *cmdopts.Global) (err error) {
 			return nil
 		}
 
-		actual, err := filepath.EvalSymlinks(path)
+		actual, err := os.Readlink(path)
 		if err != nil {
 			return nil
 		}
