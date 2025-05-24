@@ -53,7 +53,7 @@ class Display extends StatelessWidget {
             content: Column(children: [torrents.SettingsLeech()]),
           ),
           ds.Accordion(
-            description: Row(children: [Text("VPN - wireguard")
+            description: Row(children: [Text("VPN - wireguard"), Spacer(), Text("alpha"),
           ]),
             content: Container(
               constraints: BoxConstraints(maxHeight: 512),

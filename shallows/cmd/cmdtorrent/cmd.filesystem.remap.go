@@ -42,11 +42,16 @@ func (t remap) Run(gctx *cmdopts.Global) (err error) {
 			return nil
 		}
 
+		// replace the symlink with the actual contents.
 		if t.DryRun {
-			log.Println("remapping", path, "->", actual)
+			log.Println("renaming", actual, "->", path)
+		} else if err = os.Rename(actual, path); err != nil {
+			return err
 		}
 
-		if err = os.Rename(path, actual); err != nil {
+		if t.DryRun {
+			log.Println("symlinking", path, "->", actual)
+		} else if err = os.Symlink(path, actual); err != nil {
 			return err
 		}
 

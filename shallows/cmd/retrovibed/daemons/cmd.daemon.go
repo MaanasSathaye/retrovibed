@@ -11,6 +11,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/justinas/alice"
 	"golang.org/x/crypto/ssh"
+	"golang.zx2c4.com/wireguard/tun/netstack"
 
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/krpc"
@@ -63,6 +64,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		peerid                                  = krpc.IdFromString(ssh.FingerprintSHA256(id.PublicKey()))
 		bootstrap    torrent.ClientConfigOption = torrent.ClientConfigNoop
 		tnetwork     torrent.Binder
+		wgnet        *netstack.Net
 	)
 
 	// envx.Debug(os.Environ()...)
@@ -155,7 +157,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 
 		log.Println("loaded wireguard configuration", path)
 
-		if tnetwork, err = torrentx.WireguardSocket(wcfg, t.TorrentPort); err != nil {
+		if wgnet, tnetwork, err = torrentx.WireguardSocket(wcfg, t.TorrentPort); err != nil {
 			return errorsx.Wrap(err, "unable to setup wireguard torrent socket")
 		}
 	} else {
@@ -229,7 +231,11 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	go AnnounceSeeded(dctx, db, rootstore, tclient, tstore)
 	go ResumeDownloads(dctx, db, rootstore, tclient, tstore)
 
-	if err = ReloadVPN(dctx, tnetwork, tclient, torconfig, t.TorrentPort); err != nil {
+	if err = VPNIP(dctx, wgnet); err != nil {
+		log.Println("failed to lookup wireguard ip", err)
+	}
+
+	if err = VPNReload(dctx, tnetwork, tclient, torconfig, t.TorrentPort); err != nil {
 		return err
 	} else {
 		log.Println("wireguard watching", wireguardx.Latest())

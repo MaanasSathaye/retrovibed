@@ -225,6 +225,15 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 				log.Println("unable to request new connections", err)
 				continue
 			}
+
+			current := uint64(dl.BytesCompleted())
+			if md.Downloaded == current {
+				continue
+			}
+
+			if err := MetadataProgressByID(ctx, q, md.ID, uint16(stats.ActivePeers), current).Scan(md); err != nil {
+				log.Println("failed to update progress", err)
+			}
 		case <-sub.Values:
 			if !l.Allow() {
 				continue

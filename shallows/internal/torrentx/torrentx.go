@@ -60,10 +60,12 @@ func Autosocket(p int) (_ torrent.Binder, err error) {
 	return torrent.NewSocketsBind(s1, s2), nil
 }
 
-func WireguardSocket(wcfg *wireguardx.Config, port int) (_ torrent.Binder, err error) {
+func WireguardSocket(wcfg *wireguardx.Config, port int) (_ *netstack.Net, _ torrent.Binder, err error) {
 	var (
 		s1, s2    sockets.Socket
 		utpsocket *utp.Socket
+		logger    = device.NewLogger(device.LogLevelError, "")
+		// logger    = device.NewLogger(device.LogLevelVerbose, "")
 	)
 
 	if port == 0 {
@@ -76,40 +78,40 @@ func WireguardSocket(wcfg *wireguardx.Config, port int) (_ torrent.Binder, err e
 		langx.DefaultIfZero(wireguardx.DefaultMTU, int(wcfg.Interface.MTU)),
 	)
 	if err != nil {
-		return nil, errorsx.Wrap(err, "failed to create network tun device")
+		return nil, nil, errorsx.Wrap(err, "failed to create network tun device")
 	}
 
-	dev := device.NewDevice(tun, conn.NewDefaultBind(), device.NewLogger(device.LogLevelVerbose, ""))
+	dev := device.NewDevice(tun, conn.NewDefaultBind(), logger)
 
 	for _, ipcset := range wireguardx.FormatIPCSet(wcfg) {
 		if err = dev.IpcSet(ipcset); err != nil {
-			return nil, errorsx.Wrap(err, "invalid ipcset for peer")
+			return nil, nil, errorsx.Wrap(err, "invalid ipcset for peer")
 		}
 	}
 
 	if err = dev.Up(); err != nil {
-		return nil, errorsx.Wrap(err, "network device failed to come up")
+		return nil, nil, errorsx.Wrap(err, "network device failed to come up")
 	}
 
 	conn, err := tnet.ListenUDP(&net.UDPAddr{Port: port})
 	if err != nil {
-		return nil, errorsx.Wrap(err, "failed to listen on port")
+		return nil, nil, errorsx.Wrap(err, "failed to listen on port")
 	}
 
 	if utpsocket, err = utp.NewSocketFromPacketConn(conn); err != nil {
-		return nil, errorsx.Wrap(err, "failed to create utp socket")
+		return nil, nil, errorsx.Wrap(err, "failed to create utp socket")
 	}
 
 	s1 = sockets.New(utpsocket, utpsocket)
 	if addr, ok := utpsocket.Addr().(*net.UDPAddr); ok {
 		s, err := tnet.ListenTCP(&net.TCPAddr{Port: addr.Port})
 		if err != nil {
-			return nil, errorsx.Wrap(err, "unable to open tcp socket")
+			return nil, nil, errorsx.Wrap(err, "unable to open tcp socket")
 		}
 		s2 = sockets.New(s, tnet)
 	}
 
-	return torrent.NewSocketsBind(s1, s2), nil
+	return tnet, torrent.NewSocketsBind(s1, s2), nil
 }
 
 func NodesFromReply(ret dht.QueryResult) (retni []krpc.NodeInfo) {
