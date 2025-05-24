@@ -129,6 +129,15 @@ func (t *HTTPWireguard) search(w http.ResponseWriter, r *http.Request) {
 		})
 		return nil
 	})
+
+	if fsx.ErrIsNotExist(err) != nil {
+		log.Println(errorsx.Wrap(err, "no configurations exist yet"))
+		if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &resp); err != nil {
+			log.Println(errorsx.Wrap(err, "unable to write response"))
+			return
+		}
+	}
+
 	if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to walk directory"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
