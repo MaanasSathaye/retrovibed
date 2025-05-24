@@ -140,10 +140,6 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 	mediavfs := fsx.DirVirtual(vfs.Path("media"))
 	torrentvfs := fsx.DirVirtual(vfs.Path("torrent"))
 
-	log.Println("WAKA WAKA root", vfs.Path())
-	log.Println("WAKA WAKA media", mediavfs.Path())
-	log.Println("WAKA WAKA torrent", torrentvfs.Path())
-
 	// just copying as we receive data to block until done.
 	if downloaded, err = torrent.DownloadInto(ctx, mhash, t, torrent.TuneAnnounceUntilComplete, torrent.TuneNewConns); err != nil {
 		return errorsx.Wrap(err, "download failed")

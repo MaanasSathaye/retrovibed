@@ -45,7 +45,7 @@ func TrackerEvent(ctx context.Context, l Torrent, announceuri string, options ..
 	)
 
 	res, err := announcer.ForTracker(announceuri).Do(ctx, req)
-	return &res, errors.Wrapf(err, "announce: %s", announcer.TrackerUrl)
+	return &res, errors.Wrapf(err, "announce: %s", announceuri)
 }
 
 func TrackerAnnounceOnce(ctx context.Context, l Torrent, uri string, options ...tracker.AnnounceOption) (delay time.Duration, peers Peers, err error) {
@@ -84,6 +84,11 @@ func TrackerAnnounceUntil(ctx context.Context, t *torrent, donefn func() bool, o
 				return
 			}
 
+			if errors.Is(err, tracker.ErrMissingInfoHash) {
+				log.Println(err)
+				return
+			}
+
 			if err == nil {
 				t.addPeers(peers)
 				return
@@ -98,7 +103,7 @@ func TrackerAnnounceUntil(ctx context.Context, t *torrent, donefn func() bool, o
 				continue
 			}
 
-			log.Println("announce failed", err)
+			log.Println("announce failed", t.info == nil, err)
 		}
 
 		// log.Println("announce sleeping for maximum delay", t.Metadata().ID.HexString(), delay)
