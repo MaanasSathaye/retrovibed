@@ -1,6 +1,7 @@
 package tracking
 
 import (
+	"encoding/hex"
 	"testing"
 
 	"github.com/james-lawrence/torrent/dht/int160"
@@ -13,8 +14,8 @@ import (
 )
 
 func TestDescriptionFromPath(t *testing.T) {
-	require.Equal(t, "example.mp4", DescriptionFromPath(&Metadata{ID: md5x.FormatHex(md5x.Digest("example1")), Description: "derp0"}, "example.mp4"))
-	require.Equal(t, "derp1", DescriptionFromPath(&Metadata{ID: md5x.FormatHex(md5x.Digest("example2")), Description: "derp1"}, md5x.FormatHex(md5x.Digest("example2"))))
+	require.Equal(t, "example.mp4", DescriptionFromPath(&Metadata{Infohash: md5x.Digest("example1").Sum(nil), Description: "derp0"}, "example.mp4"))
+	require.Equal(t, "derp1", DescriptionFromPath(&Metadata{Infohash: md5x.Digest("example2").Sum(nil), Description: "derp1"}, md5x.FormatHex(md5x.Digest("example2"))))
 }
 
 func TestDescriptionFromPathFromMetadata(t *testing.T) {
@@ -30,5 +31,5 @@ func TestDescriptionFromPathFromMetadata(t *testing.T) {
 	)
 
 	require.NoError(t, MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
-	require.Equal(t, "Hello World", DescriptionFromPath(&lmd, lmd.ID))
+	require.Equal(t, "Hello World", DescriptionFromPath(&lmd, hex.EncodeToString(lmd.Infohash)))
 }

@@ -191,7 +191,7 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 
 func DescriptionFromPath(md *Metadata, path string) string {
 	tmp := filepath.Base(path)
-	if md.ID == tmp {
+	if hex.EncodeToString(md.Infohash) == tmp {
 		tmp = ""
 	}
 
