@@ -53,6 +53,7 @@ type Command struct {
 	AutoDownload    bool             `flag:"" name:"auto-download" help:"enable automatically downloading torrent from the downloads folder" default:"false"`
 	HTTP            cmdopts.Listener `flag:"" name:"http-address" help:"address to serve daemon api from" default:"tcp://:9998" env:"${env_daemon_socket}"`
 	SelfSignedHosts []string         `flag:"" name:"self-signed-hosts" help:"comma seperated list of hosts to add to the sign signed certificate" env:"${env_self_signed_hosts}"`
+	TorrentPort     int              `flag:"" name:"torrent-port" help:"port to use for torrenting" env:"${env_torrent_port}" default:"10000"`
 }
 
 func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
@@ -97,27 +98,6 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	go func() {
 		errorsx.Log(errorsx.Wrap(PrepareDefaultFeeds(dctx, db), "unable to initialize default rss feeds"))
 	}()
-
-	if path := wireguardx.Latest(); fsx.Exists(path) {
-		wcfg, err := wireguardx.Parse(path)
-		if err != nil {
-			return errorsx.Wrapf(err, "unable to parse wireguard configuration: %s", path)
-		}
-
-		log.Println("loaded wireguard configuration", path)
-
-		if tnetwork, err = torrentx.WireguardSocket(wcfg); err != nil {
-			return errorsx.Wrap(err, "unable to setup wireguard torrent socket")
-		}
-	} else {
-		log.Println("no wireguard configuration found at", path)
-	}
-
-	if tnetwork == nil {
-		if tnetwork, err = torrentx.Autosocket(0); err != nil {
-			return errorsx.Wrap(err, "unable to setup torrent socket")
-		}
-	}
 
 	if fsx.IsRegularFile(torrentpeers) {
 		bootstrap = torrent.ClientConfigBootstrapPeerFile(torrentpeers)
@@ -166,6 +146,27 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		// }
 		bootstrap,
 	)
+
+	if path := wireguardx.Latest(); fsx.Exists(path) {
+		wcfg, err := wireguardx.Parse(path)
+		if err != nil {
+			return errorsx.Wrapf(err, "unable to parse wireguard configuration: %s", path)
+		}
+
+		log.Println("loaded wireguard configuration", path)
+
+		if tnetwork, err = torrentx.WireguardSocket(wcfg, t.TorrentPort); err != nil {
+			return errorsx.Wrap(err, "unable to setup wireguard torrent socket")
+		}
+	} else {
+		log.Println("no wireguard configuration found at", path)
+	}
+
+	if tnetwork == nil {
+		if tnetwork, err = torrentx.Autosocket(t.TorrentPort); err != nil {
+			return errorsx.Wrap(err, "unable to setup torrent socket")
+		}
+	}
 
 	tclient, err := tnetwork.Bind(torrent.NewClient(torconfig))
 	if err != nil {
@@ -228,7 +229,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	go AnnounceSeeded(dctx, db, rootstore, tclient, tstore)
 	go ResumeDownloads(dctx, db, rootstore, tclient, tstore)
 
-	if err = ReloadVPN(dctx, tnetwork, tclient, torconfig); err != nil {
+	if err = ReloadVPN(dctx, tnetwork, tclient, torconfig, t.TorrentPort); err != nil {
 		return err
 	} else {
 		log.Println("wireguard watching", wireguardx.Latest())

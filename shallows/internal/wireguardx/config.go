@@ -143,9 +143,9 @@ func (t HandshakeTime) String() string {
 	u := time.Unix(0, 0).Add(time.Duration(t)).Unix()
 	n := time.Now().Unix()
 	if u == n {
-		return fmt.Sprintf("Now")
+		return "Now"
 	} else if u > n {
-		return fmt.Sprintf("System clock wound backward!")
+		return "System clock wound backward!"
 	}
 	left := n - u
 	years := left / (365 * 24 * 60 * 60)

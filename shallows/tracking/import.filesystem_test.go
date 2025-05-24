@@ -65,5 +65,4 @@ func TestImportTorrent(t *testing.T) {
 
 	require.Equal(t, 1, count)
 	require.Equal(t, 0, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM library_metadata WHERE torrent_id = '00000000-0000-0000-0000-000000000000'"))(t))
-
 }

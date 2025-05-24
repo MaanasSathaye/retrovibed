@@ -55,6 +55,13 @@ func MetadataUpdateAutodescriptionByID(
 	gql = gql.Query(`UPDATE library_metadata SET updated_at = NOW(), auto_description = {autodescription} WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
 }
 
+func MetadataUpdateDescriptionByID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string, description string) NewMetadataScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE library_metadata SET updated_at = NOW(), description = {description} WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
+}
+
 func MetadataFindByID(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewMetadataScannerStaticRow,

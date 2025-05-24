@@ -3,18 +3,22 @@ package wireguardx
 import (
 	"encoding/base64"
 	"fmt"
+	"net"
 	"net/netip"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 
+	"github.com/retrovibed/retrovibed/internal/errorsx"
+	"github.com/retrovibed/retrovibed/internal/langx"
 	"github.com/retrovibed/retrovibed/internal/userx"
 	"golang.org/x/text/encoding/unicode"
 )
 
 const (
-	Current = "_current"
+	DefaultMTU = 1420
+	Current    = "_current"
 )
 
 type ParseError struct {
@@ -158,8 +162,11 @@ func (c *Config) maybeAddPeer(p *Peer) {
 
 func FormatIPCSet(wcfg *Config) (ipcsets []string) {
 	for _, peer := range wcfg.Peers {
+		// ensure host is converted to an ip address.
+		peer.Endpoint.Host = langx.DefaultIfZero(peer.Endpoint.Host, errorsx.Zero(net.ResolveIPAddr("ip", peer.Endpoint.Host)).String())
 		ipcset := fmt.Sprintf("private_key=%x\n", wcfg.Interface.PrivateKey)
 		ipcset += fmt.Sprintf("public_key=%x\n", peer.PublicKey)
+		ipcset += fmt.Sprintf("preshared_key=%x\n", peer.PresharedKey)
 		ipcset += fmt.Sprintf("endpoint=%s\n", peer.Endpoint.String())
 		ipcset += fmt.Sprintf("persistent_keepalive_interval=%d\n", peer.PersistentKeepalive)
 
@@ -330,18 +337,18 @@ func FromWgQuick(s, name string) (_ *Config, err error) {
 				}
 				peer.Endpoint = *e
 			default:
-				return nil, &ParseError{fmt.Sprintf("Invalid key for [Peer] section"), key}
+				return nil, &ParseError{why: "Invalid key for [Peer] section", offender: key}
 			}
 		}
 	}
 	conf.maybeAddPeer(peer)
 
 	if !sawPrivateKey {
-		return nil, &ParseError{fmt.Sprintf("An interface must have a private key"), fmt.Sprintf("[none specified]")}
+		return nil, &ParseError{why: "An interface must have a private key", offender: "[none specified]"}
 	}
 	for _, p := range conf.Peers {
 		if p.PublicKey.IsZero() {
-			return nil, &ParseError{fmt.Sprintf("All peers must have public keys"), fmt.Sprintf("[none specified]")}
+			return nil, &ParseError{why: "All peers must have public keys", offender: "[none specified]"}
 		}
 	}
 

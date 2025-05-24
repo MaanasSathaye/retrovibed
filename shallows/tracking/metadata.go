@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
+	"fmt"
 	"log"
 	"path/filepath"
 	"strings"
@@ -154,7 +155,7 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 			continue
 		}
 
-		desc := stringsx.FirstNonBlank(md.Description, filepath.Base(tx.Path))
+		desc := DescriptionFromPath(md, tx.Path)
 		lmd := library.NewMetadata(
 			md5x.FormatUUID(tx.MD5),
 			library.MetadataOptionDescription(desc),
@@ -182,6 +183,15 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 	}
 
 	return nil
+}
+
+func DescriptionFromPath(md *Metadata, path string) string {
+	tmp := filepath.Base(path)
+	if md.ID == tmp {
+		tmp = ""
+	}
+	fmt.Println("DERP DERP", spew.Sdump(path))
+	return stringsx.FirstNonBlank(tmp, md.Description)
 }
 
 func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torrent.Torrent) {

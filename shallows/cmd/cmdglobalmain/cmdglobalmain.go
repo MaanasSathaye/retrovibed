@@ -91,6 +91,7 @@ func Main(args ...string) {
 			"env_auto_discovery":     env.AutoDiscovery,
 			"env_self_signed_hosts":  env.SelfSignedHosts,
 			"env_daemon_socket":      env.DaemonSocket,
+			"env_torrent_port":       env.TorrentPort,
 		},
 		kong.UsageOnError(),
 		kong.Bind(

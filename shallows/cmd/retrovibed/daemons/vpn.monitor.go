@@ -13,7 +13,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/wireguardx"
 )
 
-func ReloadVPN(ctx context.Context, tnetwork torrent.Binder, tclient *torrent.Client, torconfig *torrent.ClientConfig) error {
+func ReloadVPN(ctx context.Context, tnetwork torrent.Binder, tclient *torrent.Client, torconfig *torrent.ClientConfig, port int) error {
 	var previous = errorsx.Zero(filepath.EvalSymlinks(wireguardx.Latest()))
 
 	return errorsx.Wrap(fsnotifyx.OnceAndOnChange(ctx, wireguardx.Latest(), func(ictx context.Context, evt fsnotify.Event) error {
@@ -33,7 +33,7 @@ func ReloadVPN(ctx context.Context, tnetwork torrent.Binder, tclient *torrent.Cl
 				return errorsx.Wrap(err, "unable to parse wireguard config")
 			}
 
-			if tnetwork, err = torrentx.WireguardSocket(wcfg); err != nil {
+			if tnetwork, err = torrentx.WireguardSocket(wcfg, port); err != nil {
 				return errorsx.Wrap(err, "unable to setup wireguard torrent socket")
 			}
 			nclient, err := tnetwork.Bind(torrent.NewClient(torconfig))

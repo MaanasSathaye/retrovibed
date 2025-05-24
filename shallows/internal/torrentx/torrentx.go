@@ -10,6 +10,7 @@ import (
 
 	"github.com/james-lawrence/torrent"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
+	"github.com/retrovibed/retrovibed/internal/langx"
 	"github.com/retrovibed/retrovibed/internal/slicesx"
 	"github.com/retrovibed/retrovibed/internal/stringsx"
 	"github.com/retrovibed/retrovibed/internal/wireguardx"
@@ -59,19 +60,23 @@ func Autosocket(p int) (_ torrent.Binder, err error) {
 	return torrent.NewSocketsBind(s1, s2), nil
 }
 
-func WireguardSocket(wcfg *wireguardx.Config) (_ torrent.Binder, err error) {
+func WireguardSocket(wcfg *wireguardx.Config, port int) (_ torrent.Binder, err error) {
 	var (
 		s1, s2    sockets.Socket
 		utpsocket *utp.Socket
 	)
 
+	if port == 0 {
+		panic("wireguard sockets require a specified torrent port currently")
+	}
+
 	tun, tnet, err := netstack.CreateNetTUN(
 		slicesx.MapTransform(func(n netip.Prefix) netip.Addr { return n.Addr() }, wcfg.Interface.Addresses...),
 		wcfg.Interface.DNS,
-		int(wcfg.Interface.MTU),
+		langx.DefaultIfZero(wireguardx.DefaultMTU, int(wcfg.Interface.MTU)),
 	)
 	if err != nil {
-		return nil, errorsx.Wrap(err, "checkpoint 0")
+		return nil, errorsx.Wrap(err, "failed to create network tun device")
 	}
 
 	dev := device.NewDevice(tun, conn.NewDefaultBind(), device.NewLogger(device.LogLevelVerbose, ""))
@@ -83,16 +88,16 @@ func WireguardSocket(wcfg *wireguardx.Config) (_ torrent.Binder, err error) {
 	}
 
 	if err = dev.Up(); err != nil {
-		return nil, errorsx.Wrap(err, "checkpoint 1")
+		return nil, errorsx.Wrap(err, "network device failed to come up")
 	}
 
-	conn, err := tnet.ListenUDP(&net.UDPAddr{Port: int(wcfg.Interface.ListenPort)})
+	conn, err := tnet.ListenUDP(&net.UDPAddr{Port: port})
 	if err != nil {
-		return nil, errorsx.Wrap(err, "checkpoint 2")
+		return nil, errorsx.Wrap(err, "failed to listen on port")
 	}
 
 	if utpsocket, err = utp.NewSocketFromPacketConn(conn); err != nil {
-		return nil, errorsx.Wrap(err, "checkpoint 3")
+		return nil, errorsx.Wrap(err, "failed to create utp socket")
 	}
 
 	s1 = sockets.New(utpsocket, utpsocket)
