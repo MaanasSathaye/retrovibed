@@ -82,7 +82,7 @@ func MetadataUploadedByID(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, id []byte, uploaded uint64) NewMetadataScannerStaticRow,
 ) {
-	gql = gql.Query(`UPDATE torrents_metadata SET updated_at = NOW(), uploaded = uploaded + {uploaded}) WHERE "infohash" = {id} RETURNING ` + MetadataScannerStaticColumns)
+	gql = gql.Query(`UPDATE torrents_metadata SET updated_at = NOW(), uploaded = (uploaded + {uploaded}) WHERE "infohash" = {id} RETURNING ` + MetadataScannerStaticColumns)
 }
 
 func MetadataAnnounced(

@@ -140,6 +140,10 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 	mediavfs := fsx.DirVirtual(vfs.Path("media"))
 	torrentvfs := fsx.DirVirtual(vfs.Path("torrent"))
 
+	log.Println("WAKA WAKA root", vfs.Path())
+	log.Println("WAKA WAKA media", mediavfs.Path())
+	log.Println("WAKA WAKA torrent", torrentvfs.Path())
+
 	// just copying as we receive data to block until done.
 	if downloaded, err = torrent.DownloadInto(ctx, mhash, t, torrent.TuneAnnounceUntilComplete, torrent.TuneNewConns); err != nil {
 		return errorsx.Wrap(err, "download failed")
@@ -150,7 +154,7 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 
 	for tx, cause := range library.ImportFilesystem(ctx, library.ImportSymlinkFile(mediavfs), torrentvfs.Path(t.Metadata().ID.HexString())) {
 		if cause != nil {
-			log.Println(cause)
+			log.Println("import failed", cause)
 			err = errorsx.Compact(err, cause)
 			continue
 		}
@@ -190,7 +194,8 @@ func DescriptionFromPath(md *Metadata, path string) string {
 	if md.ID == tmp {
 		tmp = ""
 	}
-	fmt.Println("DERP DERP", spew.Sdump(path))
+
+	fmt.Println("DERP DERP", md.ID, hex.EncodeToString(md.Infohash), spew.Sdump(path), "tmp:", tmp)
 	return stringsx.FirstNonBlank(tmp, md.Description)
 }
 

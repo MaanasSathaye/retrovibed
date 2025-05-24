@@ -50,6 +50,7 @@ func ImportSymlinkFile(vfs fsx.Virtual) ImportOp {
 	}
 
 	return func(ctx context.Context, path string) (*Transfered, error) {
+		log.Println("imported", path)
 		tx, err := TransferedFromPath(path)
 		if err != nil {
 			return nil, err
