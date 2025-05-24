@@ -75,15 +75,9 @@ class Feed extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   Feed clone() => Feed()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   Feed copyWith(void Function(Feed) updates) => super.copyWith((message) => updates(message as Feed)) as Feed;
 
   $pb.BuilderInfo get info_ => _i;
@@ -207,15 +201,9 @@ class FeedSearchRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   FeedSearchRequest clone() => FeedSearchRequest()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   FeedSearchRequest copyWith(void Function(FeedSearchRequest) updates) => super.copyWith((message) => updates(message as FeedSearchRequest)) as FeedSearchRequest;
 
   $pb.BuilderInfo get info_ => _i;
@@ -280,15 +268,9 @@ class FeedSearchResponse extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   FeedSearchResponse clone() => FeedSearchResponse()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   FeedSearchResponse copyWith(void Function(FeedSearchResponse) updates) => super.copyWith((message) => updates(message as FeedSearchResponse)) as FeedSearchResponse;
 
   $pb.BuilderInfo get info_ => _i;
@@ -335,15 +317,9 @@ class FeedCreateRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   FeedCreateRequest clone() => FeedCreateRequest()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   FeedCreateRequest copyWith(void Function(FeedCreateRequest) updates) => super.copyWith((message) => updates(message as FeedCreateRequest)) as FeedCreateRequest;
 
   $pb.BuilderInfo get info_ => _i;
@@ -387,15 +363,9 @@ class FeedCreateResponse extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   FeedCreateResponse clone() => FeedCreateResponse()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   FeedCreateResponse copyWith(void Function(FeedCreateResponse) updates) => super.copyWith((message) => updates(message as FeedCreateResponse)) as FeedCreateResponse;
 
   $pb.BuilderInfo get info_ => _i;
@@ -439,15 +409,9 @@ class FeedUpdateRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   FeedUpdateRequest clone() => FeedUpdateRequest()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   FeedUpdateRequest copyWith(void Function(FeedUpdateRequest) updates) => super.copyWith((message) => updates(message as FeedUpdateRequest)) as FeedUpdateRequest;
 
   $pb.BuilderInfo get info_ => _i;
@@ -491,15 +455,9 @@ class FeedUpdateResponse extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   FeedUpdateResponse clone() => FeedUpdateResponse()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   FeedUpdateResponse copyWith(void Function(FeedUpdateResponse) updates) => super.copyWith((message) => updates(message as FeedUpdateResponse)) as FeedUpdateResponse;
 
   $pb.BuilderInfo get info_ => _i;
@@ -534,15 +492,9 @@ class FeedDeleteRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   FeedDeleteRequest clone() => FeedDeleteRequest()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   FeedDeleteRequest copyWith(void Function(FeedDeleteRequest) updates) => super.copyWith((message) => updates(message as FeedDeleteRequest)) as FeedDeleteRequest;
 
   $pb.BuilderInfo get info_ => _i;
@@ -575,15 +527,9 @@ class FeedDeleteResponse extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   FeedDeleteResponse clone() => FeedDeleteResponse()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   FeedDeleteResponse copyWith(void Function(FeedDeleteResponse) updates) => super.copyWith((message) => updates(message as FeedDeleteResponse)) as FeedDeleteResponse;
 
   $pb.BuilderInfo get info_ => _i;

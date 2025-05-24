@@ -35,15 +35,9 @@ class Wireguard extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   Wireguard clone() => Wireguard()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   Wireguard copyWith(void Function(Wireguard) updates) => super.copyWith((message) => updates(message as Wireguard)) as Wireguard;
 
   $pb.BuilderInfo get info_ => _i;
@@ -100,15 +94,9 @@ class WireguardSearchRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   WireguardSearchRequest clone() => WireguardSearchRequest()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   WireguardSearchRequest copyWith(void Function(WireguardSearchRequest) updates) => super.copyWith((message) => updates(message as WireguardSearchRequest)) as WireguardSearchRequest;
 
   $pb.BuilderInfo get info_ => _i;
@@ -182,15 +170,9 @@ class WireguardSearchResponse extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   WireguardSearchResponse clone() => WireguardSearchResponse()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   WireguardSearchResponse copyWith(void Function(WireguardSearchResponse) updates) => super.copyWith((message) => updates(message as WireguardSearchResponse)) as WireguardSearchResponse;
 
   $pb.BuilderInfo get info_ => _i;
@@ -228,15 +210,9 @@ class WireguardTouchRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   WireguardTouchRequest clone() => WireguardTouchRequest()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   WireguardTouchRequest copyWith(void Function(WireguardTouchRequest) updates) => super.copyWith((message) => updates(message as WireguardTouchRequest)) as WireguardTouchRequest;
 
   $pb.BuilderInfo get info_ => _i;
@@ -260,15 +236,9 @@ class WireguardTouchResponse extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   WireguardTouchResponse clone() => WireguardTouchResponse()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   WireguardTouchResponse copyWith(void Function(WireguardTouchResponse) updates) => super.copyWith((message) => updates(message as WireguardTouchResponse)) as WireguardTouchResponse;
 
   $pb.BuilderInfo get info_ => _i;
@@ -292,15 +262,9 @@ class WireguardUploadRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   WireguardUploadRequest clone() => WireguardUploadRequest()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   WireguardUploadRequest copyWith(void Function(WireguardUploadRequest) updates) => super.copyWith((message) => updates(message as WireguardUploadRequest)) as WireguardUploadRequest;
 
   $pb.BuilderInfo get info_ => _i;
@@ -333,15 +297,9 @@ class WireguardUploadResponse extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   WireguardUploadResponse clone() => WireguardUploadResponse()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   WireguardUploadResponse copyWith(void Function(WireguardUploadResponse) updates) => super.copyWith((message) => updates(message as WireguardUploadResponse)) as WireguardUploadResponse;
 
   $pb.BuilderInfo get info_ => _i;
@@ -376,15 +334,9 @@ class WireguardCurrentRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   WireguardCurrentRequest clone() => WireguardCurrentRequest()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   WireguardCurrentRequest copyWith(void Function(WireguardCurrentRequest) updates) => super.copyWith((message) => updates(message as WireguardCurrentRequest)) as WireguardCurrentRequest;
 
   $pb.BuilderInfo get info_ => _i;
@@ -417,15 +369,9 @@ class WireguardCurrentResponse extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   WireguardCurrentResponse clone() => WireguardCurrentResponse()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   WireguardCurrentResponse copyWith(void Function(WireguardCurrentResponse) updates) => super.copyWith((message) => updates(message as WireguardCurrentResponse)) as WireguardCurrentResponse;
 
   $pb.BuilderInfo get info_ => _i;
@@ -460,15 +406,9 @@ class WireguardDeleteRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   WireguardDeleteRequest clone() => WireguardDeleteRequest()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   WireguardDeleteRequest copyWith(void Function(WireguardDeleteRequest) updates) => super.copyWith((message) => updates(message as WireguardDeleteRequest)) as WireguardDeleteRequest;
 
   $pb.BuilderInfo get info_ => _i;
@@ -501,15 +441,9 @@ class WireguardDeleteResponse extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   WireguardDeleteResponse clone() => WireguardDeleteResponse()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   WireguardDeleteResponse copyWith(void Function(WireguardDeleteResponse) updates) => super.copyWith((message) => updates(message as WireguardDeleteResponse)) as WireguardDeleteResponse;
 
   $pb.BuilderInfo get info_ => _i;

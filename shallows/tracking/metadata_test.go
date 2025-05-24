@@ -14,7 +14,7 @@ import (
 )
 
 func TestDescriptionFromPath(t *testing.T) {
-	require.Equal(t, "example.mp4", DescriptionFromPath(&Metadata{Infohash: md5x.Digest("example1").Sum(nil), Description: "derp0"}, "example.mp4"))
+	require.Equal(t, "example mp4", DescriptionFromPath(&Metadata{Infohash: md5x.Digest("example1").Sum(nil), Description: "derp0"}, "example.mp4"))
 	require.Equal(t, "derp1", DescriptionFromPath(&Metadata{Infohash: md5x.Digest("example2").Sum(nil), Description: "derp1"}, md5x.FormatHex(md5x.Digest("example2"))))
 }
 

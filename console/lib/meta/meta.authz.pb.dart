@@ -65,15 +65,9 @@ class Bearer extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   Bearer clone() => Bearer()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   Bearer copyWith(void Function(Bearer) updates) => super.copyWith((message) => updates(message as Bearer)) as Bearer;
 
   $pb.BuilderInfo get info_ => _i;
@@ -205,15 +199,9 @@ class Token extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   Token clone() => Token()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   Token copyWith(void Function(Token) updates) => super.copyWith((message) => updates(message as Token)) as Token;
 
   $pb.BuilderInfo get info_ => _i;
@@ -310,15 +298,9 @@ class AuthzRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   AuthzRequest clone() => AuthzRequest()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   AuthzRequest copyWith(void Function(AuthzRequest) updates) => super.copyWith((message) => updates(message as AuthzRequest)) as AuthzRequest;
 
   $pb.BuilderInfo get info_ => _i;
@@ -356,15 +338,9 @@ class AuthzResponse extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   AuthzResponse clone() => AuthzResponse()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   AuthzResponse copyWith(void Function(AuthzResponse) updates) => super.copyWith((message) => updates(message as AuthzResponse)) as AuthzResponse;
 
   $pb.BuilderInfo get info_ => _i;
@@ -417,15 +393,9 @@ class AuthzGrantRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   AuthzGrantRequest clone() => AuthzGrantRequest()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   AuthzGrantRequest copyWith(void Function(AuthzGrantRequest) updates) => super.copyWith((message) => updates(message as AuthzGrantRequest)) as AuthzGrantRequest;
 
   $pb.BuilderInfo get info_ => _i;
@@ -469,15 +439,9 @@ class AuthzGrantResponse extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   AuthzGrantResponse clone() => AuthzGrantResponse()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   AuthzGrantResponse copyWith(void Function(AuthzGrantResponse) updates) => super.copyWith((message) => updates(message as AuthzGrantResponse)) as AuthzGrantResponse;
 
   $pb.BuilderInfo get info_ => _i;
@@ -521,15 +485,9 @@ class AuthzRevokeRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   AuthzRevokeRequest clone() => AuthzRevokeRequest()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   AuthzRevokeRequest copyWith(void Function(AuthzRevokeRequest) updates) => super.copyWith((message) => updates(message as AuthzRevokeRequest)) as AuthzRevokeRequest;
 
   $pb.BuilderInfo get info_ => _i;
@@ -573,15 +531,9 @@ class AuthzRevokeResponse extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   AuthzRevokeResponse clone() => AuthzRevokeResponse()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   AuthzRevokeResponse copyWith(void Function(AuthzRevokeResponse) updates) => super.copyWith((message) => updates(message as AuthzRevokeResponse)) as AuthzRevokeResponse;
 
   $pb.BuilderInfo get info_ => _i;
@@ -625,15 +577,9 @@ class AuthzProfileRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   AuthzProfileRequest clone() => AuthzProfileRequest()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   AuthzProfileRequest copyWith(void Function(AuthzProfileRequest) updates) => super.copyWith((message) => updates(message as AuthzProfileRequest)) as AuthzProfileRequest;
 
   $pb.BuilderInfo get info_ => _i;
@@ -675,15 +621,9 @@ class AuthzProfileResponse extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   AuthzProfileResponse clone() => AuthzProfileResponse()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   AuthzProfileResponse copyWith(void Function(AuthzProfileResponse) updates) => super.copyWith((message) => updates(message as AuthzProfileResponse)) as AuthzProfileResponse;
 
   $pb.BuilderInfo get info_ => _i;

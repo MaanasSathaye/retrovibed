@@ -80,15 +80,9 @@ class Profile extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   Profile clone() => Profile()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   Profile copyWith(void Function(Profile) updates) => super.copyWith((message) => updates(message as Profile)) as Profile;
 
   $pb.BuilderInfo get info_ => _i;
@@ -226,15 +220,9 @@ class ProfileSearchRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   ProfileSearchRequest clone() => ProfileSearchRequest()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   ProfileSearchRequest copyWith(void Function(ProfileSearchRequest) updates) => super.copyWith((message) => updates(message as ProfileSearchRequest)) as ProfileSearchRequest;
 
   $pb.BuilderInfo get info_ => _i;
@@ -308,15 +296,9 @@ class ProfileSearchResponse extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   ProfileSearchResponse clone() => ProfileSearchResponse()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   ProfileSearchResponse copyWith(void Function(ProfileSearchResponse) updates) => super.copyWith((message) => updates(message as ProfileSearchResponse)) as ProfileSearchResponse;
 
   $pb.BuilderInfo get info_ => _i;
@@ -363,15 +345,9 @@ class ProfileCreateRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   ProfileCreateRequest clone() => ProfileCreateRequest()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   ProfileCreateRequest copyWith(void Function(ProfileCreateRequest) updates) => super.copyWith((message) => updates(message as ProfileCreateRequest)) as ProfileCreateRequest;
 
   $pb.BuilderInfo get info_ => _i;
@@ -415,15 +391,9 @@ class ProfileCreateResponse extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   ProfileCreateResponse clone() => ProfileCreateResponse()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   ProfileCreateResponse copyWith(void Function(ProfileCreateResponse) updates) => super.copyWith((message) => updates(message as ProfileCreateResponse)) as ProfileCreateResponse;
 
   $pb.BuilderInfo get info_ => _i;
@@ -458,15 +428,9 @@ class ProfileLookupRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   ProfileLookupRequest clone() => ProfileLookupRequest()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   ProfileLookupRequest copyWith(void Function(ProfileLookupRequest) updates) => super.copyWith((message) => updates(message as ProfileLookupRequest)) as ProfileLookupRequest;
 
   $pb.BuilderInfo get info_ => _i;
@@ -499,15 +463,9 @@ class ProfileLookupResponse extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   ProfileLookupResponse clone() => ProfileLookupResponse()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   ProfileLookupResponse copyWith(void Function(ProfileLookupResponse) updates) => super.copyWith((message) => updates(message as ProfileLookupResponse)) as ProfileLookupResponse;
 
   $pb.BuilderInfo get info_ => _i;
@@ -551,15 +509,9 @@ class ProfileUpdateRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   ProfileUpdateRequest clone() => ProfileUpdateRequest()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   ProfileUpdateRequest copyWith(void Function(ProfileUpdateRequest) updates) => super.copyWith((message) => updates(message as ProfileUpdateRequest)) as ProfileUpdateRequest;
 
   $pb.BuilderInfo get info_ => _i;
@@ -603,15 +555,9 @@ class ProfileUpdateResponse extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   ProfileUpdateResponse clone() => ProfileUpdateResponse()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   ProfileUpdateResponse copyWith(void Function(ProfileUpdateResponse) updates) => super.copyWith((message) => updates(message as ProfileUpdateResponse)) as ProfileUpdateResponse;
 
   $pb.BuilderInfo get info_ => _i;
@@ -655,15 +601,9 @@ class ProfileDisableRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   ProfileDisableRequest clone() => ProfileDisableRequest()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   ProfileDisableRequest copyWith(void Function(ProfileDisableRequest) updates) => super.copyWith((message) => updates(message as ProfileDisableRequest)) as ProfileDisableRequest;
 
   $pb.BuilderInfo get info_ => _i;
@@ -707,15 +647,9 @@ class ProfileDisableResponse extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   ProfileDisableResponse clone() => ProfileDisableResponse()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   ProfileDisableResponse copyWith(void Function(ProfileDisableResponse) updates) => super.copyWith((message) => updates(message as ProfileDisableResponse)) as ProfileDisableResponse;
 
   $pb.BuilderInfo get info_ => _i;

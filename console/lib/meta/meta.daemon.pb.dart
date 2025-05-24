@@ -55,15 +55,9 @@ class Daemon extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   Daemon clone() => Daemon()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   Daemon copyWith(void Function(Daemon) updates) => super.copyWith((message) => updates(message as Daemon)) as Daemon;
 
   $pb.BuilderInfo get info_ => _i;
@@ -151,15 +145,9 @@ class DaemonSearchRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonSearchRequest clone() => DaemonSearchRequest()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonSearchRequest copyWith(void Function(DaemonSearchRequest) updates) => super.copyWith((message) => updates(message as DaemonSearchRequest)) as DaemonSearchRequest;
 
   $pb.BuilderInfo get info_ => _i;
@@ -224,15 +212,9 @@ class DaemonSearchResponse extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonSearchResponse clone() => DaemonSearchResponse()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonSearchResponse copyWith(void Function(DaemonSearchResponse) updates) => super.copyWith((message) => updates(message as DaemonSearchResponse)) as DaemonSearchResponse;
 
   $pb.BuilderInfo get info_ => _i;
@@ -279,15 +261,9 @@ class DaemonCreateRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonCreateRequest clone() => DaemonCreateRequest()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonCreateRequest copyWith(void Function(DaemonCreateRequest) updates) => super.copyWith((message) => updates(message as DaemonCreateRequest)) as DaemonCreateRequest;
 
   $pb.BuilderInfo get info_ => _i;
@@ -331,15 +307,9 @@ class DaemonCreateResponse extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonCreateResponse clone() => DaemonCreateResponse()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonCreateResponse copyWith(void Function(DaemonCreateResponse) updates) => super.copyWith((message) => updates(message as DaemonCreateResponse)) as DaemonCreateResponse;
 
   $pb.BuilderInfo get info_ => _i;
@@ -374,15 +344,9 @@ class DaemonDeleteRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonDeleteRequest clone() => DaemonDeleteRequest()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonDeleteRequest copyWith(void Function(DaemonDeleteRequest) updates) => super.copyWith((message) => updates(message as DaemonDeleteRequest)) as DaemonDeleteRequest;
 
   $pb.BuilderInfo get info_ => _i;
@@ -415,15 +379,9 @@ class DaemonDeleteResponse extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonDeleteResponse clone() => DaemonDeleteResponse()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonDeleteResponse copyWith(void Function(DaemonDeleteResponse) updates) => super.copyWith((message) => updates(message as DaemonDeleteResponse)) as DaemonDeleteResponse;
 
   $pb.BuilderInfo get info_ => _i;
@@ -458,15 +416,9 @@ class DaemonLookupRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonLookupRequest clone() => DaemonLookupRequest()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonLookupRequest copyWith(void Function(DaemonLookupRequest) updates) => super.copyWith((message) => updates(message as DaemonLookupRequest)) as DaemonLookupRequest;
 
   $pb.BuilderInfo get info_ => _i;
@@ -499,15 +451,9 @@ class DaemonLookupResponse extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonLookupResponse clone() => DaemonLookupResponse()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonLookupResponse copyWith(void Function(DaemonLookupResponse) updates) => super.copyWith((message) => updates(message as DaemonLookupResponse)) as DaemonLookupResponse;
 
   $pb.BuilderInfo get info_ => _i;
@@ -551,15 +497,9 @@ class DaemonUpdateRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonUpdateRequest clone() => DaemonUpdateRequest()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonUpdateRequest copyWith(void Function(DaemonUpdateRequest) updates) => super.copyWith((message) => updates(message as DaemonUpdateRequest)) as DaemonUpdateRequest;
 
   $pb.BuilderInfo get info_ => _i;
@@ -603,15 +543,9 @@ class DaemonUpdateResponse extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonUpdateResponse clone() => DaemonUpdateResponse()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonUpdateResponse copyWith(void Function(DaemonUpdateResponse) updates) => super.copyWith((message) => updates(message as DaemonUpdateResponse)) as DaemonUpdateResponse;
 
   $pb.BuilderInfo get info_ => _i;
@@ -655,15 +589,9 @@ class DaemonDisableRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonDisableRequest clone() => DaemonDisableRequest()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonDisableRequest copyWith(void Function(DaemonDisableRequest) updates) => super.copyWith((message) => updates(message as DaemonDisableRequest)) as DaemonDisableRequest;
 
   $pb.BuilderInfo get info_ => _i;
@@ -707,15 +635,9 @@ class DaemonDisableResponse extends $pb.GeneratedMessage {
     ..hasRequiredFields = false
   ;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonDisableResponse clone() => DaemonDisableResponse()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonDisableResponse copyWith(void Function(DaemonDisableResponse) updates) => super.copyWith((message) => updates(message as DaemonDisableResponse)) as DaemonDisableResponse;
 
   $pb.BuilderInfo get info_ => _i;

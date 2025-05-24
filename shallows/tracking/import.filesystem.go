@@ -9,7 +9,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/bencode"
 	"github.com/james-lawrence/torrent/metainfo"
@@ -98,7 +97,7 @@ func ImportTorrent(q sqlx.Queryer, mvfs, tvfs fsx.Virtual) library.ImportOp {
 		if err := MetadataDownloadByID(ctx, q, tmd.ID).Scan(&tmd); err != nil {
 			return nil, errorsx.Wrap(err, "unable to mark torrent for downloading")
 		}
-		log.Println("WAKA", spew.Sdump(tx))
+
 		return tx, nil
 	}
 }
