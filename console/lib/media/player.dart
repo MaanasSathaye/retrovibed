@@ -40,7 +40,8 @@ class _VideoState extends State<VideoScreen> {
   @override
   void initState() {
     super.initState();
-
+  
+    _playing = widget.player.state.playing;
     sub0 = widget.player.stream.tracks.listen((state) {
       setState(() {});
     });
