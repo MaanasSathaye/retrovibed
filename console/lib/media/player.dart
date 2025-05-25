@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart'; // Provides [Player], [Media], [Playlist] etc.
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import './playlist.dart' as internal;
 
 class VideoScreen extends StatefulWidget {
   final Widget child;
@@ -18,12 +19,17 @@ class VideoScreen extends StatefulWidget {
 }
 
 class _VideoState extends State<VideoScreen> {
-  Widget _resume = SizedBox();
+  bool _playing = false;
 
   // Create a [VideoController] to handle video output from [Player].
   late final controller = VideoController(widget.player);
-  late final StreamSubscription<bool> sub0;
+ late final StreamSubscription<bool> sub0; 
   late final StreamSubscription<bool> sub1;
+
+  void setState(VoidCallback fn) {
+    if (!mounted) return;
+    super.setState(fn);
+  }
 
   void add(Media m) {
     widget.player.add(m).then((v) {
@@ -34,47 +40,20 @@ class _VideoState extends State<VideoScreen> {
   @override
   void initState() {
     super.initState();
-    sub0 = widget.player.stream.completed.listen((completed) {
-      setState(() {
-        if (!super.mounted) return;
-        _resume = SizedBox();
-      });
-    });
+
+    // sub0 = widget.player.stream.track.listen((state) {
+    //   setState(() {});
+    // });
 
     sub1 = widget.player.stream.playing.listen((state) {
-      Widget resumew = SizedBox();
-      if (widget.player.state.playlist.medias.length > 0) {
-        final _m =
-            widget.player.state.playlist.medias[widget
-                .player
-                .state
-                .playlist
-                .index];
-        final _title = _m.extras?["title"] ?? "";
-        resumew = IconButton(
-          onPressed: () {
-            widget.player.play();
-          },
-          icon: Row(
-            spacing: 10.0,
-            children: [
-              Icon(Icons.play_circle_outline_rounded),
-              Text("Resume ${_title}"),
-            ],
-          ),
-        );
-      }
-
       setState(() {
-        if (!super.mounted) return;
-        _resume = resumew;
+        _playing = state;
       });
     });
   }
 
   @override
   void dispose() {
-    sub0.cancel();
     sub1.cancel();
     super.dispose();
   }
@@ -83,9 +62,11 @@ class _VideoState extends State<VideoScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final themex = ds.Defaults.of(context);
+    var plist = internal.Playlist.of(context);
+    var title = plist?.current?.extras?["title"] ?? "";
 
     final m =
-        widget.player.state.playing
+        _playing
             ? SizedBox()
             : Column(
               mainAxisSize: MainAxisSize.min,
@@ -104,13 +85,74 @@ class _VideoState extends State<VideoScreen> {
                   decoration: BoxDecoration(
                     color: theme.scaffoldBackgroundColor,
                   ),
-                  child: _resume,
+                  child:
+                      plist?.current == null
+                          ? SizedBox()
+                          : IconButton(
+                            onPressed: () {
+                              widget.player.play();
+                            },
+                            icon: Row(
+                              spacing: 10.0,
+                              children: [
+                                Icon(Icons.play_circle_outline_rounded),
+                                Text("Resume ${title}"),
+                              ],
+                            ),
+                          ),
                 ),
               ],
             );
 
     return Stack(
-      children: [ds.Full(Center(child: Video(controller: controller))), m],
+      children: [
+        MaterialDesktopVideoControlsTheme(
+          normal: MaterialDesktopVideoControlsThemeData(
+            bottomButtonBar: [
+              IconButton(
+                onPressed: () {
+                  internal.Playlist.of(context)?.previous();
+                },
+                icon: Icon(Icons.skip_previous_rounded),
+              ),
+              MaterialPlayOrPauseButton(),
+              IconButton(
+                onPressed: () {
+                  internal.Playlist.of(context)?.next();
+                },
+                icon: Icon(Icons.skip_next_rounded),
+              ),
+              Text(title, maxLines: 1, overflow: TextOverflow.ellipsis),
+              Spacer(),
+              MaterialPositionIndicator(),
+              MaterialFullscreenButton(),
+            ],
+          ),
+          fullscreen: MaterialDesktopVideoControlsThemeData(
+            bottomButtonBar: [
+              IconButton(
+                onPressed: () {
+                  internal.Playlist.of(context)?.previous();
+                },
+                icon: Icon(Icons.skip_previous_rounded),
+              ),
+              MaterialPlayOrPauseButton(),
+              IconButton(
+                onPressed: () {
+                  internal.Playlist.of(context)?.next();
+                },
+                icon: Icon(Icons.skip_next_rounded),
+              ),
+              Text(title, maxLines: 1, overflow: TextOverflow.ellipsis),
+              Spacer(),
+              MaterialPositionIndicator(),
+              MaterialFullscreenButton(),
+            ],
+          ),
+          child: Video(controller: controller),
+        ),
+        m,
+      ],
     );
   }
 }

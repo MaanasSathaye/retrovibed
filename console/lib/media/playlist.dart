@@ -5,6 +5,56 @@ import 'package:flutter/services.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:language_code/language_code.dart';
 
+import 'dart:collection';
+
+class RingBuffer<T> {
+  final ListQueue<T> _queue;
+  final int capacity;
+
+  RingBuffer(this.capacity)
+    : assert(capacity > 0),
+      _queue = ListQueue<T>(
+        capacity,
+      ); // Pre-allocate with capacity for efficiency
+
+  int get length => _queue.length;
+  bool get isEmpty => _queue.isEmpty;
+  bool get isFull => _queue.length == capacity;
+
+  /// Returns a new List containing all elements in the buffer, from oldest to newest.
+  List<T> toList() {
+    return _queue.toList();
+  }
+
+  /// Adds an element to the buffer. If the buffer is full,
+  /// the oldest element is removed first to make space.
+  void insert(T? element) {
+    if (element == null) return;
+    if (isFull) {
+      _queue.removeFirst(); // Remove the oldest element
+    }
+    _queue.addLast(element); // Add the new element
+  }
+
+  /// Removes and returns the oldest element from the buffer.
+  T? remove() {
+    if (isEmpty) {
+      return null;
+    }
+    return _queue.removeLast();
+  }
+
+  /// Returns the oldest element without removing it.
+  T? peek() {
+    return _queue.lastOrNull;
+  }
+
+  /// Clears all elements from the buffer.
+  void clear() {
+    _queue.clear();
+  }
+}
+
 class Playlist extends StatefulWidget {
   final Widget child;
 
@@ -28,10 +78,6 @@ class Playlist extends StatefulWidget {
       },
     );
   }
-
-  static playlist(Iterable<Media> playlist) {
-
-  }
 }
 
 class _PlaylistState extends State<Playlist> {
@@ -39,33 +85,49 @@ class _PlaylistState extends State<Playlist> {
   final FocusNode searchfocus = FocusNode();
   final FocusNode _selffocus = FocusNode();
   final player = Player();
-  StreamIterator<Media> playlist = StreamIterator(Stream.empty());
+  StreamIterator<Media> upcoming = StreamIterator(Stream.empty());
+  Media? current;
+  RingBuffer<Media> _upcoming = RingBuffer(128);
+  RingBuffer<Media> _previous = RingBuffer(128);
 
   @override
   void initState() {
     super.initState();
-    player.setAudioTrack(AudioTrack.auto());
     player.stream.tracks.listen((track) {
       final current = LanguageCode.locale.toLanguageTag();
-      // track.audio.forEach((t) => print("audio: ${t.id} ${t.language} ${t.title} -- ${t}"));
-      // track.subtitle.forEach((t) => print("subtitle: ${t.id} ${t.language} ${t.title} -- ${t}"));
-      final audio = track.audio.firstWhere((t) => t.language == current, orElse: () => AudioTrack.auto());
-      final subtitles = audio.language == current ? SubtitleTrack.no() : track.subtitle.firstWhere((t) => t.language == current, orElse: () => SubtitleTrack.no());
+      final audio = track.audio.firstWhere(
+        (t) => t.language == current,
+        orElse: () => AudioTrack.auto(),
+      );
+      final subtitles =
+          audio.language == current
+              ? SubtitleTrack.no()
+              : track.subtitle.firstWhere(
+                (t) => t.language == current,
+                orElse: () => SubtitleTrack.no(),
+              );
       player.setAudioTrack(audio);
       player.setSubtitleTrack(subtitles);
 
-      print("audio: ${audio.id} ${audio.language} ${audio.title} -- ${audio}");
-      print("subtitles: ${subtitles.id} ${subtitles.language} ${subtitles.title} -- ${subtitles}");
+      // track.audio.forEach((t) => print("audio: ${t.id} ${t.language} ${t.title} -- ${t}"));
+      // track.subtitle.forEach((t) => print("subtitle: ${t.id} ${t.language} ${t.title} -- ${t}"));
+      // print("audio: ${audio.id} ${audio.language} ${audio.title} -- ${audio}");
+      // print("subtitles: ${subtitles.id} ${subtitles.language} ${subtitles.title} -- ${subtitles}");
+    });
+    player.stream.playlist.listen((list) {
+      print("playlist: ${list.index} - ${list}");
+    });
+
+    player.stream.error.listen((err) {
+      print("error: ${err}");
     });
     player.stream.completed.listen((completed) {
-      if (!completed) {return;}
-      print("advancing through playlist ${player.state.playlist.medias.length} ${player.state.playlist.medias}");
+      if (!completed) return;
 
-      player.remove(0).then((_) {
-        _advance();
-      }).catchError((cause) {
-        print("unable to advance stream ${cause}");
-      }).ignore();
+      print(
+        "advancing through playlist ${player.state.playlist.medias.length} ${player.state.playlist.medias}",
+      );
+      completed ? next() : player.pause();
     });
 
     player.stream.playing.listen((playing) {
@@ -76,18 +138,66 @@ class _PlaylistState extends State<Playlist> {
   }
 
   void setPlaylist(Stream<Media> pl) {
-    playlist = StreamIterator(pl);
-    _advance();
+    print("set playlist invoked");
+    upcoming = StreamIterator(pl);
+    _upcoming.clear();
+    next();
   }
 
-  void _advance() {
-    playlist.moveNext().then((next) {
-      return player.add(playlist.current).then((v) {
-        return player.next();
-      });
-    }).catchError((cause) {
-      print("unable to pull next media from playlist ${cause}");
+  void next() {
+    print(
+      "next initiated: ${_previous.toList().length} | ${current?.extras?["title"]} | ${_upcoming.toList().length}",
+    );
+    _advance().whenComplete(() {
+      print(
+        "next completed: ${_previous.toList().length} | ${current?.extras?["title"]} | ${_upcoming.toList().length}",
+      );
     });
+  }
+
+  void previous() {
+    print(
+      "previous initiated: ${_previous.toList().length} | ${current?.extras?["title"]} | ${_upcoming.toList().length}",
+    );
+    _reverse().then((m) {
+      print(
+        "previous completed: ${_previous.toList().length} | ${current?.extras?["title"]} | ${_upcoming.toList().length}",
+      );
+    });
+  }
+
+  Future<Media?> _reverse() {
+    final prev = _previous.remove();
+    if (prev == null) return Future.value(null);
+    return player.open(prev).then((_) {
+      _upcoming.insert(current);
+      current = prev;
+      return current;
+    });
+  }
+
+  Future<Media?> _advance() {
+    return Future<Media?>.value(
+          _upcoming.remove() ??
+              upcoming.moveNext().then((next) {
+                return next ? upcoming.current : null;
+              }),
+        )
+        .then((m) {
+          if (m == null) return Future.value(null);
+          return player.open(m).then((_) {
+            _previous.insert(current);
+            current = m;
+            return m;
+          });
+        })
+        .then((m) {
+          if (m != null) return;
+          print("end of media reached");
+        })
+        .catchError((cause) {
+          print("unable to pull next media from playlist ${cause}");
+        });
   }
 
   @override
