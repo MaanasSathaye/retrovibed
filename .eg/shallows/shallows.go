@@ -16,8 +16,7 @@ import (
 	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
 )
 
-// var buildTags = []string{"duckdb_use_lib"}
-var buildTags = []string{}
+var buildTags = []string{"duckdb_use_lib"}
 
 func rootdir() string {
 	return egenv.WorkingDirectory("shallows")
@@ -62,7 +61,6 @@ func Install(ctx context.Context, _ eg.Op) error {
 	gruntime := shellruntime()
 	return shell.Run(
 		ctx,
-		// go -C shallows install -tags duckdb_use_lib ./cmd/...|
 		gruntime.Newf("go install -tags %s ./cmd/...", strings.Join(buildTags, ",")).Environ("GOBIN", dstdir),
 	)
 }

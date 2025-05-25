@@ -114,13 +114,14 @@ class _PlaylistState extends State<Playlist> {
       // print("audio: ${audio.id} ${audio.language} ${audio.title} -- ${audio}");
       // print("subtitles: ${subtitles.id} ${subtitles.language} ${subtitles.title} -- ${subtitles}");
     });
-    player.stream.playlist.listen((list) {
-      print("playlist: ${list.index} - ${list}");
-    });
+    // player.stream.playlist.listen((list) {
+    //   print("playlist: ${list.index} - ${list}");
+    // });
 
     player.stream.error.listen((err) {
       print("error: ${err}");
     });
+
     player.stream.completed.listen((completed) {
       if (!completed) return;
 

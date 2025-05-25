@@ -23,7 +23,7 @@ class _VideoState extends State<VideoScreen> {
 
   // Create a [VideoController] to handle video output from [Player].
   late final controller = VideoController(widget.player);
- late final StreamSubscription<bool> sub0; 
+  late final StreamSubscription<Tracks> sub0;
   late final StreamSubscription<bool> sub1;
 
   void setState(VoidCallback fn) {
@@ -41,11 +41,13 @@ class _VideoState extends State<VideoScreen> {
   void initState() {
     super.initState();
 
-    // sub0 = widget.player.stream.track.listen((state) {
-    //   setState(() {});
-    // });
+    sub0 = widget.player.stream.tracks.listen((state) {
+      setState(() {});
+    });
 
     sub1 = widget.player.stream.playing.listen((state) {
+      // prevents flashing to the search screen which switching tracks.
+      if (_playing && widget.player.state.playlist.medias.length == 0) return;
       setState(() {
         _playing = state;
       });
@@ -54,6 +56,7 @@ class _VideoState extends State<VideoScreen> {
 
   @override
   void dispose() {
+    sub0.cancel();
     sub1.cancel();
     super.dispose();
   }
@@ -62,8 +65,8 @@ class _VideoState extends State<VideoScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final themex = ds.Defaults.of(context);
-    var plist = internal.Playlist.of(context);
-    var title = plist?.current?.extras?["title"] ?? "";
+    final plist = internal.Playlist.of(context);
+    final title = plist?.current?.extras?["title"] ?? "";
 
     final m =
         _playing
@@ -104,50 +107,44 @@ class _VideoState extends State<VideoScreen> {
               ],
             );
 
+    final controls = [
+      IconButton(
+        onPressed: () {
+          internal.Playlist.of(context)?.previous();
+        },
+        icon: Icon(Icons.skip_previous_rounded),
+      ),
+      MaterialPlayOrPauseButton(),
+      IconButton(
+        onPressed: () {
+          internal.Playlist.of(context)?.next();
+        },
+        icon: Icon(Icons.skip_next_rounded),
+      ),
+      SizedBox.square(dimension: themex.spacing),
+      Expanded(
+        child: StreamBuilder(
+          stream: widget.player.stream.track,
+          builder: (context, snapshot) {
+            final plist = internal.Playlist.of(context);
+            final title = plist?.current?.extras?["title"] ?? "";
+            return Text(title, maxLines: 1, overflow: TextOverflow.ellipsis);
+          },
+        ),
+      ),
+      SizedBox.square(dimension: themex.spacing),
+      MaterialPositionIndicator(),
+      MaterialFullscreenButton(),
+    ];
+
     return Stack(
       children: [
         MaterialDesktopVideoControlsTheme(
           normal: MaterialDesktopVideoControlsThemeData(
-            bottomButtonBar: [
-              IconButton(
-                onPressed: () {
-                  internal.Playlist.of(context)?.previous();
-                },
-                icon: Icon(Icons.skip_previous_rounded),
-              ),
-              MaterialPlayOrPauseButton(),
-              IconButton(
-                onPressed: () {
-                  internal.Playlist.of(context)?.next();
-                },
-                icon: Icon(Icons.skip_next_rounded),
-              ),
-              Text(title, maxLines: 1, overflow: TextOverflow.ellipsis),
-              Spacer(),
-              MaterialPositionIndicator(),
-              MaterialFullscreenButton(),
-            ],
+            bottomButtonBar: controls,
           ),
           fullscreen: MaterialDesktopVideoControlsThemeData(
-            bottomButtonBar: [
-              IconButton(
-                onPressed: () {
-                  internal.Playlist.of(context)?.previous();
-                },
-                icon: Icon(Icons.skip_previous_rounded),
-              ),
-              MaterialPlayOrPauseButton(),
-              IconButton(
-                onPressed: () {
-                  internal.Playlist.of(context)?.next();
-                },
-                icon: Icon(Icons.skip_next_rounded),
-              ),
-              Text(title, maxLines: 1, overflow: TextOverflow.ellipsis),
-              Spacer(),
-              MaterialPositionIndicator(),
-              MaterialFullscreenButton(),
-            ],
+            bottomButtonBar: controls,
           ),
           child: Video(controller: controller),
         ),

@@ -25,6 +25,11 @@ class _MDNSDiscovery extends State<MDNSDiscovery> {
   bool _loading = true;
   Widget? _cause = null;
 
+  void setState(VoidCallback fn) {
+    if (!mounted) return;
+    super.setState(fn);
+  }
+
   void discover() {
     final MDnsClient _client = MDnsClient();
     final Completer<String> _c = new Completer();
@@ -70,7 +75,6 @@ class _MDNSDiscovery extends State<MDNSDiscovery> {
         })
         .whenComplete(() {
           _client.stop();
-          if (!super.mounted) return;
           setState(() {
             _loading = false;
           });
