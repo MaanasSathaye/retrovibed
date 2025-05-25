@@ -2,6 +2,7 @@ package cmdmedia
 
 import (
 	"database/sql"
+	"log"
 	"os"
 
 	"github.com/Masterminds/squirrel"
@@ -47,6 +48,7 @@ func (t reindex) Run(gctx *cmdopts.Global) (err error) {
 	)
 
 	return sqlxx.ScanEach(library.MetadataSearch(gctx.Context, db, query), func(md *library.Metadata) error {
+		log.Println("proccessing", md.ID, md.TorrentID)
 		if md.TorrentID != uuid.Nil.String() {
 			// JAL 2025-05-24: this if statement can be removed once v0 is out.
 			var tmd tracking.Metadata
@@ -59,12 +61,15 @@ func (t reindex) Run(gctx *cmdopts.Global) (err error) {
 
 			resolved, err := os.Readlink(mediastore.Path(md.ID))
 			if err != nil {
+				log.Println("failed to read link", err)
 				return nil
 			}
 
-			if err = library.MetadataUpdateDescriptionByID(gctx.Context, db, md.ID, tracking.DescriptionFromPath(&tmd, tracking.DescriptionFromPath(&tmd, resolved))).Scan(md); err != nil {
+			if err = library.MetadataUpdateDescriptionByID(gctx.Context, db, md.ID, tracking.DescriptionFromPath(&tmd, resolved)).Scan(md); err != nil {
 				return err
 			}
+
+			log.Println("after", md.Description)
 		}
 
 		if err = library.MetadataUpdateAutodescriptionByID(gctx.Context, db, md.ID, tracking.NormalizedDescription(md.Description)).Scan(md); err != nil {

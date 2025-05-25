@@ -1,6 +1,7 @@
 package cmdtorrent
 
 import (
+	"fmt"
 	"io/fs"
 	"log"
 	"os"
@@ -27,19 +28,29 @@ func (t remap) Run(gctx *cmdopts.Global) (err error) {
 			return nil
 		}
 
-		actual, err := os.Readlink(path)
-		if err != nil {
-			return nil
-		}
-
 		if d.IsDir() {
 			return nil
 		}
 
 		// we only care about symlinks
 		if d.Type()&fs.ModeSymlink == 0 {
-			log.Println("ignoring non-symlink", path)
+			// log.Println("ignoring non-symlink", path)
 			return nil
+		}
+
+		path = tvfs.Path(path)
+
+		actual, err := os.Readlink(path)
+		if err != nil {
+			log.Println("failed to read link", path, err)
+			return nil
+		}
+
+		npath := fmt.Sprintf("%s.oldlink", path)
+		if t.DryRun {
+			log.Println("renaming", path, "->", npath)
+		} else if err = os.Rename(path, npath); err != nil {
+			return err
 		}
 
 		// replace the symlink with the actual contents.

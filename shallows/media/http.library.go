@@ -30,6 +30,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/numericx"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
 	"github.com/retrovibed/retrovibed/internal/sqlxx"
+	"github.com/retrovibed/retrovibed/internal/stringsx"
 	"github.com/retrovibed/retrovibed/library"
 )
 
@@ -213,10 +214,15 @@ func (t *HTTPLibrary) search(w http.ResponseWriter, r *http.Request) {
 	}
 	msg.Next.Limit = numericx.Min(msg.Next.Limit, 100)
 
+	ordering := "created_at DESC, description ASC"
+	if stringsx.Present(msg.Next.Query) {
+		ordering = "description ASC"
+	}
+
 	q := library.MetadataSearchBuilder().Where(squirrel.And{
 		library.MetadataQueryVisible(),
 		lucenex.Query(t.fts, msg.Next.Query, lucenex.WithDefaultField("auto_description")),
-	}).OrderBy("created_at DESC, description ASC").Offset(msg.Next.Offset * msg.Next.Limit).Limit(msg.Next.Limit)
+	}).OrderBy(ordering).Offset(msg.Next.Offset * msg.Next.Limit).Limit(msg.Next.Limit)
 
 	err = sqlxx.ScanEach(library.MetadataSearch(r.Context(), t.q, q), func(p *library.Metadata) error {
 		tmp := langx.Clone(Media{}, MediaOptionFromLibraryMetadata(langx.Clone(*p, library.MetadataOptionJSONSafeEncode)))

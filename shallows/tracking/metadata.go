@@ -195,7 +195,7 @@ func DescriptionFromPath(md *Metadata, path string) string {
 
 func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torrent.Torrent) {
 	const (
-		statsfreq = 10 * time.Second
+		statsfreq = 1 * time.Minute
 	)
 
 	var (
@@ -226,15 +226,6 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 			if err := dl.Tune(torrent.TuneNewConns); err != nil {
 				log.Println("unable to request new connections", err)
 				continue
-			}
-
-			current := uint64(dl.BytesCompleted())
-			if md.Downloaded == current {
-				continue
-			}
-
-			if err := MetadataProgressByID(ctx, q, md.ID, uint16(stats.ActivePeers), current).Scan(md); err != nil {
-				log.Println("failed to update progress", err)
 			}
 		case <-sub.Values:
 			if !l.Allow() {

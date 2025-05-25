@@ -393,7 +393,7 @@ func (t *HTTPDiscovered) downloading(w http.ResponseWriter, r *http.Request) {
 			tracking.MetadataQueryIncomplete(),
 			tracking.MetadataQueryNotPaused(),
 		},
-	).OrderBy("created_at DESC").Offset(msg.Next.Offset * msg.Next.Limit).Limit(msg.Next.Limit)
+	).OrderBy("downloaded/bytes, created_at DESC").Offset(msg.Next.Offset * msg.Next.Limit).Limit(msg.Next.Limit)
 
 	err = sqlxx.ScanEach(tracking.MetadataSearch(r.Context(), t.q, q), func(p *tracking.Metadata) error {
 		tmp := langx.Clone(Download{}, DownloadOptionFromTorrentMetadata(langx.Clone(*p, tracking.MetadataOptionJSONSafeEncode)))
@@ -432,7 +432,6 @@ func (t *HTTPDiscovered) search(w http.ResponseWriter, r *http.Request) {
 
 	q := tracking.MetadataSearchBuilder().Where(squirrel.And{
 		tracking.MetadataQueryNotInitiated(),
-		// tracking.MetadataQuerySearch(msg.Next.Query, "description"),
 		lucenex.Query(t.fts, msg.Next.Query, lucenex.WithDefaultField("auto_description")),
 	}).OrderBy("created_at DESC").Offset(msg.Next.Offset * msg.Next.Limit).Limit(msg.Next.Limit)
 
