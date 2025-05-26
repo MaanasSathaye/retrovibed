@@ -105,43 +105,6 @@ func TestHTTPDaemonCreateNew(t *testing.T) {
 	require.Equal(t, v.Hostname, result.Daemon.Hostname)
 }
 
-func TestHTTPDaemonTouch(t *testing.T) {
-	var (
-		v      meta.Daemon
-		result metaapi.DaemonLookupResponse
-		claims jwt.RegisteredClaims
-	)
-
-	ctx, done := testx.Context(t)
-	defer done()
-
-	q := sqltestx.Metadatabase(t)
-	defer q.Close()
-
-	require.NoError(t, testx.Fake(&v, meta.DaemonOptionTestDefaults, meta.DaemonOptionMaybeID, timex.UTCEncodeOption))
-	require.NoError(t, meta.DaemonInsertWithDefaults(ctx, q, v).Scan(&v))
-
-	routes := mux.NewRouter()
-
-	metaapi.NewHTTPDaemons(
-		q,
-		metaapi.HTTPDaemonsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
-	).Bind(routes.PathPrefix("/").Subrouter())
-
-	claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
-
-	resp, req, err := httptestx.BuildRequest(http.MethodPut, fmt.Sprintf("/%s", v.ID), nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
-	require.NoError(t, err)
-
-	routes.ServeHTTP(resp, req)
-
-	require.NoError(t, httpx.ErrorCode(resp.Result()))
-	require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
-
-	require.Equal(t, v.ID, result.Daemon.Id)
-	require.Equal(t, v.Hostname, result.Daemon.Hostname)
-}
-
 func TestHTTPDaemonCreateUpdate(t *testing.T) {
 	var (
 		v      meta.Daemon
@@ -187,7 +150,47 @@ func TestHTTPDaemonCreateUpdate(t *testing.T) {
 	require.NotEqual(t, v.UpdatedAt, testx.Must(time.Parse(time.RFC3339Nano, result.Daemon.UpdatedAt))(t))
 }
 
-func TestHTTPDaemonCreateDelete(t *testing.T) {
+func TestHTTPDaemonTouch(t *testing.T) {
+	var (
+		v, ignored meta.Daemon
+		result     metaapi.DaemonLookupResponse
+		claims     jwt.RegisteredClaims
+	)
+
+	ctx, done := testx.Context(t)
+	defer done()
+
+	q := sqltestx.Metadatabase(t)
+	defer q.Close()
+
+	require.NoError(t, testx.Fake(&v, meta.DaemonOptionTestDefaults, meta.DaemonOptionMaybeID, timex.UTCEncodeOption))
+	require.NoError(t, meta.DaemonInsertWithDefaults(ctx, q, v).Scan(&v))
+
+	require.NoError(t, testx.Fake(&ignored, meta.DaemonOptionTestDefaults, meta.DaemonOptionMaybeID, timex.UTCEncodeOption))
+	require.NoError(t, meta.DaemonInsertWithDefaults(ctx, q, ignored).Scan(&ignored))
+
+	routes := mux.NewRouter()
+
+	metaapi.NewHTTPDaemons(
+		q,
+		metaapi.HTTPDaemonsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+	).Bind(routes.PathPrefix("/").Subrouter())
+
+	claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+
+	resp, req, err := httptestx.BuildRequest(http.MethodPut, fmt.Sprintf("/%s", v.ID), nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
+	require.NoError(t, err)
+
+	routes.ServeHTTP(resp, req)
+
+	require.NoError(t, httpx.ErrorCode(resp.Result()))
+	require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+
+	require.Equal(t, v.ID, result.Daemon.Id)
+	require.Equal(t, v.Hostname, result.Daemon.Hostname)
+}
+
+func TestHTTPDaemonDelete(t *testing.T) {
 	var (
 		v      meta.Daemon
 		result metaapi.DaemonCreateResponse
@@ -231,9 +234,9 @@ func TestHTTPDaemonCreateDelete(t *testing.T) {
 
 func TestHTTPDaemonLatest(t *testing.T) {
 	var (
-		v      meta.Daemon
-		result metaapi.DaemonLookupResponse
-		claims jwt.RegisteredClaims
+		v, latest meta.Daemon
+		result    metaapi.DaemonLookupResponse
+		claims    jwt.RegisteredClaims
 	)
 
 	ctx, done := testx.Context(t)
@@ -251,6 +254,9 @@ func TestHTTPDaemonLatest(t *testing.T) {
 
 	require.NoError(t, testx.Fake(&v, meta.DaemonOptionTestDefaults, meta.DaemonOptionMaybeID, timex.UTCEncodeOption))
 	require.NoError(t, meta.DaemonInsertWithDefaults(ctx, q, v).Scan(&v))
+
+	time.Sleep(time.Millisecond)
+	require.NoError(t, meta.DaemonTouch(ctx, q, v.ID).Scan(&latest))
 
 	routes := mux.NewRouter()
 
@@ -275,5 +281,5 @@ func TestHTTPDaemonLatest(t *testing.T) {
 
 	require.Equal(t, v.ID, result.Daemon.Id)
 	require.Equal(t, v.Hostname, result.Daemon.Hostname)
-	require.Equal(t, v.UpdatedAt, testx.Must(time.Parse(time.RFC3339Nano, result.Daemon.UpdatedAt))(t))
+	require.Equal(t, latest.UpdatedAt, testx.Must(time.Parse(time.RFC3339Nano, result.Daemon.UpdatedAt))(t))
 }

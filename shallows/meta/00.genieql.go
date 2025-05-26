@@ -72,6 +72,15 @@ func DaemonTouch(
 	gql = gql.Query(`UPDATE meta_daemons SET updated_at = NOW() WHERE "id" = {id} RETURNING ` + DaemonScannerStaticColumns)
 }
 
+// requires partial indexes to support this.
+// func DaemonTouch2(
+// 	gql genieql.Function,
+// 	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewDaemonScannerStaticRow,
+// ) {
+// 	copy := strings.ReplaceAll(DaemonScannerStaticColumns, "meta_daemons.\"id\",", "'ffffffff-ffff-ffff-ffff-ffffffffffff',")
+// 	gql = gql.Query(`BEGIN; DELETE FROM meta_daemons WHERE id = 'ffffffff-ffff-ffff-ffff-ffffffffffff'; INSERT INTO meta_daemons (` + DaemonScannerStaticColumns + `) SELECT ` + copy + ` FROM meta_daemons WHERE "id" = {id} RETURNING ` + DaemonScannerStaticColumns + `; COMMIT`)
+// }
+
 func DaemonDeleteByID(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewDaemonScannerStaticRow,

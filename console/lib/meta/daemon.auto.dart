@@ -76,6 +76,9 @@ class _DaemonAuto extends State<EndpointAuto> {
           return api.authz(host: v.hostname).then((value) => v);
         })
         .then((v) {
+          return api.daemons.touch(v.id).then((value) => v);
+        })
+        .then((v) {
           setState(() {
             httpx.set(v.hostname);
             _res = v;
