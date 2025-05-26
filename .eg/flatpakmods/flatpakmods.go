@@ -158,6 +158,7 @@ func Libmpv() egflatpak.Module {
 		"-Dvulkan=enabled",
 		"-Dmanpage-build=disabled",
 		"-Dbuild-date=false",
+		"--libdir=/app/lib", // fixes build issue with flatpak 1.4.2 - https://github.com/flatpak/flatpak-builder/commit/8c036e00630e35423c03388aacc06cd00dda74ea
 	).PostInstall(
 		"pwd",
 		"ls -lha .",
