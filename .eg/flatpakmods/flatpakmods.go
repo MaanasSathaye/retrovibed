@@ -133,6 +133,7 @@ func Libplacebo() egflatpak.Module {
 	return egflatpak.NewModule("libplacebo", "meson", egflatpak.ModuleOptions().ConfigOptions(
 		"-Dvulkan=enabled",
 		"-Dshaderc=enabled",
+		"--libdir=/app/lib", // fixes build issue with flatpak 1.4.2 - https://github.com/flatpak/flatpak-builder/commit/8c036e00630e35423c03388aacc06cd00dda74ea
 	).Sources(
 		egflatpak.SourceGit(
 			"https://github.com/haasn/libplacebo.git",

@@ -8,3 +8,7 @@ gpg --no-default-keyring --keyring temp.gpg --export > derp.gpg
 
 policies standards for debian packages. primarily useful for looking up the current value
 for the Standards-Version field in the control file.
+
+### distrobuilds
+
+contains container files that ensure flatpak builds properly.
