@@ -36,17 +36,16 @@ func DistroBuilds(ctx context.Context, op eg.Op) error {
 	return eg.Sequential(
 		eg.Parallel(
 			shell.Op(
-				shell.New("echo ---------------------------------------------------------------"),
+				podman.New("echo ---------------------------------------------------------------"),
 				podman.New("podman build -t retrovibed.flatpak.distro.check.ubuntu.noble -f .dist/distrobuilds/ubuntu.noble").Privileged(),
-				shell.New("echo ---------------------------------------------------------------"),
+				podman.New("echo ---------------------------------------------------------------"),
 			),
 			// shell.Op(shell.New("podman build -tag retrovibed.flatpak.distro.check.ubuntu.oracular -f .dist/distrobuilds/ubuntu.oracular")),
 		),
 		eg.Parallel(
-			shell.Op(shell.New("tree -a -L 1")),
+			shell.Op(podman.New("tree -a -L 1")),
 			shell.Op(podman.New("podman run --privileged --rm --volume .eg.cache/flatpak.client.yml:/retrovibed.client.yml:ro retrovibed.flatpak.distro.check.ubuntu.noble cat /retrovibed.client.yml").Privileged()),
-			shell.Op(podman.New("podman run --rm --volume .eg.cache/flatpak.client.yml:/retrovibed.client.yml:ro retrovibed.flatpak.distro.check.ubuntu.noble")),
-			// eg.Build(ubuntuoracular.BuildFromFile(".dist/distrobuilds/ubuntu.noble")),
+			shell.Op(podman.New("podman run --privileged --rm --volume .eg.cache/flatpak.client.yml:/retrovibed.client.yml:ro retrovibed.flatpak.distro.check.ubuntu.noble").Privileged()),
 		),
 	)(ctx, op)
 }
