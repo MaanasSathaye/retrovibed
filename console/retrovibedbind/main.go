@@ -66,6 +66,10 @@ func ips() *C.char {
 	}
 	defer db.Close()
 
+	if err := cmdglobalmain.Profile(db); err != nil {
+		log.Fatalln(err)
+	}
+
 	results, err := cmdmeta.Hostnames(ctx, db)
 	if err != nil {
 		log.Fatalln(err)

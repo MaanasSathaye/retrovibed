@@ -2,6 +2,7 @@ package cmdglobalmain
 
 import (
 	"context"
+	"database/sql"
 	"log"
 	"net"
 	"os"
@@ -23,15 +24,36 @@ import (
 	"github.com/retrovibed/retrovibed/internal/env"
 	"github.com/retrovibed/retrovibed/internal/envx"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
+	"github.com/retrovibed/retrovibed/internal/sshx"
 	"github.com/retrovibed/retrovibed/internal/stringsx"
 	"github.com/retrovibed/retrovibed/internal/userx"
+	"github.com/retrovibed/retrovibed/meta/identityssh"
 	"github.com/willabides/kongplete"
+	"golang.org/x/crypto/ssh"
 
 	_ "github.com/benbjohnson/immutable"
 )
 
 func Hostname() string {
 	return stringsx.FirstNonBlank(errorsx.Zero(os.Hostname()), "localhost")
+}
+
+func Profile(db *sql.DB) (err error) {
+	var (
+		id ssh.Signer
+	)
+	ctx, done := context.WithTimeout(context.Background(), time.Second)
+	defer done()
+
+	if id, err = sshx.AutoCached(sshx.NewKeyGen(), env.PrivateKeyPath()); err != nil {
+		return err
+	}
+
+	if err = identityssh.ImportPublicKey(ctx, db, id.PublicKey()); err != nil {
+		return errorsx.Wrap(err, "unable to import ssh identity")
+	}
+
+	return nil
 }
 
 func Main(args ...string) {
