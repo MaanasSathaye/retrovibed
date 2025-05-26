@@ -82,3 +82,20 @@ func MetadataAssociateTorrent(
 ) {
 	gql = gql.Query(`UPDATE library_metadata SET torrent_id = {tid} WHERE "description" = {desc} AND torrent_id = '00000000-0000-0000-0000-000000000000' RETURNING ` + MetadataScannerStaticColumns)
 }
+
+// func Known(gql genieql.Structure) {
+// 	gql.From(
+// 		gql.Table("library_known_media"),
+// 	)
+// }
+
+// func MetadataScanner(gql genieql.Scanner, pattern func(i Known)) {
+// 	gql.ColumnNamePrefix("library_known_media.")
+// }
+
+// func KnownFindByID(
+// 	gql genieql.Function,
+// 	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewKnownScannerStaticRow,
+// ) {
+// 	gql = gql.Query(`SELECT ` + KnownScannerStaticColumns + ` FROM library_known_media WHERE "id" = {id}`)
+// }

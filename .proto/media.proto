@@ -11,6 +11,7 @@ message Media {
   string torrent_id = 6 [ json_name = "torrent_id" ];
   string created_at = 7 [ json_name = "created_at" ];
   string updated_at = 8 [ json_name = "updated_at" ];
+  string metadata = 9 [ json_name = "metadata" ];
 }
 
 message MediaSearchRequest {

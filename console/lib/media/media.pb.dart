@@ -26,6 +26,7 @@ class Media extends $pb.GeneratedMessage {
     $core.String? torrentId,
     $core.String? createdAt,
     $core.String? updatedAt,
+    $core.String? metadata,
   }) {
     final $result = create();
     if (id != null) {
@@ -52,6 +53,9 @@ class Media extends $pb.GeneratedMessage {
     if (updatedAt != null) {
       $result.updatedAt = updatedAt;
     }
+    if (metadata != null) {
+      $result.metadata = metadata;
+    }
     return $result;
   }
   Media._() : super();
@@ -67,6 +71,7 @@ class Media extends $pb.GeneratedMessage {
     ..aOS(6, _omitFieldNames ? '' : 'torrent_id')
     ..aOS(7, _omitFieldNames ? '' : 'created_at')
     ..aOS(8, _omitFieldNames ? '' : 'updated_at')
+    ..aOS(9, _omitFieldNames ? '' : 'metadata')
     ..hasRequiredFields = false
   ;
 
@@ -156,6 +161,15 @@ class Media extends $pb.GeneratedMessage {
   $core.bool hasUpdatedAt() => $_has(7);
   @$pb.TagNumber(8)
   void clearUpdatedAt() => $_clearField(8);
+
+  @$pb.TagNumber(9)
+  $core.String get metadata => $_getSZ(8);
+  @$pb.TagNumber(9)
+  set metadata($core.String v) { $_setString(8, v); }
+  @$pb.TagNumber(9)
+  $core.bool hasMetadata() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearMetadata() => $_clearField(9);
 }
 
 class MediaSearchRequest extends $pb.GeneratedMessage {

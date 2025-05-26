@@ -74,6 +74,10 @@ func RefreshFTS(ctx context.Context, db *sql.DB) (err error) {
 		return errorsx.Wrap(err, "failed to refresh torrents_metadata fts index")
 	}
 
+	if _, err := db.ExecContext(ctx, "PRAGMA create_fts_index('library_known_media', 'id', 'title', overwrite = 1);"); err != nil {
+		return errorsx.Wrap(err, "failed to refresh library_known_media fts index")
+	}
+
 	return nil
 }
 

@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package media;
+
+message Known {
+  string id = 1 [ json_name = "id" ];
+  string description = 2 [ json_name = "description" ];
+  string mimetype = 3 [ json_name = "mimetype" ];
+  string image = 4 [ json_name = "image" ];
+  string archive_id = 5 [ json_name = "archive_id" ];
+  string torrent_id = 6 [ json_name = "torrent_id" ];
+  string created_at = 7 [ json_name = "created_at" ];
+  string updated_at = 8 [ json_name = "updated_at" ];
+  string metadata = 9 [ json_name = "metadata" ];
+}
+
+message KnownSearchRequest {
+  string query = 1 [ json_name = "query" ];
+  reserved 2 to 899;
+  uint64 offset = 900 [ json_name = "offset" ];
+  uint64 limit = 901 [ json_name = "limit" ];
+  reserved 902 to 999;
+}
+
+message KnownSearchResponse {
+  KnownSearchRequest next = 1 [ json_name = "next" ];
+  repeated Known items = 2 [ json_name = "items" ];
+}
+
+message KnownMatchRequest {
+    string query = 1 [ json_name = "query" ];
+}
+
+message KnownLookupRequest {}
+message KnownLookupResponse {
+  Known known = 1 [ json_name = "known" ];
+}
