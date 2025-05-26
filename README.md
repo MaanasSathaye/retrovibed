@@ -42,6 +42,8 @@ systemctl enable --now retrovibed.service
 
 #### install flatpak gui
 
+requires flatpak-builder 1.4.2 or later to be installed.
+
 ```bash
 mkdir retrovibe
 curl -L -o retrovibed.client.yml https://github.com/retrovibed/retrovibed/releases/latest/download/flatpak.client.yml
