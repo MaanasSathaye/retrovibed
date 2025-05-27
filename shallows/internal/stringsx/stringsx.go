@@ -1,6 +1,9 @@
 package stringsx
 
-import "strings"
+import (
+	"regexp"
+	"strings"
+)
 
 // Join a more convient string join method.
 func Join(sep string, parts ...string) string {
@@ -50,4 +53,10 @@ func Blank(s string) bool {
 
 func Present(s string) bool {
 	return len(strings.TrimSpace(s)) > 0
+}
+
+var whitespace = regexp.MustCompile(`\s+`)
+
+func CompactWhitespace(s string) string {
+	return whitespace.ReplaceAllString(s, " ")
 }
