@@ -12,6 +12,7 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/anacrolix/missinggo/pubsub"
 	"github.com/davecgh/go-spew/spew"
+	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/internal/duckdbx"
@@ -55,6 +56,12 @@ func MetadataOptionTrackers(d ...string) func(*Metadata) {
 	}
 }
 
+func MetadataOptionKnownMediaID(d string) func(*Metadata) {
+	return func(m *Metadata) {
+		m.KnownMediaID = d
+	}
+}
+
 func MetadataOptionJSONSafeEncode(p *Metadata) {
 	p.CreatedAt = timex.RFC3339NanoEncode(p.CreatedAt)
 	p.UpdatedAt = timex.RFC3339NanoEncode(p.UpdatedAt)
@@ -70,6 +77,7 @@ func NewMetadata(md *metainfo.Hash, options ...func(*Metadata)) (m Metadata) {
 		Infohash:       md.Bytes(),
 		InitiatedAt:    timex.Inf(),
 		NextAnnounceAt: timex.Inf(),
+		KnownMediaID:   uuid.Max.String(),
 	}, options...)
 	return r
 }
@@ -106,6 +114,10 @@ func MetadataQueryAnnounceable() squirrel.Sqlizer {
 	return squirrel.Expr("torrents_metadata.next_announce_at < 'infinity'")
 }
 
+func MetadataQueryNeedsKnownMediaID() squirrel.Sqlizer {
+	return squirrel.Expr("torrents_metadata.known_media_id = 'FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF'")
+}
+
 func MetadataSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) MetadataScanner {
 	return NewMetadataScannerStatic(b.RunWith(q).QueryContext(ctx))
 }
@@ -127,6 +139,7 @@ func Verify(ctx context.Context, t torrent.Torrent) error {
 func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata, t torrent.Torrent) (err error) {
 	var (
 		downloaded int64
+		known      *library.Known
 		mhash      = md5.New()
 	)
 
@@ -143,6 +156,12 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 	if downloaded, err = torrent.DownloadInto(ctx, mhash, t, torrent.TuneAnnounceUntilComplete, torrent.TuneNewConns); err != nil {
 		return errorsx.Wrap(err, "download failed")
 	}
+
+	if known, err = library.DetectKnownMedia(ctx, q, t.Metadata().DisplayName); err != nil {
+		log.Println("unable to detect known media ignoring", err)
+	}
+
+	_ = known
 
 	log.Println("content transfer to library initiated", t.Metadata().ID.HexString())
 	defer log.Println("content transfer to library completed", t.Metadata().ID.HexString())

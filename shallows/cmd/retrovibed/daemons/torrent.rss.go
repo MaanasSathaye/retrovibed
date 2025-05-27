@@ -25,6 +25,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/slicesx"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
 	"github.com/retrovibed/retrovibed/internal/stringsx"
+	"github.com/retrovibed/retrovibed/library"
 	"github.com/retrovibed/retrovibed/rss"
 	"github.com/retrovibed/retrovibed/tracking"
 	"golang.org/x/time/rate"
@@ -130,7 +131,8 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Vir
 
 			for _, item := range items {
 				var (
-					meta tracking.Metadata
+					known *library.Known
+					meta  tracking.Metadata
 				)
 
 				if err = l.Wait(ctx); err != nil {
@@ -175,12 +177,17 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Vir
 					continue
 				}
 
+				if known, err = library.DetectKnownMedia(ctx, q, mi.Name); err != nil {
+					log.Println("unable to detect known media ignoring", err)
+				}
+
 				if err = tracking.MetadataInsertWithDefaults(
 					ctx, q, tracking.NewMetadata(
 						langx.Autoptr(md.HashInfoBytes()),
 						tracking.MetadataOptionFromInfo(&mi),
 						tracking.MetadataOptionDescription(stringsx.FirstNonBlank(mi.Name, item.Title)),
 						tracking.MetadataOptionTrackers(md.Announce),
+						tracking.MetadataOptionKnownMediaID(known.UID),
 						tracking.MetadataOptionAutoDescription,
 					)).Scan(&meta); err != nil {
 					log.Println("unable to record torrent metadata", feed.ID, err)

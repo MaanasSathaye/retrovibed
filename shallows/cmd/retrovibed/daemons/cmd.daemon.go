@@ -230,6 +230,10 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 
 	go AnnounceSeeded(dctx, db, rootstore, tclient, tstore)
 	go ResumeDownloads(dctx, db, rootstore, tclient, tstore)
+	go timex.NowAndEvery(gctx.Context, 15*time.Minute, func(ctx context.Context) error {
+		errorsx.Log(IdentifyTorrentyMedia(dctx, db))
+		return nil
+	})
 
 	if err = VPNIP(dctx, wgnet); err != nil {
 		log.Println("failed to lookup wireguard ip", err)

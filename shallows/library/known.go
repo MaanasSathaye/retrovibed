@@ -2,10 +2,16 @@ package library
 
 import (
 	"context"
+	"log"
+	"strings"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/internal/duckdbx"
+	"github.com/retrovibed/retrovibed/internal/lucenex"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
 	"github.com/retrovibed/retrovibed/internal/squirrelx"
+	"github.com/retrovibed/retrovibed/internal/stringsx"
 )
 
 func KnownSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) KnownScanner {
@@ -14,4 +20,77 @@ func KnownSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) 
 
 func KnownSearchBuilder() squirrel.SelectBuilder {
 	return squirrelx.PSQL.Select(sqlx.Columns(KnownScannerStaticColumns)...).From("library_known_media")
+}
+
+func DetectKnownMedia(ctx context.Context, db sqlx.Queryer, query string) (_ *Known, err error) {
+	type ScoredKnown struct {
+		Known
+		Relevance float64
+	}
+	var (
+		result ScoredKnown = ScoredKnown{
+			Known: Known{
+				UID: uuid.Nil.String(),
+			},
+		}
+	)
+
+	{
+		q := KnownSearchBuilder().Where(squirrel.And{
+			lucenex.Query(duckdbx.NewLucene(), query, lucenex.WithDefaultField("title")),
+		})
+
+		scanner := sqlx.Scan(KnownSearch(ctx, db, q))
+
+		for v := range scanner.Iter() {
+			var cur ScoredKnown = ScoredKnown{Known: v}
+
+			if err := KnownScoreByID(ctx, db, v.UID, query).Scan(&cur.Relevance); err != nil {
+				log.Println("unable to score", v.UID, err)
+				continue
+			}
+
+			if cur.Relevance > result.Relevance {
+				result = cur
+				log.Println(cur.Relevance, cur.UID, cur.Title)
+			}
+		}
+
+		if err := scanner.Err(); err != nil {
+			return nil, err
+		}
+	}
+
+	if result.Relevance > 0 {
+		return &result.Known, nil
+	}
+
+	{
+		terms := strings.ReplaceAll(stringsx.CompactWhitespace(query), " ", " OR ")
+		q := KnownSearchBuilder().Where(squirrel.And{
+			lucenex.Query(duckdbx.NewLucene(), terms, lucenex.WithDefaultField("title")),
+		})
+
+		scanner := sqlx.Scan(KnownSearch(ctx, db, q))
+
+		for v := range scanner.Iter() {
+			var cur ScoredKnown = ScoredKnown{Known: v}
+
+			if err := KnownScoreByID(ctx, db, v.UID, query).Scan(&cur.Relevance); err != nil {
+				log.Println("unable to score", v.UID, err)
+				continue
+			}
+
+			if cur.Relevance > result.Relevance {
+				result = cur
+				log.Println(cur.Relevance, cur.UID, cur.Title)
+			}
+		}
+
+		if err := scanner.Err(); err != nil {
+			return nil, err
+		}
+	}
+
+	return &result.Known, nil
 }

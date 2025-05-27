@@ -99,6 +99,13 @@ func MetadataDisableAnnounced(
 	gql = gql.Query(`UPDATE torrents_metadata SET updated_at = NOW(), next_announce_at = 'infinity' WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
 }
 
+func MetadataAssignKnownMediaID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string, kid string) NewMetadataScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE torrents_metadata SET updated_at = NOW(), known_media_id = {kid} WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
+}
+
 //easyjson:json
 func Peer(gql genieql.Structure) {
 	gql.From(
