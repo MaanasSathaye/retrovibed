@@ -58,5 +58,5 @@ func Present(s string) bool {
 var whitespace = regexp.MustCompile(`\s+`)
 
 func CompactWhitespace(s string) string {
-	return whitespace.ReplaceAllString(s, " ")
+	return strings.TrimSpace(whitespace.ReplaceAllString(s, " "))
 }

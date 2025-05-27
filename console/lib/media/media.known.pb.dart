@@ -19,42 +19,30 @@ export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
 class Known extends $pb.GeneratedMessage {
   factory Known({
     $core.String? id,
+    $core.double? rating,
+    $core.bool? adult,
     $core.String? description,
-    $core.String? mimetype,
+    $core.String? summary,
     $core.String? image,
-    $core.String? archiveId,
-    $core.String? torrentId,
-    $core.String? createdAt,
-    $core.String? updatedAt,
-    $core.String? metadata,
   }) {
     final $result = create();
     if (id != null) {
       $result.id = id;
     }
+    if (rating != null) {
+      $result.rating = rating;
+    }
+    if (adult != null) {
+      $result.adult = adult;
+    }
     if (description != null) {
       $result.description = description;
     }
-    if (mimetype != null) {
-      $result.mimetype = mimetype;
+    if (summary != null) {
+      $result.summary = summary;
     }
     if (image != null) {
       $result.image = image;
-    }
-    if (archiveId != null) {
-      $result.archiveId = archiveId;
-    }
-    if (torrentId != null) {
-      $result.torrentId = torrentId;
-    }
-    if (createdAt != null) {
-      $result.createdAt = createdAt;
-    }
-    if (updatedAt != null) {
-      $result.updatedAt = updatedAt;
-    }
-    if (metadata != null) {
-      $result.metadata = metadata;
     }
     return $result;
   }
@@ -64,14 +52,11 @@ class Known extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'Known', package: const $pb.PackageName(_omitMessageNames ? '' : 'media'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'id')
-    ..aOS(2, _omitFieldNames ? '' : 'description')
-    ..aOS(3, _omitFieldNames ? '' : 'mimetype')
-    ..aOS(4, _omitFieldNames ? '' : 'image')
-    ..aOS(5, _omitFieldNames ? '' : 'archive_id')
-    ..aOS(6, _omitFieldNames ? '' : 'torrent_id')
-    ..aOS(7, _omitFieldNames ? '' : 'created_at')
-    ..aOS(8, _omitFieldNames ? '' : 'updated_at')
-    ..aOS(9, _omitFieldNames ? '' : 'metadata')
+    ..a<$core.double>(2, _omitFieldNames ? '' : 'rating', $pb.PbFieldType.OF)
+    ..aOB(3, _omitFieldNames ? '' : 'adult')
+    ..aOS(4, _omitFieldNames ? '' : 'description')
+    ..aOS(5, _omitFieldNames ? '' : 'summary')
+    ..aOS(6, _omitFieldNames ? '' : 'image')
     ..hasRequiredFields = false
   ;
 
@@ -100,76 +85,49 @@ class Known extends $pb.GeneratedMessage {
   void clearId() => $_clearField(1);
 
   @$pb.TagNumber(2)
-  $core.String get description => $_getSZ(1);
+  $core.double get rating => $_getN(1);
   @$pb.TagNumber(2)
-  set description($core.String v) { $_setString(1, v); }
+  set rating($core.double v) { $_setFloat(1, v); }
   @$pb.TagNumber(2)
-  $core.bool hasDescription() => $_has(1);
+  $core.bool hasRating() => $_has(1);
   @$pb.TagNumber(2)
-  void clearDescription() => $_clearField(2);
+  void clearRating() => $_clearField(2);
 
   @$pb.TagNumber(3)
-  $core.String get mimetype => $_getSZ(2);
+  $core.bool get adult => $_getBF(2);
   @$pb.TagNumber(3)
-  set mimetype($core.String v) { $_setString(2, v); }
+  set adult($core.bool v) { $_setBool(2, v); }
   @$pb.TagNumber(3)
-  $core.bool hasMimetype() => $_has(2);
+  $core.bool hasAdult() => $_has(2);
   @$pb.TagNumber(3)
-  void clearMimetype() => $_clearField(3);
+  void clearAdult() => $_clearField(3);
 
   @$pb.TagNumber(4)
-  $core.String get image => $_getSZ(3);
+  $core.String get description => $_getSZ(3);
   @$pb.TagNumber(4)
-  set image($core.String v) { $_setString(3, v); }
+  set description($core.String v) { $_setString(3, v); }
   @$pb.TagNumber(4)
-  $core.bool hasImage() => $_has(3);
+  $core.bool hasDescription() => $_has(3);
   @$pb.TagNumber(4)
-  void clearImage() => $_clearField(4);
+  void clearDescription() => $_clearField(4);
 
   @$pb.TagNumber(5)
-  $core.String get archiveId => $_getSZ(4);
+  $core.String get summary => $_getSZ(4);
   @$pb.TagNumber(5)
-  set archiveId($core.String v) { $_setString(4, v); }
+  set summary($core.String v) { $_setString(4, v); }
   @$pb.TagNumber(5)
-  $core.bool hasArchiveId() => $_has(4);
+  $core.bool hasSummary() => $_has(4);
   @$pb.TagNumber(5)
-  void clearArchiveId() => $_clearField(5);
+  void clearSummary() => $_clearField(5);
 
   @$pb.TagNumber(6)
-  $core.String get torrentId => $_getSZ(5);
+  $core.String get image => $_getSZ(5);
   @$pb.TagNumber(6)
-  set torrentId($core.String v) { $_setString(5, v); }
+  set image($core.String v) { $_setString(5, v); }
   @$pb.TagNumber(6)
-  $core.bool hasTorrentId() => $_has(5);
+  $core.bool hasImage() => $_has(5);
   @$pb.TagNumber(6)
-  void clearTorrentId() => $_clearField(6);
-
-  @$pb.TagNumber(7)
-  $core.String get createdAt => $_getSZ(6);
-  @$pb.TagNumber(7)
-  set createdAt($core.String v) { $_setString(6, v); }
-  @$pb.TagNumber(7)
-  $core.bool hasCreatedAt() => $_has(6);
-  @$pb.TagNumber(7)
-  void clearCreatedAt() => $_clearField(7);
-
-  @$pb.TagNumber(8)
-  $core.String get updatedAt => $_getSZ(7);
-  @$pb.TagNumber(8)
-  set updatedAt($core.String v) { $_setString(7, v); }
-  @$pb.TagNumber(8)
-  $core.bool hasUpdatedAt() => $_has(7);
-  @$pb.TagNumber(8)
-  void clearUpdatedAt() => $_clearField(8);
-
-  @$pb.TagNumber(9)
-  $core.String get metadata => $_getSZ(8);
-  @$pb.TagNumber(9)
-  set metadata($core.String v) { $_setString(8, v); }
-  @$pb.TagNumber(9)
-  $core.bool hasMetadata() => $_has(8);
-  @$pb.TagNumber(9)
-  void clearMetadata() => $_clearField(9);
+  void clearImage() => $_clearField(6);
 }
 
 class KnownSearchRequest extends $pb.GeneratedMessage {

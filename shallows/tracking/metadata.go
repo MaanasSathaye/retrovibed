@@ -139,7 +139,6 @@ func Verify(ctx context.Context, t torrent.Torrent) error {
 func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata, t torrent.Torrent) (err error) {
 	var (
 		downloaded int64
-		known      *library.Known
 		mhash      = md5.New()
 	)
 
@@ -156,12 +155,6 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 	if downloaded, err = torrent.DownloadInto(ctx, mhash, t, torrent.TuneAnnounceUntilComplete, torrent.TuneNewConns); err != nil {
 		return errorsx.Wrap(err, "download failed")
 	}
-
-	if known, err = library.DetectKnownMedia(ctx, q, t.Metadata().DisplayName); err != nil {
-		log.Println("unable to detect known media ignoring", err)
-	}
-
-	_ = known
 
 	log.Println("content transfer to library initiated", t.Metadata().ID.HexString())
 	defer log.Println("content transfer to library completed", t.Metadata().ID.HexString())
@@ -180,6 +173,7 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 			library.MetadataOptionAutoDescription(NormalizedDescription(desc)),
 			library.MetadataOptionBytes(tx.Bytes),
 			library.MetadataOptionTorrentID(md.ID),
+			library.MetadataOptionTorrentID(md.KnownMediaID),
 			library.MetadataOptionMimetype(tx.Mimetype.String()),
 		)
 

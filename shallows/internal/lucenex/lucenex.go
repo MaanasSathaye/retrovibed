@@ -1,12 +1,20 @@
 package lucenex
 
 import (
+	"log"
+	"strings"
+	"unicode"
+
 	"github.com/Masterminds/squirrel"
 	"github.com/grindlemire/go-lucene"
 	"github.com/grindlemire/go-lucene/pkg/lucene/expr"
 	"github.com/retrovibed/retrovibed/internal/langx"
+	"github.com/retrovibed/retrovibed/internal/runesx"
 	"github.com/retrovibed/retrovibed/internal/squirrelx"
 	"github.com/retrovibed/retrovibed/internal/stringsx"
+	"golang.org/x/text/runes"
+	"golang.org/x/text/transform"
+	"golang.org/x/text/unicode/norm"
 )
 
 type Driver interface {
@@ -24,6 +32,7 @@ func WithDefaultField(s string) Option {
 		c.DefaultField = s
 	}
 }
+
 func Query(d Driver, s string, options ...Option) squirrel.Sqlizer {
 	if stringsx.Blank(s) {
 		return squirrelx.Noop{}
@@ -38,4 +47,30 @@ func Query(d Driver, s string, options ...Option) squirrel.Sqlizer {
 
 		return d.RenderParam(ast)
 	})
+}
+
+// clean a random string of text for use by lucene.
+func Clean(s string) string {
+	transformer := transform.Chain(transform.Chain(norm.NFD, transform.RemoveFunc(func(r rune) bool {
+		// 2. Filter out combining diacritical marks (Unicode category Mn - Mark, Nonspacing)
+		return unicode.Is(unicode.Mn, r)
+	}), norm.NFC), runes.ReplaceIllFormed(), runesx.Replace(unicode.IsPunct, ' '), runesx.Replace(unicode.IsSymbol, ' '))
+	o, _, err := transform.String(transformer, s)
+	if err != nil {
+		log.Println("unable to normalize lucene query", err)
+		return s
+	}
+
+	o = stringsx.CompactWhitespace(o)
+	o = strings.ToLower(o)
+	o = strings.TrimPrefix(o, "and ")
+	o = strings.ReplaceAll(o, " and ", " ")
+	o = strings.TrimPrefix(o, "or ")
+	o = strings.ReplaceAll(o, " or ", " ")
+	o = strings.TrimPrefix(o, "to ")
+	o = strings.ReplaceAll(o, " to ", " ")
+	o = strings.TrimPrefix(o, "not ")
+	o = strings.ReplaceAll(o, " not ", " ")
+
+	return o
 }

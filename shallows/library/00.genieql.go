@@ -83,6 +83,9 @@ func MetadataAssociateTorrent(
 	gql = gql.Query(`UPDATE library_metadata SET torrent_id = {tid} WHERE "description" = {desc} AND torrent_id = '00000000-0000-0000-0000-000000000000' RETURNING ` + MetadataScannerStaticColumns)
 }
 
+func ScoredScanner(gql genieql.Scanner, pattern func(relevance float64)) {
+}
+
 func Known(gql genieql.Structure) {
 	gql.From(
 		gql.Table("library_known_media"),
@@ -93,19 +96,23 @@ func KnownScanner(gql genieql.Scanner, pattern func(i Known)) {
 	gql.ColumnNamePrefix("library_known_media.")
 }
 
-func ScoredScanner(gql genieql.Scanner, pattern func(relevance float64)) {
+func KnownInsertWithDefaults(
+	gql genieql.Insert,
+	pattern func(ctx context.Context, q sqlx.Queryer, a Known) NewKnownScannerStaticRow,
+) {
+	gql.Into("library_known_media")
 }
 
 func KnownFindByID(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewKnownScannerStaticRow,
 ) {
-	gql = gql.Query(`SELECT ` + KnownScannerStaticColumns + ` FROM library_known_media WHERE "id" = {id}`)
+	gql = gql.Query(`SELECT ` + KnownScannerStaticColumns + ` FROM library_known_media WHERE "uid" = {id}`)
 }
 
 func KnownScoreByID(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, uid string, terms string) NewScoredScannerStaticRow,
 ) {
-	gql = gql.Query(`SELECT fts_main_library_known_media.match_bm25(md5_lower, {terms})::float AS relevance FROM library_known_media WHERE uid = {uid}`)
+	gql = gql.Query(`SELECT COALESCE(fts_main_library_known_media.match_bm25(md5_lower, {terms}), 0.0)::float AS relevance FROM library_known_media WHERE uid = {uid}`)
 }

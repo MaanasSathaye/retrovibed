@@ -24,14 +24,11 @@ const (
 type Known struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	Mimetype      string                 `protobuf:"bytes,3,opt,name=mimetype,proto3" json:"mimetype,omitempty"`
-	Image         string                 `protobuf:"bytes,4,opt,name=image,proto3" json:"image,omitempty"`
-	ArchiveId     string                 `protobuf:"bytes,5,opt,name=archive_id,proto3" json:"archive_id,omitempty"`
-	TorrentId     string                 `protobuf:"bytes,6,opt,name=torrent_id,proto3" json:"torrent_id,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,7,opt,name=created_at,proto3" json:"created_at,omitempty"`
-	UpdatedAt     string                 `protobuf:"bytes,8,opt,name=updated_at,proto3" json:"updated_at,omitempty"`
-	Metadata      string                 `protobuf:"bytes,9,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	Rating        float32                `protobuf:"fixed32,2,opt,name=rating,proto3" json:"rating,omitempty"`
+	Adult         bool                   `protobuf:"varint,3,opt,name=adult,proto3" json:"adult,omitempty"`
+	Description   string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
+	Summary       string                 `protobuf:"bytes,5,opt,name=summary,proto3" json:"summary,omitempty"`
+	Image         string                 `protobuf:"bytes,6,opt,name=image,proto3" json:"image,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -73,6 +70,20 @@ func (x *Known) GetId() string {
 	return ""
 }
 
+func (x *Known) GetRating() float32 {
+	if x != nil {
+		return x.Rating
+	}
+	return 0
+}
+
+func (x *Known) GetAdult() bool {
+	if x != nil {
+		return x.Adult
+	}
+	return false
+}
+
 func (x *Known) GetDescription() string {
 	if x != nil {
 		return x.Description
@@ -80,9 +91,9 @@ func (x *Known) GetDescription() string {
 	return ""
 }
 
-func (x *Known) GetMimetype() string {
+func (x *Known) GetSummary() string {
 	if x != nil {
-		return x.Mimetype
+		return x.Summary
 	}
 	return ""
 }
@@ -90,41 +101,6 @@ func (x *Known) GetMimetype() string {
 func (x *Known) GetImage() string {
 	if x != nil {
 		return x.Image
-	}
-	return ""
-}
-
-func (x *Known) GetArchiveId() string {
-	if x != nil {
-		return x.ArchiveId
-	}
-	return ""
-}
-
-func (x *Known) GetTorrentId() string {
-	if x != nil {
-		return x.TorrentId
-	}
-	return ""
-}
-
-func (x *Known) GetCreatedAt() string {
-	if x != nil {
-		return x.CreatedAt
-	}
-	return ""
-}
-
-func (x *Known) GetUpdatedAt() string {
-	if x != nil {
-		return x.UpdatedAt
-	}
-	return ""
-}
-
-func (x *Known) GetMetadata() string {
-	if x != nil {
-		return x.Metadata
 	}
 	return ""
 }
@@ -369,25 +345,14 @@ var File_media_known_proto protoreflect.FileDescriptor
 
 const file_media_known_proto_rawDesc = "" +
 	"\n" +
-	"\x11media.known.proto\x12\x05media\"\x87\x02\n" +
+	"\x11media.known.proto\x12\x05media\"\x97\x01\n" +
 	"\x05Known\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12 \n" +
-	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x1a\n" +
-	"\bmimetype\x18\x03 \x01(\tR\bmimetype\x12\x14\n" +
-	"\x05image\x18\x04 \x01(\tR\x05image\x12\x1e\n" +
-	"\n" +
-	"archive_id\x18\x05 \x01(\tR\n" +
-	"archive_id\x12\x1e\n" +
-	"\n" +
-	"torrent_id\x18\x06 \x01(\tR\n" +
-	"torrent_id\x12\x1e\n" +
-	"\n" +
-	"created_at\x18\a \x01(\tR\n" +
-	"created_at\x12\x1e\n" +
-	"\n" +
-	"updated_at\x18\b \x01(\tR\n" +
-	"updated_at\x12\x1a\n" +
-	"\bmetadata\x18\t \x01(\tR\bmetadata\"i\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x16\n" +
+	"\x06rating\x18\x02 \x01(\x02R\x06rating\x12\x14\n" +
+	"\x05adult\x18\x03 \x01(\bR\x05adult\x12 \n" +
+	"\vdescription\x18\x04 \x01(\tR\vdescription\x12\x18\n" +
+	"\asummary\x18\x05 \x01(\tR\asummary\x12\x14\n" +
+	"\x05image\x18\x06 \x01(\tR\x05image\"i\n" +
 	"\x12KnownSearchRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12\x17\n" +
 	"\x06offset\x18\x84\a \x01(\x04R\x06offset\x12\x15\n" +

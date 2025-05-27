@@ -66,6 +66,9 @@ func InitializeDatabase(ctx context.Context, db *sql.DB) (err error) {
 }
 
 func RefreshFTS(ctx context.Context, db *sql.DB) (err error) {
+	log.Println("------------------------------------------------ FTS refresh initiated ------------------------------------------------")
+	defer log.Println("------------------------------------------------ FTS refresh completed ------------------------------------------------")
+
 	if _, err := db.ExecContext(ctx, "PRAGMA create_fts_index('library_metadata', 'id', 'description', overwrite = 1);"); err != nil {
 		return errorsx.Wrap(err, "failed to refresh library_metadata fts index")
 	}

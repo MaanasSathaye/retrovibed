@@ -18,24 +18,19 @@ const Known$json = {
   '1': 'Known',
   '2': [
     {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
-    {'1': 'description', '3': 2, '4': 1, '5': 9, '10': 'description'},
-    {'1': 'mimetype', '3': 3, '4': 1, '5': 9, '10': 'mimetype'},
-    {'1': 'image', '3': 4, '4': 1, '5': 9, '10': 'image'},
-    {'1': 'archive_id', '3': 5, '4': 1, '5': 9, '10': 'archive_id'},
-    {'1': 'torrent_id', '3': 6, '4': 1, '5': 9, '10': 'torrent_id'},
-    {'1': 'created_at', '3': 7, '4': 1, '5': 9, '10': 'created_at'},
-    {'1': 'updated_at', '3': 8, '4': 1, '5': 9, '10': 'updated_at'},
-    {'1': 'metadata', '3': 9, '4': 1, '5': 9, '10': 'metadata'},
+    {'1': 'rating', '3': 2, '4': 1, '5': 2, '10': 'rating'},
+    {'1': 'adult', '3': 3, '4': 1, '5': 8, '10': 'adult'},
+    {'1': 'description', '3': 4, '4': 1, '5': 9, '10': 'description'},
+    {'1': 'summary', '3': 5, '4': 1, '5': 9, '10': 'summary'},
+    {'1': 'image', '3': 6, '4': 1, '5': 9, '10': 'image'},
   ],
 };
 
 /// Descriptor for `Known`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List knownDescriptor = $convert.base64Decode(
-    'CgVLbm93bhIOCgJpZBgBIAEoCVICaWQSIAoLZGVzY3JpcHRpb24YAiABKAlSC2Rlc2NyaXB0aW'
-    '9uEhoKCG1pbWV0eXBlGAMgASgJUghtaW1ldHlwZRIUCgVpbWFnZRgEIAEoCVIFaW1hZ2USHgoK'
-    'YXJjaGl2ZV9pZBgFIAEoCVIKYXJjaGl2ZV9pZBIeCgp0b3JyZW50X2lkGAYgASgJUgp0b3JyZW'
-    '50X2lkEh4KCmNyZWF0ZWRfYXQYByABKAlSCmNyZWF0ZWRfYXQSHgoKdXBkYXRlZF9hdBgIIAEo'
-    'CVIKdXBkYXRlZF9hdBIaCghtZXRhZGF0YRgJIAEoCVIIbWV0YWRhdGE=');
+    'CgVLbm93bhIOCgJpZBgBIAEoCVICaWQSFgoGcmF0aW5nGAIgASgCUgZyYXRpbmcSFAoFYWR1bH'
+    'QYAyABKAhSBWFkdWx0EiAKC2Rlc2NyaXB0aW9uGAQgASgJUgtkZXNjcmlwdGlvbhIYCgdzdW1t'
+    'YXJ5GAUgASgJUgdzdW1tYXJ5EhQKBWltYWdlGAYgASgJUgVpbWFnZQ==');
 
 @$core.Deprecated('Use knownSearchRequestDescriptor instead')
 const KnownSearchRequest$json = {

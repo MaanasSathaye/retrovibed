@@ -48,13 +48,14 @@ import (
 )
 
 type Command struct {
-	DisableMDNS     bool             `flag:"" name:"no-mdns" help:"disable the multicast dns service" default:"false" env:"${env_mdns_disabled}"`
-	AutoBootstrap   bool             `flag:"" name:"auto-bootstrap" help:"bootstrap from a predefined set of peers" default:"true" env:"${env_auto_bootstrap}"`
-	AutoDiscovery   bool             `flag:"" name:"auto-discovery" help:"enable autodiscovery of content from peers" default:"false" env:"${env_auto_discovery}"`
-	AutoDownload    bool             `flag:"" name:"auto-download" help:"enable automatically downloading torrent from the downloads folder" default:"false"`
-	HTTP            cmdopts.Listener `flag:"" name:"http-address" help:"address to serve daemon api from" default:"tcp://:9998" env:"${env_daemon_socket}"`
-	SelfSignedHosts []string         `flag:"" name:"self-signed-hosts" help:"comma seperated list of hosts to add to the sign signed certificate" env:"${env_self_signed_hosts}"`
-	TorrentPort     int              `flag:"" name:"torrent-port" help:"port to use for torrenting" env:"${env_torrent_port}" default:"10000"`
+	DisableMDNS       bool             `flag:"" name:"no-mdns" help:"disable the multicast dns service" default:"false" env:"${env_mdns_disabled}"`
+	AutoBootstrap     bool             `flag:"" name:"auto-bootstrap" help:"bootstrap from a predefined set of peers" default:"true" env:"${env_auto_bootstrap}"`
+	AutoDiscovery     bool             `flag:"" name:"auto-discovery" help:"enable autodiscovery of content from peers" default:"false" env:"${env_auto_discovery}"`
+	AutoDownload      bool             `flag:"" name:"auto-download" help:"enable automatically downloading torrent from the downloads folder" default:"false"`
+	AutoIdentifyMedia bool             `flag:"" name:"auto-identify-media" help:"enable automatically identifying media - EXPERIMENTAL" default:"false"`
+	HTTP              cmdopts.Listener `flag:"" name:"http-address" help:"address to serve daemon api from" default:"tcp://:9998" env:"${env_daemon_socket}"`
+	SelfSignedHosts   []string         `flag:"" name:"self-signed-hosts" help:"comma seperated list of hosts to add to the sign signed certificate" env:"${env_self_signed_hosts}"`
+	TorrentPort       int              `flag:"" name:"torrent-port" help:"port to use for torrenting" env:"${env_torrent_port}" default:"10000"`
 }
 
 func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
@@ -205,9 +206,10 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 
 	go PrintStatistics(dctx, db)
 
-	go timex.NowAndEvery(gctx.Context, time.Minute, func(ctx context.Context) error {
-		errorsx.Log(cmdmeta.RefreshFTS(ctx, db))
-		return nil
+	// block for first refresh
+	errorsx.Log(cmdmeta.RefreshFTS(gctx.Context, db))
+	go timex.Every(10*time.Minute, func() {
+		errorsx.Log(cmdmeta.RefreshFTS(gctx.Context, db))
 	})
 
 	if t.AutoDiscovery {
@@ -230,10 +232,12 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 
 	go AnnounceSeeded(dctx, db, rootstore, tclient, tstore)
 	go ResumeDownloads(dctx, db, rootstore, tclient, tstore)
-	go timex.NowAndEvery(gctx.Context, 15*time.Minute, func(ctx context.Context) error {
-		errorsx.Log(IdentifyTorrentyMedia(dctx, db))
-		return nil
-	})
+	if t.AutoIdentifyMedia {
+		go timex.NowAndEvery(gctx.Context, 15*time.Minute, func(ctx context.Context) error {
+			errorsx.Log(IdentifyTorrentyMedia(dctx, db))
+			return nil
+		})
+	}
 
 	if err = VPNIP(dctx, wgnet); err != nil {
 		log.Println("failed to lookup wireguard ip", err)

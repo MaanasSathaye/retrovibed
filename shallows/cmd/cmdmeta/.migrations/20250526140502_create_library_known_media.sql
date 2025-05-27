@@ -1,11 +1,12 @@
 -- +goose Up
 -- +goose StatementBegin
+DROP TABLE IF EXISTS library_known_media;
 CREATE TABLE library_known_media (
     -- uid UUID PRIMARY KEY NOT NULL,
     uid UUID NOT NULL,
     md5 UUID UNIQUE NOT NULL,
     md5_lower UBIGINT NOT NULL,
-    duplicates BIGINT DEFAULT 0,
+    duplicates BIGINT NOT NULL DEFAULT 0,
     id BIGINT NOT NULL DEFAULT 0,
     title VARCHAR NOT NULL DEFAULT '',
     vote_average DOUBLE NOT NULL DEFAULT 0.0,

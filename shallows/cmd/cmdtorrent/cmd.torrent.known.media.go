@@ -7,6 +7,7 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/internal/lucenex"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
 	"github.com/retrovibed/retrovibed/library"
 	"github.com/retrovibed/retrovibed/tracking"
@@ -31,10 +32,10 @@ func (t cmdKnownMedia) Run(ctx *cmdopts.Global) (err error) {
 	iter := sqlx.Scan(tracking.MetadataSearch(ctx.Context, db, q))
 	for md := range iter.Iter() {
 		var (
-			known *library.Known
+			known library.Known
 		)
 
-		if known, err = library.DetectKnownMedia(ctx.Context, db, md.Description); err != nil {
+		if known, err = library.DetectKnownMedia(ctx.Context, db, lucenex.Clean(md.Description)); err != nil {
 			log.Println("failed to detect known media", err)
 			continue
 		}

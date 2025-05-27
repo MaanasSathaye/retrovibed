@@ -20,6 +20,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/fsx"
 	"github.com/retrovibed/retrovibed/internal/httpx"
 	"github.com/retrovibed/retrovibed/internal/langx"
+	"github.com/retrovibed/retrovibed/internal/lucenex"
 	"github.com/retrovibed/retrovibed/internal/md5x"
 	"github.com/retrovibed/retrovibed/internal/mimex"
 	"github.com/retrovibed/retrovibed/internal/slicesx"
@@ -131,7 +132,7 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Vir
 
 			for _, item := range items {
 				var (
-					known *library.Known
+					known library.Known
 					meta  tracking.Metadata
 				)
 
@@ -177,7 +178,7 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Vir
 					continue
 				}
 
-				if known, err = library.DetectKnownMedia(ctx, q, mi.Name); err != nil {
+				if known, err = library.DetectKnownMedia(ctx, q, lucenex.Clean(mi.Name)); err != nil {
 					log.Println("unable to detect known media ignoring", err)
 				}
 

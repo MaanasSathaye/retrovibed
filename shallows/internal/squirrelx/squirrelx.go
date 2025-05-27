@@ -1,7 +1,7 @@
 package squirrelx
 
 import (
-	"fmt"
+	"regexp"
 
 	"github.com/Masterminds/squirrel"
 )
@@ -29,13 +29,10 @@ func In[T any](expr string, values ...T) squirrel.Sqlizer {
 	return squirrel.Expr(expr+" IN ("+squirrel.Placeholders(len(values))+")", r...)
 }
 
-func Sprint(s squirrel.Sqlizer) string {
-	q, args, err := s.ToSql()
-	if err != nil {
-		return err.Error()
-	}
+var psqlplaceholder = regexp.MustCompile(`\$\d+`)
 
-	return q + " " + fmt.Sprint(args...)
+func Sprint(q string, args ...any) string {
+	return squirrel.DebugSqlizer(squirrel.Expr(psqlplaceholder.ReplaceAllString(q, "?"), args...))
 }
 
 func QueryNonZero[T comparable](expr string, s T) squirrel.Sqlizer {
