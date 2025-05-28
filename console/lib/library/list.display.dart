@@ -25,11 +25,15 @@ class AvailableListDisplay extends StatefulWidget {
 
 class _AvailableListDisplay extends State<AvailableListDisplay> {
   bool _loading = true;
-  Widget? _player = null;
   ds.Error? _cause = null;
   media.MediaSearchResponse _res = media.media.response(
     next: media.media.request(limit: 32),
   );
+
+  void setState(VoidCallback fn) {
+    if (!mounted) return;
+    super.setState(fn);
+  }
 
   void reseterr() {
     setState(() {
@@ -47,23 +51,15 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
           });
 
           widget.focus?.requestFocus();
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            final controller = widget.controller;
-            if (controller == null) return;
-            controller.selection = TextSelection.fromPosition(
-              TextPosition(offset: controller.text.length),
-            );
-          });
+          ds.SearchTray.refocus(widget.controller);
         })
         .catchError((cause) {
-          if(!super.mounted) return;
           setState(() {
             _cause = ds.Error.unauthorized(cause, onTap: reseterr);
             _loading = false;
           });
         }, test: httpx.ErrorsTest.unauthorized)
         .catchError((e) {
-          if(!super.mounted) return;
           setState(() {
             _cause = ds.Error.unknown(e, onTap: reseterr);
             _loading = false;
@@ -123,9 +119,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
       });
     };
 
-    return ds.Overlay(
-      overlay: _player,
-      child: ds.Table(
+    return ds.Table(
         loading: _loading,
         cause: _cause,
         leading: ds.SearchTray(
@@ -164,7 +158,6 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
           ),
         ),
         empty: ds.FileDropWell(upload),
-      ),
-    );
+      );
   }
 }

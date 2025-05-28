@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart'; // Provides [Player], [Media], [Playlist] etc.
+import 'package:retrovibed/env.dart' as env;
 import 'package:retrovibed/auth.dart' as auth;
 import 'package:retrovibed/downloads.dart' as downloads;
 import 'package:retrovibed/settings.dart' as settings;
@@ -53,6 +54,11 @@ class MyApp extends StatelessWidget {
                         ds.ErrorBoundary(
                           media.Playlist.wrap((ctx, s) {
                             return media.VideoScreen(
+                              env.Boolean(env.vars.AutoIdentifyMedia, fallback: false) ?
+                              medialib.AvailableGridDisplay(
+                                focus: s.searchfocus,
+                                controller: s.controller,
+                              ) :
                               medialib.AvailableListDisplay(
                                 focus: s.searchfocus,
                                 controller: s.controller,

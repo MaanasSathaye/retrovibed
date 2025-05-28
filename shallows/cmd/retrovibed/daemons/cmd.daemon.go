@@ -52,7 +52,7 @@ type Command struct {
 	AutoBootstrap     bool             `flag:"" name:"auto-bootstrap" help:"bootstrap from a predefined set of peers" default:"true" env:"${env_auto_bootstrap}"`
 	AutoDiscovery     bool             `flag:"" name:"auto-discovery" help:"enable autodiscovery of content from peers" default:"false" env:"${env_auto_discovery}"`
 	AutoDownload      bool             `flag:"" name:"auto-download" help:"enable automatically downloading torrent from the downloads folder" default:"false"`
-	AutoIdentifyMedia bool             `flag:"" name:"auto-identify-media" help:"enable automatically identifying media - EXPERIMENTAL" default:"false"`
+	AutoIdentifyMedia bool             `flag:"" name:"auto-identify-media" help:"enable automatically identifying media - EXPERIMENTAL" default:"false" env:"${env_auto_identify_media}"`
 	HTTP              cmdopts.Listener `flag:"" name:"http-address" help:"address to serve daemon api from" default:"tcp://:9998" env:"${env_daemon_socket}"`
 	SelfSignedHosts   []string         `flag:"" name:"self-signed-hosts" help:"comma seperated list of hosts to add to the sign signed certificate" env:"${env_self_signed_hosts}"`
 	TorrentPort       int              `flag:"" name:"torrent-port" help:"port to use for torrenting" env:"${env_torrent_port}" default:"10000"`
@@ -144,9 +144,6 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 				return
 			}
 		}),
-		// func(t *torrent, stats ConnStats) {
-		// log.Println("connection closed", t.md.ID.HexString(), stats.BytesReadUsefulData.Int64(), stats.BytesWrittenData.Int64())
-		// }
 		bootstrap,
 	)
 
@@ -237,6 +234,8 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 			errorsx.Log(IdentifyTorrentyMedia(dctx, db))
 			return nil
 		})
+	} else {
+		log.Println("auto identify media is disabled, to enable add --auto-identify-media. highly experimental.")
 	}
 
 	if err = VPNIP(dctx, wgnet); err != nil {

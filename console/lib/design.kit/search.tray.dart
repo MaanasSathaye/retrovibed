@@ -6,8 +6,8 @@ class SearchTray extends StatelessWidget {
   static fixnum.Int64 Zero = fixnum.Int64.ZERO;
 
   static refocus(TextEditingController? controller) {
+    if (controller == null) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (controller == null) return;
       controller.selection = TextSelection.fromPosition(
         TextPosition(offset: controller.text.length),
       );

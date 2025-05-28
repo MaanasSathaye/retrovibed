@@ -11,5 +11,7 @@ export 'design.kit/debug.dart';
 export 'design.kit/file.drop.well.dart';
 export 'design.kit/inputs.dart';
 export 'design.kit/search.tray.dart';
+export 'design.kit/card.dart';
+export 'design.kit/rating.dart';
 
 const Widget? NullWidget = null;
