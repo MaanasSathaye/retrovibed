@@ -4,7 +4,6 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/httpx.dart' as httpx;
 import './known.table.row.dart';
-import './known.media.display.dart';
 import './api.dart' as api;
 
 class KnownMediaDropdown extends StatefulWidget {
@@ -12,12 +11,14 @@ class KnownMediaDropdown extends StatefulWidget {
   final TextEditingController? controller;
   final FocusNode? focus;
   final String current;
+  final void Function(api.Known k)? onChange;
   const KnownMediaDropdown({
     super.key,
     this.search = api.known.search,
     this.controller,
     this.focus,
     this.current = "",
+    this.onChange,
   });
 
   @override
@@ -72,34 +73,11 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
   @override
   void initState() {
     super.initState();
-
-    final pending =
-        widget.current == ""
-            ? Future<api.Known?>.value(null)
-            : api.known.get(widget.current).then((w) => w.known);
-    pending
-        .then((w) {
-          setState(() {
-            current = w;
-            _loading = w == null;
-          });
-          if (w == null) {
-            refresh(_res.next);
-          }
-        })
-        .catchError((cause) {
-          setState(() {
-            cause = ds.Error.unknown(cause);
-          });
-        });
+    refresh(_res.next);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (current != null) {
-      return KnownMediaDisplay(Future.value(current));
-    }
-
     return forms.Container(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -130,7 +108,7 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
             cause: _cause,
             children: _res.items,
             flex: 1,
-            ds.Table.expanded<api.Known>((v) => KnownRow(current: v)),
+            ds.Table.expanded<api.Known>((v) => KnownRow(current: v, onTap: widget.onChange == null ? null : () => widget.onChange!(v))),
             empty: Center(child: Text("no known media")),
           )),
         ],

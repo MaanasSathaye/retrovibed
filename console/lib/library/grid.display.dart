@@ -175,37 +175,59 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                       16 / 9, // Aspect ratio of each grid item (width/height)
                 ),
                 itemBuilder: (context, index) {
-                  final _media = _res.items.elementAt(index);
-                  final onSettings = () {
+                  var _media = _res.items.elementAt(index);
+                  var onSettings = () {
                     ds.modals
                         .of(context)
                         ?.push(
-                          KnownMediaDropdown(current: _media.knownMediaId),
-                          // SizedBox(
-                          //   height: 512,
-                          //   width: 1024,
-                          //   // child: Text("HELLO WORLD"),
-                          //   child: KnownMediaDropdown(
-                          //     current: _media.knownMediaId,
-                          //   ),
-                          // ),
+                          KnownMediaDropdown(
+                            current: _media.knownMediaId,
+                            onChange: (known) {
+                              final upd = _media..knownMediaId = known.id;
+                              media.media
+                                  .update(upd.id, upd)
+                                  .then((v) {
+                                    // print("selected known media: ${known}");
+                                    final replaced = _res.items.map(
+                                      (o) => o.id == v.media.id ? v.media : o,
+                                    );
+                                    print("old ${_res.items}\nnew ${replaced}");
+                                    setState(() {
+                                      _res = media.MediaSearchResponse(
+                                        items: replaced,
+                                        next: _res.next,
+                                      );
+                                    });
+                                    print("clearing modal");
+                                    ds.modals.of(context)?.push(null);
+                                  })
+                                  .catchError((cause) {
+                                    setState(() {
+                                      _cause = ds.Error.unknown(cause);
+                                    });
+                                  });
+                            },
+                          ),
                         );
                   };
 
-                  if (_media.knownMediaId == "") {
-                    return KnownMediaDisplay.missing(
-                      _media,
-                      onDoubleTap:
-                          () => media.PlayAction(context, _media, _res),
-                      onSettings: onSettings,
-                    );
+                  switch (_media.knownMediaId) {
+                    case "00000000-0000-0000-0000-000000000000":
+                    case "ffffffff-ffff-ffff-ffff-ffffffffffff":
+                      return KnownMediaDisplay.missing(
+                        _media,
+                        onDoubleTap:
+                            () => media.PlayAction(context, _media, _res),
+                        onSettings: onSettings,
+                      );
+                    default:
+                      return KnownMediaDisplay(
+                        api.known.get(_media.knownMediaId).then((w) => (w.known..description = _media.description)),
+                        key: UniqueKey(),
+                        onDoubleTap: media.PlayAction(context, _media, _res),
+                        onSettings: onSettings,
+                      );
                   }
-
-                  return KnownMediaDisplay(
-                    api.known.get(_media.knownMediaId).then((w) => w.known),
-                    onDoubleTap: media.PlayAction(context, _media, _res),
-                    onSettings: onSettings,
-                  );
                 },
               ),
             ),

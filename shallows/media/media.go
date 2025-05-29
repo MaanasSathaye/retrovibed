@@ -15,6 +15,7 @@ func MediaOptionFromLibraryMetadata(cc library.Metadata) MediaOption {
 		c.Mimetype = cc.Mimetype
 		c.TorrentId = cc.TorrentID
 		c.ArchiveId = cc.ArchiveID
+		c.KnownMediaId = cc.KnownMediaID
 		c.CreatedAt = grpcx.EncodeTime(cc.CreatedAt)
 		c.UpdatedAt = grpcx.EncodeTime(cc.UpdatedAt)
 	}

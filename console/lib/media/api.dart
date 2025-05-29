@@ -78,6 +78,23 @@ abstract class media {
         });
   }
 
+  static Future<MediaUpdateResponse> update(String id, Media upd ) async {
+    final client = http.Client();
+    return client
+        .post(
+          Uri.https(httpx.host(), "/m/${id}"),
+          headers: {"Authorization": httpx.auto_bearer_host()},
+          body: jsonEncode(MediaUpdateRequest(media: upd).toProto3Json()),
+        )
+        .then(httpx.auto_error)
+        .then((v) {
+          return Future.value(
+            MediaUpdateResponse.create()
+              ..mergeFromProto3Json(jsonDecode(v.body)),
+          );
+        });
+  }
+
   static Future<http.MultipartFile> uploadable(
     String path,
     String name,

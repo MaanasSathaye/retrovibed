@@ -14,6 +14,6 @@ func KnownOptionFromLibraryKnown(cc library.Known) KnownOption {
 		c.Rating = float32(cc.Popularity)
 		c.Description = cc.Title
 		c.Summary = cc.Overview
-		// c.Adult = cc.Adult
+		c.Adult = cc.Adult
 	}
 }

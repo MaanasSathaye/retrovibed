@@ -24,7 +24,7 @@ class KnownRow extends StatelessWidget {
         width: 54,
         height: 80,
         child: Image.network(current.image, errorBuilder:(context, error, stackTrace) {
-          print("failed to load image ${error}");
+          print("failed to load image ${current.image} ${error}");
           return SizedBox();
         }),
       ),
@@ -37,7 +37,7 @@ class KnownRow extends StatelessWidget {
       padding: themex.padding,
       child: InkWell(
         onTap: onTap,
-        child: SelectionArea(child: Row(spacing: themex.spacing!, children: children)),
+        child: Row(spacing: themex.spacing!, children: children),
       ),
     );
   }

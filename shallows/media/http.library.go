@@ -2,6 +2,7 @@ package media
 
 import (
 	"crypto/md5"
+	"encoding/json"
 	"io"
 	"log"
 	"mime/multipart"
@@ -81,6 +82,14 @@ func (t *HTTPLibrary) Bind(r *mux.Router) {
 		httpx.TimeoutRollingRead(3*time.Second),
 	).ThenFunc(t.upload))
 
+	r.Path("/{id}").Methods(http.MethodPost).Handler(alice.New(
+		httpx.ContextBufferPool512(),
+		httpx.ParseForm,
+		httpauth.AuthenticateWithToken(t.jwtsecret),
+		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
+		httpx.Timeout2s(),
+	).ThenFunc(t.patch))
+
 	r.Path("/{id}").Methods(http.MethodDelete).Handler(alice.New(
 		httpx.ContextBufferPool512(),
 		httpx.ParseForm,
@@ -115,6 +124,47 @@ func (t *HTTPLibrary) delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &MediaDeleteResponse{
+		Media: langx.Autoptr(
+			langx.Clone(
+				Media{},
+				MediaOptionFromLibraryMetadata(langx.Clone(md, library.MetadataOptionJSONSafeEncode))),
+		),
+	}); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to write response"))
+		return
+	}
+}
+
+func (t *HTTPLibrary) patch(w http.ResponseWriter, r *http.Request) {
+	var (
+		req MediaUpdateRequest
+		md  library.Metadata
+		id  = mux.Vars(r)["id"]
+	)
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to decoded update"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
+
+	md = langx.Clone(
+		md,
+		library.MetadataOptionDescription(req.Media.Description),
+		library.MetadataOptionKnownMediaID(req.Media.KnownMediaId),
+	)
+
+	if err := library.MetadataUpdate(r.Context(), t.q, id, md).Scan(&md); sqlx.ErrNoRows(err) != nil {
+		log.Println(errorsx.Wrap(err, "update ignored"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+		return
+	} else if err != nil {
+		log.Println(errorsx.Wrap(err, "unable to tombstone metadata"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &MediaUpdateResponse{
 		Media: langx.Autoptr(
 			langx.Clone(
 				Media{},

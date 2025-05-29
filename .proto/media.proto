@@ -27,6 +27,9 @@ message MediaSearchResponse {
   repeated Media items = 2 [ json_name = "items" ];
 }
 
+message MediaUpdateRequest { Media media = 1 [ json_name = "media" ];}
+message MediaUpdateResponse { Media media = 1 [ json_name = "media" ]; }
+
 message MediaDeleteRequest {}
 message MediaDeleteResponse { Media media = 1 [ json_name = "media" ]; }
 message MediaUploadResponse { Media media = 1 [ json_name = "media" ]; }

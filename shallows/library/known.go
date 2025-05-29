@@ -21,6 +21,7 @@ func KnownOptionJSONSafeEncode(t *Known) {
 func KnownOptionTestDefaults(t *Known) {
 	t.UID = errorsx.Must(uuid.NewV4()).String()
 	t.Md5 = errorsx.Must(uuid.NewV4()).String()
+	t.Adult = false
 }
 
 func Unknown() Known {

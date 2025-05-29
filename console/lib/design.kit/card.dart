@@ -34,7 +34,7 @@ class Card extends material.StatelessWidget {
           padding: defaults.padding,
           child: material.Column(
             children: [
-              leading,
+              material.Padding(padding: material.EdgeInsets.only(top: 0.0, bottom: 10.0), child: leading),
               material.Expanded(
                 child: material.Row(
                   mainAxisSize: material.MainAxisSize.min,

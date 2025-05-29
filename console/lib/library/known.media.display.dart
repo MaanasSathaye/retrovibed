@@ -78,7 +78,7 @@ class _KnownMediaDisplayState extends State<KnownMediaDisplay> {
       leading: Center(
         child: Text(
           current.description,
-          overflow: TextOverflow.fade,
+          overflow: TextOverflow.ellipsis,
           maxLines: 1,
         ),
       ),
@@ -113,10 +113,7 @@ class _KnownMediaDisplayState extends State<KnownMediaDisplay> {
                 ),
               ),
               Spacer(flex: 9),
-              IconButton(
-                onPressed: widget.onSettings,
-                icon: Icon(Icons.tune),
-              ),
+              IconButton(onPressed: widget.onSettings, icon: Icon(Icons.tune)),
             ],
           ),
     );

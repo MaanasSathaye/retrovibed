@@ -20,6 +20,12 @@ func MetadataOptionDescription(d string) MetadataOption {
 	}
 }
 
+func MetadataOptionKnownMediaID(d string) MetadataOption {
+	return func(m *Metadata) {
+		m.KnownMediaID = d
+	}
+}
+
 func MetadataOptionAutoDescription(d string) MetadataOption {
 	return func(m *Metadata) {
 		m.AutoDescription = d
