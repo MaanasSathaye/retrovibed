@@ -17,6 +17,17 @@ with the world and allows users to sign up for at cost cloud backup functionalit
 It allow supports community rss feeds of content, like linux ISOs, AI models, and public interest archives that you can subscribe
 to and donate your storage towards enabling distribution.
 
+#### features
+- [x] a builtin userspace wireguard vpn. bring any wireguard vpn provider and anonymizes your sharing traffic without any complicated or system wide changes.
+- [x] encrypts and offloads data to an archival service.
+- [x] rss feeds for subscribing to content.
+- [x] build a community to reduce costs for shared content. 
+
+#### community sharing
+
+build a community around content. great for AI datasets. library archives. each member reduces the cost for everyone.
+
+
 #### install deb daemon
 
 ```bash
