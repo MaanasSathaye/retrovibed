@@ -133,7 +133,7 @@ func (t *HTTPRSSFeed) create(w http.ResponseWriter, r *http.Request) {
 		NewTrackingFeedRSSFromFeedRSS(&req),
 	)
 
-	if err = tracking.RSSInsertWithDefaults(r.Context(), sqlx.Debug(t.q), feed).Scan(&feed); err != nil {
+	if err = tracking.RSSInsertWithDefaults(r.Context(), t.q, feed).Scan(&feed); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to record failed"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return

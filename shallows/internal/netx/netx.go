@@ -1,10 +1,12 @@
 package netx
 
 import (
+	"errors"
 	"log"
 	"net"
 	"net/netip"
 	"strconv"
+	"strings"
 )
 
 func DefaultIfZero(fallback net.IP, v net.IP) net.IP {
@@ -71,4 +73,20 @@ func AddrPort(a net.Addr) *netip.AddrPort {
 		log.Printf("unknown address type: %T\n", a)
 		return nil
 	}
+}
+
+func IgnoreConnectionClosed(err error) error {
+	var (
+		c = &net.OpError{}
+	)
+
+	if !errors.As(err, &c) {
+		return err
+	}
+
+	if !strings.HasSuffix(c.Error(), "use of closed network connection") {
+		return err
+	}
+
+	return nil
 }

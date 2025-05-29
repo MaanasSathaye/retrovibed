@@ -28,6 +28,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/fsx"
 	"github.com/retrovibed/retrovibed/internal/httpx"
 	"github.com/retrovibed/retrovibed/internal/jwtx"
+	"github.com/retrovibed/retrovibed/internal/netx"
 	"github.com/retrovibed/retrovibed/internal/slicesx"
 	"github.com/retrovibed/retrovibed/internal/timex"
 	"github.com/retrovibed/retrovibed/internal/tlsx"
@@ -89,6 +90,8 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		httpbind.Close()
 	}()
 
+	gctx.Cleanup.Add(1)
+	defer gctx.Cleanup.Done()
 	if db, err = cmdmeta.Database(dctx); err != nil {
 		return err
 	}
@@ -303,10 +306,10 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	}
 
 	log.Println("https listening on:", httpbind.Addr().String(), tlspem)
-	if cause := http.ServeTLS(httpbind, httpmux, tlspem, tlspem); cause != nil {
+	if cause := http.ServeTLS(httpbind, httpmux, tlspem, tlspem); netx.IgnoreConnectionClosed(cause) != nil {
 		return errorsx.Wrap(cause, "http server stopped")
 	}
 
 	// report any async failures.
-	return errorsx.Compact(context.Cause(dctx), dctx.Err())
+	return contextx.IgnoreCancelled(errorsx.Compact(context.Cause(dctx), dctx.Err()))
 }
