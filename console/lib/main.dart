@@ -54,7 +54,7 @@ class MyApp extends StatelessWidget {
                         ds.ErrorBoundary(
                           media.Playlist.wrap((ctx, s) {
                             return media.VideoScreen(
-                              env.Boolean(env.vars.AutoIdentifyMedia, fallback: false) ?
+                              env.Boolean(env.vars.AutoIdentifyMedia, fallback: true) ?
                               medialib.AvailableGridDisplay(
                                 focus: s.searchfocus,
                                 controller: s.controller,

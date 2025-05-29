@@ -2,6 +2,7 @@ import 'package:retrovibed/design.kit/file.drop.well.dart';
 import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/library/known.media.dropdown.dart';
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/httpx.dart' as httpx;
 
@@ -127,7 +128,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ds.SearchTray(
-              inputDecoration: InputDecoration(hintText: "search the library"),
+              inputDecoration: InputDecoration(hintText: "search library"),
               controller: widget.controller,
               focus: widget.focus,
               onSubmitted: (v) {
@@ -145,9 +146,16 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
               },
               current: _res.next.offset,
               empty: fixnum.Int64(_res.items.length) < _res.next.limit,
-              trailing: ds.FileDropWell(
-                upload,
-                child: IgnorePointer(child: Icon(Icons.file_upload_outlined)),
+              trailing: Row(
+                children: [
+                  ds.FileDropWell(
+                    upload,
+                    child: IgnorePointer(
+                      child: Icon(Icons.file_upload_outlined),
+                    ),
+                  ),
+                  Icon(Icons.tune),
+                ],
               ),
               autofocus: true,
             ),
@@ -168,31 +176,50 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                 itemBuilder: (context, index) {
                   final _media = _res.items.elementAt(index);
                   return ds.Card(
-                      onDoubleTap: media.PlayAction(context, _media, _res),
-                      leading: Center(
-                        child: Text(
-                          _media.description,
-                          overflow: TextOverflow.fade,
-                          maxLines: 1,
-                        ),
+                    onDoubleTap: media.PlayAction(context, _media, _res),
+                    leading: Center(
+                      child: Text(
+                        _media.description,
+                        overflow: TextOverflow.fade,
+                        maxLines: 1,
                       ),
-                      image: AspectRatio(
-                        aspectRatio: 27 / 40,
-                        child: Opacity(
-                          opacity: 0.25,
-                          child: SizedBox.expand(
-                            child: Icon(
-                              Icons.image_outlined,
-                              // color: Colors.grey,
-                              size: 128,
-                              // size: double.maxFinite,
-                            ),
+                    ),
+                    image: AspectRatio(
+                      aspectRatio: 27 / 40,
+                      child: Opacity(
+                        opacity: 0.25,
+                        child: SizedBox.expand(
+                          child: Icon(
+                            Icons.image_outlined,
+                            size: 128,
                           ),
                         ),
                       ),
-                      child: Text("Magna nulla aute ea sunt esse dolore Lorem excepteur fugiat esse culpa officia. Incididunt proident reprehenderit ut anim dolore non mollit commodo nostrud proident. Sit est consequat consequat sit nisi commodo. Tempor quis amet dolore ut voluptate ullamco. Tempor consectetur velit minim in excepteur aliquip ipsum. Magna cillum ad laboris do duis proident culpa dolor ad labore ut. Elit aliquip aute nulla eu id anim ullamco."),
-                      trailing: Row(children: [Flexible(flex: 4, child: Center(child: ds.Rating(rating: 0.6))), Spacer(flex: 9)]),
-                    );
+                    ),
+                    child: Text(
+                      "Magna nulla aute ea sunt esse dolore Lorem excepteur fugiat esse culpa officia. Incididunt proident reprehenderit ut anim dolore non mollit commodo nostrud proident. Sit est consequat consequat sit nisi commodo. Tempor quis amet dolore ut voluptate ullamco. Tempor consectetur velit minim in excepteur aliquip ipsum. Magna cillum ad laboris do duis proident culpa dolor ad labore ut. Elit aliquip aute nulla eu id anim ullamco.",
+                    ),
+                    trailing: Row(
+                      children: [
+                        Flexible(
+                          flex: 4,
+                          child: Center(child: ds.Rating(rating: 0.6)),
+                        ),
+                        Flexible(flex: 9, child: Row(children: [
+                          IconButton(
+                            onPressed: (){
+                              setState((){
+                                // _cause = ds.Error(child: KnownMediaDropdown(current: _media.known_media_id));
+                              });
+                            },
+                            icon: Icon(
+                            Icons.tune,
+                          ),
+                        ),
+                        ])),
+                      ],
+                    ),
+                  );
                 },
               ),
             ),

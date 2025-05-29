@@ -27,6 +27,8 @@ class Feed extends $pb.GeneratedMessage {
     $core.bool? autodownload,
     $core.bool? autoarchive,
     $core.bool? contributing,
+    $core.String? disabledAt,
+    $fixnum.Int64? ttlMinimum,
   }) {
     final $result = create();
     if (id != null) {
@@ -56,6 +58,12 @@ class Feed extends $pb.GeneratedMessage {
     if (contributing != null) {
       $result.contributing = contributing;
     }
+    if (disabledAt != null) {
+      $result.disabledAt = disabledAt;
+    }
+    if (ttlMinimum != null) {
+      $result.ttlMinimum = ttlMinimum;
+    }
     return $result;
   }
   Feed._() : super();
@@ -72,6 +80,8 @@ class Feed extends $pb.GeneratedMessage {
     ..aOB(7, _omitFieldNames ? '' : 'autodownload')
     ..aOB(8, _omitFieldNames ? '' : 'autoarchive')
     ..aOB(9, _omitFieldNames ? '' : 'contributing')
+    ..aOS(10, _omitFieldNames ? '' : 'disabled_at')
+    ..a<$fixnum.Int64>(11, _omitFieldNames ? '' : 'ttl_minimum', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
     ..hasRequiredFields = false
   ;
 
@@ -170,6 +180,24 @@ class Feed extends $pb.GeneratedMessage {
   $core.bool hasContributing() => $_has(8);
   @$pb.TagNumber(9)
   void clearContributing() => $_clearField(9);
+
+  @$pb.TagNumber(10)
+  $core.String get disabledAt => $_getSZ(9);
+  @$pb.TagNumber(10)
+  set disabledAt($core.String v) { $_setString(9, v); }
+  @$pb.TagNumber(10)
+  $core.bool hasDisabledAt() => $_has(9);
+  @$pb.TagNumber(10)
+  void clearDisabledAt() => $_clearField(10);
+
+  @$pb.TagNumber(11)
+  $fixnum.Int64 get ttlMinimum => $_getI64(10);
+  @$pb.TagNumber(11)
+  set ttlMinimum($fixnum.Int64 v) { $_setInt64(10, v); }
+  @$pb.TagNumber(11)
+  $core.bool hasTtlMinimum() => $_has(10);
+  @$pb.TagNumber(11)
+  void clearTtlMinimum() => $_clearField(11);
 }
 
 class FeedSearchRequest extends $pb.GeneratedMessage {

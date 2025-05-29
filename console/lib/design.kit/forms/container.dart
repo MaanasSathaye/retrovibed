@@ -1,5 +1,6 @@
-import 'package:retrovibed/design.kit/theme.defaults.dart' as theming;
 import 'package:flutter/material.dart' as m;
+import 'package:retrovibed/design.kit/theme.defaults.dart' as theming;
+
 
 class Container extends m.Container {
   final m.Widget child;
@@ -12,7 +13,7 @@ class Container extends m.Container {
     return m.Container(
       padding: theme.extension<theming.Defaults>()!.padding,
       decoration: m.BoxDecoration(color: theme.scaffoldBackgroundColor),
-      child: child,
+      child: m.SelectionArea(child: child),
     );
   }
 }

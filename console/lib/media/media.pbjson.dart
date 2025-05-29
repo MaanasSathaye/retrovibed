@@ -25,7 +25,7 @@ const Media$json = {
     {'1': 'torrent_id', '3': 6, '4': 1, '5': 9, '10': 'torrent_id'},
     {'1': 'created_at', '3': 7, '4': 1, '5': 9, '10': 'created_at'},
     {'1': 'updated_at', '3': 8, '4': 1, '5': 9, '10': 'updated_at'},
-    {'1': 'metadata', '3': 9, '4': 1, '5': 9, '10': 'metadata'},
+    {'1': 'known_media_id', '3': 9, '4': 1, '5': 9, '10': 'known_media_id'},
   ],
 };
 
@@ -35,7 +35,7 @@ final $typed_data.Uint8List mediaDescriptor = $convert.base64Decode(
     '9uEhoKCG1pbWV0eXBlGAMgASgJUghtaW1ldHlwZRIUCgVpbWFnZRgEIAEoCVIFaW1hZ2USHgoK'
     'YXJjaGl2ZV9pZBgFIAEoCVIKYXJjaGl2ZV9pZBIeCgp0b3JyZW50X2lkGAYgASgJUgp0b3JyZW'
     '50X2lkEh4KCmNyZWF0ZWRfYXQYByABKAlSCmNyZWF0ZWRfYXQSHgoKdXBkYXRlZF9hdBgIIAEo'
-    'CVIKdXBkYXRlZF9hdBIaCghtZXRhZGF0YRgJIAEoCVIIbWV0YWRhdGE=');
+    'CVIKdXBkYXRlZF9hdBImCg5rbm93bl9tZWRpYV9pZBgJIAEoCVIOa25vd25fbWVkaWFfaWQ=');
 
 @$core.Deprecated('Use mediaSearchRequestDescriptor instead')
 const MediaSearchRequest$json = {
