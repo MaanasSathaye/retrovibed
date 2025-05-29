@@ -37,19 +37,21 @@ const KnownSearchRequest$json = {
   '1': 'KnownSearchRequest',
   '2': [
     {'1': 'query', '3': 1, '4': 1, '5': 9, '10': 'query'},
+    {'1': 'adult', '3': 2, '4': 1, '5': 8, '10': 'adult'},
     {'1': 'offset', '3': 900, '4': 1, '5': 4, '10': 'offset'},
     {'1': 'limit', '3': 901, '4': 1, '5': 4, '10': 'limit'},
   ],
   '9': [
-    {'1': 2, '2': 900},
+    {'1': 3, '2': 900},
     {'1': 902, '2': 1000},
   ],
 };
 
 /// Descriptor for `KnownSearchRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List knownSearchRequestDescriptor = $convert.base64Decode(
-    'ChJLbm93blNlYXJjaFJlcXVlc3QSFAoFcXVlcnkYASABKAlSBXF1ZXJ5EhcKBm9mZnNldBiEBy'
-    'ABKARSBm9mZnNldBIVCgVsaW1pdBiFByABKARSBWxpbWl0SgUIAhCEB0oGCIYHEOgH');
+    'ChJLbm93blNlYXJjaFJlcXVlc3QSFAoFcXVlcnkYASABKAlSBXF1ZXJ5EhQKBWFkdWx0GAIgAS'
+    'gIUgVhZHVsdBIXCgZvZmZzZXQYhAcgASgEUgZvZmZzZXQSFQoFbGltaXQYhQcgASgEUgVsaW1p'
+    'dEoFCAMQhAdKBgiGBxDoBw==');
 
 @$core.Deprecated('Use knownSearchResponseDescriptor instead')
 const KnownSearchResponse$json = {

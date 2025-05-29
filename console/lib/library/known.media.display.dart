@@ -115,23 +115,6 @@ class _KnownMediaDisplayState extends State<KnownMediaDisplay> {
               Spacer(flex: 9),
               IconButton(
                 onPressed: widget.onSettings,
-                // onPressed: () {
-                //   ds.modals
-                //       .of(context)
-                //       ?.push(
-                //           Flexible(
-                //             child: Center(
-                //               child: SizedBox(
-                //                 height: 512,
-                //                 width: 1024,
-                //                 child: KnownMediaDropdown(
-                //                   current: current.id,
-                //                 ),
-                //               ),
-                //             ),
-                //           ),
-                //       );
-                // },
                 icon: Icon(Icons.tune),
               ),
             ],

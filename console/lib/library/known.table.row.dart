@@ -20,6 +20,15 @@ class KnownRow extends StatelessWidget {
     final themex = ds.Defaults.of(context);
     List<Widget> children = List.from(leading);
     children += [
+      SizedBox(
+        width: 54,
+        height: 80,
+        child: Image.network(current.image, errorBuilder:(context, error, stackTrace) {
+          print("failed to load image ${error}");
+          return SizedBox();
+        }),
+      ),
+      // Text(current.id, overflow: TextOverflow.ellipsis),
       Expanded(child: Text(current.description, overflow: TextOverflow.ellipsis)),
     ];
     children += trailing;

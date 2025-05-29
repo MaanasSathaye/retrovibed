@@ -17,7 +17,7 @@ class Loading extends StatelessWidget {
   const Loading({
     super.key,
     this.child,
-    this.overlay = const Flexible(child: Center(child: Loading.Icon)),
+    this.overlay = const Center(child: Loading.Icon),
     this.loading = false,
     this.cause = null,
   });
@@ -25,7 +25,7 @@ class Loading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (loading) {
-      return Container(child: overlay);
+      return Container(child: overlay, alignment: Alignment.center);
     }
 
     return s.Overlay(child: child ?? const SizedBox(), overlay: cause);

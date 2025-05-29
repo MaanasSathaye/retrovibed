@@ -180,17 +180,15 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                     ds.modals
                         .of(context)
                         ?.push(
-                          Flexible(
-                            child: Center(
-                              child: SizedBox(
-                                height: 512,
-                                width: 1024,
-                                child: KnownMediaDropdown(
-                                  current: _media.knownMediaId,
-                                ),
-                              ),
-                            ),
-                          ),
+                          KnownMediaDropdown(current: _media.knownMediaId),
+                          // SizedBox(
+                          //   height: 512,
+                          //   width: 1024,
+                          //   // child: Text("HELLO WORLD"),
+                          //   child: KnownMediaDropdown(
+                          //     current: _media.knownMediaId,
+                          //   ),
+                          // ),
                         );
                   };
 

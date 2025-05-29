@@ -69,7 +69,7 @@ class NodeState extends State<Node> {
                       alpha: themex.opaque?.a ?? 0.0,
                     ),
                   ),
-                  child: Flex(children: [current!], direction: Axis.vertical),
+                  child: current!,
                 ),
               ),
       alignment: widget.alignment,

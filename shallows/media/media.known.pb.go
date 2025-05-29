@@ -108,6 +108,7 @@ func (x *Known) GetImage() string {
 type KnownSearchRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Query         string                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
+	Adult         bool                   `protobuf:"varint,2,opt,name=adult,proto3" json:"adult,omitempty"`
 	Offset        uint64                 `protobuf:"varint,900,opt,name=offset,proto3" json:"offset,omitempty"`
 	Limit         uint64                 `protobuf:"varint,901,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -149,6 +150,13 @@ func (x *KnownSearchRequest) GetQuery() string {
 		return x.Query
 	}
 	return ""
+}
+
+func (x *KnownSearchRequest) GetAdult() bool {
+	if x != nil {
+		return x.Adult
+	}
+	return false
 }
 
 func (x *KnownSearchRequest) GetOffset() uint64 {
@@ -352,11 +360,12 @@ const file_media_known_proto_rawDesc = "" +
 	"\x05adult\x18\x03 \x01(\bR\x05adult\x12 \n" +
 	"\vdescription\x18\x04 \x01(\tR\vdescription\x12\x18\n" +
 	"\asummary\x18\x05 \x01(\tR\asummary\x12\x14\n" +
-	"\x05image\x18\x06 \x01(\tR\x05image\"i\n" +
+	"\x05image\x18\x06 \x01(\tR\x05image\"\x7f\n" +
 	"\x12KnownSearchRequest\x12\x14\n" +
-	"\x05query\x18\x01 \x01(\tR\x05query\x12\x17\n" +
+	"\x05query\x18\x01 \x01(\tR\x05query\x12\x14\n" +
+	"\x05adult\x18\x02 \x01(\bR\x05adult\x12\x17\n" +
 	"\x06offset\x18\x84\a \x01(\x04R\x06offset\x12\x15\n" +
-	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x02\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"h\n" +
+	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x03\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"h\n" +
 	"\x13KnownSearchResponse\x12-\n" +
 	"\x04next\x18\x01 \x01(\v2\x19.media.KnownSearchRequestR\x04next\x12\"\n" +
 	"\x05items\x18\x02 \x03(\v2\f.media.KnownR\x05items\")\n" +

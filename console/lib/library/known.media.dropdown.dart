@@ -77,19 +77,21 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
         widget.current == ""
             ? Future<api.Known?>.value(null)
             : api.known.get(widget.current).then((w) => w.known);
-    pending.then((w) {
-      setState(() {
-        current = w;
-        _loading = w == null;
-      });
-      if (w == null) {
-        refresh(_res.next);
-      }
-    }).catchError((cause) {
-      setState(() {
-        cause = ds.Error.unknown(cause);
-      });
-    });
+    pending
+        .then((w) {
+          setState(() {
+            current = w;
+            _loading = w == null;
+          });
+          if (w == null) {
+            refresh(_res.next);
+          }
+        })
+        .catchError((cause) {
+          setState(() {
+            cause = ds.Error.unknown(cause);
+          });
+        });
   }
 
   @override
@@ -103,6 +105,7 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
         mainAxisSize: MainAxisSize.min,
         children: [
           ds.SearchTray(
+            inputDecoration: InputDecoration(hintText: "search known media"),
             controller: widget.controller,
             focus: widget.focus,
             onSubmitted: (v) {
@@ -120,39 +123,16 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
             },
             current: _res.next.offset,
             empty: fixnum.Int64(_res.items.length) < _res.next.limit,
+            autofocus: true,
           ),
-          ds.Table(
+          Expanded(child: ds.Table(
             loading: _loading,
             cause: _cause,
-            leading: ds.SearchTray(
-              inputDecoration: InputDecoration(hintText: "search known media"),
-              controller: widget.controller,
-              focus: widget.focus,
-              onSubmitted: (v) {
-                setState(() {
-                  _res.next.query = v;
-                  _res.next.offset = fixnum.Int64(0);
-                });
-                refresh(_res.next);
-              },
-              next: (i) {
-                setState(() {
-                  _res.next.offset = i;
-                });
-                refresh(_res.next);
-              },
-              current: _res.next.offset,
-              empty: fixnum.Int64(_res.items.length) < _res.next.limit,
-              autofocus: true,
-            ),
             children: _res.items,
             flex: 1,
-            ds.Table.expanded<api.Known>(
-              (v) => KnownRow(
-                current: v,
-              ),
-            ),
-          ),
+            ds.Table.expanded<api.Known>((v) => KnownRow(current: v)),
+            empty: Center(child: Text("no known media")),
+          )),
         ],
       ),
     );

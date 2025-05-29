@@ -32,6 +32,10 @@ func KnownSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) 
 	return NewKnownScannerStatic(b.RunWith(q).QueryContext(ctx))
 }
 
+func KnownQueryExplicit(b bool) squirrel.Sqlizer {
+	return squirrel.Expr("library_known_media.adult = ?", b)
+}
+
 func KnownSearchBuilder() squirrel.SelectBuilder {
 	return squirrelx.PSQL.Select(sqlx.Columns(KnownScannerStaticColumns)...).From("library_known_media")
 }
