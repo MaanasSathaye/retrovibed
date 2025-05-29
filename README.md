@@ -19,9 +19,11 @@ to and donate your storage towards enabling distribution.
 
 #### features
 - [x] a builtin userspace wireguard vpn. bring any wireguard vpn provider and anonymizes your sharing traffic without any complicated or system wide changes.
+- [x] builtin media player, watch your home videos anywhere.
+- [x] builtin bittorrent, share your personal library with whoever you want.
 - [x] encrypts and offloads data to an archival service.
 - [x] rss feeds for subscribing to content.
-- [x] build a community to reduce costs for shared content. 
+- [x] build a community to reduce costs for shared content.
 
 #### community sharing
 
