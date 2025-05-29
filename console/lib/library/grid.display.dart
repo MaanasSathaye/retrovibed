@@ -216,8 +216,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                     case "ffffffff-ffff-ffff-ffff-ffffffffffff":
                       return KnownMediaDisplay.missing(
                         _media,
-                        onDoubleTap:
-                            () => media.PlayAction(context, _media, _res),
+                        onDoubleTap: media.PlayAction(context, _media, _res),
                         onSettings: onSettings,
                       );
                     default:
