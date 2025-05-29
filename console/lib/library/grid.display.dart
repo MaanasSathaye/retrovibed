@@ -2,9 +2,11 @@ import 'package:retrovibed/design.kit/file.drop.well.dart';
 import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/library/known.media.display.dart';
 import 'package:retrovibed/library/known.media.dropdown.dart';
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/httpx.dart' as httpx;
+import './api.dart' as api;
 
 class AvailableGridDisplay extends StatefulWidget {
   final media.FnMediaSearch search;
@@ -166,59 +168,45 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                 gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                   maxCrossAxisExtent: 633, // Maximum width of each item
                   crossAxisSpacing:
-                      defaults.padding?.horizontal ??
-                      0.0, // Spacing between columns
+                      (defaults.spacing ?? 0.0) / 2, // Spacing between columns
                   mainAxisSpacing:
-                      defaults.padding?.vertical ?? 0.0, // Spacing between rows
+                      (defaults.spacing ?? 0.0) / 2, // Spacing between rows
                   childAspectRatio:
                       16 / 9, // Aspect ratio of each grid item (width/height)
                 ),
                 itemBuilder: (context, index) {
                   final _media = _res.items.elementAt(index);
-                  return ds.Card(
+                  final onSettings = () {
+                    ds.modals
+                        .of(context)
+                        ?.push(
+                          Flexible(
+                            child: Center(
+                              child: SizedBox(
+                                height: 512,
+                                width: 1024,
+                                child: KnownMediaDropdown(
+                                  current: _media.knownMediaId,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                  };
+
+                  if (_media.knownMediaId == "") {
+                    return KnownMediaDisplay.missing(
+                      _media,
+                      onDoubleTap:
+                          () => media.PlayAction(context, _media, _res),
+                      onSettings: onSettings,
+                    );
+                  }
+
+                  return KnownMediaDisplay(
+                    api.known.get(_media.knownMediaId).then((w) => w.known),
                     onDoubleTap: media.PlayAction(context, _media, _res),
-                    leading: Center(
-                      child: Text(
-                        _media.description,
-                        overflow: TextOverflow.fade,
-                        maxLines: 1,
-                      ),
-                    ),
-                    image: AspectRatio(
-                      aspectRatio: 27 / 40,
-                      child: Opacity(
-                        opacity: 0.25,
-                        child: SizedBox.expand(
-                          child: Icon(
-                            Icons.image_outlined,
-                            size: 128,
-                          ),
-                        ),
-                      ),
-                    ),
-                    child: Text(
-                      "Magna nulla aute ea sunt esse dolore Lorem excepteur fugiat esse culpa officia. Incididunt proident reprehenderit ut anim dolore non mollit commodo nostrud proident. Sit est consequat consequat sit nisi commodo. Tempor quis amet dolore ut voluptate ullamco. Tempor consectetur velit minim in excepteur aliquip ipsum. Magna cillum ad laboris do duis proident culpa dolor ad labore ut. Elit aliquip aute nulla eu id anim ullamco.",
-                    ),
-                    trailing: Row(
-                      children: [
-                        Flexible(
-                          flex: 4,
-                          child: Center(child: ds.Rating(rating: 0.6)),
-                        ),
-                        Flexible(flex: 9, child: Row(children: [
-                          IconButton(
-                            onPressed: (){
-                              setState((){
-                                // _cause = ds.Error(child: KnownMediaDropdown(current: _media.known_media_id));
-                              });
-                            },
-                            icon: Icon(
-                            Icons.tune,
-                          ),
-                        ),
-                        ])),
-                      ],
-                    ),
+                    onSettings: onSettings,
                   );
                 },
               ),

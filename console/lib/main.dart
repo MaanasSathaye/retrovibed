@@ -10,6 +10,7 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/retrovibed.dart' as retro;
 import 'package:retrovibed/design.kit/theme.defaults.dart' as theming;
+import 'package:retrovibed/design.kit/modals.dart' as modals;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,38 +39,43 @@ class MyApp extends StatelessWidget {
         child: ds.Full(
           meta.EndpointAuto(
             auth.AuthzCache(
-              media.Playlist(
-                DefaultTabController(
-                  length: 3,
-                  child: Scaffold(
-                    appBar: TabBar(
-                      tabs: [
-                        Tab(icon: Icon(Icons.movie)),
-                        Tab(icon: Icon(Icons.download)),
-                        Tab(icon: Icon(Icons.settings)),
-                      ],
-                    ),
-                    body: TabBarView(
-                      children: [
-                        ds.ErrorBoundary(
-                          media.Playlist.wrap((ctx, s) {
-                            return media.VideoScreen(
-                              env.Boolean(env.vars.AutoIdentifyMedia, fallback: true) ?
-                              medialib.AvailableGridDisplay(
-                                focus: s.searchfocus,
-                                controller: s.controller,
-                              ) :
-                              medialib.AvailableListDisplay(
-                                focus: s.searchfocus,
-                                controller: s.controller,
-                              ),
-                              s.player,
-                            );
-                          }),
-                        ),
-                        ds.ErrorBoundary(downloads.Display()),
-                        ds.ErrorBoundary(settings.Display()),
-                      ],
+              modals.Node(
+                media.Playlist(
+                  DefaultTabController(
+                    length: 3,
+                    child: Scaffold(
+                      appBar: TabBar(
+                        tabs: [
+                          Tab(icon: Icon(Icons.movie)),
+                          Tab(icon: Icon(Icons.download)),
+                          Tab(icon: Icon(Icons.settings)),
+                        ],
+                      ),
+                      body: TabBarView(
+                        children: [
+                          ds.ErrorBoundary(
+                            media.Playlist.wrap((ctx, s) {
+                              return media.VideoScreen(
+                                env.Boolean(
+                                      env.vars.AutoIdentifyMedia,
+                                      fallback: true,
+                                    )
+                                    ? medialib.AvailableGridDisplay(
+                                      focus: s.searchfocus,
+                                      controller: s.controller,
+                                    )
+                                    : medialib.AvailableListDisplay(
+                                      focus: s.searchfocus,
+                                      controller: s.controller,
+                                    ),
+                                s.player,
+                              );
+                            }),
+                          ),
+                          ds.ErrorBoundary(downloads.Display()),
+                          ds.ErrorBoundary(settings.Display()),
+                        ],
+                      ),
                     ),
                   ),
                 ),

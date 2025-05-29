@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:retrovibed/design.kit/modals.dart' as _modals;
 
 export 'design.kit/screens.dart';
 export 'design.kit/accordian.dart';
@@ -13,5 +14,11 @@ export 'design.kit/inputs.dart';
 export 'design.kit/search.tray.dart';
 export 'design.kit/card.dart';
 export 'design.kit/rating.dart';
+
+abstract class modals {
+  static _modals.NodeState? of(BuildContext context) {
+    return _modals.of(context);
+  }
+}
 
 const Widget? NullWidget = null;
