@@ -2,17 +2,28 @@ package tracking
 
 import (
 	"context"
+	"time"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/retrovibed/retrovibed/internal/langx"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
 	"github.com/retrovibed/retrovibed/internal/squirrelx"
 	"github.com/retrovibed/retrovibed/internal/timex"
 )
 
+func NewFeedRSS(id string, options ...func(*RSS)) (m RSS) {
+	r := langx.Clone(RSS{
+		ID:          id,
+		LastBuiltAt: time.UnixMicro(0), //timex.NegInf(), should be neg inf but duckdb driver data types still need work.
+	}, options...)
+	return r
+}
+
 func RSSOptionJSONSafeEncode(p *RSS) {
 	p.CreatedAt = timex.RFC3339NanoEncode(p.CreatedAt)
 	p.UpdatedAt = timex.RFC3339NanoEncode(p.UpdatedAt)
 	p.NextCheck = timex.RFC3339NanoEncode(p.NextCheck)
+	p.LastBuiltAt = timex.RFC3339NanoEncode(p.LastBuiltAt)
 }
 
 func RSSQuerySearch(q string) squirrel.Sqlizer {

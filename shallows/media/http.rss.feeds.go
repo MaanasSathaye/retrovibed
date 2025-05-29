@@ -128,17 +128,13 @@ func (t *HTTPRSSFeed) create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	feed := tracking.RSS{
-		ID:           stringsx.DefaultIfBlank(req.Feed.Id, md5x.FormatUUID(md5x.Digest(req.Feed.Url))),
-		Description:  req.Feed.Description,
-		URL:          req.Feed.Url,
-		Autodownload: req.Feed.Autodownload,
-		Autoarchive:  req.Feed.Autoarchive,
-		Contributing: req.Feed.Contributing,
-	}
+	feed := tracking.NewFeedRSS(
+		stringsx.DefaultIfBlank(req.Feed.Id, md5x.FormatUUID(md5x.Digest(req.Feed.Url))),
+		NewTrackingFeedRSSFromFeedRSS(&req),
+	)
 
-	if err = tracking.RSSInsertWithDefaults(r.Context(), t.q, feed).Scan(&feed); err != nil {
-		log.Println(errorsx.Wrap(err, "encoding failed"))
+	if err = tracking.RSSInsertWithDefaults(r.Context(), sqlx.Debug(t.q), feed).Scan(&feed); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to record failed"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
