@@ -378,8 +378,8 @@ github.com/jackc/pgx/v5/stdlib
 ## explicit; go 1.19
 github.com/jackc/puddle/v2
 github.com/jackc/puddle/v2/internal/genstack
-# github.com/james-lawrence/genieql v0.0.0-20250306161027-bb1395f5f457
-## explicit; go 1.23.2
+# github.com/james-lawrence/genieql v0.0.0-20250326213227-2205a50ec4f9
+## explicit; go 1.24
 github.com/james-lawrence/genieql
 github.com/james-lawrence/genieql/astbuild
 github.com/james-lawrence/genieql/astcodec
@@ -481,7 +481,7 @@ github.com/marcboeker/go-duckdb/arrowmapping
 # github.com/marcboeker/go-duckdb/mapping v0.0.9
 ## explicit; go 1.24
 github.com/marcboeker/go-duckdb/mapping
-# github.com/marcboeker/go-duckdb/v2 v2.2.1
+# github.com/marcboeker/go-duckdb/v2 v2.3.0
 ## explicit; go 1.24
 github.com/marcboeker/go-duckdb/v2
 # github.com/mattn/go-isatty v0.0.20
