@@ -283,6 +283,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	media.NewHTTPLibrary(db, mediastore).Bind(httpmux.PathPrefix("/m").Subrouter())
 	media.NewHTTPDiscovered(db, tclient, tstore, media.HTTPDiscoveredOptionTorrentStorage(torrentstore)).Bind(httpmux.PathPrefix("/d").Subrouter())
 	media.NewHTTPRSSFeed(db).Bind(httpmux.PathPrefix("/rss").Subrouter())
+	media.NewHTTPKnown(db).Bind(httpmux.PathPrefix("/k").Subrouter())
 
 	tlspem := envx.String(userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "tls.pem"), env.DaemonTLSPEM)
 	if err = tlsx.SelfSignedLocalHostTLS(tlspem, tlsx.X509OptionHosts(t.SelfSignedHosts...)); err != nil {
