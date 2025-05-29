@@ -80,7 +80,11 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
     pending.then((w) {
       setState(() {
         current = w;
+        _loading = w == null;
       });
+      if (w == null) {
+        refresh(_res.next);
+      }
     }).catchError((cause) {
       setState(() {
         cause = ds.Error.unknown(cause);

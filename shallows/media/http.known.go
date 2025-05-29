@@ -81,7 +81,7 @@ func (t *HTTPKnown) search(w http.ResponseWriter, r *http.Request) {
 	}
 	msg.Next.Limit = numericx.Min(msg.Next.Limit, 100)
 
-	q := sqlx.Scan(library.KnownSearch(r.Context(), sqlx.Debug(t.q), library.KnownSearchBuilder().Where(squirrel.And{
+	q := sqlx.Scan(library.KnownSearch(r.Context(), t.q, library.KnownSearchBuilder().Where(squirrel.And{
 		squirrel.Expr("1=1"),
 		lucenex.Query(t.fts, msg.Next.Query, lucenex.WithDefaultField("title")),
 	}).OrderBy("title DESC").Offset(msg.Next.Offset*msg.Next.Limit).Limit(msg.Next.Limit)))

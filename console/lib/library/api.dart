@@ -17,6 +17,7 @@ abstract class known {
 
   static Future<KnownSearchResponse> search(KnownSearchRequest req) async {
     final client = http.Client();
+    print("searching known media");
     return client
         .get(
           Uri.https(
@@ -28,6 +29,7 @@ abstract class known {
         )
         .then(httpx.auto_error)
         .then((v) {
+          print("DERP!");
           return Future.value(
             KnownSearchResponse.create()
               ..mergeFromProto3Json(jsonDecode(v.body)),

@@ -11,11 +11,7 @@ class Node extends StatefulWidget {
   final Widget child;
   final AlignmentGeometry alignment;
 
-  const Node(
-    this.child, {
-    super.key,
-    this.alignment = Alignment.center,
-  });
+  const Node(this.child, {super.key, this.alignment = Alignment.center});
 
   static NodeState? of(BuildContext context) {
     return context.findAncestorStateOfType<NodeState>();
@@ -24,7 +20,6 @@ class Node extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => NodeState();
 }
-
 
 class NodeState extends State<Node> {
   final FocusNode _selffocus = FocusNode();
@@ -54,26 +49,29 @@ class NodeState extends State<Node> {
     final themex = Defaults.of(context);
     return screens.Overlay(
       child: widget.child,
-      overlay: current == null ? null : KeyboardListener(
-      focusNode: _selffocus,
-      onKeyEvent: (event) {
-        if (event is KeyDownEvent) {
-          return;
-        }
+      overlay:
+          current == null
+              ? null
+              : KeyboardListener(
+                focusNode: _selffocus,
+                onKeyEvent: (event) {
+                  if (event is KeyDownEvent) {
+                    return;
+                  }
 
-        if (event.logicalKey == LogicalKeyboardKey.escape) {
-          push(null);
-        }
-      },
-      child: Container(
-         decoration: BoxDecoration(
-                      color: theme.scaffoldBackgroundColor.withValues(
-                        alpha: themex.opaque?.a ?? 0.0,
-                      ),
+                  if (event.logicalKey == LogicalKeyboardKey.escape) {
+                    push(null);
+                  }
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: theme.scaffoldBackgroundColor.withValues(
+                      alpha: themex.opaque?.a ?? 0.0,
                     ),
-        child: current!,
-      ),
-    ),
+                  ),
+                  child: Flex(children: [current!], direction: Axis.vertical),
+                ),
+              ),
       alignment: widget.alignment,
       onTap: current != null ? reset : null,
     );

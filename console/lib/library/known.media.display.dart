@@ -17,7 +17,11 @@ class KnownMediaDisplay extends StatefulWidget {
     this.trailing,
   });
 
-  static KnownMediaDisplay missing(Media m, {GestureTapCallback? onDoubleTap, void Function()? onSettings}) {
+  static KnownMediaDisplay missing(
+    Media m, {
+    GestureTapCallback? onDoubleTap,
+    void Function()? onSettings,
+  }) {
     return KnownMediaDisplay(
       Future.value(
         api.Known(
@@ -42,7 +46,13 @@ class KnownMediaDisplay extends StatefulWidget {
 }
 
 class _KnownMediaDisplayState extends State<KnownMediaDisplay> {
-  late api.Known current;
+  api.Known current = api.Known(
+    id: "",
+    description: "",
+    summary: "",
+    rating: 0.0,
+    image: "",
+  );
 
   void setState(VoidCallback fn) {
     if (!mounted) return;

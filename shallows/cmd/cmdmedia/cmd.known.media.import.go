@@ -8,7 +8,6 @@ import (
 	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
-	"github.com/retrovibed/retrovibed/internal/sqlx"
 )
 
 type knownimport struct {
@@ -96,7 +95,7 @@ FROM ':filepath:' AS csv WHERE status IN ('Released', 'Post Production') ON CONF
 	q = strings.ReplaceAll(q, ":filepath:", t.Path)
 	q = strings.ReplaceAll(q, ":urlbase:", t.URL)
 
-	rs, err := sqlx.Debug(db).ExecContext(gctx.Context, q, t.Source)
+	rs, err := db.ExecContext(gctx.Context, q, t.Source)
 	if err != nil {
 		return errorsx.Wrap(err, "unable to import known media")
 	}
