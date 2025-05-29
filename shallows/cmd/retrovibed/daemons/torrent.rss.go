@@ -64,30 +64,15 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Vir
 				},
 			).Limit(128)
 
-			scanner := tracking.RSSSearch(ctx, q, query)
-			defer scanner.Close()
+			qiter := sqlx.Scan(tracking.RSSSearch(ctx, q, query))
 
-			for scanner.Next() {
-				var (
-					p tracking.RSS
-				)
-
-				if err := scanner.Scan(&p); err != nil {
-					done(err)
-					return
-				}
-
+			for p := range qiter.Iter() {
 				if !yield(p) {
-					return
+					break
 				}
 			}
 
-			if err := scanner.Err(); err != nil {
-				done(err)
-				return
-			}
-
-			done(nil)
+			done(qiter.Err())
 		}
 	}
 
@@ -118,7 +103,7 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Vir
 			resp, err := httpx.AsError(c.Do(req))
 			if err != nil {
 				log.Println("unable to retrieve feed", feed.ID, err)
-				if err = tracking.RSSCooldownByID(fctx, q, feed.ID, defaultttl).Scan(&feed); err != nil {
+				if err = tracking.RSSCooldownByID(fctx, q, feed.ID, defaultttl, feed.LastBuiltAt).Scan(&feed); err != nil {
 					log.Println("unable to mark rss feed for cooldown", err)
 				}
 				continue
@@ -127,6 +112,14 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Vir
 			channel, items, err := rss.Parse(ctx, resp.Body)
 			if err != nil {
 				log.Println("unable to parse feed", feed.ID, err)
+				continue
+			}
+
+			if v := channel.LastBuildDate.Timestamp(time.Now()); v.After(feed.LastBuiltAt) {
+				log.Println("torrent rss feed has not updated since last check", feed.ID, v, "<=", feed.LastBuiltAt)
+				if err = tracking.RSSCooldownByID(fctx, q, feed.ID, langx.DefaultIfZero(defaultttl, channel.TTL), v).Scan(&feed); err != nil {
+					log.Println("unable to mark rss feed for cooldown", err)
+				}
 				continue
 			}
 
@@ -212,7 +205,7 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Vir
 					continue
 				}
 			} else {
-				if err = tracking.RSSCooldownByID(fctx, q, feed.ID, langx.DefaultIfZero(defaultttl, channel.TTL)).Scan(&feed); err != nil {
+				if err = tracking.RSSCooldownByID(fctx, q, feed.ID, langx.DefaultIfZero(defaultttl, channel.TTL), channel.LastBuildDate.Timestamp(time.Now())).Scan(&feed); err != nil {
 					log.Println("unable to mark rss feed for cooldown", err)
 					continue
 				}

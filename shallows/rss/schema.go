@@ -17,10 +17,11 @@ type rss struct {
 // in the oficial shcema channel contains more than just `item`
 // but there is no need to use those fields
 type channel struct {
-	XMLName xml.Name `xml:"channel"`
-	Title   string   `xml:"title"`
-	Items   []item   `xml:"item"`
-	TTL     int      `xml:"ttl"`
+	XMLName       xml.Name `xml:"channel"`
+	Title         string   `xml:"title"`
+	Items         []item   `xml:"item"`
+	TTL           int      `xml:"ttl"`
+	LastBuildDate xmlTime  `xml:"lastBuildDate"`
 }
 
 // item represent the actual feed for each news
@@ -68,6 +69,14 @@ func parseTimestamp(encoded string) (_ time.Time, err error) {
 type xmlTime struct {
 	value    time.Time
 	hasValue bool
+}
+
+func (t xmlTime) Timestamp(fallback time.Time) time.Time {
+	if t.hasValue {
+		return t.value
+	}
+
+	return fallback
 }
 
 func (t *xmlTime) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {

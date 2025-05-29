@@ -257,7 +257,7 @@ github.com/gabriel-vasile/mimetype
 github.com/gabriel-vasile/mimetype/internal/charset
 github.com/gabriel-vasile/mimetype/internal/json
 github.com/gabriel-vasile/mimetype/internal/magic
-# github.com/go-faker/faker/v4 v4.6.0
+# github.com/go-faker/faker/v4 v4.6.1
 ## explicit; go 1.18
 github.com/go-faker/faker/v4
 github.com/go-faker/faker/v4/pkg/errors
@@ -410,7 +410,7 @@ github.com/james-lawrence/genieql/internal/userx
 github.com/james-lawrence/genieql/internal/wasidialect
 github.com/james-lawrence/genieql/internal/wasix/ffierrors
 github.com/james-lawrence/genieql/internal/wasix/ffiguest
-# github.com/james-lawrence/torrent v0.0.0-20250524195917-16fb7f904a94
+# github.com/james-lawrence/torrent v0.0.0-20250529113017-2d81626931dc
 ## explicit; go 1.23.2
 github.com/james-lawrence/torrent
 github.com/james-lawrence/torrent/bencode
@@ -589,7 +589,7 @@ github.com/rivo/uniseg
 # github.com/riywo/loginshell v0.0.0-20200815045211-7d26008be1ab
 ## explicit
 github.com/riywo/loginshell
-# github.com/rogpeppe/go-internal v1.13.1
+# github.com/rogpeppe/go-internal v1.14.1
 ## explicit; go 1.23
 # github.com/rs/dnscache v0.0.0-20230804202142-fc85eb664529
 ## explicit; go 1.12
@@ -627,6 +627,8 @@ github.com/zeebo/xxh3
 # github.com/zieckey/goini v0.0.0-20240615065340-08ee21c836fb
 ## explicit; go 1.22.4
 github.com/zieckey/goini
+# go.opentelemetry.io/otel v1.35.0
+## explicit; go 1.22.0
 # go.uber.org/automaxprocs v1.6.0
 ## explicit; go 1.20
 go.uber.org/automaxprocs
@@ -769,10 +771,8 @@ golang.zx2c4.com/wireguard/rwcancel
 golang.zx2c4.com/wireguard/tai64n
 golang.zx2c4.com/wireguard/tun
 golang.zx2c4.com/wireguard/tun/netstack
-# google.golang.org/genproto/googleapis/rpc v0.0.0-20250313205543-e70fdf4c4cb4
-## explicit; go 1.23.0
 # google.golang.org/genproto/googleapis/rpc v0.0.0-20250324211829-b45e905df463
-## go 1.23.0
+## explicit; go 1.23.0
 google.golang.org/genproto/googleapis/rpc/status
 # google.golang.org/grpc v1.71.0
 ## explicit; go 1.22.0
@@ -836,8 +836,6 @@ google.golang.org/grpc/serviceconfig
 google.golang.org/grpc/stats
 google.golang.org/grpc/status
 google.golang.org/grpc/tap
-# google.golang.org/protobuf v1.36.5
-## explicit; go 1.22
 # google.golang.org/protobuf v1.36.6
 ## explicit; go 1.22
 google.golang.org/protobuf/encoding/protojson

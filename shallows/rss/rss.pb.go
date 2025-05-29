@@ -32,6 +32,8 @@ type Feed struct {
 	Autodownload  bool                   `protobuf:"varint,7,opt,name=autodownload,proto3" json:"autodownload,omitempty"`
 	Autoarchive   bool                   `protobuf:"varint,8,opt,name=autoarchive,proto3" json:"autoarchive,omitempty"`
 	Contributing  bool                   `protobuf:"varint,9,opt,name=contributing,proto3" json:"contributing,omitempty"`
+	DisabledAt    string                 `protobuf:"bytes,10,opt,name=disabled_at,proto3" json:"disabled_at,omitempty"`
+	TtlMinimum    uint64                 `protobuf:"varint,11,opt,name=ttl_minimum,proto3" json:"ttl_minimum,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -127,6 +129,20 @@ func (x *Feed) GetContributing() bool {
 		return x.Contributing
 	}
 	return false
+}
+
+func (x *Feed) GetDisabledAt() string {
+	if x != nil {
+		return x.DisabledAt
+	}
+	return ""
+}
+
+func (x *Feed) GetTtlMinimum() uint64 {
+	if x != nil {
+		return x.TtlMinimum
+	}
+	return 0
 }
 
 type FeedSearchRequest struct {
@@ -501,7 +517,7 @@ var File_rss_proto protoreflect.FileDescriptor
 
 const file_rss_proto_rawDesc = "" +
 	"\n" +
-	"\trss.proto\x12\x03rss\"\x94\x02\n" +
+	"\trss.proto\x12\x03rss\"\xd8\x02\n" +
 	"\x04Feed\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1e\n" +
 	"\n" +
@@ -517,7 +533,10 @@ const file_rss_proto_rawDesc = "" +
 	"\x03url\x18\x06 \x01(\tR\x03url\x12\"\n" +
 	"\fautodownload\x18\a \x01(\bR\fautodownload\x12 \n" +
 	"\vautoarchive\x18\b \x01(\bR\vautoarchive\x12\"\n" +
-	"\fcontributing\x18\t \x01(\bR\fcontributing\"h\n" +
+	"\fcontributing\x18\t \x01(\bR\fcontributing\x12 \n" +
+	"\vdisabled_at\x18\n" +
+	" \x01(\tR\vdisabled_at\x12 \n" +
+	"\vttl_minimum\x18\v \x01(\x04R\vttl_minimum\"h\n" +
 	"\x11FeedSearchRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12\x17\n" +
 	"\x06offset\x18\x84\a \x01(\x04R\x06offset\x12\x15\n" +

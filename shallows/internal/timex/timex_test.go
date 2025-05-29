@@ -70,3 +70,17 @@ func TestJSONSafeEncodeInfShouldBeAdjusted(t *testing.T) {
 	require.Equal(t, tmp.Bar.Timestamp, timex.RFC3339Inf())
 	require.NotEqual(t, tmp.Bar.Timestamp, timex.Inf())
 }
+
+func TestMax(t *testing.T) {
+	expected := time.Now().Add(time.Hour)
+	require.Equal(t, expected, timex.Max(time.UnixMicro(0), time.Now(), time.Now().Add(time.Minute), expected))
+	require.Equal(t, timex.NegInf(), timex.Max(timex.NegInf()))
+	require.Equal(t, timex.Inf(), timex.Max(timex.NegInf(), timex.Inf()))
+}
+
+func TestMin(t *testing.T) {
+	require.Equal(t, time.UnixMicro(0), timex.Min(time.UnixMicro(0), time.Now(), time.Now().Add(time.Minute), time.Now().Add(time.Hour)))
+	require.Equal(t, timex.Inf(), timex.Min(timex.Inf()))
+	require.Equal(t, timex.NegInf(), timex.Min(timex.NegInf(), timex.Inf()))
+	require.Equal(t, time.UnixMicro(0), timex.Min(time.UnixMicro(0), timex.Inf()))
+}

@@ -18,6 +18,30 @@ func NegInf() time.Time {
 	return time.Unix(math.MinInt64, math.MinInt64)
 }
 
+// Max select the maximum timestamp from the set.
+func Max(ds ...time.Time) (d time.Time) {
+	d = NegInf()
+	for _, c := range ds {
+		if c.After(d) {
+			d = c
+		}
+	}
+
+	return d
+}
+
+// Min select the minimum timpstamp from the set.
+func Min(ds ...time.Time) (d time.Time) {
+	d = Inf()
+	for _, c := range ds {
+		if c.Before(d) {
+			d = c
+		}
+	}
+
+	return d
+}
+
 // Run the provided function after the duration.
 func After(d time.Duration, do func()) {
 	go func() {

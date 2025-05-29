@@ -31,7 +31,7 @@ type Media struct {
 	TorrentId     string                 `protobuf:"bytes,6,opt,name=torrent_id,proto3" json:"torrent_id,omitempty"`
 	CreatedAt     string                 `protobuf:"bytes,7,opt,name=created_at,proto3" json:"created_at,omitempty"`
 	UpdatedAt     string                 `protobuf:"bytes,8,opt,name=updated_at,proto3" json:"updated_at,omitempty"`
-	Metadata      string                 `protobuf:"bytes,9,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	KnownMediaId  string                 `protobuf:"bytes,9,opt,name=known_media_id,proto3" json:"known_media_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -122,9 +122,9 @@ func (x *Media) GetUpdatedAt() string {
 	return ""
 }
 
-func (x *Media) GetMetadata() string {
+func (x *Media) GetKnownMediaId() string {
 	if x != nil {
-		return x.Metadata
+		return x.KnownMediaId
 	}
 	return ""
 }
@@ -805,7 +805,7 @@ var File_media_proto protoreflect.FileDescriptor
 
 const file_media_proto_rawDesc = "" +
 	"\n" +
-	"\vmedia.proto\x12\x05media\"\x87\x02\n" +
+	"\vmedia.proto\x12\x05media\"\x93\x02\n" +
 	"\x05Media\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x1a\n" +
@@ -822,8 +822,8 @@ const file_media_proto_rawDesc = "" +
 	"created_at\x12\x1e\n" +
 	"\n" +
 	"updated_at\x18\b \x01(\tR\n" +
-	"updated_at\x12\x1a\n" +
-	"\bmetadata\x18\t \x01(\tR\bmetadata\"i\n" +
+	"updated_at\x12&\n" +
+	"\x0eknown_media_id\x18\t \x01(\tR\x0eknown_media_id\"i\n" +
 	"\x12MediaSearchRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12\x17\n" +
 	"\x06offset\x18\x84\a \x01(\x04R\x06offset\x12\x15\n" +

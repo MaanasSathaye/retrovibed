@@ -12,6 +12,8 @@ message Feed {
   bool autodownload = 7 [ json_name = "autodownload" ];
   bool autoarchive = 8 [ json_name = "autoarchive" ];
   bool contributing = 9 [ json_name = "contributing" ];
+  string disabled_at = 10 [ json_name = "disabled_at" ];
+  uint64 ttl_minimum = 11 [ json_name = "ttl_minimum" ];
 }
 
 message FeedSearchRequest {
