@@ -121,6 +121,8 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Vir
 					log.Println("unable to mark rss feed for cooldown", err)
 				}
 				continue
+			} else {
+				log.Println("torrent rss feed changes detected", feed.ID, "fetching", len(items), "torrents")
 			}
 
 			for _, item := range items {
