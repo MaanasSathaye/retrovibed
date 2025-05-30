@@ -24,12 +24,12 @@ class RowDisplay extends StatelessWidget {
     ];
     children += trailing;
 
-    return Container(
+    return SelectionArea(child: Container(
       padding: themex.padding,
       child: InkWell(
         onTap: onTap,
-        child: SelectionArea(child: Row(spacing: themex.spacing!, children: children)),
+        child: Row(spacing: themex.spacing!, children: children),
       ),
-    );
+    ));
   }
 }

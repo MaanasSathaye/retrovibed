@@ -12,6 +12,18 @@ import 'package:retrovibed/retrovibed.dart' as retro;
 import 'package:retrovibed/design.kit/theme.defaults.dart' as theming;
 import 'package:retrovibed/design.kit/modals.dart' as modals;
 
+TextScaler autoscaling(BuildContext context) {
+  final width = MediaQuery.of(context).size.width;
+  print("autoscaling width ${width}");
+  if (width > 1920) {
+    return TextScaler.linear(
+      3.0,
+    ).clamp(minScaleFactor: 0.8, maxScaleFactor: 4.0);
+  } else {
+    return TextScaler.linear(1.0);
+  }
+}
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
@@ -28,60 +40,65 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        cardTheme: CardTheme(margin: EdgeInsets.all(10.0)),
-        extensions: [theming.Defaults.defaults],
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(
+        textScaler: autoscaling(context),
       ),
-      themeMode: ThemeMode.dark,
-      home: Material(
-        child: ds.Full(
-          meta.EndpointAuto(
-            auth.AuthzCache(
-              modals.Node(
-                media.Playlist(
-                  DefaultTabController(
-                    length: 3,
-                    child: Scaffold(
-                      appBar: TabBar(
-                        tabs: [
-                          Tab(icon: Icon(Icons.movie)),
-                          Tab(icon: Icon(Icons.download)),
-                          Tab(icon: Icon(Icons.settings)),
-                        ],
-                      ),
-                      body: TabBarView(
-                        children: [
-                          ds.ErrorBoundary(
-                            media.Playlist.wrap((ctx, s) {
-                              return media.VideoScreen(
-                                env.Boolean(
-                                      env.vars.AutoIdentifyMedia,
-                                      fallback: false,
-                                    )
-                                    ? medialib.AvailableGridDisplay(
-                                      focus: s.searchfocus,
-                                      controller: s.controller,
-                                    )
-                                    : medialib.AvailableListDisplay(
-                                      focus: s.searchfocus,
-                                      controller: s.controller,
-                                    ),
-                                s.player,
-                              );
-                            }),
-                          ),
-                          ds.ErrorBoundary(downloads.Display()),
-                          ds.ErrorBoundary(settings.Display()),
-                        ],
+      child: MaterialApp(
+        darkTheme: ThemeData(
+          brightness: Brightness.dark,
+          cardTheme: CardTheme(margin: EdgeInsets.all(10.0)),
+          extensions: [theming.Defaults.defaults],
+        ),
+        themeMode: ThemeMode.dark,
+        home: Material(
+          child: ds.Full(
+            meta.EndpointAuto(
+              auth.AuthzCache(
+                modals.Node(
+                  media.Playlist(
+                    DefaultTabController(
+                      length: 3,
+                      child: Scaffold(
+                        appBar: TabBar(
+                          tabs: [
+                            Tab(icon: Icon(Icons.movie)),
+                            Tab(icon: Icon(Icons.download)),
+                            Tab(icon: Icon(Icons.settings)),
+                          ],
+                        ),
+                        body: TabBarView(
+                          children: [
+                            ds.ErrorBoundary(
+                              media.Playlist.wrap((ctx, s) {
+                                return media.VideoScreen(
+                                  env.Boolean(
+                                        env.vars.AutoIdentifyMedia,
+                                        fallback: false,
+                                      )
+                                      ? medialib.AvailableGridDisplay(
+                                        focus: s.searchfocus,
+                                        controller: s.controller,
+                                      )
+                                      : medialib.AvailableListDisplay(
+                                        focus: s.searchfocus,
+                                        controller: s.controller,
+                                      ),
+                                  s.player,
+                                );
+                              }),
+                            ),
+                            ds.ErrorBoundary(downloads.Display()),
+                            ds.ErrorBoundary(settings.Display()),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
+              defaultips: ips,
             ),
-            defaultips: ips,
           ),
         ),
       ),
