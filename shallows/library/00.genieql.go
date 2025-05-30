@@ -5,6 +5,7 @@ package library
 
 import (
 	"context"
+	"time"
 
 	genieql "github.com/james-lawrence/genieql/ginterp"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
@@ -90,6 +91,13 @@ func MetadataUpdate(
 	gql = gql.Query(`UPDATE library_metadata SET description = {md.Description}, known_media_id = {md.KnownMediaID} WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
 }
 
+func MetadataTransferKnownMediaIDFromTorrent(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, ts time.Time) NewMetadataScannerStatic,
+) {
+	gql = gql.Query(`UPDATE library_metadata SET updated_at = NOW(), known_media_id = t.known_media_id FROM torrents_metadata AS t WHERE t.id = library_metadata.torrent_id AND t."updated_at" >= {ts} AND library_metadata.known_media_id = 'ffffffff-ffff-ffff-ffff-ffffffffffff' AND t.known_media_id NOT IN ('ffffffff-ffff-ffff-ffff-ffffffffffff', '00000000-0000-0000-0000-000000000000') RETURNING ` + MetadataScannerStaticColumns)
+}
+
 func ScoredScanner(gql genieql.Scanner, pattern func(relevance float64)) {
 }
 
@@ -122,4 +130,11 @@ func KnownScoreByID(
 	pattern func(ctx context.Context, q sqlx.Queryer, uid string, terms string) NewScoredScannerStaticRow,
 ) {
 	gql = gql.Query(`SELECT COALESCE(fts_main_library_known_media.match_bm25(md5_lower, {terms}), 0.0)::float AS relevance FROM library_known_media WHERE uid = {uid}`)
+}
+
+func KnownBestMatch(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, terms string, cutoff float32) NewKnownScannerStaticRow,
+) {
+	gql = gql.Query(`WITH scored AS (SELECT uid, {terms} as q, (jaro_winkler_similarity(title, q, {cutoff}) + jaro_similarity(title, q, {cutoff})) / 2 AS relevance FROM library_known_media WHERE NOT adult ORDER BY relevance DESC) SELECT ` + KnownScannerStaticColumns + ` FROM library_known_media INNER JOIN scored ON library_known_media.uid = scored.uid WHERE scored.relevance > {cutoff} ORDER BY scored.relevance DESC`)
 }

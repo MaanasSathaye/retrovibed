@@ -20,7 +20,6 @@ import (
 	"github.com/retrovibed/retrovibed/internal/fsx"
 	"github.com/retrovibed/retrovibed/internal/httpx"
 	"github.com/retrovibed/retrovibed/internal/langx"
-	"github.com/retrovibed/retrovibed/internal/lucenex"
 	"github.com/retrovibed/retrovibed/internal/md5x"
 	"github.com/retrovibed/retrovibed/internal/mimex"
 	"github.com/retrovibed/retrovibed/internal/slicesx"
@@ -116,7 +115,7 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Vir
 			}
 
 			if v := channel.LastBuildDate.Timestamp(time.Now()); v.After(feed.LastBuiltAt) {
-				log.Println("torrent rss feed has not updated since last check", feed.ID, v, ">=", feed.LastBuiltAt)
+				log.Println("torrent rss feed has not updated since last check", feed.ID, feed.LastBuiltAt, "<", v)
 				if err = tracking.RSSCooldownByID(fctx, q, feed.ID, langx.DefaultIfZero(defaultttl, channel.TTL), v).Scan(&feed); err != nil {
 					log.Println("unable to mark rss feed for cooldown", err)
 				}
@@ -173,7 +172,7 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Vir
 					continue
 				}
 
-				if known, err = library.DetectKnownMedia(ctx, q, lucenex.Clean(mi.Name)); err != nil {
+				if known, err = library.DetectKnownMedia(ctx, q, mi.Name); err != nil {
 					log.Println("unable to detect known media ignoring", err)
 				}
 

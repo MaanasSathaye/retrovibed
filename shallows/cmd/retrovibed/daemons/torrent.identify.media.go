@@ -3,10 +3,10 @@ package daemons
 import (
 	"context"
 	"log"
+	"time"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
-	"github.com/retrovibed/retrovibed/internal/lucenex"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
 	"github.com/retrovibed/retrovibed/library"
 	"github.com/retrovibed/retrovibed/tracking"
@@ -17,9 +17,14 @@ func IdentifyTorrentyMedia(ctx context.Context, db sqlx.Queryer) error {
 		squirrel.And{
 			tracking.MetadataQueryNeedsKnownMediaID(),
 		},
-	).Limit(1024)
+	)
 
 	iter := sqlx.Scan(tracking.MetadataSearch(ctx, db, q))
+
+	log.Println("attempting to locate unidentified media initiated")
+	defer log.Println("attempting to locate unidentified media completed")
+
+	ts := time.Now()
 
 	for md := range iter.Iter() {
 		var (
@@ -27,19 +32,26 @@ func IdentifyTorrentyMedia(ctx context.Context, db sqlx.Queryer) error {
 			known library.Known
 		)
 
-		if known, err = library.DetectKnownMedia(ctx, db, lucenex.Clean(md.Description)); err != nil {
-			log.Println("unable to detect media for torrent", md.ID, md.Description, "|", lucenex.Clean(md.Description), "|", err)
+		if known, err = library.DetectKnownMedia(ctx, db, md.Description); err != nil {
+			log.Println("unable to detect media for torrent", md.ID, md.Description, "|", md.Description, "|", err)
 			continue
 		}
 
-		log.Println("matched", md.ID, "with", known.UID, known.Title)
 		if err = tracking.MetadataAssignKnownMediaID(ctx, db, md.ID, known.UID).Scan(&md); err != nil {
 			log.Println("unable to assign known media id to torrent", md.ID, known.UID, err)
 			continue
 		}
 
-		log.Println("assigned known media", md.ID, known.UID)
+		log.Println("matched", md.ID, "->", known.UID, md.Description, "->", known.Title)
 	}
 
-	return errorsx.Wrap(iter.Err(), "failed to mark known media torrents")
+	if err := iter.Err(); err != nil {
+		return errorsx.Wrap(iter.Err(), "failed to mark known media torrents")
+	}
+
+	if err := sqlx.Discard(sqlx.Scan(library.MetadataTransferKnownMediaIDFromTorrent(ctx, db, ts))); err != nil {
+		return errorsx.Wrap(iter.Err(), "failed to associate known media with upstream library")
+	}
+
+	return nil
 }

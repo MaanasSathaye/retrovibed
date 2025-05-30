@@ -52,13 +52,14 @@ func (t *HTTPKnown) Bind(r *mux.Router) {
 	r.StrictSlash(false)
 
 	r.Path("/").Methods(http.MethodGet).Handler(alice.New(
-		httpx.ContextBufferPool512(),
+		httpx.ContextBufferPool1024(),
 		httpx.ParseForm,
 		httpauth.AuthenticateWithToken(t.jwtsecret),
 		httpx.Timeout2s(),
 	).ThenFunc(t.search))
 
 	r.Path("/{id}").Methods(http.MethodGet).Handler(alice.New(
+		httpx.ContextBufferPool1024(),
 		httpauth.AuthenticateWithToken(t.jwtsecret),
 		httpx.Timeout2s(),
 	).ThenFunc(t.find))

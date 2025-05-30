@@ -63,3 +63,10 @@ func ScanInto[T any](s Iter[T], dst *[]T) (err error) {
 
 	return s.Err()
 }
+
+func Discard[T any](s Iter[T]) (err error) {
+	for range s.Iter() {
+	}
+
+	return s.Err()
+}

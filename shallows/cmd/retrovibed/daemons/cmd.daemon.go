@@ -51,9 +51,9 @@ import (
 type Command struct {
 	DisableMDNS       bool             `flag:"" name:"no-mdns" help:"disable the multicast dns service" default:"false" env:"${env_mdns_disabled}"`
 	AutoBootstrap     bool             `flag:"" name:"auto-bootstrap" help:"bootstrap from a predefined set of peers" default:"true" env:"${env_auto_bootstrap}"`
-	AutoDiscovery     bool             `flag:"" name:"auto-discovery" help:"enable autodiscovery of content from peers" default:"false" env:"${env_auto_discovery}"`
-	AutoDownload      bool             `flag:"" name:"auto-download" help:"enable automatically downloading torrent from the downloads folder" default:"false"`
-	AutoIdentifyMedia bool             `flag:"" name:"auto-identify-media" help:"enable automatically identifying media - EXPERIMENTAL" default:"false" env:"${env_auto_identify_media}"`
+	AutoDiscovery     bool             `flag:"" name:"auto-discovery" help:"EXPERIMENTAL: enable autodiscovery of content from peers" default:"false" env:"${env_auto_discovery}"`
+	AutoDownload      bool             `flag:"" name:"auto-download" help:"EXPERIMENTAL: enable automatically downloading torrent from the downloads folder" default:"false"`
+	AutoIdentifyMedia bool             `flag:"" name:"auto-identify-media" help:"EXPERIMENTAL: enable automatically identifying media" default:"true" env:"${env_auto_identify_media}"`
 	HTTP              cmdopts.Listener `flag:"" name:"http-address" help:"address to serve daemon api from" default:"tcp://:9998" env:"${env_daemon_socket}"`
 	SelfSignedHosts   []string         `flag:"" name:"self-signed-hosts" help:"comma seperated list of hosts to add to the sign signed certificate" env:"${env_self_signed_hosts}"`
 	TorrentPort       int              `flag:"" name:"torrent-port" help:"port to use for torrenting" env:"${env_torrent_port}" default:"10000"`
