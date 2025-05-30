@@ -114,6 +114,8 @@ func Main(args ...string) {
 			"env_self_signed_hosts":   env.SelfSignedHosts,
 			"env_daemon_socket":       env.DaemonSocket,
 			"env_torrent_port":        env.TorrentPort,
+			"env_torrent_ipv4":        env.TorrentPublicIP4,
+			"env_torrent_ipv6":        env.TorrentPublicIP6,
 			"env_auto_identify_media": env.AutoIdentifyMedia,
 		},
 		kong.UsageOnError(),

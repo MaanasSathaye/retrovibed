@@ -30,8 +30,9 @@ const (
 	AutoBootstrap     = "RETROVIBED_TORRENT_AUTO_BOOTSTRAP" // enable/disable the predefined set of public swarms to bootstrap from.
 	AutoIdentifyMedia = "RETROVIBED_AUTO_IDENTIFY_MEDIA"    // enable/disable automatically identified media.
 	TorrentPort       = "RETROVIBED_TORRENT_PORT"           // specify the port to listen to torrents on
+	TorrentPublicIP4  = "RETROVIBED_TORRENT_PUBLIC_IP4"     // specify the public ipv4 address the torrent service.
+	TorrentPublicIP6  = "RETROVIBED_TORRENT_PUBLIC_IP6"     // specify the public ipv6 address the torrent service.
 	SelfSignedHosts   = "RETROVIBED_SELF_SIGNED_HOSTS"      // list of hosts to add to the self signed certificate.
-
 )
 
 var v = sync.OnceValue(func() []byte {

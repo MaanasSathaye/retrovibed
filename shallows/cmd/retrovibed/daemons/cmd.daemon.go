@@ -57,6 +57,8 @@ type Command struct {
 	HTTP              cmdopts.Listener `flag:"" name:"http-address" help:"address to serve daemon api from" default:"tcp://:9998" env:"${env_daemon_socket}"`
 	SelfSignedHosts   []string         `flag:"" name:"self-signed-hosts" help:"comma seperated list of hosts to add to the sign signed certificate" env:"${env_self_signed_hosts}"`
 	TorrentPort       int              `flag:"" name:"torrent-port" help:"port to use for torrenting" env:"${env_torrent_port}" default:"10000"`
+	TorrentPublicIP4  string           `flag:"" name:"torrent-ipv4" help:"public ipv4 address of the torrent" env:"${env_torrent_ipv4}"`
+	TorrentPublicIP6  string           `flag:"" name:"torrent-ipv6" help:"public ipv6 address of the torrent" env:"${env_torrent_ipv6}"`
 }
 
 func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
@@ -129,6 +131,9 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		torrent.NewMetadataCache(torrentstore.Path()),
 		tstore,
 		torrent.ClientConfigPeerID(string(peerid[:])),
+		torrent.ClientConfigPortForward(true),
+		torrent.ClientConfigIPv4(t.TorrentPublicIP4),
+		torrent.ClientConfigIPv6(t.TorrentPublicIP6),
 		torrent.ClientConfigSeed(true),
 		torrent.ClientConfigInfoLogger(log.New(io.Discard, "[torrent] ", log.Flags())),
 		torrent.ClientConfigMuxer(tm),
@@ -164,6 +169,8 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	} else {
 		log.Println("no wireguard configuration found at", path)
 	}
+
+	log.Println("torrent specified public ip:", torconfig.PublicIP4, torconfig.PublicIP6)
 
 	if tnetwork == nil {
 		if tnetwork, err = torrentx.Autosocket(t.TorrentPort); err != nil {

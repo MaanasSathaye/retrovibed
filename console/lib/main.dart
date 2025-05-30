@@ -17,7 +17,7 @@ TextScaler autoscaling(BuildContext context) {
   print("autoscaling width ${width}");
   if (width > 1920) {
     return TextScaler.linear(
-      3.0,
+      2.0,
     ).clamp(minScaleFactor: 0.8, maxScaleFactor: 4.0);
   } else {
     return TextScaler.linear(1.0);
