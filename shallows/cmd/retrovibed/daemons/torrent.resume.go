@@ -15,6 +15,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/backoffx"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/fsx"
+	"github.com/retrovibed/retrovibed/internal/netx"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
 	"github.com/retrovibed/retrovibed/internal/sqlxx"
 	"github.com/retrovibed/retrovibed/internal/timex"
@@ -66,12 +67,12 @@ func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual
 	errorsx.Log(errorsx.Wrap(iter.Err(), "failed to resume all downloads"))
 }
 
-func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, tclient *torrent.Client, tstore storage.ClientImpl) {
+func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, tclient *torrent.Client, tstore storage.ClientImpl, d netx.Dialer) {
 	const limit = 128
 
 	defer log.Println("announce seeded completed")
 
-	announcer := torrentx.AnnouncerFromClient(tclient)
+	announcer := torrentx.AnnouncerFromClient(tclient, d)
 	nport := tclient.LocalPort()
 	pid := int160.FromByteArray(tclient.PeerID())
 
@@ -110,7 +111,7 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, 
 			)
 
 			log.Println("announcing", i.ID, int160.FromBytes(i.Infohash).String())
-			announced, err := announcer.ForTracker(i.Tracker).Do(ctx, req)
+			announced, err := announcer.ForTracker(i.Tracker).WithDialer(d).Do(ctx, req)
 			if err == tracker.ErrMissingInfoHash {
 				errorsx.Log(errorsx.Wrapf(tracking.MetadataDisableAnnounced(ctx, q, i.ID).Scan(&i), "unable to disable announcements for torrent: %s", i.ID))
 				continue

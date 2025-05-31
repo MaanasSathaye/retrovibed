@@ -1,6 +1,7 @@
 package netx
 
 import (
+	"context"
 	"errors"
 	"log"
 	"net"
@@ -8,6 +9,11 @@ import (
 	"strconv"
 	"strings"
 )
+
+// Dialer missing interface from the net package.
+type Dialer interface {
+	DialContext(ctx context.Context, network, address string) (net.Conn, error)
+}
 
 func DefaultIfZero(fallback net.IP, v net.IP) net.IP {
 	if v != nil {

@@ -11,6 +11,7 @@ import (
 	"github.com/james-lawrence/torrent"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/langx"
+	"github.com/retrovibed/retrovibed/internal/netx"
 	"github.com/retrovibed/retrovibed/internal/slicesx"
 	"github.com/retrovibed/retrovibed/internal/stringsx"
 	"github.com/retrovibed/retrovibed/internal/wireguardx"
@@ -27,13 +28,14 @@ import (
 	"golang.zx2c4.com/wireguard/tun/netstack"
 )
 
-func AnnouncerFromClient(c *torrent.Client) tracker.Announce {
+func AnnouncerFromClient(c *torrent.Client, d netx.Dialer) tracker.Announce {
 	cfg := c.Config()
 
 	return tracker.Announce{
 		UserAgent: cfg.HTTPUserAgent,
 		ClientIp4: krpc.NewNodeAddrFromIPPort(cfg.PublicIP4, 0),
 		ClientIp6: krpc.NewNodeAddrFromIPPort(cfg.PublicIP6, 0),
+		Dialer:    d,
 	}
 }
 

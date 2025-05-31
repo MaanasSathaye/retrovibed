@@ -237,7 +237,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		}
 	}()
 
-	go AnnounceSeeded(dctx, db, rootstore, tclient, tstore)
+	go AnnounceSeeded(dctx, db, rootstore, tclient, tstore, wgnet)
 	go ResumeDownloads(dctx, db, rootstore, tclient, tstore)
 	if t.AutoIdentifyMedia {
 		go timex.NowAndEvery(gctx.Context, 15*time.Minute, func(ctx context.Context) error {
