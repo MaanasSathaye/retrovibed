@@ -69,6 +69,8 @@ func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual
 func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, tclient *torrent.Client, tstore storage.ClientImpl) {
 	const limit = 128
 
+	defer log.Println("announce seeded completed")
+
 	announcer := torrentx.AnnouncerFromClient(tclient)
 	nport := tclient.LocalPort()
 	pid := int160.FromByteArray(tclient.PeerID())
@@ -116,14 +118,14 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, 
 				log.Println("failed to announce seeded torrent", i.ID, int160.FromBytes(i.Infohash).String(), err)
 			}
 
-			nextts := time.Now().Add(timex.DurationMax(time.Duration(announced.Interval)*time.Second, time.Hour)).Add(backoffx.Random(5 * time.Minute))
+			nextts := time.Now().Add(timex.DurationMax(time.Duration(announced.Interval)*time.Second, 10*time.Minute)).Add(backoffx.Random(5 * time.Minute))
 
 			if err := tracking.MetadataAnnounced(ctx, q, i.ID, nextts).Scan(&i); err != nil {
 				log.Println("failed to record announcement", err)
 				continue
 			}
 
-			log.Println("announced", i.ID, "next", i.NextAnnounceAt)
+			log.Println("announced", i.ID, "next", i.NextAnnounceAt, announced.Interval, time.Duration(announced.Interval)*time.Second)
 		}
 
 		if len(seeded) >= limit {
