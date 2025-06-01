@@ -222,7 +222,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                     default:
                       return KnownMediaDisplay(
                         api.known.get(_media.knownMediaId).then((w) => (w.known..description = _media.description)),
-                        key: UniqueKey(),
+                        key: ValueKey(_media.id),
                         onDoubleTap: media.PlayAction(context, _media, _res),
                         onSettings: onSettings,
                       );

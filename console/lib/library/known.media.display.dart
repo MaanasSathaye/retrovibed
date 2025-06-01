@@ -32,6 +32,7 @@ class KnownMediaDisplay extends StatefulWidget {
           image: "",
         ),
       ),
+      key: ValueKey(m.id),
       onDoubleTap: onDoubleTap,
       onSettings: onSettings,
     );
