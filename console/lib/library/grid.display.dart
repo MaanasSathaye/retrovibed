@@ -212,6 +212,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                   };
 
                   switch (_media.knownMediaId) {
+                    case "":
                     case "00000000-0000-0000-0000-000000000000":
                     case "ffffffff-ffff-ffff-ffff-ffffffffffff":
                       return KnownMediaDisplay.missing(
