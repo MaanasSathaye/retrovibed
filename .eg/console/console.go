@@ -125,12 +125,13 @@ func flatpak(final egflatpak.Module) *egflatpak.Builder {
 			AllowDownload().
 			AllowMusic().
 			AllowVideos().Allow(
-			"--filesystem=host:ro",               // for mpv
-			"--socket=pulseaudio",                // for mpv
-			"--env=LC_NUMERIC=C",                 // for mpv
-			"--filesystem=xdg-run/pipewire-0:ro", // for mpv
-			"--filesystem=~/.duckdb:create",      // for duckdb
-			"--env=TMPDIR=/var/tmp/",             // enaure golang sets its os.TempDir() to a working value.
+			"--filesystem=host:ro",                 // for mpv
+			"--socket=pulseaudio",                  // for mpv
+			"--env=LC_NUMERIC=C",                   // for mpv
+			"--filesystem=xdg-run/pipewire-0:ro",   // for mpv
+			"--filesystem=~/.duckdb:create",        // for duckdb
+			"--env=TMPDIR=/var/tmp/",               // enaure golang sets its os.TempDir() to a working value.
+			"--talk-name=org.freedesktop.portal.*", // enable standard desktop functionality.
 		)...)
 }
 
