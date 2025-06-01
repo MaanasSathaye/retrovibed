@@ -60,9 +60,9 @@ systemctl enable --now retrovibed.service
 requires flatpak-builder 1.4.2 or later to be installed.
 
 ```bash
+flatpak remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 mkdir retrovibe
 curl -L -o retrovibed.client.yml https://github.com/retrovibed/retrovibed/releases/latest/download/flatpak.client.yml
-flatpak remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 flatpak-builder --user --install-deps-from=flathub --install --ccache --force-clean retrovibe retrovibed.client.yml
 flatpak run --user space.retrovibe.Console
 flatpak run --command=sh --user space.retrovibe.Console # for debugging the runtime
