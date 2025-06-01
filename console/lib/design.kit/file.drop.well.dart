@@ -120,12 +120,16 @@ class _FileDropWell extends State<FileDropWell> {
                               );
                             });
                       }).toList();
-                  Future.wait(eventfiles).then((files) {
+                  return Future.wait(eventfiles).then((files) {
                     final resolved = FilesEvent(files: files);
-                    widget.onDropped(resolved).whenComplete(() {
+                    return widget.onDropped(resolved).whenComplete(() {
                       loading(false);
                     });
                   });
+                })
+                .catchError((cause) {
+                  print("failed to open files ${cause}");
+                  return ds.Error.unknown(cause);
                 })
                 .whenComplete(() {
                   loading(false);
