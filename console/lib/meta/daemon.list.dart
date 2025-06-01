@@ -181,7 +181,10 @@ class _RowDisplay extends StatelessWidget {
             if (onRemove != null)
               IconButton(
                 onPressed: () {
-                  onRemove!(current);
+                  onRemove!(current).catchError((cause) {
+                    ds.ErrorBoundary.of(context)?.onError(ds.Error.unknown(cause));
+                    throw cause;
+                  }).ignore();
                 },
                 icon: Icon(Icons.remove),
               ),
