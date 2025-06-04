@@ -132,10 +132,8 @@ func (t *HTTPWireguard) search(w http.ResponseWriter, r *http.Request) {
 
 	if fsx.ErrIsNotExist(err) != nil {
 		log.Println(errorsx.Wrap(err, "no configurations exist yet"))
-		if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &resp); err != nil {
-			log.Println(errorsx.Wrap(err, "unable to write response"))
-			return
-		}
+		errorsx.Log(errorsx.Wrap(httpx.WriteJSON(w, httpx.GetBuffer(r), &resp), "unable to write response"))
+		return
 	}
 
 	if err != nil {
@@ -219,8 +217,8 @@ func (t *HTTPWireguard) create(w http.ResponseWriter, r *http.Request) {
 
 func (t *HTTPWireguard) current(w http.ResponseWriter, r *http.Request) {
 	var (
-		err      error
-		cfg      *wireguardx.Config
+		err error
+		// cfg      *wireguardx.Config
 		realpath = errorsx.Zero(filepath.EvalSymlinks(t.dir.Path(wireguardx.Current)))
 	)
 
@@ -237,12 +235,11 @@ func (t *HTTPWireguard) current(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if cfg, err = wireguardx.FromWgQuick(string(encoded), "retrovibed"); err != nil {
+	if _, err = wireguardx.FromWgQuick(string(encoded), "retrovibed"); err != nil {
 		log.Println(errorsx.Wrap(err, "failed to parse config"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}
-	_ = cfg
 
 	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &WireguardCurrentResponse{
 		Wireguard: &Wireguard{Id: filepath.Base(realpath)},

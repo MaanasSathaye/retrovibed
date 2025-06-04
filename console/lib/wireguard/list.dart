@@ -32,6 +32,11 @@ class _ListDisplay extends State<ListDisplay> {
     next: api.wireguard.request(limit: 32),
   );
 
+  void setState(VoidCallback fn) {
+    if (!mounted) return;
+    super.setState(fn);
+  }
+
   void reseterr() {
     setState(() {
       _cause = null;
@@ -51,14 +56,17 @@ class _ListDisplay extends State<ListDisplay> {
           ds.SearchTray.refocus(widget.controller);
         })
         .catchError((cause) {
-          if(!super.mounted) return;
+          setState(() {
+            _loading = false;
+          });
+        }, test: httpx.ErrorsTest.err404)
+        .catchError((cause) {
           setState(() {
             _cause = ds.Error.unauthorized(cause, onTap: reseterr);
             _loading = false;
           });
         }, test: httpx.ErrorsTest.unauthorized)
         .catchError((e) {
-          if(!super.mounted) return;
           setState(() {
             _cause = ds.Error.unknown(e, onTap: reseterr);
             _loading = false;
@@ -71,13 +79,18 @@ class _ListDisplay extends State<ListDisplay> {
     super.initState();
     _res.next..query = widget.controller?.text ?? "";
     refresh(_res.next);
-    api.wireguard.current().then((r) => setState(() {
-      setState(() {
-        _current = r.wireguard;
-      });
-    })).catchError((cause) {
-      print("failed to load current vpn settings ${cause}");
-    }).ignore();
+    api.wireguard
+        .current()
+        .then(
+          (r) => setState(() {
+              _current = r.wireguard;
+          }),
+        )
+        .catchError((cause) {}, test: httpx.ErrorsTest.err404)
+        .catchError((cause) {
+          print("failed to load current vpn settings ${cause}");
+        })
+        .ignore();
   }
 
   @override
@@ -126,50 +139,53 @@ class _ListDisplay extends State<ListDisplay> {
     };
 
     return ds.Table(
-        loading: _loading,
-        cause: _cause,
-        leading: ds.SearchTray(
-          controller: widget.controller,
-          focus: widget.focus,
-          disabled: true,
-          onSubmitted: (v) {
-            setState(() {
-              _res.next.query = v;
-              _res.next.offset = ds.SearchTray.Zero;
-            });
-            refresh(_res.next);
-          },
-          next: (i) {
-            setState(() {
-              _res.next.offset = i;
-            });
-            refresh(_res.next);
-          },
-          current: _res.next.offset,
-          empty: _res.items.length < _res.next.limit.toInt(),
-          trailing: ds.FileDropWell(
-            upload,
-            child: IgnorePointer(child: Icon(Icons.file_upload_outlined)),
-          ),
-          autofocus: true,
+      loading: _loading,
+      cause: _cause,
+      leading: ds.SearchTray(
+        controller: widget.controller,
+        focus: widget.focus,
+        disabled: true,
+        onSubmitted: (v) {
+          setState(() {
+            _res.next.query = v;
+            _res.next.offset = ds.SearchTray.Zero;
+          });
+          refresh(_res.next);
+        },
+        next: (i) {
+          setState(() {
+            _res.next.offset = i;
+          });
+          refresh(_res.next);
+        },
+        current: _res.next.offset,
+        empty: _res.items.length < _res.next.limit.toInt(),
+        trailing: ds.FileDropWell(
+          upload,
+          child: IgnorePointer(child: Icon(Icons.file_upload_outlined)),
         ),
-        children: _res.items,
-        flex: 1,
-        ds.Table.expanded<api.Wireguard>(
-          (v) => RowDisplay(
-            current: v,
-            leading: [
-              IconCheckmark(_current.id == v.id, onTap: () {
+        autofocus: true,
+      ),
+      children: _res.items,
+      flex: 1,
+      ds.Table.expanded<api.Wireguard>(
+        (v) => RowDisplay(
+          current: v,
+          leading: [
+            IconCheckmark(
+              _current.id == v.id,
+              onTap: () {
                 return api.wireguard.touch(v.id).then((r) {
                   setState(() {
                     _current = v;
                   });
                 });
-              }),
-            ],
+              },
             ),
-          ),
-        empty: ds.FileDropWell(upload),
+          ],
+        ),
+      ),
+      empty: ds.FileDropWell(upload),
     );
   }
 }
