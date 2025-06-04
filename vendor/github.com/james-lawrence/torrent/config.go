@@ -14,6 +14,7 @@ import (
 	"github.com/james-lawrence/torrent/internal/netx"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
+	"github.com/james-lawrence/torrent/tracker"
 	"github.com/james-lawrence/torrent/x/conntrack"
 	"golang.org/x/time/rate"
 
@@ -109,8 +110,8 @@ type ClientConfig struct {
 	dialer netx.Dialer
 	// The IP addresses as our peers should see them. May differ from the
 	// local interfaces due to NAT or other network configurations.
-	PublicIP4 net.IP
-	PublicIP6 net.IP
+	publicIP4 net.IP
+	publicIP6 net.IP
 
 	// Don't add connections that have the same peer ID as an existing
 	// connection for a given Torrent.
@@ -126,6 +127,23 @@ type ClientConfig struct {
 	DHTMuxer        dht.Muxer
 
 	ConnectionClosed func(ih metainfo.Hash, stats ConnStats)
+}
+
+func (cfg *ClientConfig) PublicIP4() net.IP {
+	return cfg.publicIP4
+}
+
+func (cfg *ClientConfig) PublicIP6() net.IP {
+	return cfg.publicIP6
+}
+
+func (cfg *ClientConfig) AnnounceRequest() tracker.Announce {
+	return tracker.Announce{
+		UserAgent: cfg.HTTPUserAgent,
+		ClientIp4: krpc.NewNodeAddrFromIPPort(cfg.publicIP4, 0),
+		ClientIp6: krpc.NewNodeAddrFromIPPort(cfg.publicIP6, 0),
+		Dialer:    cfg.dialer,
+	}
 }
 
 func (cfg *ClientConfig) errors() llog {
@@ -182,7 +200,7 @@ func ClientConfigIPv4(ip string) ClientConfigOption {
 			return
 		}
 
-		cc.PublicIP4 = net.ParseIP(ip)
+		cc.publicIP4 = net.ParseIP(ip)
 	}
 }
 
@@ -192,7 +210,7 @@ func ClientConfigIPv6(ip string) ClientConfigOption {
 			return
 		}
 
-		cc.PublicIP6 = net.ParseIP(ip)
+		cc.publicIP6 = net.ParseIP(ip)
 	}
 }
 

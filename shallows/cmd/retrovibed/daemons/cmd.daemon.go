@@ -130,6 +130,21 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	tm := dht.DefaultMuxer().
 		Method(bep0051.Query, bep0051.NewEndpoint(bep0051.EmptySampler{}))
 
+	if path := wireguardx.Latest(); fsx.Exists(path) {
+		wcfg, err := wireguardx.Parse(path)
+		if err != nil {
+			return errorsx.Wrapf(err, "unable to parse wireguard configuration: %s", path)
+		}
+
+		log.Println("loaded wireguard configuration", path)
+
+		if wgnet, tnetwork, err = torrentx.WireguardSocket(wcfg, t.TorrentPort); err != nil {
+			return errorsx.Wrap(err, "unable to setup wireguard torrent socket")
+		}
+	} else {
+		log.Println("no wireguard configuration found at", path)
+	}
+
 	torconfig := torrent.NewDefaultClientConfig(
 		torrent.NewMetadataCache(torrentstore.Path()),
 		tstore,
@@ -138,6 +153,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		torrent.ClientConfigIPv4(t.TorrentPublicIP4),
 		torrent.ClientConfigIPv6(t.TorrentPublicIP6),
 		torrent.ClientConfigSeed(true),
+		torrent.ClientConfigDialer(wgnet),
 		torrent.ClientConfigInfoLogger(log.New(io.Discard, "[torrent] ", log.Flags())),
 		torrent.ClientConfigMuxer(tm),
 		torrent.ClientConfigBucketLimit(32),
@@ -158,22 +174,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		bootstrap,
 	)
 
-	if path := wireguardx.Latest(); fsx.Exists(path) {
-		wcfg, err := wireguardx.Parse(path)
-		if err != nil {
-			return errorsx.Wrapf(err, "unable to parse wireguard configuration: %s", path)
-		}
-
-		log.Println("loaded wireguard configuration", path)
-
-		if wgnet, tnetwork, err = torrentx.WireguardSocket(wcfg, t.TorrentPort); err != nil {
-			return errorsx.Wrap(err, "unable to setup wireguard torrent socket")
-		}
-	} else {
-		log.Println("no wireguard configuration found at", path)
-	}
-
-	log.Println("torrent specified public ip:", torconfig.PublicIP4, torconfig.PublicIP6)
+	log.Println("torrent specified public ip:", torconfig.PublicIP4(), torconfig.PublicIP6())
 
 	if tnetwork == nil {
 		if tnetwork, err = torrentx.Autosocket(t.TorrentPort); err != nil {
@@ -240,7 +241,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		}
 	}()
 
-	go AnnounceSeeded(dctx, db, rootstore, tclient, tstore, wgnet)
+	go AnnounceSeeded(dctx, db, rootstore, tclient, tstore)
 	go ResumeDownloads(dctx, db, rootstore, tclient, tstore)
 	if t.AutoIdentifyMedia {
 		go timex.NowAndEvery(gctx.Context, 15*time.Minute, func(ctx context.Context) error {

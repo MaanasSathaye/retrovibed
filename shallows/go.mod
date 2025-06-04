@@ -22,7 +22,7 @@ require (
 	github.com/grindlemire/go-lucene v0.0.21
 	github.com/hashicorp/mdns v1.0.6
 	github.com/james-lawrence/genieql v0.0.0-20250326213227-2205a50ec4f9
-	github.com/james-lawrence/torrent v0.0.0-20250531125400-77709c458d71
+	github.com/james-lawrence/torrent v0.0.0-20250604112657-c613f8eb257d
 	github.com/justinas/alice v1.2.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/marcboeker/go-duckdb/v2 v2.3.0
@@ -45,7 +45,7 @@ require (
 	github.com/RoaringBitmap/roaring v1.9.4 // indirect
 	github.com/alecthomas/atomic v0.1.0-alpha2 // indirect
 	github.com/anacrolix/chansync v0.6.0 // indirect
-	github.com/anacrolix/generics v0.0.3-0.20250526144502-593be7092deb // indirect
+	github.com/anacrolix/generics v0.0.3 // indirect
 	github.com/anacrolix/log v0.16.0 // indirect
 	github.com/anacrolix/missinggo/perf v1.0.0 // indirect
 	github.com/anacrolix/missinggo/v2 v2.8.0 // indirect

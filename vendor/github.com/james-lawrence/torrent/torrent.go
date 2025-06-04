@@ -21,7 +21,6 @@ import (
 	"github.com/anacrolix/missinggo/v2"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/int160"
-	"github.com/james-lawrence/torrent/dht/krpc"
 	"github.com/james-lawrence/torrent/internal/bytesx"
 	"github.com/james-lawrence/torrent/internal/errorsx"
 	"github.com/james-lawrence/torrent/internal/langx"
@@ -92,7 +91,7 @@ func TuneReadPublicIPv4(v net.IP) Tuner {
 		t.rLock()
 		defer t.rUnlock()
 
-		copy(v, t.cln.config.PublicIP4)
+		copy(v, t.cln.config.publicIP4)
 	}
 }
 
@@ -101,7 +100,7 @@ func TuneReadPublicIPv6(v net.IP) Tuner {
 		t.rLock()
 		defer t.rUnlock()
 
-		copy(v, t.cln.config.PublicIP6)
+		copy(v, t.cln.config.publicIP6)
 	}
 }
 
@@ -139,12 +138,7 @@ func TuneReadAnnounce(v *tracker.Announce) Tuner {
 		t.rLock()
 		defer t.rUnlock()
 
-		*v = tracker.Announce{
-			UserAgent: t.cln.config.HTTPUserAgent,
-			ClientIp4: krpc.NewNodeAddrFromIPPort(t.cln.config.PublicIP4, 0),
-			ClientIp6: krpc.NewNodeAddrFromIPPort(t.cln.config.PublicIP6, 0),
-			Dialer:    t.cln.config.dialer,
-		}
+		*v = t.cln.config.AnnounceRequest()
 	}
 }
 
@@ -338,7 +332,7 @@ func newTorrent(cl *Client, src Metadata) *torrent {
 		cln: cl,
 		_mu: m,
 		peers: newPeerPool(32, func(p Peer) peerPriority {
-			return bep40PriorityIgnoreError(cl.publicAddr(p.IP), p.addr())
+			return bep40PriorityIgnoreError(cl.publicAddr(p.addr()), p.addr())
 		}),
 		conns:                   newconnset(2 * maxEstablishedConns),
 		halfOpen:                make(map[string]Peer),
@@ -597,8 +591,8 @@ func (t *torrent) KnownSwarm() (ks []Peer) {
 	for _, conn := range t.conns.list() {
 		ks = append(ks, Peer{
 			ID:     conn.PeerID,
-			IP:     conn.remoteAddr.IP,
-			Port:   int(conn.remoteAddr.Port),
+			IP:     conn.remoteAddr.Addr().AsSlice(),
+			Port:   int(conn.remoteAddr.Port()),
 			Source: conn.Discovery,
 			// > If the connection is encrypted, that's certainly enough to set SupportsEncryption.
 			// > But if we're not connected to them with an encrypted connection, I couldn't say
@@ -1395,7 +1389,7 @@ func (t *torrent) initiateConn(ctx context.Context, peer Peer) {
 		return
 	}
 
-	addr := IpPort{IP: peer.IP, Port: uint16(peer.Port)}
+	addr := peer.addr()
 	if t.addrActive(addr.String()) {
 		return
 	}
@@ -1520,10 +1514,6 @@ func (t *torrent) ping(addr net.UDPAddr) {
 			}
 		}()
 	})
-}
-
-func (t *torrent) publicAddr(ip net.IP) IpPort {
-	return t.cln.publicAddr(ip)
 }
 
 // Process incoming ut_metadata message.

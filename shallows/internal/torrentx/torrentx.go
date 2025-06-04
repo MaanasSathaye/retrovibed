@@ -11,7 +11,6 @@ import (
 	"github.com/james-lawrence/torrent"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/langx"
-	"github.com/retrovibed/retrovibed/internal/netx"
 	"github.com/retrovibed/retrovibed/internal/slicesx"
 	"github.com/retrovibed/retrovibed/internal/stringsx"
 	"github.com/retrovibed/retrovibed/internal/wireguardx"
@@ -28,15 +27,8 @@ import (
 	"golang.zx2c4.com/wireguard/tun/netstack"
 )
 
-func AnnouncerFromClient(c *torrent.Client, d netx.Dialer) tracker.Announce {
-	cfg := c.Config()
-
-	return tracker.Announce{
-		UserAgent: cfg.HTTPUserAgent,
-		ClientIp4: krpc.NewNodeAddrFromIPPort(cfg.PublicIP4, 0),
-		ClientIp6: krpc.NewNodeAddrFromIPPort(cfg.PublicIP6, 0),
-		Dialer:    d,
-	}
+func AnnouncerFromClient(c *torrent.Client) tracker.Announce {
+	return c.Config().AnnounceRequest()
 }
 
 func Autosocket(p int) (_ torrent.Binder, err error) {
@@ -66,12 +58,12 @@ func WireguardSocket(wcfg *wireguardx.Config, port int) (_ *netstack.Net, _ torr
 	var (
 		s1, s2    sockets.Socket
 		utpsocket *utp.Socket
-		logger    = device.NewLogger(device.LogLevelError, "")
-		// logger    = device.NewLogger(device.LogLevelVerbose, "")
+		// logger    = device.NewLogger(device.LogLevelError, "")
+		logger = device.NewLogger(device.LogLevelVerbose, "")
 	)
 
 	if port == 0 {
-		panic("wireguard sockets require a specified torrent port currently")
+		panic("wireguard sockets requires a specified torrent port")
 	}
 
 	tun, tnet, err := netstack.CreateNetTUN(

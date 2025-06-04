@@ -12,6 +12,7 @@ import (
 	"github.com/james-lawrence/torrent"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/fsnotifyx"
+	"github.com/retrovibed/retrovibed/internal/langx"
 	"github.com/retrovibed/retrovibed/internal/torrentx"
 	"github.com/retrovibed/retrovibed/internal/wireguardx"
 	"golang.zx2c4.com/wireguard/tun/netstack"
@@ -48,6 +49,10 @@ func VPNReload(ctx context.Context, tnetwork torrent.Binder, tclient *torrent.Cl
 		switch evt.Op {
 		case fsnotify.Remove:
 		default:
+			var (
+				wgnet *netstack.Net
+			)
+
 			if previous == errorsx.Zero(filepath.EvalSymlinks(wireguardx.Latest())) {
 				log.Println("vpn configuration unchanged")
 				return nil
@@ -58,10 +63,13 @@ func VPNReload(ctx context.Context, tnetwork torrent.Binder, tclient *torrent.Cl
 				return errorsx.Wrap(err, "unable to parse wireguard config")
 			}
 
-			if _, tnetwork, err = torrentx.WireguardSocket(wcfg, port); err != nil {
+			if wgnet, tnetwork, err = torrentx.WireguardSocket(wcfg, port); err != nil {
 				return errorsx.Wrap(err, "unable to setup wireguard torrent socket")
 			}
-			nclient, err := tnetwork.Bind(torrent.NewClient(torconfig))
+
+			dupped := langx.Clone(*torconfig, torrent.ClientConfigDialer(wgnet))
+
+			nclient, err := tnetwork.Bind(torrent.NewClient(&dupped))
 			if err != nil {
 				return errorsx.Wrap(err, "unable to setup torrent client")
 			}
