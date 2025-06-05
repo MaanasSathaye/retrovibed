@@ -5,9 +5,10 @@
 // @dart = 3.3
 
 // ignore_for_file: annotate_overrides, camel_case_types, comment_references
-// ignore_for_file: constant_identifier_names, library_prefixes
-// ignore_for_file: non_constant_identifier_names, prefer_final_fields
-// ignore_for_file: unnecessary_import, unnecessary_this, unused_import
+// ignore_for_file: constant_identifier_names
+// ignore_for_file: curly_braces_in_flow_control_structures
+// ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
+// ignore_for_file: non_constant_identifier_names
 
 import 'dart:core' as $core;
 
@@ -24,27 +25,19 @@ class Daemon extends $pb.GeneratedMessage {
     $core.String? description,
     $core.String? hostname,
   }) {
-    final $result = create();
-    if (id != null) {
-      $result.id = id;
-    }
-    if (createdAt != null) {
-      $result.createdAt = createdAt;
-    }
-    if (updatedAt != null) {
-      $result.updatedAt = updatedAt;
-    }
-    if (description != null) {
-      $result.description = description;
-    }
-    if (hostname != null) {
-      $result.hostname = hostname;
-    }
-    return $result;
+    final result = create();
+    if (id != null) result.id = id;
+    if (createdAt != null) result.createdAt = createdAt;
+    if (updatedAt != null) result.updatedAt = updatedAt;
+    if (description != null) result.description = description;
+    if (hostname != null) result.hostname = hostname;
+    return result;
   }
-  Daemon._() : super();
-  factory Daemon.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory Daemon.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  Daemon._();
+
+  factory Daemon.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
+  factory Daemon.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'Daemon', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'id')
@@ -60,10 +53,12 @@ class Daemon extends $pb.GeneratedMessage {
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   Daemon copyWith(void Function(Daemon) updates) => super.copyWith((message) => updates(message as Daemon)) as Daemon;
 
+  @$core.override
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
   static Daemon create() => Daemon._();
+  @$core.override
   Daemon createEmptyInstance() => create();
   static $pb.PbList<Daemon> createRepeated() => $pb.PbList<Daemon>();
   @$core.pragma('dart2js:noInline')
@@ -73,7 +68,7 @@ class Daemon extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.String get id => $_getSZ(0);
   @$pb.TagNumber(1)
-  set id($core.String v) { $_setString(0, v); }
+  set id($core.String value) => $_setString(0, value);
   @$pb.TagNumber(1)
   $core.bool hasId() => $_has(0);
   @$pb.TagNumber(1)
@@ -82,7 +77,7 @@ class Daemon extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.String get createdAt => $_getSZ(1);
   @$pb.TagNumber(2)
-  set createdAt($core.String v) { $_setString(1, v); }
+  set createdAt($core.String value) => $_setString(1, value);
   @$pb.TagNumber(2)
   $core.bool hasCreatedAt() => $_has(1);
   @$pb.TagNumber(2)
@@ -91,7 +86,7 @@ class Daemon extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.String get updatedAt => $_getSZ(2);
   @$pb.TagNumber(3)
-  set updatedAt($core.String v) { $_setString(2, v); }
+  set updatedAt($core.String value) => $_setString(2, value);
   @$pb.TagNumber(3)
   $core.bool hasUpdatedAt() => $_has(2);
   @$pb.TagNumber(3)
@@ -100,7 +95,7 @@ class Daemon extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $core.String get description => $_getSZ(3);
   @$pb.TagNumber(4)
-  set description($core.String v) { $_setString(3, v); }
+  set description($core.String value) => $_setString(3, value);
   @$pb.TagNumber(4)
   $core.bool hasDescription() => $_has(3);
   @$pb.TagNumber(4)
@@ -109,7 +104,7 @@ class Daemon extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   $core.String get hostname => $_getSZ(4);
   @$pb.TagNumber(5)
-  set hostname($core.String v) { $_setString(4, v); }
+  set hostname($core.String value) => $_setString(4, value);
   @$pb.TagNumber(5)
   $core.bool hasHostname() => $_has(4);
   @$pb.TagNumber(5)
@@ -122,21 +117,17 @@ class DaemonSearchRequest extends $pb.GeneratedMessage {
     $fixnum.Int64? offset,
     $fixnum.Int64? limit,
   }) {
-    final $result = create();
-    if (query != null) {
-      $result.query = query;
-    }
-    if (offset != null) {
-      $result.offset = offset;
-    }
-    if (limit != null) {
-      $result.limit = limit;
-    }
-    return $result;
+    final result = create();
+    if (query != null) result.query = query;
+    if (offset != null) result.offset = offset;
+    if (limit != null) result.limit = limit;
+    return result;
   }
-  DaemonSearchRequest._() : super();
-  factory DaemonSearchRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory DaemonSearchRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  DaemonSearchRequest._();
+
+  factory DaemonSearchRequest.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
+  factory DaemonSearchRequest.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DaemonSearchRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'query')
@@ -150,10 +141,12 @@ class DaemonSearchRequest extends $pb.GeneratedMessage {
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonSearchRequest copyWith(void Function(DaemonSearchRequest) updates) => super.copyWith((message) => updates(message as DaemonSearchRequest)) as DaemonSearchRequest;
 
+  @$core.override
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
   static DaemonSearchRequest create() => DaemonSearchRequest._();
+  @$core.override
   DaemonSearchRequest createEmptyInstance() => create();
   static $pb.PbList<DaemonSearchRequest> createRepeated() => $pb.PbList<DaemonSearchRequest>();
   @$core.pragma('dart2js:noInline')
@@ -163,7 +156,7 @@ class DaemonSearchRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.String get query => $_getSZ(0);
   @$pb.TagNumber(1)
-  set query($core.String v) { $_setString(0, v); }
+  set query($core.String value) => $_setString(0, value);
   @$pb.TagNumber(1)
   $core.bool hasQuery() => $_has(0);
   @$pb.TagNumber(1)
@@ -172,7 +165,7 @@ class DaemonSearchRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $fixnum.Int64 get offset => $_getI64(1);
   @$pb.TagNumber(2)
-  set offset($fixnum.Int64 v) { $_setInt64(1, v); }
+  set offset($fixnum.Int64 value) => $_setInt64(1, value);
   @$pb.TagNumber(2)
   $core.bool hasOffset() => $_has(1);
   @$pb.TagNumber(2)
@@ -181,7 +174,7 @@ class DaemonSearchRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $fixnum.Int64 get limit => $_getI64(2);
   @$pb.TagNumber(3)
-  set limit($fixnum.Int64 v) { $_setInt64(2, v); }
+  set limit($fixnum.Int64 value) => $_setInt64(2, value);
   @$pb.TagNumber(3)
   $core.bool hasLimit() => $_has(2);
   @$pb.TagNumber(3)
@@ -193,18 +186,16 @@ class DaemonSearchResponse extends $pb.GeneratedMessage {
     DaemonSearchRequest? next,
     $core.Iterable<Daemon>? items,
   }) {
-    final $result = create();
-    if (next != null) {
-      $result.next = next;
-    }
-    if (items != null) {
-      $result.items.addAll(items);
-    }
-    return $result;
+    final result = create();
+    if (next != null) result.next = next;
+    if (items != null) result.items.addAll(items);
+    return result;
   }
-  DaemonSearchResponse._() : super();
-  factory DaemonSearchResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory DaemonSearchResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  DaemonSearchResponse._();
+
+  factory DaemonSearchResponse.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
+  factory DaemonSearchResponse.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DaemonSearchResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
     ..aOM<DaemonSearchRequest>(1, _omitFieldNames ? '' : 'next', subBuilder: DaemonSearchRequest.create)
@@ -217,10 +208,12 @@ class DaemonSearchResponse extends $pb.GeneratedMessage {
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonSearchResponse copyWith(void Function(DaemonSearchResponse) updates) => super.copyWith((message) => updates(message as DaemonSearchResponse)) as DaemonSearchResponse;
 
+  @$core.override
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
   static DaemonSearchResponse create() => DaemonSearchResponse._();
+  @$core.override
   DaemonSearchResponse createEmptyInstance() => create();
   static $pb.PbList<DaemonSearchResponse> createRepeated() => $pb.PbList<DaemonSearchResponse>();
   @$core.pragma('dart2js:noInline')
@@ -230,7 +223,7 @@ class DaemonSearchResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   DaemonSearchRequest get next => $_getN(0);
   @$pb.TagNumber(1)
-  set next(DaemonSearchRequest v) { $_setField(1, v); }
+  set next(DaemonSearchRequest value) => $_setField(1, value);
   @$pb.TagNumber(1)
   $core.bool hasNext() => $_has(0);
   @$pb.TagNumber(1)
@@ -246,15 +239,15 @@ class DaemonCreateRequest extends $pb.GeneratedMessage {
   factory DaemonCreateRequest({
     Daemon? daemon,
   }) {
-    final $result = create();
-    if (daemon != null) {
-      $result.daemon = daemon;
-    }
-    return $result;
+    final result = create();
+    if (daemon != null) result.daemon = daemon;
+    return result;
   }
-  DaemonCreateRequest._() : super();
-  factory DaemonCreateRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory DaemonCreateRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  DaemonCreateRequest._();
+
+  factory DaemonCreateRequest.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
+  factory DaemonCreateRequest.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DaemonCreateRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
     ..aOM<Daemon>(1, _omitFieldNames ? '' : 'daemon', subBuilder: Daemon.create)
@@ -266,10 +259,12 @@ class DaemonCreateRequest extends $pb.GeneratedMessage {
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonCreateRequest copyWith(void Function(DaemonCreateRequest) updates) => super.copyWith((message) => updates(message as DaemonCreateRequest)) as DaemonCreateRequest;
 
+  @$core.override
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
   static DaemonCreateRequest create() => DaemonCreateRequest._();
+  @$core.override
   DaemonCreateRequest createEmptyInstance() => create();
   static $pb.PbList<DaemonCreateRequest> createRepeated() => $pb.PbList<DaemonCreateRequest>();
   @$core.pragma('dart2js:noInline')
@@ -279,7 +274,7 @@ class DaemonCreateRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Daemon get daemon => $_getN(0);
   @$pb.TagNumber(1)
-  set daemon(Daemon v) { $_setField(1, v); }
+  set daemon(Daemon value) => $_setField(1, value);
   @$pb.TagNumber(1)
   $core.bool hasDaemon() => $_has(0);
   @$pb.TagNumber(1)
@@ -292,15 +287,15 @@ class DaemonCreateResponse extends $pb.GeneratedMessage {
   factory DaemonCreateResponse({
     Daemon? daemon,
   }) {
-    final $result = create();
-    if (daemon != null) {
-      $result.daemon = daemon;
-    }
-    return $result;
+    final result = create();
+    if (daemon != null) result.daemon = daemon;
+    return result;
   }
-  DaemonCreateResponse._() : super();
-  factory DaemonCreateResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory DaemonCreateResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  DaemonCreateResponse._();
+
+  factory DaemonCreateResponse.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
+  factory DaemonCreateResponse.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DaemonCreateResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
     ..aOM<Daemon>(1, _omitFieldNames ? '' : 'daemon', subBuilder: Daemon.create)
@@ -312,10 +307,12 @@ class DaemonCreateResponse extends $pb.GeneratedMessage {
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonCreateResponse copyWith(void Function(DaemonCreateResponse) updates) => super.copyWith((message) => updates(message as DaemonCreateResponse)) as DaemonCreateResponse;
 
+  @$core.override
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
   static DaemonCreateResponse create() => DaemonCreateResponse._();
+  @$core.override
   DaemonCreateResponse createEmptyInstance() => create();
   static $pb.PbList<DaemonCreateResponse> createRepeated() => $pb.PbList<DaemonCreateResponse>();
   @$core.pragma('dart2js:noInline')
@@ -325,7 +322,7 @@ class DaemonCreateResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Daemon get daemon => $_getN(0);
   @$pb.TagNumber(1)
-  set daemon(Daemon v) { $_setField(1, v); }
+  set daemon(Daemon value) => $_setField(1, value);
   @$pb.TagNumber(1)
   $core.bool hasDaemon() => $_has(0);
   @$pb.TagNumber(1)
@@ -336,9 +333,11 @@ class DaemonCreateResponse extends $pb.GeneratedMessage {
 
 class DaemonDeleteRequest extends $pb.GeneratedMessage {
   factory DaemonDeleteRequest() => create();
-  DaemonDeleteRequest._() : super();
-  factory DaemonDeleteRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory DaemonDeleteRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  DaemonDeleteRequest._();
+
+  factory DaemonDeleteRequest.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
+  factory DaemonDeleteRequest.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DaemonDeleteRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
     ..hasRequiredFields = false
@@ -349,10 +348,12 @@ class DaemonDeleteRequest extends $pb.GeneratedMessage {
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonDeleteRequest copyWith(void Function(DaemonDeleteRequest) updates) => super.copyWith((message) => updates(message as DaemonDeleteRequest)) as DaemonDeleteRequest;
 
+  @$core.override
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
   static DaemonDeleteRequest create() => DaemonDeleteRequest._();
+  @$core.override
   DaemonDeleteRequest createEmptyInstance() => create();
   static $pb.PbList<DaemonDeleteRequest> createRepeated() => $pb.PbList<DaemonDeleteRequest>();
   @$core.pragma('dart2js:noInline')
@@ -364,15 +365,15 @@ class DaemonDeleteResponse extends $pb.GeneratedMessage {
   factory DaemonDeleteResponse({
     Daemon? daemon,
   }) {
-    final $result = create();
-    if (daemon != null) {
-      $result.daemon = daemon;
-    }
-    return $result;
+    final result = create();
+    if (daemon != null) result.daemon = daemon;
+    return result;
   }
-  DaemonDeleteResponse._() : super();
-  factory DaemonDeleteResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory DaemonDeleteResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  DaemonDeleteResponse._();
+
+  factory DaemonDeleteResponse.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
+  factory DaemonDeleteResponse.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DaemonDeleteResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
     ..aOM<Daemon>(1, _omitFieldNames ? '' : 'daemon', subBuilder: Daemon.create)
@@ -384,10 +385,12 @@ class DaemonDeleteResponse extends $pb.GeneratedMessage {
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonDeleteResponse copyWith(void Function(DaemonDeleteResponse) updates) => super.copyWith((message) => updates(message as DaemonDeleteResponse)) as DaemonDeleteResponse;
 
+  @$core.override
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
   static DaemonDeleteResponse create() => DaemonDeleteResponse._();
+  @$core.override
   DaemonDeleteResponse createEmptyInstance() => create();
   static $pb.PbList<DaemonDeleteResponse> createRepeated() => $pb.PbList<DaemonDeleteResponse>();
   @$core.pragma('dart2js:noInline')
@@ -397,7 +400,7 @@ class DaemonDeleteResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Daemon get daemon => $_getN(0);
   @$pb.TagNumber(1)
-  set daemon(Daemon v) { $_setField(1, v); }
+  set daemon(Daemon value) => $_setField(1, value);
   @$pb.TagNumber(1)
   $core.bool hasDaemon() => $_has(0);
   @$pb.TagNumber(1)
@@ -408,9 +411,11 @@ class DaemonDeleteResponse extends $pb.GeneratedMessage {
 
 class DaemonLookupRequest extends $pb.GeneratedMessage {
   factory DaemonLookupRequest() => create();
-  DaemonLookupRequest._() : super();
-  factory DaemonLookupRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory DaemonLookupRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  DaemonLookupRequest._();
+
+  factory DaemonLookupRequest.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
+  factory DaemonLookupRequest.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DaemonLookupRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
     ..hasRequiredFields = false
@@ -421,10 +426,12 @@ class DaemonLookupRequest extends $pb.GeneratedMessage {
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonLookupRequest copyWith(void Function(DaemonLookupRequest) updates) => super.copyWith((message) => updates(message as DaemonLookupRequest)) as DaemonLookupRequest;
 
+  @$core.override
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
   static DaemonLookupRequest create() => DaemonLookupRequest._();
+  @$core.override
   DaemonLookupRequest createEmptyInstance() => create();
   static $pb.PbList<DaemonLookupRequest> createRepeated() => $pb.PbList<DaemonLookupRequest>();
   @$core.pragma('dart2js:noInline')
@@ -436,15 +443,15 @@ class DaemonLookupResponse extends $pb.GeneratedMessage {
   factory DaemonLookupResponse({
     Daemon? daemon,
   }) {
-    final $result = create();
-    if (daemon != null) {
-      $result.daemon = daemon;
-    }
-    return $result;
+    final result = create();
+    if (daemon != null) result.daemon = daemon;
+    return result;
   }
-  DaemonLookupResponse._() : super();
-  factory DaemonLookupResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory DaemonLookupResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  DaemonLookupResponse._();
+
+  factory DaemonLookupResponse.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
+  factory DaemonLookupResponse.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DaemonLookupResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
     ..aOM<Daemon>(1, _omitFieldNames ? '' : 'daemon', subBuilder: Daemon.create)
@@ -456,10 +463,12 @@ class DaemonLookupResponse extends $pb.GeneratedMessage {
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonLookupResponse copyWith(void Function(DaemonLookupResponse) updates) => super.copyWith((message) => updates(message as DaemonLookupResponse)) as DaemonLookupResponse;
 
+  @$core.override
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
   static DaemonLookupResponse create() => DaemonLookupResponse._();
+  @$core.override
   DaemonLookupResponse createEmptyInstance() => create();
   static $pb.PbList<DaemonLookupResponse> createRepeated() => $pb.PbList<DaemonLookupResponse>();
   @$core.pragma('dart2js:noInline')
@@ -469,7 +478,7 @@ class DaemonLookupResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Daemon get daemon => $_getN(0);
   @$pb.TagNumber(1)
-  set daemon(Daemon v) { $_setField(1, v); }
+  set daemon(Daemon value) => $_setField(1, value);
   @$pb.TagNumber(1)
   $core.bool hasDaemon() => $_has(0);
   @$pb.TagNumber(1)
@@ -482,15 +491,15 @@ class DaemonUpdateRequest extends $pb.GeneratedMessage {
   factory DaemonUpdateRequest({
     Daemon? daemon,
   }) {
-    final $result = create();
-    if (daemon != null) {
-      $result.daemon = daemon;
-    }
-    return $result;
+    final result = create();
+    if (daemon != null) result.daemon = daemon;
+    return result;
   }
-  DaemonUpdateRequest._() : super();
-  factory DaemonUpdateRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory DaemonUpdateRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  DaemonUpdateRequest._();
+
+  factory DaemonUpdateRequest.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
+  factory DaemonUpdateRequest.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DaemonUpdateRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
     ..aOM<Daemon>(1, _omitFieldNames ? '' : 'daemon', subBuilder: Daemon.create)
@@ -502,10 +511,12 @@ class DaemonUpdateRequest extends $pb.GeneratedMessage {
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonUpdateRequest copyWith(void Function(DaemonUpdateRequest) updates) => super.copyWith((message) => updates(message as DaemonUpdateRequest)) as DaemonUpdateRequest;
 
+  @$core.override
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
   static DaemonUpdateRequest create() => DaemonUpdateRequest._();
+  @$core.override
   DaemonUpdateRequest createEmptyInstance() => create();
   static $pb.PbList<DaemonUpdateRequest> createRepeated() => $pb.PbList<DaemonUpdateRequest>();
   @$core.pragma('dart2js:noInline')
@@ -515,7 +526,7 @@ class DaemonUpdateRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Daemon get daemon => $_getN(0);
   @$pb.TagNumber(1)
-  set daemon(Daemon v) { $_setField(1, v); }
+  set daemon(Daemon value) => $_setField(1, value);
   @$pb.TagNumber(1)
   $core.bool hasDaemon() => $_has(0);
   @$pb.TagNumber(1)
@@ -528,15 +539,15 @@ class DaemonUpdateResponse extends $pb.GeneratedMessage {
   factory DaemonUpdateResponse({
     Daemon? daemon,
   }) {
-    final $result = create();
-    if (daemon != null) {
-      $result.daemon = daemon;
-    }
-    return $result;
+    final result = create();
+    if (daemon != null) result.daemon = daemon;
+    return result;
   }
-  DaemonUpdateResponse._() : super();
-  factory DaemonUpdateResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory DaemonUpdateResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  DaemonUpdateResponse._();
+
+  factory DaemonUpdateResponse.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
+  factory DaemonUpdateResponse.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DaemonUpdateResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
     ..aOM<Daemon>(1, _omitFieldNames ? '' : 'daemon', subBuilder: Daemon.create)
@@ -548,10 +559,12 @@ class DaemonUpdateResponse extends $pb.GeneratedMessage {
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonUpdateResponse copyWith(void Function(DaemonUpdateResponse) updates) => super.copyWith((message) => updates(message as DaemonUpdateResponse)) as DaemonUpdateResponse;
 
+  @$core.override
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
   static DaemonUpdateResponse create() => DaemonUpdateResponse._();
+  @$core.override
   DaemonUpdateResponse createEmptyInstance() => create();
   static $pb.PbList<DaemonUpdateResponse> createRepeated() => $pb.PbList<DaemonUpdateResponse>();
   @$core.pragma('dart2js:noInline')
@@ -561,7 +574,7 @@ class DaemonUpdateResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Daemon get daemon => $_getN(0);
   @$pb.TagNumber(1)
-  set daemon(Daemon v) { $_setField(1, v); }
+  set daemon(Daemon value) => $_setField(1, value);
   @$pb.TagNumber(1)
   $core.bool hasDaemon() => $_has(0);
   @$pb.TagNumber(1)
@@ -574,15 +587,15 @@ class DaemonDisableRequest extends $pb.GeneratedMessage {
   factory DaemonDisableRequest({
     Daemon? daemon,
   }) {
-    final $result = create();
-    if (daemon != null) {
-      $result.daemon = daemon;
-    }
-    return $result;
+    final result = create();
+    if (daemon != null) result.daemon = daemon;
+    return result;
   }
-  DaemonDisableRequest._() : super();
-  factory DaemonDisableRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory DaemonDisableRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  DaemonDisableRequest._();
+
+  factory DaemonDisableRequest.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
+  factory DaemonDisableRequest.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DaemonDisableRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
     ..aOM<Daemon>(1, _omitFieldNames ? '' : 'daemon', subBuilder: Daemon.create)
@@ -594,10 +607,12 @@ class DaemonDisableRequest extends $pb.GeneratedMessage {
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonDisableRequest copyWith(void Function(DaemonDisableRequest) updates) => super.copyWith((message) => updates(message as DaemonDisableRequest)) as DaemonDisableRequest;
 
+  @$core.override
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
   static DaemonDisableRequest create() => DaemonDisableRequest._();
+  @$core.override
   DaemonDisableRequest createEmptyInstance() => create();
   static $pb.PbList<DaemonDisableRequest> createRepeated() => $pb.PbList<DaemonDisableRequest>();
   @$core.pragma('dart2js:noInline')
@@ -607,7 +622,7 @@ class DaemonDisableRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Daemon get daemon => $_getN(0);
   @$pb.TagNumber(1)
-  set daemon(Daemon v) { $_setField(1, v); }
+  set daemon(Daemon value) => $_setField(1, value);
   @$pb.TagNumber(1)
   $core.bool hasDaemon() => $_has(0);
   @$pb.TagNumber(1)
@@ -620,15 +635,15 @@ class DaemonDisableResponse extends $pb.GeneratedMessage {
   factory DaemonDisableResponse({
     Daemon? daemon,
   }) {
-    final $result = create();
-    if (daemon != null) {
-      $result.daemon = daemon;
-    }
-    return $result;
+    final result = create();
+    if (daemon != null) result.daemon = daemon;
+    return result;
   }
-  DaemonDisableResponse._() : super();
-  factory DaemonDisableResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory DaemonDisableResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  DaemonDisableResponse._();
+
+  factory DaemonDisableResponse.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
+  factory DaemonDisableResponse.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DaemonDisableResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
     ..aOM<Daemon>(1, _omitFieldNames ? '' : 'daemon', subBuilder: Daemon.create)
@@ -640,10 +655,12 @@ class DaemonDisableResponse extends $pb.GeneratedMessage {
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DaemonDisableResponse copyWith(void Function(DaemonDisableResponse) updates) => super.copyWith((message) => updates(message as DaemonDisableResponse)) as DaemonDisableResponse;
 
+  @$core.override
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
   static DaemonDisableResponse create() => DaemonDisableResponse._();
+  @$core.override
   DaemonDisableResponse createEmptyInstance() => create();
   static $pb.PbList<DaemonDisableResponse> createRepeated() => $pb.PbList<DaemonDisableResponse>();
   @$core.pragma('dart2js:noInline')
@@ -653,7 +670,7 @@ class DaemonDisableResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Daemon get daemon => $_getN(0);
   @$pb.TagNumber(1)
-  set daemon(Daemon v) { $_setField(1, v); }
+  set daemon(Daemon value) => $_setField(1, value);
   @$pb.TagNumber(1)
   $core.bool hasDaemon() => $_has(0);
   @$pb.TagNumber(1)
@@ -663,5 +680,5 @@ class DaemonDisableResponse extends $pb.GeneratedMessage {
 }
 
 
-const _omitFieldNames = $core.bool.fromEnvironment('protobuf.omit_field_names');
-const _omitMessageNames = $core.bool.fromEnvironment('protobuf.omit_message_names');
+const $core.bool _omitFieldNames = $core.bool.fromEnvironment('protobuf.omit_field_names');
+const $core.bool _omitMessageNames = $core.bool.fromEnvironment('protobuf.omit_message_names');

@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package meta;
+
+message Billing {
+  string customer_id = 1 [ json_name = "customer_id" ];
+  string plan_id = 2 [ json_name = "plan_id" ];
+  string subscription_id = 3 [ json_name = "subscription_id" ];
+  string subscription_ended_at = 4 [ json_name = "subscription_ended_at" ];
+}
+
+message BillingCreateRequest {}
+message BillingCreateResponse { Billing billing = 1 [ json_name = "billing" ]; }
+
+message BillingLookupRequest {}
+message BillingLookupResponse { Billing billing = 1 [ json_name = "billing" ]; }
+
+message BillingSubscribeRequest { string plan = 1 [ json_name = "plan" ]; }
+message BillingSubscribeResponse {
+  Billing billing = 1 [ json_name = "billing" ];
+}
+
+message BillingSessionRequest { string plan = 1 [ json_name = "plan" ]; }
+message BillingSessionResponse {
+  string redirect = 1 [ json_name = "redirect" ];
+}

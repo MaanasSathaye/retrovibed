@@ -16,13 +16,76 @@ import (
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/httpx"
 	"github.com/retrovibed/retrovibed/internal/jwtx"
+	"github.com/retrovibed/retrovibed/internal/oauth2x"
 	"github.com/retrovibed/retrovibed/internal/sshx"
+	"github.com/retrovibed/retrovibed/internal/stringsx"
+	"github.com/retrovibed/retrovibed/internal/userx"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/oauth2"
 )
 
+func oauth2SSHConfig(signer ssh.Signer, otp string, endpoint oauth2.Endpoint) oauth2.Config {
+	return oauth2.Config{
+		ClientID:     ssh.FingerprintSHA256(signer.PublicKey()),
+		ClientSecret: otp,
+		Endpoint:     endpoint,
+	}
+}
+
 func PublicKeyPath() string {
 	return env.PrivateKeyPath() + ".pub"
+}
+
+func UserDisplayName() string {
+	u := userx.CurrentUserOrDefault(userx.Zero())
+	return stringsx.FirstNonBlank(u.Name, u.Username)
+}
+
+func Oauth2Bearer(ctx context.Context, c *http.Client, email, displayname string) (*oauth2.Token, error) {
+	type exstate struct {
+		Entropy   string `json:"uid"`
+		PublicKey []byte `json:"pkey"`
+		Email     string `json:"email"`
+		Display   string `json:"display"`
+	}
+
+	c = httpx.BindRetryTransport(c, http.StatusBadGateway, http.StatusTooManyRequests)
+
+	signer, err := sshx.AutoCached(sshx.NewKeyGen(), env.PrivateKeyPath())
+	if err != nil {
+		return nil, errorsx.Wrap(err, "unable to read identity")
+	}
+
+	cfg := oauth2SSHConfig(signer, "", EndpointSSHAuth("https://localhost:8081"))
+
+	state, err := jwtx.EncodeJSON(exstate{
+		Entropy:   errorsx.Must(uuid.NewV4()).String(),
+		PublicKey: signer.PublicKey().Marshal(),
+		Email:     email,
+		Display:   displayname,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	authzuri := cfg.AuthCodeURL(
+		state,
+		oauth2.AccessTypeOffline,
+	)
+
+	exchanged, err := oauth2x.RetrieveAuthCode(ctx, c, authzuri)
+	if err != nil {
+		return nil, err
+	}
+
+	if exchanged.State != state {
+		return nil, fmt.Errorf("unexpected state")
+	}
+
+	ctx = context.WithValue(ctx, oauth2.HTTPClient, c)
+	token, err := cfg.Exchange(ctx, exchanged.Code, oauth2.AccessTypeOffline)
+
+	return token, errorsx.Wrap(err, "token signature failure")
 }
 
 func NewBearer() (string, error) {
@@ -42,10 +105,6 @@ func NewBearer() (string, error) {
 	debugx.Println("claims", spew.Sdump(claims))
 
 	bearer, err := jwtx.Signed(JWTSecretFromEnv(), claims)
-	// bearer, err := jwt.NewWithClaims(
-	// 	jwtx.NewSSHSigner(),
-	// 	claims,
-	// ).SignedString(signer)
 
 	return bearer, errorsx.Wrap(err, "token signature failure")
 }

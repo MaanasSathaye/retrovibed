@@ -92,7 +92,7 @@ class Error extends StatelessWidget {
 
   static Error unknown(Object obj, {void Function()? onTap}) {
     return Error(
-      child: SelectableText("an unexpected problem has occurred"),
+      child: Text("an unexpected problem has occurred"),
       cause: obj,
       onTap: onTap,
     );
@@ -100,7 +100,7 @@ class Error extends StatelessWidget {
 
   static Error unauthorized(Object obj, {void Function()? onTap, Widget? message, Color? color }) {
     return Error(
-      child: message ?? SelectableText("you lack sufficient permissions"),
+      child: message ?? Text("you lack sufficient permissions"),
       cause: obj,
       onTap: onTap,
       color: color,
@@ -125,7 +125,7 @@ class Error extends StatelessWidget {
 
   static Error timeout(Object obj, {void Function()? onTap}) {
     return Error(
-      child: SelectableText(
+      child: Text(
         "timeout error: unable to complete within the expected timeframe",
       ),
       cause: obj,
@@ -152,7 +152,10 @@ class Error extends StatelessWidget {
       onTap: onTap,
       onLongPress: onTap,
       child: Container(
-        decoration: BoxDecoration(color: color ?? defaults.danger),
+        decoration: BoxDecoration(
+          color: color ?? defaults.danger,
+          borderRadius: BorderRadius.circular(20.0),
+        ),
         child: Center(
           child: SelectionArea(
             child: child,

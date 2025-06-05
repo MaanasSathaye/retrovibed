@@ -21,7 +21,7 @@ class Overlay extends StatelessWidget {
       child: Stack(
         fit: StackFit.passthrough,
         alignment: alignment,
-        children: [child, overlay ?? const SizedBox()],
+        children: [child, Positioned.fill(child: overlay ?? const SizedBox())],
       ),
     );
   }

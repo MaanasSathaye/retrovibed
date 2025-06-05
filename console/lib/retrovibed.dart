@@ -21,6 +21,10 @@ String _path() {
 
 final bridge = lib.DaemonBridge(DynamicLibrary.open(_path()));
 
+String oauth2_bearer() {
+  return _convertstring(bridge.oauth2_bearer());
+}
+
 String bearer_token() {
   return _convertstring(bridge.authn_bearer());
 }

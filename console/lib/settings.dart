@@ -4,6 +4,7 @@ import 'package:retrovibed/rss.dart' as rss;
 import 'package:retrovibed/torrents.dart' as torrents;
 import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/profiles.dart' as profiles;
+import 'package:retrovibed/billing.dart' as billing;
 import 'package:retrovibed/wireguard.dart' as wg;
 
 class Display extends StatelessWidget {
@@ -61,9 +62,10 @@ class Display extends StatelessWidget {
             ),
           ),
           ds.Accordion(
-            disabled: Text("coming soon - opt in premium features"),
-            description: Text("billing"),
-            content: Container(),
+            description: Row(children: [Text("billing"), Spacer(), Text("opt in premium features")]),
+            content: billing.Registered(
+              billing.Settings(),
+            ),
           ),
         ],
       ),

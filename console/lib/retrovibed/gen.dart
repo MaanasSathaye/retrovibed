@@ -26,6 +26,16 @@ class DaemonBridge {
           lookup)
       : _lookup = lookup;
 
+  ffi.Pointer<ffi.Char> oauth2_bearer() {
+    return _oauth2_bearer();
+  }
+
+  late final _oauth2_bearerPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function()>>(
+          'oauth2_bearer');
+  late final _oauth2_bearer =
+      _oauth2_bearerPtr.asFunction<ffi.Pointer<ffi.Char> Function()>();
+
   ffi.Pointer<ffi.Char> authn_bearer() {
     return _authn_bearer();
   }

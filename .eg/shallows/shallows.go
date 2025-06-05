@@ -23,7 +23,9 @@ func rootdir() string {
 }
 
 func shellruntime() shell.Command {
-	return eggolang.Runtime().Directory(rootdir())
+	return eggolang.Runtime().Directory(rootdir()).Environ(
+		"CACHE_DIRECTORY", egenv.CacheDirectory(),
+	)
 }
 
 func Generate(ctx context.Context, op eg.Op) error {
@@ -37,7 +39,7 @@ func GenerateGogen(ctx context.Context, _ eg.Op) error {
 	gruntime := shellruntime()
 	return shell.Run(
 		ctx,
-		gruntime.New("go generate ./... && go fmt ./...").Timeout(10*time.Minute),
+		gruntime.New("go generate ./... && go fmt ./...").Timeout(15*time.Minute),
 	)
 }
 

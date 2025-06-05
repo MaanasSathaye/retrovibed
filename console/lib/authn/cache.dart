@@ -6,6 +6,7 @@ class AuthzCache extends StatefulWidget {
   final Widget child;
 
   const AuthzCache(this.child, {Key? key}) : super(key: key);
+
   static _AuthzCache? of(BuildContext context) {
     return context.findAncestorStateOfType<_AuthzCache>();
   }

@@ -18,6 +18,10 @@ func Root() user.User {
 	}
 }
 
+func Zero() user.User {
+	return user.User{}
+}
+
 // returns the relative root that should be used for all well known directories.
 func DefaultRelRoot() string {
 	const DefaultDir = "retrovibed"

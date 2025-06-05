@@ -125,6 +125,8 @@ type Token struct {
 	Expires        int64  `protobuf:"varint,6,opt,name=expires,json=exp,proto3" json:"expires,omitempty"`
 	NotBefore      int64  `protobuf:"varint,7,opt,name=not_before,json=nbf,proto3" json:"not_before,omitempty"`
 	Usermanagement bool   `protobuf:"varint,1000,opt,name=usermanagement,proto3" json:"usermanagement,omitempty"`
+	BillingRead    bool   `protobuf:"varint,1002,opt,name=billing_read,proto3" json:"billing_read,omitempty"`
+	BillingModify  bool   `protobuf:"varint,1003,opt,name=billing_modify,proto3" json:"billing_modify,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -211,6 +213,20 @@ func (x *Token) GetNotBefore() int64 {
 func (x *Token) GetUsermanagement() bool {
 	if x != nil {
 		return x.Usermanagement
+	}
+	return false
+}
+
+func (x *Token) GetBillingRead() bool {
+	if x != nil {
+		return x.BillingRead
+	}
+	return false
+}
+
+func (x *Token) GetBillingModify() bool {
+	if x != nil {
+		return x.BillingModify
 	}
 	return false
 }
@@ -582,7 +598,7 @@ const file_meta_authz_proto_rawDesc = "" +
 	"\x06issued\x18\x05 \x01(\x03R\x03iat\x12\x14\n" +
 	"\aexpires\x18\x06 \x01(\x03R\x03exp\x12\x17\n" +
 	"\n" +
-	"not_before\x18\a \x01(\x03R\x03nbf\"\xd3\x01\n" +
+	"not_before\x18\a \x01(\x03R\x03nbf\"\xa1\x02\n" +
 	"\x05Token\x12\x0f\n" +
 	"\x02id\x18\x01 \x01(\tR\x03jti\x12\x13\n" +
 	"\x06issuer\x18\x02 \x01(\tR\x03iss\x12\x17\n" +
@@ -594,7 +610,9 @@ const file_meta_authz_proto_rawDesc = "" +
 	"\aexpires\x18\x06 \x01(\x03R\x03exp\x12\x17\n" +
 	"\n" +
 	"not_before\x18\a \x01(\x03R\x03nbf\x12'\n" +
-	"\x0eusermanagement\x18\xe8\a \x01(\bR\x0eusermanagementJ\x05\b\t\x10\xe8\a\"\x0e\n" +
+	"\x0eusermanagement\x18\xe8\a \x01(\bR\x0eusermanagement\x12#\n" +
+	"\fbilling_read\x18\xea\a \x01(\bR\fbilling_read\x12'\n" +
+	"\x0ebilling_modify\x18\xeb\a \x01(\bR\x0ebilling_modifyJ\x05\b\t\x10\xe8\a\"\x0e\n" +
 	"\fAuthzRequest\"J\n" +
 	"\rAuthzResponse\x12\x16\n" +
 	"\x06bearer\x18\x01 \x01(\tR\x06bearer\x12!\n" +

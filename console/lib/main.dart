@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart'; // Provides [Player], [Media], [Playlist] etc.
 import 'package:retrovibed/env.dart' as env;
-import 'package:retrovibed/auth.dart' as auth;
+import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/downloads.dart' as downloads;
 import 'package:retrovibed/settings.dart' as settings;
 import 'package:retrovibed/media.dart' as media;
@@ -41,9 +41,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(
-        textScaler: autoscaling(context),
-      ),
+      data: MediaQuery.of(context).copyWith(textScaler: autoscaling(context)),
       child: MaterialApp(
         darkTheme: ThemeData(
           brightness: Brightness.dark,
@@ -54,43 +52,45 @@ class MyApp extends StatelessWidget {
         home: Material(
           child: ds.Full(
             meta.EndpointAuto(
-              auth.AuthzCache(
-                modals.Node(
-                  media.Playlist(
-                    DefaultTabController(
-                      length: 3,
-                      child: Scaffold(
-                        appBar: TabBar(
-                          tabs: [
-                            Tab(icon: Icon(Icons.movie)),
-                            Tab(icon: Icon(Icons.download)),
-                            Tab(icon: Icon(Icons.settings)),
-                          ],
-                        ),
-                        body: TabBarView(
-                          children: [
-                            ds.ErrorBoundary(
-                              media.Playlist.wrap((ctx, s) {
-                                return media.VideoScreen(
-                                  env.Boolean(
-                                        env.vars.AutoIdentifyMedia,
-                                        fallback: false,
-                                      )
-                                      ? medialib.AvailableGridDisplay(
-                                        focus: s.searchfocus,
-                                        controller: s.controller,
-                                      )
-                                      : medialib.AvailableListDisplay(
-                                        focus: s.searchfocus,
-                                        controller: s.controller,
-                                      ),
-                                  s.player,
-                                );
-                              }),
-                            ),
-                            ds.ErrorBoundary(downloads.Display()),
-                            ds.ErrorBoundary(settings.Display()),
-                          ],
+              authn.Authenticated(
+                authn.AuthzCache(
+                  modals.Node(
+                    media.Playlist(
+                      DefaultTabController(
+                        length: 3,
+                        child: Scaffold(
+                          appBar: TabBar(
+                            tabs: [
+                              Tab(icon: Icon(Icons.movie)),
+                              Tab(icon: Icon(Icons.download)),
+                              Tab(icon: Icon(Icons.settings)),
+                            ],
+                          ),
+                          body: TabBarView(
+                            children: [
+                              ds.ErrorBoundary(
+                                media.Playlist.wrap((ctx, s) {
+                                  return media.VideoScreen(
+                                    env.Boolean(
+                                          env.vars.AutoIdentifyMedia,
+                                          fallback: false,
+                                        )
+                                        ? medialib.AvailableGridDisplay(
+                                          focus: s.searchfocus,
+                                          controller: s.controller,
+                                        )
+                                        : medialib.AvailableListDisplay(
+                                          focus: s.searchfocus,
+                                          controller: s.controller,
+                                        ),
+                                    s.player,
+                                  );
+                                }),
+                              ),
+                              ds.ErrorBoundary(downloads.Display()),
+                              ds.ErrorBoundary(settings.Display()),
+                            ],
+                          ),
                         ),
                       ),
                     ),

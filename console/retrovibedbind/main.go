@@ -13,7 +13,44 @@ import (
 	"github.com/retrovibed/retrovibed/authn"
 	"github.com/retrovibed/retrovibed/cmd/cmdglobalmain"
 	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
+	"golang.org/x/oauth2"
 )
+
+// var cachedOauth2 *oauth2.Token
+
+//export oauth2_bearer
+func oauth2_bearer() *C.char {
+	var (
+		err   error
+		token *oauth2.Token
+	)
+
+	// if cachedOauth2 != nil && cachedOauth2.Expiry.After(time.Now()) {
+	// 	return C.CString(cachedOauth2.AccessToken)
+	// }
+
+	ctx, done := context.WithTimeout(context.Background(), 10*time.Second)
+	defer done()
+
+	chttp := &http.Client{
+		Transport: &http.Transport{
+			Proxy:                 http.ProxyFromEnvironment,
+			ForceAttemptHTTP2:     true,
+			MaxIdleConns:          100,
+			IdleConnTimeout:       90 * time.Second,
+			TLSHandshakeTimeout:   10 * time.Second,
+			ExpectContinueTimeout: 1 * time.Second,
+			TLSClientConfig:       &tls.Config{InsecureSkipVerify: true},
+		},
+	}
+
+	if token, err = authn.Oauth2Bearer(ctx, chttp, "", authn.UserDisplayName()); err != nil {
+		log.Println("failed to create oauth2 bearer token", err)
+		return C.CString("")
+	}
+
+	return C.CString(token.AccessToken)
+}
 
 //export authn_bearer
 func authn_bearer() *C.char {
