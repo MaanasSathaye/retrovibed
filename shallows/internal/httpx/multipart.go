@@ -26,7 +26,7 @@ func NewMultipartHeader(mimetype string, fieldname string, filename string) text
 	return h
 }
 
-func Multipart(do func(*multipart.Writer) error) (_ string, _ *os.File, err error) {
+func Multipart(do func(*multipart.Writer) error) (contentType string, _ *os.File, err error) {
 	buffer, err := os.CreateTemp(envx.String("", "CACHE_DIRECTORY"), "multipart.upload.bin.")
 	if err != nil {
 		return "", nil, errorsx.Wrap(err, "unable to create tmpfile buffer")

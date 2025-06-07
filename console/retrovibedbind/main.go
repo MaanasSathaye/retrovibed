@@ -16,18 +16,12 @@ import (
 	"golang.org/x/oauth2"
 )
 
-// var cachedOauth2 *oauth2.Token
-
 //export oauth2_bearer
 func oauth2_bearer() *C.char {
 	var (
 		err   error
 		token *oauth2.Token
 	)
-
-	// if cachedOauth2 != nil && cachedOauth2.Expiry.After(time.Now()) {
-	// 	return C.CString(cachedOauth2.AccessToken)
-	// }
 
 	ctx, done := context.WithTimeout(context.Background(), 10*time.Second)
 	defer done()
@@ -44,7 +38,13 @@ func oauth2_bearer() *C.char {
 		},
 	}
 
-	if token, err = authn.Oauth2Bearer(ctx, chttp, "", authn.UserDisplayName()); err != nil {
+	signer, err := authn.SSHSigner()
+	if err != nil {
+		log.Println("failed to create oauth2 bearer token", err)
+		return C.CString("")
+	}
+
+	if token, err = authn.Oauth2Bearer(ctx, signer, chttp, "", authn.UserDisplayName()); err != nil {
 		log.Println("failed to create oauth2 bearer token", err)
 		return C.CString("")
 	}

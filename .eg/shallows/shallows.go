@@ -47,14 +47,18 @@ func GenerateProtocol(ctx context.Context, op eg.Op) error {
 	gruntime := shellruntime()
 	return shell.Run(
 		ctx,
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta.authz.proto=github.com/retrovibed/retrovibed/metaapi --go_opt=paths=source_relative --go_out=metaapi meta.authz.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta.account.proto=github.com/retrovibed/retrovibed/metaapi --go_opt=paths=source_relative --go_out=metaapi meta.account.proto"),
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta.profile.proto=github.com/retrovibed/retrovibed/metaapi --go_opt=paths=source_relative --go_out=metaapi meta.profile.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta.authz.proto=github.com/retrovibed/retrovibed/metaapi --go_opt=paths=source_relative --go_out=metaapi meta.authz.proto"),
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta.daemon.proto=github.com/retrovibed/retrovibed/metaapi --go_opt=paths=source_relative --go_out=metaapi meta.daemon.proto"),
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta.wireguard.proto=github.com/retrovibed/retrovibed/metaapi --go_opt=paths=source_relative --go_out=metaapi meta.wireguard.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta.authn.proto=github.com/retrovibed/retrovibed/metaapi --go_opt=Mmeta.account.proto=github.com/retrovibed/retrovibed/metaapi --go_opt=Mmeta.profile.proto=github.com/retrovibed/retrovibed/metaapi --go_opt=paths=source_relative --go_out=metaapi meta.authn.proto"),
 		// media
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmedia.proto=github.com/retrovibed/retrovibed/media --go_opt=paths=source_relative --go_out=media media.proto"),
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmedia.known.proto=github.com/retrovibed/retrovibed/media --go_opt=paths=source_relative --go_out=media media.known.proto"),
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mrss.proto=github.com/retrovibed/retrovibed/rss --go_opt=paths=source_relative --go_out=rss rss.proto"),
+		// block cache
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mcontent.addressable.storage.proto=github.com/retrovibed/retrovibed/deeppool --go_opt=paths=source_relative --go_out=deeppool content.addressable.storage.proto"),
 	)
 }
 

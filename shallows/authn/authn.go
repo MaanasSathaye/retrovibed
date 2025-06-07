@@ -3,11 +3,13 @@ package authn
 import (
 	"context"
 	"crypto/rand"
+	"crypto/tls"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/gofrs/uuid/v5"
@@ -23,6 +25,28 @@ import (
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/oauth2"
 )
+
+func DeeppoolEndpoint() oauth2.Endpoint {
+	return EndpointSSHAuth("https://localhost:8081")
+}
+
+func Deeppool() string {
+	return "localhost:8081"
+}
+
+func HTTPClientDefaults() *http.Client {
+	return &http.Client{
+		Transport: &http.Transport{
+			Proxy:                 http.ProxyFromEnvironment,
+			ForceAttemptHTTP2:     true,
+			MaxIdleConns:          100,
+			IdleConnTimeout:       90 * time.Second,
+			TLSHandshakeTimeout:   10 * time.Second,
+			ExpectContinueTimeout: 1 * time.Second,
+			TLSClientConfig:       &tls.Config{InsecureSkipVerify: true},
+		},
+	}
+}
 
 func oauth2SSHConfig(signer ssh.Signer, otp string, endpoint oauth2.Endpoint) oauth2.Config {
 	return oauth2.Config{
@@ -41,7 +65,29 @@ func UserDisplayName() string {
 	return stringsx.FirstNonBlank(u.Name, u.Username)
 }
 
-func Oauth2Bearer(ctx context.Context, c *http.Client, email, displayname string) (*oauth2.Token, error) {
+func Oauth2HTTPClient(ctx context.Context) (*http.Client, error) {
+	signer, err := sshx.AutoCached(sshx.NewKeyGen(), env.PrivateKeyPath())
+	if err != nil {
+		return nil, errorsx.Wrap(err, "unable to read identity")
+	}
+
+	cfg := oauth2SSHConfig(signer, "", DeeppoolEndpoint())
+
+	c := HTTPClientDefaults()
+
+	token, err := oauth2Bearer(ctx, signer, c, cfg, "", "")
+	if err != nil {
+		return nil, err
+	}
+
+	return cfg.Client(context.WithValue(ctx, oauth2.HTTPClient, c), token), nil
+}
+
+func SSHSigner() (ssh.Signer, error) {
+	return sshx.AutoCached(sshx.NewKeyGen(), env.PrivateKeyPath())
+}
+
+func oauth2Bearer(ctx context.Context, signer ssh.Signer, c *http.Client, cfg oauth2.Config, email, displayname string) (*oauth2.Token, error) {
 	type exstate struct {
 		Entropy   string `json:"uid"`
 		PublicKey []byte `json:"pkey"`
@@ -50,13 +96,6 @@ func Oauth2Bearer(ctx context.Context, c *http.Client, email, displayname string
 	}
 
 	c = httpx.BindRetryTransport(c, http.StatusBadGateway, http.StatusTooManyRequests)
-
-	signer, err := sshx.AutoCached(sshx.NewKeyGen(), env.PrivateKeyPath())
-	if err != nil {
-		return nil, errorsx.Wrap(err, "unable to read identity")
-	}
-
-	cfg := oauth2SSHConfig(signer, "", EndpointSSHAuth("https://localhost:8081"))
 
 	state, err := jwtx.EncodeJSON(exstate{
 		Entropy:   errorsx.Must(uuid.NewV4()).String(),
@@ -86,6 +125,10 @@ func Oauth2Bearer(ctx context.Context, c *http.Client, email, displayname string
 	token, err := cfg.Exchange(ctx, exchanged.Code, oauth2.AccessTypeOffline)
 
 	return token, errorsx.Wrap(err, "token signature failure")
+}
+
+func Oauth2Bearer(ctx context.Context, signer ssh.Signer, c *http.Client, email, displayname string) (*oauth2.Token, error) {
+	return oauth2Bearer(ctx, signer, c, oauth2SSHConfig(signer, "", DeeppoolEndpoint()), email, displayname)
 }
 
 func NewBearer() (string, error) {
