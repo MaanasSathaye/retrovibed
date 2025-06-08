@@ -50,7 +50,16 @@ func NewHashFromHex(s string) (h Hash) {
 	return
 }
 
-func HashBytes(b []byte) (ret Hash) {
+func NewHashFromInfo(i *Info) (Hash, error) {
+	encoded, err := Encode(i)
+	if err != nil {
+		return Hash{}, err
+	}
+
+	return NewHashFromBytes(encoded), nil
+}
+
+func NewHashFromBytes(b []byte) (ret Hash) {
 	hasher := sha1.New()
 	hasher.Write(b)
 	copy(ret[:], hasher.Sum(nil))

@@ -766,7 +766,7 @@ func (t *torrent) setInfoBytes(b []byte) error {
 		return nil
 	}
 
-	if metainfo.HashBytes(b) != t.md.ID {
+	if metainfo.NewHashFromBytes(b) != t.md.ID {
 		return errors.New("info bytes have wrong hash")
 	}
 

@@ -26,7 +26,7 @@ func TestDescriptionFromPathFromMetadata(t *testing.T) {
 	defer q.Close()
 
 	lmd := NewMetadata(
-		langx.Autoptr(metainfo.HashBytes(int160.Random().Bytes())),
+		langx.Autoptr(metainfo.NewHashFromBytes(int160.Random().Bytes())),
 		MetadataOptionDescription("Hello World"),
 	)
 

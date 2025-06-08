@@ -145,6 +145,6 @@ func Main(args ...string) {
 	}
 
 	shellCli.Cleanup.Wait()
-	log.Println("system cleanup completed")
+	debugx.Println("system cleanup completed")
 	ctx.FatalIfErrorf(err)
 }

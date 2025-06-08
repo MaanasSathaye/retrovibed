@@ -425,3 +425,8 @@ func AutoClose(r *http.Response) error {
 
 	return r.Body.Close()
 }
+
+func RangeHeaders(r *http.Request, start, end uint64) *http.Request {
+	r.Header.Add("Range", fmt.Sprintf("bytes=%d-%d", start, end))
+	return r
+}

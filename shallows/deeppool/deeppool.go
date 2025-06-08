@@ -88,10 +88,34 @@ func (t Retrieval) Download(ctx context.Context, id string, into io.Writer) erro
 	return nil
 }
 
+func NewRanger(c *http.Client) Ranger {
+	return Ranger{
+		c:        c,
+		endpoint: Deeppool(),
+	}
+}
+
 type Ranger struct {
-	c *http.Client
+	c        *http.Client
+	endpoint string
 }
 
 func (t Ranger) Download(ctx context.Context, id string, start, end uint64, into io.Writer) error {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("https://%s/m/%s/download", t.endpoint, id), nil)
+	if err != nil {
+		return err
+	}
+	httpx.RangeHeaders(req, start, end)
+
+	resp, err := httpx.AsError(t.c.Do(req))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if _, err := io.Copy(into, resp.Body); err != nil {
+		return err
+	}
+
 	return nil
 }

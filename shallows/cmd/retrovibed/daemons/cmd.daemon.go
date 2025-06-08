@@ -123,9 +123,9 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	if err := fsx.MkDirs(0700, rootstore.Path(), mediastore.Path(), torrentstore.Path()); err != nil {
 		return err
 	}
-	// tstore := blockcache.NewTorrentFromVirtualFS(mediastore)
-	torrentdir := env.TorrentDir()
-	tstore := storage.NewFile(torrentdir, storage.FileOptionPathMakerInfohash)
+
+	// tstore := blockcache.NewTorrentFromVirtualFS(torrentstore)
+	tstore := storage.NewFile(torrentstore.Path(), storage.FileOptionPathMakerInfohash)
 
 	tm := dht.DefaultMuxer().
 		Method(bep0051.Query, bep0051.NewEndpoint(bep0051.EmptySampler{}))
