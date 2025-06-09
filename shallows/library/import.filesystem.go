@@ -182,7 +182,7 @@ func (t importer) Import(ctx context.Context, paths ...string) iter.Seq2[*Transf
 					err = errorsx.Wrapf(cause, "failed %s", p)
 					return
 				} else if !info.IsDir() {
-					if _, cause := arena.Run(ctx, p); cause != nil {
+					if cause := arena.Run(ctx, p); cause != nil {
 						err = errorsx.Wrapf(cause, "failed %s", p)
 						return
 					}
@@ -199,8 +199,7 @@ func (t importer) Import(ctx context.Context, paths ...string) iter.Seq2[*Transf
 						return nil
 					}
 
-					_, cause := arena.Run(ctx, filepath.Join(p, path))
-					return cause
+					return arena.Run(ctx, filepath.Join(p, path))
 				})
 
 				if cause != nil {

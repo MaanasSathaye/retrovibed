@@ -4,8 +4,10 @@ import (
 	"context"
 	"runtime"
 	"sync"
+	"sync/atomic"
 
 	"github.com/retrovibed/retrovibed/internal/contextx"
+	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/langx"
 )
 
@@ -14,22 +16,24 @@ type Pool[T any] struct {
 	workers  int
 	shutdown sync.WaitGroup // track active compute routines
 	async    func(ctx context.Context, w T) error
-	queued   chan pending[T]
+	queued   chan pending
+	failed   atomic.Pointer[error]
 }
 
-func (t *Pool[T]) Run(ctx context.Context, w T) (context.Context, error) {
-	ctx, cancelled := context.WithCancelCause(ctx)
+func (t *Pool[T]) Run(ctx context.Context, w T) error {
 	select {
-	case t.queued <- pending[T]{ctx: ctx, workload: w, completed: cancelled}:
-		return ctx, nil
+	case t.queued <- pending{workload: func() error { return t.async(ctx, w) }}:
+		return nil
 	case <-ctx.Done():
-		return ctx, context.Cause(ctx)
+		return context.Cause(ctx)
 	}
 }
 
-func (t *Pool[T]) Close() {
+func (t *Pool[T]) Close() error {
 	close(t.queued)
 	t.shutdown.Wait()
+	cause := t.failed.Load()
+	return *cause
 }
 
 func (t *Pool[T]) init() *Pool[T] {
@@ -38,7 +42,8 @@ func (t *Pool[T]) init() *Pool[T] {
 		go func() {
 			defer t.shutdown.Done()
 			for pending := range t.queued {
-				pending.completed(t.async(pending.ctx, pending.workload))
+				cause := errorsx.LogErr(pending.workload())
+				t.failed.CompareAndSwap(nil, &cause)
 			}
 		}()
 	}
@@ -46,17 +51,15 @@ func (t *Pool[T]) init() *Pool[T] {
 	return t
 }
 
-type pending[T any] struct {
-	ctx       context.Context
-	completed context.CancelCauseFunc
-	workload  T
+type pending struct {
+	workload func() error
 }
 
 type Option[T any] func(*Pool[T])
 
 func Backlog[T any](n uint16) Option[T] {
 	return func(p *Pool[T]) {
-		p.queued = make(chan pending[T], n)
+		p.queued = make(chan pending, n)
 	}
 }
 
@@ -77,7 +80,7 @@ func Compose[T any](options ...Option[T]) Option[T] {
 func New[T any](async func(ctx context.Context, w T) error, options ...Option[T]) *Pool[T] {
 	return langx.Autoptr(langx.Clone(Pool[T]{
 		workers: runtime.NumCPU(),
-		queued:  make(chan pending[T], runtime.NumCPU()),
+		queued:  make(chan pending, runtime.NumCPU()),
 		async:   async,
 	}, options...)).init()
 }
@@ -87,8 +90,7 @@ func New[T any](async func(ctx context.Context, w T) error, options ...Option[T]
 func Shutdown[T any](ctx context.Context, p *Pool[T]) error {
 	dctx, cancelled := context.WithCancelCause(ctx)
 	go func() {
-		p.Close()
-		cancelled(nil)
+		cancelled(p.Close())
 	}()
 
 	<-dctx.Done()

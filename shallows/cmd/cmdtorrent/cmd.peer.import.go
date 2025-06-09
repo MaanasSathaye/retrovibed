@@ -225,7 +225,7 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	})
 
 	for meta := range t.torrents(torrentstore) {
-		if _, err := arena.Run(gctx.Context, meta); err != nil {
+		if err := arena.Run(gctx.Context, meta); err != nil {
 			return errorsx.Compact(err, asynccompute.Shutdown(gctx.Context, arena))
 		}
 	}
