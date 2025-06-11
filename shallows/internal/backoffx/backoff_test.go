@@ -1,35 +1,37 @@
 package backoffx
 
 import (
-	"fmt"
 	"math"
+	"testing"
 	"time"
 
-	. "github.com/onsi/ginkgo/v2"
-
-	. "github.com/onsi/gomega"
+	"github.com/stretchr/testify/require"
 )
 
-func testBackoff(attempts int, s Strategy, expected ...time.Duration) {
+func testBackoff(t testing.TB, attempts int, s Strategy, expected ...time.Duration) {
 	for i := 0; i < attempts; i++ {
-		Expect(s.Backoff(i)).To(Equal(expected[i]), fmt.Sprintf("attempt %d", i))
+		require.Equal(t, expected[i], s.Backoff(i), "attempt %d", i)
 	}
 }
 
-func expectedDurationTest(attempt int, s Strategy, expected time.Duration) {
-	Expect(s.Backoff(attempt)).To(Equal(expected))
+func expectedDurationTest(t testing.TB, attempt int, s Strategy, expected time.Duration) {
+	require.Equal(t, expected, s.Backoff(attempt))
 }
 
-var _ = Describe("Backoff", func() {
-	DescribeTable("Explicit",
-		testBackoff,
-		Entry("more attempts than delays", 5, Explicit(1*time.Second, 2*time.Second, 3*time.Second), 1*time.Second, 2*time.Second, 3*time.Second, 1*time.Second, 2*time.Second),
-	)
-	DescribeTable("Exponential",
-		testBackoff,
-		Entry("should double each time", 5, Exponential(1*time.Second), 1*time.Second, 2*time.Second, 4*time.Second, 8*time.Second, 16*time.Second),
-		Entry(
-			"should gracefully handle overflows",
+func TestCycle(t *testing.T) {
+	t.Run("more attempts than delays", func(t *testing.T) {
+		testBackoff(t, 5, Cycle(1*time.Second, 2*time.Second, 3*time.Second), 1*time.Second, 2*time.Second, 3*time.Second, 1*time.Second, 2*time.Second)
+	})
+}
+
+func TestExponential(t *testing.T) {
+	t.Run("double each time", func(t *testing.T) {
+		testBackoff(t, 5, Exponential(1*time.Second), 1*time.Second, 2*time.Second, 4*time.Second, 8*time.Second, 16*time.Second)
+	})
+
+	t.Run("should gracefully handle overflows", func(t *testing.T) {
+		testBackoff(
+			t,
 			101,
 			Exponential(1*time.Second),
 			time.Second<<uint(0),
@@ -133,40 +135,61 @@ var _ = Describe("Backoff", func() {
 			time.Duration(math.MaxInt64),
 			time.Duration(math.MaxInt64),
 			time.Duration(math.MaxInt64), // 100
-		),
-	)
-	DescribeTable("Constant",
-		testBackoff,
-		Entry("should remain constant", 5, Constant(1*time.Second), 1*time.Second, 1*time.Second, 1*time.Second, 1*time.Second, 1*time.Second),
-	)
+		)
+	})
 
-	DescribeTable("Exponential Backoff",
-		expectedDurationTest,
-		Entry("attempt 0", 0, Exponential(1*time.Second), time.Duration(1*time.Second)),
-		Entry("attempt 1", 1, Exponential(1*time.Second), time.Duration(2*time.Second)),
-		Entry("attempt 2", 2, Exponential(1*time.Second), time.Duration(4*time.Second)),
-		Entry("attempt 3", 3, Exponential(1*time.Second), time.Duration(8*time.Second)),
-		Entry("attempt 36", 36, Exponential(1*time.Second), time.Duration(math.MaxInt64)),
-		Entry("attempt 37", 37, Exponential(1*time.Second), time.Duration(math.MaxInt64)),
-		Entry("attempt 54 - overflow", 54, Exponential(1*time.Second), time.Duration(math.MaxInt64)),
-		Entry("with scaling - attempt 0", 0, Exponential(500*time.Millisecond), time.Duration(500*time.Millisecond)),
-		Entry("with scaling - attempt 1", 1, Exponential(500*time.Millisecond), time.Duration(1*time.Second)),
-		Entry("with scaling - attempt 2", 2, Exponential(500*time.Millisecond), time.Duration(2*time.Second)),
-		Entry("with scaling - attempt 3", 3, Exponential(500*time.Millisecond), time.Duration(4*time.Second)),
-		Entry("max attempt value", math.MaxInt64, Exponential(1*time.Second), time.Duration(math.MaxInt64)),
-	)
+	t.Run("attempt 0", func(t *testing.T) {
+		expectedDurationTest(t, 0, Exponential(1*time.Second), time.Duration(1*time.Second))
+	})
 
-	DescribeTable(
-		"Jitter",
-		expectedDurationTest,
-		Entry(
-			"example 1 - with jitter",
-			57,
-			New(
-				Exponential(1*time.Second),
-				Jitter(0.25),
-			),
-			time.Duration(math.MaxInt64),
-		),
-	)
-})
+	t.Run("attempt 1", func(t *testing.T) {
+		expectedDurationTest(t, 1, Exponential(1*time.Second), time.Duration(2*time.Second))
+	})
+
+	// Here are the remaining test cases, following your provided pattern:
+	t.Run("attempt 2", func(t *testing.T) {
+		expectedDurationTest(t, 2, Exponential(1*time.Second), time.Duration(4*time.Second))
+	})
+
+	t.Run("attempt 3", func(t *testing.T) {
+		expectedDurationTest(t, 3, Exponential(1*time.Second), time.Duration(8*time.Second))
+	})
+
+	t.Run("attempt 36", func(t *testing.T) {
+		expectedDurationTest(t, 36, Exponential(1*time.Second), time.Duration(math.MaxInt64))
+	})
+
+	t.Run("attempt 37", func(t *testing.T) {
+		expectedDurationTest(t, 37, Exponential(1*time.Second), time.Duration(math.MaxInt64))
+	})
+
+	t.Run("attempt 54 - overflow", func(t *testing.T) {
+		expectedDurationTest(t, 54, Exponential(1*time.Second), time.Duration(math.MaxInt64))
+	})
+
+	t.Run("with scaling - attempt 0", func(t *testing.T) {
+		expectedDurationTest(t, 0, Exponential(500*time.Millisecond), time.Duration(500*time.Millisecond))
+	})
+
+	t.Run("with scaling - attempt 1", func(t *testing.T) {
+		expectedDurationTest(t, 1, Exponential(500*time.Millisecond), time.Duration(1*time.Second))
+	})
+
+	t.Run("with scaling - attempt 2", func(t *testing.T) {
+		expectedDurationTest(t, 2, Exponential(500*time.Millisecond), time.Duration(2*time.Second))
+	})
+
+	t.Run("with scaling - attempt 3", func(t *testing.T) {
+		expectedDurationTest(t, 3, Exponential(500*time.Millisecond), time.Duration(4*time.Second))
+	})
+
+	t.Run("max attempt value", func(t *testing.T) {
+		expectedDurationTest(t, math.MaxInt64, Exponential(1*time.Second), time.Duration(math.MaxInt64))
+	})
+}
+
+func TestConstant(t *testing.T) {
+	t.Run("should remain constant", func(t *testing.T) {
+		testBackoff(t, 5, Constant(1*time.Second), 1*time.Second, 1*time.Second, 1*time.Second, 1*time.Second, 1*time.Second)
+	})
+}

@@ -9,5 +9,5 @@ bool Boolean(String key, {bool fallback = false}) {
 }
 
 class vars {
-  static const AutoIdentifyMedia = "RETROVIBED_AUTO_IDENTIFY_MEDIA";
+  static const AutoIdentifyMedia = "RETROVIBED_MEDIA_AUTO_IDENTIFY";
 }

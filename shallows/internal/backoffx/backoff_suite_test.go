@@ -1,13 +1,14 @@
 package backoffx_test
 
 import (
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
+	"os"
+
+	"github.com/retrovibed/retrovibed/internal/testx"
 
 	"testing"
 )
 
-func TestBackoff(t *testing.T) {
-	RegisterFailHandler(Fail)
-	RunSpecs(t, "Backoff Suite")
+func TestMain(m *testing.M) {
+	testx.Logging()
+	os.Exit(m.Run())
 }

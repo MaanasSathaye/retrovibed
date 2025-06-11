@@ -38,6 +38,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/torrentx"
 	"github.com/retrovibed/retrovibed/internal/userx"
 	"github.com/retrovibed/retrovibed/internal/wireguardx"
+	"github.com/retrovibed/retrovibed/library"
 	"github.com/retrovibed/retrovibed/media"
 	"github.com/retrovibed/retrovibed/meta/identityssh"
 	"github.com/retrovibed/retrovibed/metaapi"
@@ -232,7 +233,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		contextx.WaitGroupAdd(gctx.Context, 1)
 		go func() {
 			defer contextx.WaitGroupDone(gctx.Context)
-			// errorsx.Log(library.NewDiskQuota(gctx.Context, rootstore, db))
+			errorsx.Log(library.NewDiskQuota(gctx.Context, rootstore, db))
 		}()
 	} else {
 		log.Println("automatic media archival is disabled")
@@ -279,6 +280,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		}
 	}()
 
+	// TODO
 	// go AnnounceSeeded(dctx, db, rootstore, tclient, tstore)
 	// go ResumeDownloads(dctx, db, rootstore, tclient, tstore)
 

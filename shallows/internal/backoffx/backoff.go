@@ -3,6 +3,7 @@ package backoffx
 import (
 	"crypto/md5"
 	"encoding/binary"
+	"iter"
 	"math"
 	"math/bits"
 	"math/rand"
@@ -119,9 +120,9 @@ func Exponential(scale time.Duration) Strategy {
 	}
 }
 
-// Explicit an explicit set of delays to use. if the attempt is larger than
+// Cycle an explicit set of delays to use. if the attempt is larger than
 // the number of values it restarts at the first delay.
-func Explicit(delays ...time.Duration) Strategy {
+func Cycle(delays ...time.Duration) Strategy {
 	return explicit{delays: delays}
 }
 
@@ -188,4 +189,14 @@ func DynamicHashDay(i string) time.Weekday {
 func DynamicHashWindow(i string, n uint64) uint64 {
 	digest := md5.Sum([]byte(i))
 	return binary.LittleEndian.Uint64(digest[:]) % n
+}
+
+func Iter(d Strategy) iter.Seq2[int, time.Duration] {
+	return func(yield func(int, time.Duration) bool) {
+		for i := 0; true; i++ {
+			if !yield(i, d.Backoff(i)) {
+				return
+			}
+		}
+	}
 }

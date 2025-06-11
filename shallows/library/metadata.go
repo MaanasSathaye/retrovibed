@@ -114,3 +114,7 @@ func MetadataQuerySearch(q string, columns ...string) squirrel.Sqlizer {
 func MetadataSearchBuilder() squirrel.SelectBuilder {
 	return squirrelx.PSQL.Select(sqlx.Columns(MetadataScannerStaticColumns)...).From("library_metadata")
 }
+
+func MetadataDiskStorageUsage(ctx context.Context, q sqlx.Queryer) sqlx.IntRowScanner {
+	return sqlx.NewIntRowScanner(q.QueryRowContext(ctx, "SELECT SUM(bytes) FROM library_metadata"))
+}
