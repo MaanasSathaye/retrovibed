@@ -70,14 +70,16 @@ func MetadataOptionTestDefaults(p *Metadata) {
 	p.ArchiveID = uuid.Nil.String()
 	p.TorrentID = uuid.Nil.String()
 	p.KnownMediaID = uuid.Nil.String()
+	p.EncryptionSeed = uuid.Nil.String()
 }
 
 func NewMetadata(id string, options ...func(*Metadata)) (m Metadata) {
 	r := langx.Clone(Metadata{
-		ID:           id,
-		TorrentID:    uuid.Nil.String(),
-		ArchiveID:    uuid.Nil.String(),
-		KnownMediaID: uuid.Nil.String(),
+		ID:             id,
+		TorrentID:      uuid.Nil.String(),
+		ArchiveID:      uuid.Nil.String(),
+		KnownMediaID:   uuid.Nil.String(),
+		EncryptionSeed: uuid.Nil.String(),
 	}, options...)
 
 	return r

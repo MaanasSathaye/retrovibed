@@ -116,9 +116,13 @@ func (t Printer) Write(b []byte) (n int, err error) {
 	return n, nil
 }
 
-type ZeroReader struct{}
+func Zero() io.Reader {
+	return zero{}
+}
 
-func (t ZeroReader) Read(p []byte) (n int, err error) {
+type zero struct{}
+
+func (t zero) Read(p []byte) (n int, err error) {
 	for i := 0; i < len(p); i++ {
 		p[i] = 0
 	}
