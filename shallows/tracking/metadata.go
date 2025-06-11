@@ -62,6 +62,18 @@ func MetadataOptionKnownMediaID(d string) func(*Metadata) {
 	}
 }
 
+func MetadataOptionEntropySeed(d ...[]byte) func(*Metadata) {
+	return func(m *Metadata) {
+		m.EncryptionSeed = md5x.FormatUUID(md5x.Digest(d...))
+	}
+}
+
+func MetadataOptionAutoArchive(b bool) func(*Metadata) {
+	return func(m *Metadata) {
+		m.Archivable = b
+	}
+}
+
 func MetadataOptionJSONSafeEncode(p *Metadata) {
 	p.CreatedAt = timex.RFC3339NanoEncode(p.CreatedAt)
 	p.UpdatedAt = timex.RFC3339NanoEncode(p.UpdatedAt)
@@ -78,6 +90,7 @@ func NewMetadata(md *metainfo.Hash, options ...func(*Metadata)) (m Metadata) {
 		InitiatedAt:    timex.Inf(),
 		NextAnnounceAt: timex.Inf(),
 		KnownMediaID:   uuid.Max.String(),
+		EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 	}, options...)
 	return r
 }
@@ -173,8 +186,10 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 			library.MetadataOptionAutoDescription(NormalizedDescription(desc)),
 			library.MetadataOptionBytes(tx.Bytes),
 			library.MetadataOptionTorrentID(md.ID),
-			library.MetadataOptionTorrentID(md.KnownMediaID),
+			library.MetadataOptionKnownMediaID(md.KnownMediaID),
 			library.MetadataOptionMimetype(tx.Mimetype.String()),
+			library.MetadataOptionEncryptionSeed(md.EncryptionSeed),
+			library.MetadataOptionArchivable(md.Archivable),
 		)
 
 		if err := library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd); err != nil {

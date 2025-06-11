@@ -2,7 +2,7 @@ package daemons
 
 import (
 	"context"
-	"errors"
+	"encoding/json"
 	"fmt"
 	"iter"
 	"log"
@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
@@ -20,11 +21,11 @@ import (
 	"github.com/retrovibed/retrovibed/internal/fsx"
 	"github.com/retrovibed/retrovibed/internal/httpx"
 	"github.com/retrovibed/retrovibed/internal/langx"
-	"github.com/retrovibed/retrovibed/internal/md5x"
 	"github.com/retrovibed/retrovibed/internal/mimex"
 	"github.com/retrovibed/retrovibed/internal/slicesx"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
 	"github.com/retrovibed/retrovibed/internal/stringsx"
+	"github.com/retrovibed/retrovibed/internal/userx"
 	"github.com/retrovibed/retrovibed/library"
 	"github.com/retrovibed/retrovibed/rss"
 	"github.com/retrovibed/retrovibed/tracking"
@@ -32,24 +33,47 @@ import (
 )
 
 func PrepareDefaultFeeds(ctx context.Context, q sqlx.Queryer) error {
-	feedcreate := func(description, url string) (err error) {
-		feed := tracking.RSS{
-			ID:           md5x.FormatUUID(md5x.Digest(url)),
-			Description:  description,
-			URL:          url,
-			Contributing: true,
-		}
+	var (
+		feeds []tracking.RSS
+	)
 
-		if err = tracking.RSSInsertDefaultFeed(ctx, q, feed).Scan(&feed); err != nil {
-			return errorsx.Wrapf(err, "feed creation failed: %s - %s", description, url)
-		}
-
-		return nil
+	encoded, err := fsx.AutoCached(userx.DefaultConfigDir(userx.DefaultRelRoot(), "default.feeds.json"), func() (_ []byte, _ error) {
+		return json.Marshal([]tracking.RSS{
+			{
+				Description:  "Arch Linux - iso",
+				URL:          "https://archlinux.org/feeds/releases/",
+				Contributing: true,
+			},
+			{
+				Description:  "Retrovibed - content for tests",
+				URL:          "https://vibed.community.retrovibe.space",
+				Contributing: true,
+				Autoarchive:  true,
+			},
+			{
+				Description:  "Retrovibed - media metadata updates. posters, ratings, descriptions",
+				URL:          "https://media.community.retrovibe.space",
+				Contributing: true,
+				Autoarchive:  true,
+			},
+		})
+	})
+	if err != nil {
+		return err
 	}
 
-	return errors.Join(
-		feedcreate("Arch Linux", "https://archlinux.org/feeds/releases/"),
-	)
+	if err = json.Unmarshal(encoded, &feeds); err != nil {
+		return err
+	}
+
+	for _, feed := range feeds {
+		feed = langx.Clone(feed, tracking.RSSOptionDefaultFeeds(feed))
+		if err = tracking.RSSInsertDefaultFeed(ctx, q, feed).Scan(&feed); err != nil {
+			return errorsx.Wrapf(err, "feed creation failed: %s - %s", feed.Description, feed.URL)
+		}
+	}
+
+	return nil
 }
 
 // retrieve torrents from rss feeds.
@@ -183,7 +207,9 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Vir
 						tracking.MetadataOptionDescription(stringsx.FirstNonBlank(mi.Name, item.Title)),
 						tracking.MetadataOptionTrackers(md.Announce),
 						tracking.MetadataOptionKnownMediaID(known.UID),
+						tracking.MetadataOptionEntropySeed(md.HashInfoBytes().Bytes(), uuid.FromStringOrNil(feed.EncryptionSeed).Bytes()),
 						tracking.MetadataOptionAutoDescription,
+						tracking.MetadataOptionAutoArchive(feed.Autoarchive),
 					)).Scan(&meta); err != nil {
 					log.Println("unable to record torrent metadata", feed.ID, err)
 					continue

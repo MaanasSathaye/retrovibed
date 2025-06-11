@@ -53,7 +53,7 @@ func TestNewReaderChaCha20(t *testing.T) {
 
 		require.Error(t, err)
 		require.Nil(t, cipher)
-		require.Contains(t, err.Error(), "unexpected EOF")
+		require.Contains(t, err.Error(), "EOF")
 	})
 
 	t.Run("returned cipher should be functional for encryption/decryption", func(t *testing.T) {

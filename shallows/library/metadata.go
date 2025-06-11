@@ -38,6 +38,20 @@ func MetadataOptionTorrentID(d string) MetadataOption {
 	}
 }
 
+func MetadataOptionEncryptionSeed(d string) MetadataOption {
+	return func(m *Metadata) {
+		m.EncryptionSeed = d
+	}
+}
+
+func MetadataOptionArchivable(b bool) MetadataOption {
+	return func(m *Metadata) {
+		if b {
+			m.ArchiveID = uuid.Max.String()
+		}
+	}
+}
+
 func MetadataOptionBytes(d uint64) MetadataOption {
 	return func(m *Metadata) {
 		m.Bytes = d
@@ -79,7 +93,7 @@ func NewMetadata(id string, options ...func(*Metadata)) (m Metadata) {
 		TorrentID:      uuid.Nil.String(),
 		ArchiveID:      uuid.Nil.String(),
 		KnownMediaID:   uuid.Nil.String(),
-		EncryptionSeed: uuid.Nil.String(),
+		EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 	}, options...)
 
 	return r

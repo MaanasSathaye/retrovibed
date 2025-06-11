@@ -5,18 +5,33 @@ import (
 	"time"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/internal/langx"
+	"github.com/retrovibed/retrovibed/internal/md5x"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
 	"github.com/retrovibed/retrovibed/internal/squirrelx"
+	"github.com/retrovibed/retrovibed/internal/stringsx"
 	"github.com/retrovibed/retrovibed/internal/timex"
 )
 
+type RSSOption func(*RSS)
+
 func NewFeedRSS(id string, options ...func(*RSS)) (m RSS) {
 	r := langx.Clone(RSS{
-		ID:          id,
-		LastBuiltAt: time.UnixMicro(0), //timex.NegInf(), should be neg inf but duckdb driver data types still need work.
+		ID:             id,
+		LastBuiltAt:    time.UnixMicro(0), //timex.NegInf(), should be neg inf but duckdb driver data types still need work.
+		EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 	}, options...)
 	return r
+}
+
+func RSSOptionDefaultFeeds(m RSS) RSSOption {
+	// provides the values for default feeds
+	return func(r *RSS) {
+		*r = m
+		r.ID = md5x.FormatUUID(md5x.Digest(m.URL))
+		r.EncryptionSeed = stringsx.FirstNonBlank(m.EncryptionSeed, md5x.FormatUUID(md5x.Digest(m.URL)))
+	}
 }
 
 func RSSOptionJSONSafeEncode(p *RSS) {

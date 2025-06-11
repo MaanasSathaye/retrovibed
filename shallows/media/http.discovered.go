@@ -192,7 +192,8 @@ func (t *HTTPDiscovered) upload(w http.ResponseWriter, r *http.Request) {
 	}
 	info.Name = fh.Filename
 
-	lmd := tracking.NewMetadata(langx.Autoptr(meta.HashInfoBytes()),
+	lmd := tracking.NewMetadata(
+		langx.Autoptr(meta.HashInfoBytes()),
 		tracking.MetadataOptionFromInfo(&info),
 		tracking.MetadataOptionTrackers(slicesx.Flatten(meta.UpvertedAnnounceList()...)...),
 		tracking.MetadataOptionAutoDescription,
