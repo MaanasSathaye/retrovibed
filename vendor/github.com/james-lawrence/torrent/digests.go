@@ -9,8 +9,8 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"github.com/james-lawrence/torrent/internal/errorsx"
 	"github.com/james-lawrence/torrent/metainfo"
-	"github.com/pkg/errors"
 )
 
 func newDigestsFromTorrent(t *torrent) digests {
@@ -106,7 +106,7 @@ func (t *digests) check(idx int) {
 	}
 
 	if digest != p.Hash() {
-		t.complete(idx, fmt.Errorf("piece %d digest mismatch %s != %s", idx, hex.EncodeToString(digest[:]), p.Hash().HexString()))
+		t.complete(idx, fmt.Errorf("piece %d digest mismatch %s != %s", idx, hex.EncodeToString(digest[:]), p.Hash().String()))
 		return
 	}
 
@@ -119,7 +119,7 @@ func (t *digests) compute(p *metainfo.Piece) (ret metainfo.Hash, err error) {
 
 	n, err := io.Copy(c, io.NewSectionReader(t.ReaderAt, p.Offset(), plen))
 	if err != nil {
-		return ret, errors.Wrapf(err, "piece %d digest failed", p.Offset())
+		return ret, errorsx.Wrapf(err, "piece %d digest failed", p.Offset())
 	}
 
 	if n != plen {

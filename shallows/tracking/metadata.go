@@ -156,10 +156,10 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 		return errorsx.Wrap(err, "download failed")
 	}
 
-	log.Println("content transfer to library initiated", t.Metadata().ID.HexString())
-	defer log.Println("content transfer to library completed", t.Metadata().ID.HexString())
+	log.Println("content transfer to library initiated", t.Metadata().ID.String())
+	defer log.Println("content transfer to library completed", t.Metadata().ID.String())
 
-	for tx, cause := range library.ImportFilesystem(ctx, library.ImportSymlinkFile(mediavfs), torrentvfs.Path(t.Metadata().ID.HexString())) {
+	for tx, cause := range library.ImportFilesystem(ctx, library.ImportSymlinkFile(mediavfs), torrentvfs.Path(t.Metadata().ID.String())) {
 		if cause != nil {
 			log.Println("import failed", cause)
 			err = errorsx.Compact(err, cause)
@@ -254,7 +254,7 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 
 			stats := dl.Stats()
 
-			log.Printf("%s: peers(%d:%d:%d) pieces(%d:%d:%d:%d)\n", dl.Metadata().ID.HexString(), stats.ActivePeers, stats.PendingPeers, stats.TotalPeers, stats.Missing, stats.Outstanding, stats.Unverified, stats.Completed)
+			log.Printf("%s: peers(%d:%d:%d) pieces(%d:%d:%d:%d)\n", dl.Metadata().ID.String(), stats.ActivePeers, stats.PendingPeers, stats.TotalPeers, stats.Missing, stats.Outstanding, stats.Unverified, stats.Completed)
 
 			if err := MetadataProgressByID(ctx, q, md.ID, uint16(stats.ActivePeers), current).Scan(md); err != nil {
 				log.Println("failed to update progress", err)

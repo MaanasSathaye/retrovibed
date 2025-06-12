@@ -204,7 +204,7 @@ func (t *HTTPDiscovered) upload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = os.Rename(tmp.Name(), t.mediastorage.Path(fmt.Sprintf("%s.torrent", metainfo.Hash(lmd.Infohash).HexString()))); err != nil {
+	if err = os.Rename(tmp.Name(), t.mediastorage.Path(fmt.Sprintf("%s.torrent", metainfo.Hash(lmd.Infohash).String()))); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to failed to record torrent file"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return

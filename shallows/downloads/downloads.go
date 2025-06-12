@@ -144,7 +144,7 @@ func (t Directory) download(ctx context.Context, path string) {
 		log.Println("tuned trackers", meta.Trackers)
 	}
 
-	infopath := t.rootstore.Path("torrent", fmt.Sprintf("%s.torrent", metainfo.Hash(md.Infohash).HexString()))
+	infopath := t.rootstore.Path("torrent", fmt.Sprintf("%s.torrent", metainfo.Hash(md.Infohash).String()))
 	errorsx.Log(tracking.Download(pctx, t.q, t.rootstore, &md, dl))
 	torrentx.RecordInfo(infopath, dl.Metadata())
 }

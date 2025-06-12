@@ -73,8 +73,11 @@ func (t *memoryseeding) Insert(cl *Client, md Metadata) (*torrent, error) {
 		return x, nil
 	}
 
-	if err := t.MetadataStore.Write(md); err != nil {
-		return nil, err
+	// only record if the info is there.
+	if len(md.InfoBytes) > 0 {
+		if err := t.MetadataStore.Write(md); err != nil {
+			return nil, err
+		}
 	}
 
 	dlt := newTorrent(cl, md)
@@ -94,15 +97,21 @@ func (t *memoryseeding) Load(cl *Client, id int160.T) (_ *torrent, cached bool, 
 		return x, true, nil
 	}
 
+	t._mu.Lock()
+	defer t._mu.Unlock()
+
+	if x, ok := t.torrents[id]; ok {
+		return x, true, nil
+	}
+
 	md, err := t.MetadataStore.Read(id)
 	if err != nil {
 		return nil, false, err
 	}
 
 	dlt := newTorrent(cl, md)
+	// log.Println("loaded torrent", len(dlt.metadataBytes), md.ID, metainfo.NewHashFromBytes(dlt.metadataBytes))
 
-	t._mu.Lock()
-	defer t._mu.Unlock()
 	t.torrents[id] = dlt
 
 	// TODO: we'll want an as needed verification
@@ -139,7 +148,11 @@ func (t metadatafilestore) path(id int160.T) string {
 }
 
 func (t metadatafilestore) Read(id int160.T) (Metadata, error) {
-	return NewFromMetaInfoFile(t.path(id))
+	p := t.path(id)
+	if md, err := NewFromMetaInfoFile(p); err == nil {
+		return md, nil
+	}
+	return NewFromFile(p)
 }
 
 func (t metadatafilestore) Write(md Metadata) error {

@@ -40,7 +40,7 @@ func testClientTransfer(t *testing.T, seedercfg, leechercfg torrent.ClientConfig
 	ctx := t.Context()
 	seedir := t.TempDir()
 
-	_, mi, err := torrenttest.RandomMulti(seedir, 3, 16*bytesx.MiB, 64*bytesx.MiB)
+	mi, err := torrenttest.RandomMulti(seedir, 3, 16*bytesx.MiB, 64*bytesx.MiB)
 	require.NoError(t, err)
 
 	// Create seeder and a Torrent.

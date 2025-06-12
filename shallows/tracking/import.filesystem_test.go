@@ -59,8 +59,8 @@ func TestImportTorrent(t *testing.T) {
 		require.NoError(t, err)
 		count++
 
-		require.Equal(t, testx.ReadMD5(testx.Fixture("example.1.txt")), testx.ReadMD5(tvfs.Path(md.HashInfoBytes().HexString(), "example.1.txt")))
-		require.Equal(t, testx.ReadMD5(testx.Fixture("example.2.txt")), testx.ReadMD5(tvfs.Path(md.HashInfoBytes().HexString(), "example.2.txt")))
+		require.Equal(t, testx.ReadMD5(testx.Fixture("example.1.txt")), testx.ReadMD5(tvfs.Path(md.HashInfoBytes().String(), "example.1.txt")))
+		require.Equal(t, testx.ReadMD5(testx.Fixture("example.2.txt")), testx.ReadMD5(tvfs.Path(md.HashInfoBytes().String(), "example.2.txt")))
 	}
 
 	require.Equal(t, 1, count)

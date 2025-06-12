@@ -10,8 +10,8 @@ import (
 	"github.com/RoaringBitmap/roaring"
 	pp "github.com/james-lawrence/torrent/btprotocol"
 	"github.com/james-lawrence/torrent/metainfo"
-	"github.com/pkg/errors"
 
+	"github.com/james-lawrence/torrent/internal/errorsx"
 	"github.com/james-lawrence/torrent/internal/langx"
 	"github.com/james-lawrence/torrent/internal/x/bitmapx"
 )
@@ -87,7 +87,7 @@ func newChunks(clength int, m *metainfo.Info, options ...chunkopt) *chunks {
 		meta:        m,
 		cmaximum:    numChunks(m.TotalLength(), m.PieceLength, int64(clength)),
 		clength:     int64(clength),
-		gracePeriod: 4 * time.Second,
+		gracePeriod: 2 * time.Minute,
 		outstanding: make(map[uint64]request),
 		missing:     roaring.NewBitmap(),
 		unverified:  roaring.NewBitmap(),
@@ -238,7 +238,7 @@ func (t *chunks) peek(available *roaring.Bitmap) (cidx int, req request, err err
 
 	cidx = int(union.Minimum())
 	if req, err = t.request(int64(cidx), int(-1*(cidx+1))); err != nil {
-		return cidx, req, errors.Wrap(err, "invalid request")
+		return cidx, req, errorsx.Wrap(err, "invalid request")
 	}
 
 	return cidx, req, nil

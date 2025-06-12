@@ -35,7 +35,7 @@ func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual
 
 	for md := range iter.Iter() {
 		log.Println("resuming", md.ID, md.Description, md.Private)
-		infopath := rootstore.Path("torrent", fmt.Sprintf("%s.torrent", metainfo.Hash(md.Infohash).HexString()))
+		infopath := rootstore.Path("torrent", fmt.Sprintf("%s.torrent", metainfo.Hash(md.Infohash).String()))
 
 		metadata, err := torrent.New(metainfo.Hash(md.Infohash), torrent.OptionStorage(tstore), torrentx.OptionTracker(md.Tracker), torrentx.OptionInfoFromFile(infopath), torrent.OptionPublicTrackers(md.Private, tracking.PublicTrackers()...))
 		if err != nil {

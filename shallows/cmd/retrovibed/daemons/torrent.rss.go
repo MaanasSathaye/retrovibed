@@ -167,7 +167,7 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Vir
 					continue
 				}
 
-				if err = os.WriteFile(rootstore.Path("torrent", fmt.Sprintf("%s.torrent", md.HashInfoBytes().HexString())), encoded, 0600); err != nil {
+				if err = os.WriteFile(rootstore.Path("torrent", fmt.Sprintf("%s.torrent", md.HashInfoBytes().String())), encoded, 0600); err != nil {
 					log.Println("unable to persist torrent to disk", feed.ID, err)
 					continue
 				}

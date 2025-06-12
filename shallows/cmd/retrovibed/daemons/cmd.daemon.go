@@ -158,7 +158,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		torrent.ClientConfigMuxer(tm),
 		torrent.ClientConfigBucketLimit(32),
 		torrent.ClientConfigHTTPUserAgent("retrovibed/0.0"),
-		torrent.ClientConfigConnectionClosed(func(ih metainfo.Hash, stats torrent.ConnStats) {
+		torrent.ClientConfigConnectionClosed(func(ih metainfo.Hash, stats torrent.ConnStats, remaining int) {
 			if stats.BytesWrittenData.Uint64() == 0 {
 				return
 			}
@@ -167,7 +167,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 			ictx, done := context.WithTimeout(context.Background(), 3*time.Second)
 			defer done()
 			if err := tracking.MetadataUploadedByID(ictx, db, ih.Bytes(), stats.BytesWrittenData.Uint64()).Scan(&md); err != nil {
-				log.Println(errorsx.Wrapf(err, "%s: unable to record uploaded metrics", ih.HexString()))
+				log.Println(errorsx.Wrapf(err, "%s: unable to record uploaded metrics", ih.String()))
 				return
 			}
 		}),

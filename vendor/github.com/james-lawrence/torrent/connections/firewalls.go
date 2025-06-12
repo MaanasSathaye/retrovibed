@@ -2,10 +2,11 @@ package connections
 
 import (
 	"net"
+	"net/netip"
 	"time"
 
 	"github.com/bits-and-blooms/bloom/v3"
-	"github.com/pkg/errors"
+	"github.com/james-lawrence/torrent/internal/errorsx"
 )
 
 // Firewall used to prevent connections.
@@ -42,14 +43,14 @@ func (t *BloomBanIP) reset() *BloomBanIP {
 	return t
 }
 
-// Blocked prevents connections from IPv6 addresses.
+// Blocked prevents banned connections from connecting for any reason until the timeout passes
 func (t *BloomBanIP) Blocked(ip net.IP, p int) error {
 	if t.bannedReset.Before(time.Now()) {
 		t.reset()
 	}
 
 	if t.banned.Test(maskLower8Bits(ip)) {
-		return errors.Errorf("ip %s is banned", ip)
+		return errorsx.Errorf("ip %s is banned", ip)
 	}
 
 	return nil
@@ -61,7 +62,11 @@ func (t *BloomBanIP) Inhibit(ip net.IP, port int, cause error) {
 		t.reset()
 	}
 
-	t.banned.Add(maskLower8Bits(ip))
+	if addr := netip.AddrFrom16([16]byte(ip.To16())); addr.IsPrivate() {
+		t.banned.Add(ip)
+	} else {
+		t.banned.Add(maskLower8Bits(ip))
+	}
 }
 
 // BanIPv6 ban IPv6 addresses
@@ -70,7 +75,7 @@ type BanIPv6 struct{}
 // Blocked prevents connections from IPv6 addresses.
 func (BanIPv6) Blocked(ip net.IP, p int) error {
 	if len(ip) == net.IPv6len && ip.To4() == nil {
-		return errors.New("ipv6 disabled")
+		return errorsx.New("ipv6 disabled")
 	}
 
 	return nil
@@ -82,11 +87,11 @@ type BanIPv4 struct{}
 // Blocked prevents connections from IPv4 addresses.
 func (BanIPv4) Blocked(ip net.IP, port int) error {
 	if ip.To4() != nil {
-		return errors.New("ipv4 peers disabled")
+		return errorsx.New("ipv4 peers disabled")
 	}
 
 	if len(ip) == net.IPv4len {
-		return errors.New("ipv4 disabled")
+		return errorsx.New("ipv4 disabled")
 	}
 
 	return nil
@@ -95,10 +100,20 @@ func (BanIPv4) Blocked(ip net.IP, port int) error {
 // BanInvalidPort blocks connections with invalid port values.
 type BanInvalidPort struct{}
 
-// Blocked prevents connections from ipv4 addresses.
 func (BanInvalidPort) Blocked(ip net.IP, port int) error {
 	if port <= 0 {
-		return errors.New("invalid port")
+		return errorsx.New("invalid port")
+	}
+
+	return nil
+}
+
+type Private struct{}
+
+func (t Private) Blocked(ip net.IP, port int) error {
+	addr := netip.AddrFrom16([16]byte(ip.To16()))
+	if !addr.IsPrivate() {
+		return errorsx.Errorf("public network %s - %s", ip, addr)
 	}
 
 	return nil

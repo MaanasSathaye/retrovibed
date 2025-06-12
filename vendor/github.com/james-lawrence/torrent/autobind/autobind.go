@@ -5,17 +5,20 @@ package autobind
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"os"
 	"strconv"
 	"strings"
+	"sync/atomic"
 
 	"github.com/anacrolix/missinggo/v2"
 	"github.com/james-lawrence/torrent"
+	"github.com/james-lawrence/torrent/internal/errorsx"
+	"github.com/james-lawrence/torrent/internal/langx"
 	"github.com/james-lawrence/torrent/internal/utpx"
 	"github.com/james-lawrence/torrent/sockets"
 	"github.com/james-lawrence/torrent/storage"
-	"github.com/pkg/errors"
 	"golang.org/x/net/proxy"
 )
 
@@ -45,6 +48,10 @@ func DisableTCP(a *Autobind) {
 // DisableDHT disables DHT.
 func DisableDHT(a *Autobind) {
 	a.NoDHT = true
+}
+
+func DisableIPv6(a *Autobind) {
+	a.DisableIPv6 = true
 }
 
 // Autobind manages automatically binding a client to available networks.
@@ -77,17 +84,19 @@ func New(options ...Option) Autobind {
 	return autobind
 }
 
+var incr int32
+
 // NewLoopback autobind to the loopback device.
 func NewLoopback(options ...Option) Autobind {
 	return New(func(a *Autobind) {
 		a.ListenHost = func(network string) string {
 			if strings.Contains(network, "4") {
-				return "127.0.0.1"
+				return fmt.Sprintf("127.0.0.%d", atomic.AddInt32(&incr, 1)%254+1)
 			}
 			return "::1"
 		}
 		a.ListenPort = 0
-	})
+	}, langx.Compose(options...))
 }
 
 // NewSpecified for use in testing only, panics if invalid host/port.
@@ -219,7 +228,7 @@ func listenAllRetry(nahs []networkAndHost, port int) (ss []sockets.Socket, retry
 	portStr := strconv.FormatInt(int64(port), 10)
 	ss[0], err = listen(nahs[0].Network, net.JoinHostPort(nahs[0].Host, portStr))
 	if err != nil {
-		return nil, false, errors.Wrap(err, "first listen")
+		return nil, false, errorsx.Wrap(err, "first listen")
 	}
 	defer func() {
 		if err != nil || retry {
@@ -235,7 +244,7 @@ func listenAllRetry(nahs []networkAndHost, port int) (ss []sockets.Socket, retry
 		if err != nil {
 			return ss,
 				missinggo.IsAddrInUse(err) && port == 0,
-				errors.Wrap(err, "subsequent listen")
+				errorsx.Wrap(err, "subsequent listen")
 		}
 		ss = append(ss, s)
 	}

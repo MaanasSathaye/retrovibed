@@ -63,7 +63,7 @@ func ImportTorrent(q sqlx.Queryer, mvfs, tvfs fsx.Virtual) library.ImportOp {
 			return nil, errorsx.Wrap(err, "unable to insert metadata")
 		}
 
-		uid := md.ID.HexString()
+		uid := md.ID.String()
 
 		for _, finfo := range info.Files {
 			var lmd library.Metadata

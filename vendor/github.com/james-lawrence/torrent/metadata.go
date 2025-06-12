@@ -6,9 +6,9 @@ import (
 
 	"github.com/james-lawrence/torrent/bencode"
 	"github.com/james-lawrence/torrent/internal/bytesx"
+	"github.com/james-lawrence/torrent/internal/errorsx"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
-	"github.com/pkg/errors"
 )
 
 // Option for the torrent.
@@ -136,10 +136,14 @@ func NewFromMetaInfoFile(path string, options ...Option) (t Metadata, err error)
 	)
 
 	if mi, err = metainfo.LoadFromFile(path); err != nil {
-		return t, err
+		return t, errorsx.Wrapf(err, "unable to load metadata from %s", path)
 	}
 
-	return NewFromMetaInfo(mi, options...)
+	if t, err = NewFromMetaInfo(mi, options...); err != nil {
+		return t, errorsx.Wrapf(err, "unable to load metadata from %s", path)
+	}
+
+	return t, nil
 }
 
 // NewFromFile convience method to create a torrent directly from a file.
@@ -150,15 +154,15 @@ func NewFromFile(path string, options ...Option) (t Metadata, err error) {
 
 	info, err := metainfo.NewFromPath(path, metainfo.OptionPieceLength(bytesx.MiB))
 	if err != nil {
-		return t, errors.WithStack(err)
+		return t, errorsx.Wrapf(err, "unable to load metadata from %s", path)
 	}
 
 	if encoded, err = bencode.Marshal(info); err != nil {
-		return t, errors.WithStack(err)
+		return t, errorsx.WithStack(err)
 	}
 
 	if t, err = New(metainfo.NewHashFromBytes(encoded), OptionInfo(encoded), OptionDisplayName(info.Name)); err != nil {
-		return t, errors.WithStack(err)
+		return t, errorsx.WithStack(err)
 	}
 
 	return t.Merge(options...), nil
@@ -187,7 +191,7 @@ func NewFromMagnet(uri string, options ...Option) (t Metadata, err error) {
 	)
 
 	if m, err = metainfo.ParseMagnetURI(uri); err != nil {
-		return t, errors.WithStack(err)
+		return t, errorsx.WithStack(err)
 	}
 
 	options = append([]Option{
@@ -247,5 +251,6 @@ func NewMagnet(md Metadata) metainfo.Magnet {
 	return metainfo.Magnet{
 		DisplayName: md.DisplayName,
 		InfoHash:    md.ID,
+		Trackers:    md.Trackers,
 	}
 }

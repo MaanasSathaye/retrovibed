@@ -116,13 +116,13 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	for u := range t.torrents() {
 		dl, _, cause := tclient.Start(u, torrent.TunePeers(sourcepeer), torrent.TuneAutoDownload)
 		if cause != nil {
-			log.Println("failed to start magnet", u.ID.HexString(), cause)
+			log.Println("failed to start magnet", u.ID.String(), cause)
 			err = errorsx.Compact(err, cause)
 			continue
 		}
 
 		if _, cause := torrent.DownloadInto(gctx.Context, io.Discard, dl); cause != nil {
-			log.Println("failed to download", u.ID.HexString(), cause)
+			log.Println("failed to download", u.ID.String(), cause)
 			err = errorsx.Compact(err, cause)
 			continue
 		}

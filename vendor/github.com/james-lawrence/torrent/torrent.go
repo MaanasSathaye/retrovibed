@@ -3,6 +3,7 @@ package torrent
 import (
 	"container/heap"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -13,8 +14,6 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/anacrolix/missinggo/pubsub"
 	"github.com/anacrolix/missinggo/slices"
@@ -158,6 +157,12 @@ func TuneClientPeer(cl *Client) Tuner {
 	}
 }
 
+func TuneDisableTrackers(t *torrent) {
+	t.lock()
+	defer t.unlock()
+	t.md.Trackers = nil
+}
+
 // add trackers to the torrent.
 func TuneTrackers(trackers ...string) Tuner {
 	return func(t *torrent) {
@@ -296,7 +301,7 @@ func DownloadInto(ctx context.Context, dst io.Writer, m Torrent, options ...Tune
 	if n, err = io.Copy(dst, NewReader(m)); err != nil {
 		return n, err
 	} else if n != m.Info().TotalLength() {
-		return n, errors.Errorf("download failed, missing data %d != %d", n, m.Info().TotalLength())
+		return n, errorsx.Errorf("download failed, missing data %d != %d", n, m.Info().TotalLength())
 	}
 
 	if err = m.Tune(TuneAnnounceOnce(tracker.AnnounceOptionEventCompleted)); err != nil {
@@ -702,7 +707,7 @@ func (t *torrent) saveMetadataPiece(index int, data []byte) {
 		return
 	}
 
-	copy(t.metadataBytes[(1<<14)*index:], data)
+	copy(t.metadataBytes[16*bytesx.KiB*index:], data)
 	t.metadataCompletedChunks[index] = true
 }
 
@@ -748,7 +753,7 @@ func (t *torrent) onSetInfo() {
 	// log.Println("set info initiated")
 	for _, conn := range t.conns.list() {
 		if err := conn.setNumPieces(t.numPieces()); err != nil {
-			t.cln.config.info().Println(errors.Wrap(err, "closing connection"))
+			t.cln.config.info().Println(errorsx.Wrap(err, "closing connection"))
 			conn.Close()
 		}
 	}
@@ -766,8 +771,8 @@ func (t *torrent) setInfoBytes(b []byte) error {
 		return nil
 	}
 
-	if metainfo.NewHashFromBytes(b) != t.md.ID {
-		return errors.New("info bytes have wrong hash")
+	if id := metainfo.NewHashFromBytes(b); id != t.md.ID {
+		return errorsx.Errorf("info bytes have wrong hash %d %s != %s", len(b), id.String(), t.md.ID.String())
 	}
 
 	if err := bencode.Unmarshal(b, &info); err != nil {
@@ -814,7 +819,7 @@ func (t *torrent) setMetadataSize(bytes int) (err error) {
 	}
 
 	if bytes <= 0 || bytes > 10*bytesx.MiB { // 10MB, pulled from my ass.
-		return errors.New("bad size")
+		return errorsx.New("bad size")
 	}
 
 	if t.metadataBytes != nil && len(t.metadataBytes) == int(bytes) {
@@ -846,11 +851,11 @@ func (t *torrent) newMetadataExtensionMessage(c *connection, msgType int, piece 
 		d["total_size"] = len(t.metadataBytes)
 	}
 
-	p := bencode.MustMarshal(d)
+	p := append(bencode.MustMarshal(d), data...)
 	return pp.Message{
 		Type:            pp.Extended,
 		ExtendedID:      c.PeerExtensionIDs[pp.ExtensionNameMetadata],
-		ExtendedPayload: append(p, data...),
+		ExtendedPayload: p,
 	}
 }
 
@@ -873,6 +878,10 @@ func (t *torrent) usualPieceSize() int {
 }
 
 func (t *torrent) numPieces() pieceIndex {
+	if !t.haveInfo() {
+		return -1
+	}
+
 	return pieceIndex(t.info.NumPieces())
 }
 
@@ -1058,6 +1067,8 @@ func (t *torrent) maybeCompleteMetadata() error {
 		return nil
 	}
 
+	// log.Println("checkpoint", metainfo.NewHashFromBytes(t.metadataBytes))
+
 	if err := t.setInfoBytes(t.metadataBytes); err != nil {
 		t.invalidateMetadata()
 		return fmt.Errorf("error setting info bytes: %s", err)
@@ -1217,8 +1228,11 @@ func (t *torrent) dhtAnnouncer(s *dht.Server) {
 
 		t.stats.DHTAnnounce.Add(1)
 
-		if err := t.announceToDht(true, s); err != nil {
-			t.cln.config.info().Println(t, errors.Wrap(err, "error announcing to DHT"))
+		if err := t.announceToDht(true, s); errors.Is(err, dht.ErrDHTNoInitialNodes) {
+			t.cln.config.info().Println(t, err)
+			time.Sleep(time.Minute)
+		} else if err != nil {
+			t.cln.config.info().Println(t, errorsx.Wrap(err, "error announcing to DHT"))
 			time.Sleep(time.Second)
 		}
 	}
@@ -1308,7 +1322,7 @@ func (t *torrent) addConnection(c *connection) (err error) {
 	)
 
 	if t.closed.IsSet() {
-		return errors.New("torrent closed")
+		return errorsx.New("torrent closed")
 	}
 
 	t.lock()
@@ -1326,14 +1340,14 @@ func (t *torrent) addConnection(c *connection) (err error) {
 		if left, ok := c.hasPreferredNetworkOver(c0); ok && left {
 			dropping = append(dropping, c0)
 		} else {
-			return errors.New("existing connection preferred")
+			return errorsx.New("existing connection preferred")
 		}
 	}
 
-	if t.conns.length() >= t.maxEstablishedConns {
+	if tot := t.conns.length(); tot >= t.maxEstablishedConns {
 		c := t.worstBadConn()
 		if c == nil {
-			return errors.New("don't want conns")
+			return errorsx.Errorf("don't want conns %d >= %d", tot, t.maxEstablishedConns)
 		}
 
 		dropping = append(dropping, c)
@@ -1375,9 +1389,12 @@ func (t *torrent) SetMaxEstablishedConns(max int) (oldMax int) {
 
 	cset := t.conns.list()
 	wcs := slices.HeapInterface(cset, worseConn)
-	for len(cset) > t.maxEstablishedConns && wcs.Len() > 0 {
+	for drop := len(cset) - t.maxEstablishedConns; drop > -1 && wcs.Len() > 0; drop-- {
+		log.Println("dropping connection", drop, wcs.Len())
 		t.dropConnection(wcs.Pop().(*connection))
+		log.Println("dropped connection", drop, wcs.Len())
 	}
+	log.Println("done dropping connection")
 	t.openNewConns()
 	return oldMax
 }
@@ -1502,7 +1519,7 @@ func (t *torrent) String() string {
 		return strconv.Quote(s)
 	}
 
-	return t.md.ID.HexString()
+	return t.md.ID.String()
 }
 
 func (t *torrent) ping(addr net.UDPAddr) {
@@ -1526,7 +1543,7 @@ func (t *torrent) gotMetadataExtensionMsg(payload []byte, c *connection) error {
 	}
 	msgType, ok := d["msg_type"]
 	if !ok {
-		return errors.New("missing msg_type field")
+		return errorsx.New("missing msg_type field")
 	}
 	piece := d["piece"]
 	switch msgType {
@@ -1540,6 +1557,7 @@ func (t *torrent) gotMetadataExtensionMsg(payload []byte, c *connection) error {
 		if begin < 0 || begin >= len(payload) {
 			return fmt.Errorf("data has bad offset in payload: %d", begin)
 		}
+
 		t.saveMetadataPiece(piece, payload[begin:])
 		c.lastUsefulChunkReceived = time.Now()
 		return t.maybeCompleteMetadata()
@@ -1548,14 +1566,14 @@ func (t *torrent) gotMetadataExtensionMsg(payload []byte, c *connection) error {
 			c.Post(t.newMetadataExtensionMessage(c, pp.RejectMetadataExtensionMsgType, d["piece"], nil))
 			return nil
 		}
-		start := (1 << 14) * piece
-
-		c.Post(t.newMetadataExtensionMessage(c, pp.DataMetadataExtensionMsgType, piece, t.metadataBytes[start:start+t.metadataPieceSize(piece)]))
+		start := 16 * bytesx.KiB * piece
+		end := start + t.metadataPieceSize(piece)
+		c.Post(t.newMetadataExtensionMessage(c, pp.DataMetadataExtensionMsgType, piece, t.metadataBytes[start:end]))
 		return nil
 	case pp.RejectMetadataExtensionMsgType:
 		return nil
 	default:
-		return errors.New("unknown msg_type value")
+		return errorsx.New("unknown msg_type value")
 	}
 }
 
