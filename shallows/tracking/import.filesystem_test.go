@@ -1,6 +1,7 @@
 package tracking_test
 
 import (
+	"io/fs"
 	"os"
 	"path/filepath"
 	"testing"
@@ -31,7 +32,7 @@ func TestImportTorrent(t *testing.T) {
 	tvfs := fsx.DirVirtual(filepath.Join(tmpdir, "torrents"))
 	require.NoError(t, fsx.MkDirs(0700, mvfs.Path(), evfs.Path(), tvfs.Path()))
 
-	for tx, cause := range library.ImportFilesystem(ctx, library.ImportCopyFile(mvfs), testx.Fixture()) {
+	for tx, cause := range library.ImportFilesystem(ctx, library.ImportCopyFile(mvfs), os.DirFS(testx.Fixture()).(fs.StatFS), ".") {
 		require.NoError(t, cause)
 
 		lmd := library.NewMetadata(
@@ -54,11 +55,9 @@ func TestImportTorrent(t *testing.T) {
 
 	require.NoError(t, os.WriteFile(evfs.Path("example.torrent"), testx.Must(metainfo.Encode(md))(t), 0600))
 	count := 0
-
-	for _, err := range library.ImportFilesystem(ctx, tracking.ImportTorrent(q, mvfs, tvfs), evfs.Path()) {
+	for _, err := range library.ImportFilesystem(ctx, tracking.ImportTorrent(q, mvfs, tvfs), os.DirFS(evfs.Path()).(fs.StatFS), ".") {
 		require.NoError(t, err)
 		count++
-
 		require.Equal(t, testx.ReadMD5(testx.Fixture("example.1.txt")), testx.ReadMD5(tvfs.Path(md.HashInfoBytes().String(), "example.1.txt")))
 		require.Equal(t, testx.ReadMD5(testx.Fixture("example.2.txt")), testx.ReadMD5(tvfs.Path(md.HashInfoBytes().String(), "example.2.txt")))
 	}

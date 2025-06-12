@@ -3,6 +3,7 @@ package iox
 import (
 	"errors"
 	"io"
+	"log"
 	"os"
 	"sync/atomic"
 )
@@ -105,14 +106,8 @@ type Copied struct {
 
 func (t Copied) Write(b []byte) (n int, err error) {
 	n = len(b)
-	atomic.AndUint64(t.Result, uint64(n))
-	return n, nil
-}
-
-type Printer uint64
-
-func (t Printer) Write(b []byte) (n int, err error) {
-	n = len(b)
+	o := atomic.AddUint64(t.Result, uint64(n))
+	log.Println("w", n, o, o+uint64(n))
 	return n, nil
 }
 

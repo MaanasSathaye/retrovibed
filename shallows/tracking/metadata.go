@@ -4,7 +4,10 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
+	"io"
+	"io/fs"
 	"log"
+	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -14,7 +17,9 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent"
+	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
+	"github.com/retrovibed/retrovibed/blockcache"
 	"github.com/retrovibed/retrovibed/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/fsx"
@@ -163,6 +168,10 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 
 	mediavfs := fsx.DirVirtual(vfs.Path("media"))
 	torrentvfs := fsx.DirVirtual(vfs.Path("torrent"))
+	bcache, err := blockcache.NewDirectoryCache(torrentvfs.Path(int160.FromBytes(md.Infohash).String()))
+	if err != nil {
+		return err
+	}
 
 	// just copying as we receive data to block until done.
 	if downloaded, err = torrent.DownloadInto(ctx, mhash, t, torrent.TuneAnnounceUntilComplete, torrent.TuneNewConns); err != nil {
@@ -172,10 +181,15 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 	log.Println("content transfer to library initiated", t.Metadata().ID.String())
 	defer log.Println("content transfer to library completed", t.Metadata().ID.String())
 
-	for tx, cause := range library.ImportFilesystem(ctx, library.ImportSymlinkFile(mediavfs), torrentvfs.Path(t.Metadata().ID.String())) {
+	for tx, cause := range library.ImportFilesystem(ctx, ImportSymlink(torrentvfs, mediavfs), blockcache.TorrentFilesystem(bcache, t.Info()), t.Metadata().ID.String()) {
 		if cause != nil {
 			log.Println("import failed", cause)
 			err = errorsx.Compact(err, cause)
+			continue
+		}
+
+		if uint64(downloaded) != tx.Bytes {
+			err = errorsx.Compact(err, errorsx.Errorf("import failed did not read all data %d != %d", tx.Bytes, downloaded))
 			continue
 		}
 
@@ -185,6 +199,7 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 			library.MetadataOptionDescription(desc),
 			library.MetadataOptionAutoDescription(NormalizedDescription(desc)),
 			library.MetadataOptionBytes(tx.Bytes),
+			library.MetadataOptionOffset(tx.Offset),
 			library.MetadataOptionTorrentID(md.ID),
 			library.MetadataOptionKnownMediaID(md.KnownMediaID),
 			library.MetadataOptionMimetype(tx.Mimetype.String()),
@@ -196,7 +211,7 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 			return errorsx.Wrap(err, "unable to record library metadata")
 		}
 
-		log.Println("new library content", spew.Sdump(lmd))
+		log.Println("new library content", lmd.ID, lmd.Description)
 	}
 
 	if err != nil {
@@ -204,7 +219,7 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 	}
 
 	stats := t.Stats()
-	log.Println("download completed", md.ID, md.Description, downloaded)
+	log.Println("download completed", md.ID, downloaded)
 	if err := MetadataCompleteByID(ctx, q, md.ID, 0, uint64(downloaded), stats.BytesWrittenData.Uint64()).Scan(md); err != nil {
 		return errorsx.Wrap(err, "progress update failed")
 	}
@@ -280,5 +295,44 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 		case <-ctx.Done():
 			return
 		}
+	}
+}
+
+func ImportSymlink(srcvfs, vfs fsx.Virtual) library.ImportOp {
+	return func(ctx context.Context, root fs.StatFS, path string) (*library.Transfered, error) {
+		tx, err := library.TransferedFromPath(root, path)
+		if err != nil {
+			return nil, err
+		}
+
+		src, err := root.Open(path)
+		if err != nil {
+			return nil, err
+		}
+		defer src.Close()
+
+		if n, err := io.Copy(tx.MD5, src); err != nil {
+			return nil, err
+		} else {
+			tx.Bytes = uint64(n)
+		}
+
+		if n, ok := src.(*blockcache.File); ok {
+			tx.Offset = n.Offset
+		}
+
+		uid := md5x.FormatUUID(tx.MD5)
+		blockpath := filepath.Dir(tx.Path)
+
+		if err := os.Remove(vfs.Path(uid)); fsx.IgnoreIsNotExist(err) != nil {
+			return nil, errorsx.Wrap(err, "unable to ensure symlink destination is available")
+		}
+
+		if err := os.Symlink(srcvfs.Path(blockpath), vfs.Path(uid)); err != nil {
+			return nil, errorsx.Wrapf(err, "unable to symlink to original location: %s -> %s", srcvfs.Path(blockpath), vfs.Path(uid))
+		}
+
+		log.Printf("symlinked: %s -> %s\n", srcvfs.Path(blockpath), vfs.Path(uid))
+		return tx, nil
 	}
 }

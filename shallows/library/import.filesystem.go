@@ -26,13 +26,20 @@ type Transfered struct {
 	Path     string
 	Mimetype *mimetype.MIME
 	MD5      hash.Hash
+	Offset   uint64
 	Bytes    uint64
 }
 
-type ImportOp = func(ctx context.Context, path string) (*Transfered, error)
+type ImportOp = func(ctx context.Context, root fs.StatFS, path string) (*Transfered, error)
 
-func TransferedFromPath(path string) (*Transfered, error) {
-	cmimetype, err := mimetype.DetectFile(path)
+func TransferedFromPath(root fs.StatFS, path string) (*Transfered, error) {
+	src, err := root.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer src.Close()
+
+	cmimetype, err := mimetype.DetectReader(src)
 	if err != nil {
 		return nil, err
 	}
@@ -44,19 +51,18 @@ func TransferedFromPath(path string) (*Transfered, error) {
 	}, nil
 }
 
-func ImportSymlinkFile(vfs fsx.Virtual) ImportOp {
+func ImportSymlinkFile(srcvfs fsx.Virtual, vfs fsx.Virtual) ImportOp {
 	if err := os.MkdirAll(vfs.Path(), 0700); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to ensure directory"))
 	}
 
-	return func(ctx context.Context, path string) (*Transfered, error) {
-		log.Println("imported", path)
-		tx, err := TransferedFromPath(path)
+	return func(ctx context.Context, root fs.StatFS, path string) (*Transfered, error) {
+		tx, err := TransferedFromPath(root, path)
 		if err != nil {
 			return nil, err
 		}
 
-		src, err := os.Open(path)
+		src, err := root.Open(path)
 		if err != nil {
 			return nil, err
 		}
@@ -74,8 +80,8 @@ func ImportSymlinkFile(vfs fsx.Virtual) ImportOp {
 			return nil, errorsx.Wrap(err, "unable to ensure symlink destination is available")
 		}
 
-		if err := os.Symlink(tx.Path, vfs.Path(uid)); err != nil {
-			return nil, errorsx.Wrap(err, "unable to symlink to original location")
+		if err := os.Symlink(srcvfs.Path(tx.Path), vfs.Path(uid)); err != nil {
+			return nil, errorsx.Wrapf(err, "unable to symlink to original location: %s -> %s", srcvfs.Path(tx.Path), vfs.Path(uid))
 		}
 
 		return tx, nil
@@ -83,13 +89,13 @@ func ImportSymlinkFile(vfs fsx.Virtual) ImportOp {
 }
 
 func ImportCopyFile(vfs fsx.Virtual) ImportOp {
-	return func(ctx context.Context, path string) (*Transfered, error) {
-		tx, err := TransferedFromPath(path)
+	return func(ctx context.Context, root fs.StatFS, path string) (*Transfered, error) {
+		tx, err := TransferedFromPath(root, path)
 		if err != nil {
 			return nil, err
 		}
 
-		src, err := os.Open(path)
+		src, err := root.Open(path)
 		if err != nil {
 			return nil, err
 		}
@@ -121,19 +127,21 @@ func ImportCopyFile(vfs fsx.Virtual) ImportOp {
 	}
 }
 
-func ImportFileDryRun(ctx context.Context, path string) (*Transfered, error) {
-	return TransferedFromPath(path)
+func ImportFileDryRun(ctx context.Context, root fs.StatFS, path string) (*Transfered, error) {
+	return TransferedFromPath(root, path)
 }
 
-func NewImporter(op ImportOp, options ...asynccompute.Option[string]) *importer {
+func NewImporter(op ImportOp, root fs.StatFS, options ...asynccompute.Option[string]) *importer {
 	return &importer{
 		op:          op,
+		root:        root,
 		computeopts: options,
 	}
 }
 
 type importer struct {
 	op          ImportOp
+	root        fs.StatFS
 	computeopts []asynccompute.Option[string]
 }
 
@@ -145,13 +153,13 @@ func (t importer) Import(ctx context.Context, paths ...string) iter.Seq2[*Transf
 		)
 		results := make(chan *Transfered)
 		arena := asynccompute.New(func(ictx context.Context, path string) error {
-			if info, err := os.Stat(path); err != nil {
+			if info, err := t.root.Stat(path); err != nil {
 				return err
 			} else if info.IsDir() {
 				return nil
 			}
 
-			tx, cause := t.op(ictx, path)
+			tx, cause := t.op(ictx, t.root, path)
 			if cause != nil {
 				capture.Do(func() {
 					err = errorsx.Compact(err, cause)
@@ -175,7 +183,7 @@ func (t importer) Import(ctx context.Context, paths ...string) iter.Seq2[*Transf
 			}()
 
 			for _, p := range paths {
-				if info, cause := os.Stat(p); errors.Is(cause, os.ErrNotExist) {
+				if info, cause := t.root.Stat(p); errors.Is(cause, fs.ErrNotExist) {
 					err = errorsx.Wrap(cause, "ignoring")
 					return
 				} else if cause != nil {
@@ -189,8 +197,12 @@ func (t importer) Import(ctx context.Context, paths ...string) iter.Seq2[*Transf
 
 					continue
 				}
-
-				cause := fs.WalkDir(os.DirFS(p), ".", func(path string, d fs.DirEntry, err error) error {
+				subroot, cause := fs.Sub(t.root, p)
+				if cause != nil {
+					err = errorsx.Wrapf(cause, "failed %s", p)
+					return
+				}
+				cause = fs.WalkDir(subroot, ".", func(path string, d fs.DirEntry, err error) error {
 					if err != nil {
 						return err
 					}
@@ -222,6 +234,6 @@ func (t importer) Import(ctx context.Context, paths ...string) iter.Seq2[*Transf
 	}
 }
 
-func ImportFilesystem(ctx context.Context, op ImportOp, paths ...string) iter.Seq2[*Transfered, error] {
-	return NewImporter(op).Import(ctx, paths...)
+func ImportFilesystem(ctx context.Context, op ImportOp, root fs.StatFS, paths ...string) iter.Seq2[*Transfered, error] {
+	return NewImporter(op, root).Import(ctx, paths...)
 }

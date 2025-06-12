@@ -58,6 +58,12 @@ func MetadataOptionBytes(d uint64) MetadataOption {
 	}
 }
 
+func MetadataOptionOffset(d uint64) MetadataOption {
+	return func(m *Metadata) {
+		m.DiskOffset = d
+	}
+}
+
 func MetadataOptionMimetype(s string) MetadataOption {
 	return func(m *Metadata) {
 		m.Mimetype = s

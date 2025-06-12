@@ -45,7 +45,7 @@ func (t importFilesystem) Run(gctx *cmdopts.Global) (err error) {
 		op = library.ImportCopyFile(vfs)
 	}
 
-	imp := library.NewImporter(op, asynccompute.Workers[string](t.Concurrency))
+	imp := library.NewImporter(op, nil /* TODO */, asynccompute.Workers[string](t.Concurrency))
 
 	for tx, cause := range imp.Import(gctx.Context, t.Paths...) {
 		if cause != nil {

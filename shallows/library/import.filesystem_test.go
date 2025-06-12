@@ -1,6 +1,8 @@
 package library_test
 
 import (
+	"io/fs"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -16,7 +18,7 @@ func TestImportFilesystemDryRun(t *testing.T) {
 	defer done()
 
 	count := 0
-	for _, err := range library.ImportFilesystem(ctx, library.ImportFileDryRun, testx.Fixture("tree.example.1")) {
+	for _, err := range library.ImportFilesystem(ctx, library.ImportFileDryRun, os.DirFS(testx.Fixture()).(fs.StatFS), "tree.example.1") {
 		require.NoError(t, err)
 		count++
 	}
@@ -31,9 +33,9 @@ func TestImportFilesystemCopy(t *testing.T) {
 	tmpdir := t.TempDir()
 	vfs := fsx.DirVirtual(tmpdir)
 	count := 0
-	for tx, err := range library.ImportFilesystem(ctx, library.ImportCopyFile(vfs), testx.Fixture("tree.example.1")) {
+	for tx, err := range library.ImportFilesystem(ctx, library.ImportCopyFile(vfs), os.DirFS(testx.Fixture()).(fs.StatFS), "tree.example.1") {
 		require.NoError(t, err)
-		require.Equal(t, testx.ReadMD5(tx.Path), testx.ReadMD5(filepath.Join(tmpdir, md5x.FormatUUID(tx.MD5))))
+		require.Equal(t, testx.ReadMD5(testx.Fixture(tx.Path)), testx.ReadMD5(filepath.Join(tmpdir, md5x.FormatUUID(tx.MD5))))
 		count++
 	}
 
@@ -46,10 +48,12 @@ func TestImportFilesystemSymlink(t *testing.T) {
 
 	tmpdir := t.TempDir()
 	vfs := fsx.DirVirtual(tmpdir)
+	fixvfs := fsx.DirVirtual(testx.Must(filepath.Abs(testx.Fixture()))(t))
 	count := 0
-	for tx, err := range library.ImportFilesystem(ctx, library.ImportSymlinkFile(vfs), testx.Must(filepath.Abs(testx.Fixture("tree.example.1")))(t)) {
+
+	for tx, err := range library.ImportFilesystem(ctx, library.ImportSymlinkFile(fixvfs, vfs), os.DirFS(testx.Fixture()).(fs.StatFS), "tree.example.1") {
 		require.NoError(t, err)
-		require.Equal(t, testx.ReadMD5(tx.Path), testx.ReadMD5(filepath.Join(tmpdir, md5x.FormatUUID(tx.MD5))))
+		require.Equal(t, testx.ReadMD5(testx.Fixture(tx.Path)), testx.ReadMD5(filepath.Join(tmpdir, md5x.FormatUUID(tx.MD5))))
 		count++
 	}
 

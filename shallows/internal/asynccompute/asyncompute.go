@@ -33,7 +33,7 @@ func (t *Pool[T]) Close() error {
 	close(t.queued)
 	t.shutdown.Wait()
 	cause := t.failed.Load()
-	return *cause
+	return langx.Autoderef(cause)
 }
 
 func (t *Pool[T]) init() *Pool[T] {

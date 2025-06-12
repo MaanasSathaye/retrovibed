@@ -24,11 +24,15 @@ func Zero[T any](v T, err error) T {
 }
 
 func Log(err error) {
+	logd(3, err)
+}
+
+func logd(d int, err error) {
 	if err == nil {
 		return
 	}
 
-	if cause := log.Output(2, fmt.Sprintln(err)); cause != nil {
+	if cause := log.Output(d, fmt.Sprintln(err)); cause != nil {
 		panic(cause)
 	}
 }
@@ -36,7 +40,7 @@ func Log(err error) {
 // print and return the error
 func LogErr(err error) error {
 	if err != nil {
-		log.Println(err)
+		logd(3, err)
 	}
 	return err
 }

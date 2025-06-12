@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
@@ -20,18 +21,24 @@ import (
 )
 
 func ImportTorrent(q sqlx.Queryer, mvfs, tvfs fsx.Virtual) library.ImportOp {
-	return func(ctx context.Context, path string) (*library.Transfered, error) {
-		tx, err := library.TransferedFromPath(path)
+	return func(ctx context.Context, root fs.StatFS, path string) (*library.Transfered, error) {
+		tx, err := library.TransferedFromPath(root, path)
 		if err != nil {
 			return nil, err
 		}
 
-		md, err := torrent.NewFromMetaInfoFile(tx.Path)
+		mdsrc, err := root.Open(tx.Path)
+		if err != nil {
+			return nil, err
+		}
+		defer mdsrc.Close()
+
+		md, err := torrent.NewFromMetaInfoReader(mdsrc)
 		if err != nil {
 			return nil, err
 		}
 
-		src, err := os.Open(path)
+		src, err := root.Open(path)
 		if err != nil {
 			return nil, err
 		}

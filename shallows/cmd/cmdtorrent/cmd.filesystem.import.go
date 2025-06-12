@@ -38,7 +38,7 @@ func (t importFilesystem) Run(gctx *cmdopts.Global) (err error) {
 	}
 	op := tracking.ImportTorrent(db, mvfs, tvfs)
 
-	for tx, cause := range library.ImportFilesystem(gctx.Context, op, t.Paths...) {
+	for tx, cause := range library.ImportFilesystem(gctx.Context, op, nil /* TODO */, t.Paths...) {
 		if cause != nil {
 			log.Println(cause)
 			err = errorsx.Compact(err, cause)
