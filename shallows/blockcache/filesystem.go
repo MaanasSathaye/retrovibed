@@ -1,6 +1,7 @@
 package blockcache
 
 import (
+	"fmt"
 	"io"
 	"io/fs"
 	"log"
@@ -9,6 +10,7 @@ import (
 	"time"
 
 	"github.com/james-lawrence/torrent/metainfo"
+	"github.com/retrovibed/retrovibed/internal/langx"
 	"github.com/retrovibed/retrovibed/internal/slicesx"
 )
 
@@ -16,38 +18,133 @@ type Info struct {
 	*File
 }
 
-// IsDir implements fs.FileInfo.
-func (t Info) IsDir() bool {
-	return t.dir
-}
-
-// ModTime implements fs.FileInfo.
 func (t Info) ModTime() time.Time {
+	log.Println("Info.ModTime", t.ts)
 	return t.ts
 }
 
-// Mode implements fs.FileInfo.
 func (t Info) Mode() fs.FileMode {
-	if t.dir {
-		return fs.ModeDir | (0700 & fs.ModePerm)
-	}
-
-	return (0600 & fs.ModePerm)
+	log.Println("Info.Mode", t.m)
+	return t.m
 }
 
-// Name implements fs.FileInfo.
-func (t Info) Name() string {
-	return filepath.Base(t.Path)
-}
-
-// Size implements fs.FileInfo.
 func (t Info) Size() int64 {
+	log.Println("Info.Size", t.Length)
 	return int64(t.Length)
 }
 
-// Sys implements fs.FileInfo.
 func (t Info) Sys() any {
+	log.Println("Info.Sys")
 	return nil
+}
+
+// FileOption defines the signature for functional options to NewFile.
+type FileOption func(*File)
+
+// WithInitialOffset sets the initial Offset field of the File.
+func WithInitialOffset(val uint64) FileOption {
+	return func(f *File) {
+		f.Offset = val
+	}
+}
+
+// WithInitialIndex sets the initial value of the atomic index field.
+func WithInitialIndex(val uint64) FileOption {
+	return func(f *File) {
+		f.index.Store(val)
+	}
+}
+
+// NewFile function updated to use the option pattern.
+func NewFile(dca cache, ts time.Time, path string, len uint64, mod fs.FileMode, opts ...FileOption) *File {
+	return langx.Autoptr(langx.Clone(File{
+		cache:  dca,
+		Path:   path,
+		Length: len,
+		ts:     ts,
+		m:      mod,
+		index:  new(atomic.Uint64),
+	}, opts...))
+}
+
+type File struct {
+	cache  cache
+	Path   string
+	Offset uint64
+	Length uint64
+	m      fs.FileMode
+	index  *atomic.Uint64
+	ts     time.Time
+}
+
+func (t *File) Info() (fs.FileInfo, error) {
+	return Info{File: t}, nil
+}
+
+func (t *File) IsDir() bool {
+	return t.m&fs.ModeDir != 0
+}
+
+func (t *File) Name() string {
+	return filepath.Base(t.Path)
+}
+
+func (t *File) Type() fs.FileMode {
+	return Info{File: t}.Mode() & fs.ModeType
+}
+
+func (t *File) Close() error {
+	return nil
+}
+
+func (t *File) Stat() (fs.FileInfo, error) {
+	return Info{File: t}, nil
+}
+
+func (t *File) Read(p []byte) (int, error) {
+	n, err := t.ReadAt(p, int64(t.index.Load()))
+	t.index.Add(uint64(n))
+	return n, err
+}
+
+func (t *File) ReadAt(p []byte, offset int64) (int, error) {
+	return t.cache.ReadAt(p, offset)
+}
+
+func (t *File) Write(p []byte) (int, error) {
+	n, err := t.WriteAt(p, int64(t.index.Load()))
+	t.index.Add(uint64(n))
+	return n, err
+}
+
+func (t *File) WriteAt(p []byte, offset int64) (int, error) {
+	return t.cache.WriteAt(p, offset)
+}
+
+func (t *File) Seek(offset int64, whence int) (int64, error) {
+	switch whence {
+	case io.SeekStart:
+		if offset < 0 {
+			return 0, fmt.Errorf("file: seek to negative index: %d", offset)
+		}
+		t.index.Store(uint64(offset))
+		return offset, nil
+	case io.SeekEnd:
+		res := int64(t.Length) + offset
+		if res < 0 {
+			return 0, fmt.Errorf("file: seek to negative index: %d", res)
+		}
+		t.index.Store(uint64(res))
+		return res, nil
+	default:
+		cur := t.index.Load()
+		res := int64(cur) + offset
+		if res < 0 {
+			return 0, fmt.Errorf("file: seek to negative index: %d", res)
+		}
+		t.index.Store(uint64(res))
+		return res, nil
+	}
 }
 
 type Dir struct {
@@ -93,57 +190,6 @@ func (t Dir) ReadDir(n int) (z []fs.DirEntry, err error) {
 	}, t.ent[t.index:m]...), nil
 }
 
-type File struct {
-	cache  *DirCache
-	Path   string
-	Offset uint64
-	Length uint64
-	dir    bool
-	index  uint64
-	ts     time.Time
-}
-
-// Info implements fs.DirEntry.
-func (t *File) Info() (fs.FileInfo, error) {
-	return Info{File: t}, nil
-}
-
-// IsDir implements fs.DirEntry.
-func (t *File) IsDir() bool {
-	return t.dir
-}
-
-// Name implements fs.DirEntry.
-func (t *File) Name() string {
-	return Info{File: t}.Name()
-}
-
-// Type implements fs.DirEntry.
-func (t *File) Type() fs.FileMode {
-	return Info{File: t}.Mode() & fs.ModeType
-}
-
-// Close implements fs.File.
-func (t *File) Close() error {
-	return nil
-}
-
-// Read implements fs.File.
-func (t *File) Read(p []byte) (int, error) {
-	n, err := t.ReadAt(p, int64(t.index))
-	atomic.AddUint64(&t.index, uint64(n))
-	return n, err
-}
-
-// Stat implements fs.File.
-func (t *File) Stat() (fs.FileInfo, error) {
-	return Info{File: t}, nil
-}
-
-func (t *File) ReadAt(p []byte, offset int64) (int, error) {
-	return t.cache.ReadAt(p, offset)
-}
-
 type FS struct {
 	dirent []*File
 	mapped map[string]*File
@@ -159,12 +205,8 @@ func (t FS) Open(name string) (fs.File, error) {
 
 	if filepath.Base(t.cache.root) == name {
 		return Dir{
-			ent: t.dirent,
-			File: &File{
-				cache: t.cache,
-				Path:  name,
-				dir:   true,
-			},
+			ent:  t.dirent,
+			File: NewFile(t.cache, time.Now(), name, 0, fs.ModeDir|(0700&fs.ModePerm)),
 		}, nil
 	}
 
@@ -174,15 +216,12 @@ func (t FS) Open(name string) (fs.File, error) {
 // Stat implements fs.StatFS.
 func (t FS) Stat(name string) (fs.FileInfo, error) {
 	if filepath.Base(t.cache.root) == name {
-		return Info{File: &File{
-			cache: t.cache,
-			Path:  name,
-			dir:   true,
-		}}, nil
+		return Info{File: NewFile(t.cache, time.Now(), name, 0, fs.ModeDir|(0700&fs.ModePerm))}, nil
 	}
 
 	if f, ok := t.mapped[name]; ok {
-		return Info{File: f}, nil
+		dup := *f
+		return Info{File: &dup}, nil
 	}
 
 	return nil, fs.ErrNotExist

@@ -1,6 +1,7 @@
 package media
 
 import (
+	"context"
 	"crypto/md5"
 	"encoding/json"
 	"io"
@@ -43,12 +44,12 @@ func HTTPLibraryOptionJWTSecret(j jwtx.SecretSource) HTTPLibraryOption {
 	}
 }
 
-func NewHTTPLibrary(q sqlx.Queryer, s fsx.Virtual, options ...HTTPLibraryOption) *HTTPLibrary {
+func NewHTTPLibrary(q sqlx.Queryer, media fsx.Virtual, options ...HTTPLibraryOption) *HTTPLibrary {
 	svc := langx.Clone(HTTPLibrary{
 		q:            q,
 		jwtsecret:    env.JWTSecret,
 		decoder:      formx.NewDecoder(),
-		mediastorage: s,
+		mediastorage: media,
 		fts:          duckdbx.NewLucene(),
 	}, options...)
 
@@ -102,9 +103,16 @@ func (t *HTTPLibrary) Bind(r *mux.Router) {
 		httpauth.AuthenticateWithToken(t.jwtsecret),
 		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
 		httpx.Timeout10s(),
-	).Then(http.FileServerFS(fsx.VirtualAsFSWithRewrite(t.mediastorage, func(s string) string {
-		return strings.TrimPrefix(s, "m/")
+		httpx.DebugRequest,
+	).Then(http.FileServerFS(library.New(t.mediastorage, func(ctx context.Context, s string) (*library.Metadata, error) {
+		var (
+			md library.Metadata
+		)
+		return &md, library.MetadataFindByID(ctx, t.q, strings.TrimPrefix(s, "m/")).Scan(&md)
 	}))))
+	// ).Then(http.FileServerFS(fsx.VirtualAsFSWithRewrite(t.mediastorage, func(s string) string {
+	// 	return strings.TrimPrefix(s, "m/")
+	// }))))
 }
 
 func (t *HTTPLibrary) delete(w http.ResponseWriter, r *http.Request) {

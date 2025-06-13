@@ -1,14 +1,22 @@
 package blockcache
 
 import (
+	"io"
+	"log"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"strconv"
 
 	"github.com/retrovibed/retrovibed/internal/bytesx"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/langx"
 )
+
+type cache interface {
+	io.ReaderAt
+	io.WriterAt
+}
 
 const defaultBlockLength = 32 * bytesx.MiB
 
@@ -21,11 +29,6 @@ func OptionDirCacheBlockLength(n int64) OptionDirCache {
 }
 
 func NewDirectoryCache(dir string, options ...OptionDirCache) (*DirCache, error) {
-	// dir, err := filepath.EvalSymlinks(dir)
-	// if err != nil {
-	// 	return nil, errorsx.Wrap(err, "symlink resolution failed")
-	// }
-
 	if err := os.MkdirAll(dir, 0700); err != nil {
 		return nil, errorsx.Wrap(err, "unable to ensure directory exists")
 	}
@@ -57,9 +60,10 @@ func (t DirCache) offset(off int64) (int64, int64) {
 }
 
 func (t DirCache) ReadAt(p []byte, off int64) (n int, err error) {
-	// defer func() {
-	// 	log.Println("finished read", n)
-	// }()
+	defer func() {
+		log.Println("finished read", n, err)
+		debug.PrintStack()
+	}()
 	readchunk := func(p []byte, off int64) (n int, err error) {
 		dst, err := os.Open(t.path(off))
 		if err != nil {
@@ -81,10 +85,6 @@ func (t DirCache) ReadAt(p []byte, off int64) (n int, err error) {
 			return n + _n, _err
 		}
 
-		// if np := t.path(off + int64(n)); np != path {
-		// 	log.Println("reading", np)
-		// 	path = np
-		// }
 		n += _n
 	}
 

@@ -102,10 +102,6 @@ func VirtualAsFS(v Virtual) fs.FS {
 	return vstoragefs{Virtual: v, pathrewrite: func(s string) string { return s }}
 }
 
-func VirtualAsFSWithRewrite(v Virtual, rewrite func(s string) string) fs.FS {
-	return vstoragefs{Virtual: v, pathrewrite: rewrite}
-}
-
 func DirVirtual(dir string) Virtual {
 	return dirvirt{root: dir}
 }
@@ -128,6 +124,10 @@ func (t dirvirt) Rename(oldpath, newpath string) error {
 
 func (t dirvirt) MkDirAll(path string, perm os.FileMode) error {
 	return os.MkdirAll(filepath.Join(t.root, path), perm)
+}
+
+func VirtualAsFSWithRewrite(v Virtual, rewrite func(s string) string) fs.FS {
+	return vstoragefs{Virtual: v, pathrewrite: rewrite}
 }
 
 type vstoragefs struct {

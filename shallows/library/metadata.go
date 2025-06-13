@@ -5,6 +5,7 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/internal/bytesx"
 	"github.com/retrovibed/retrovibed/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/internal/langx"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
@@ -91,6 +92,8 @@ func MetadataOptionTestDefaults(p *Metadata) {
 	p.TorrentID = uuid.Nil.String()
 	p.KnownMediaID = uuid.Nil.String()
 	p.EncryptionSeed = uuid.Nil.String()
+	p.Bytes = 16 * bytesx.KiB
+	p.DiskOffset = 0
 }
 
 func NewMetadata(id string, options ...func(*Metadata)) (m Metadata) {

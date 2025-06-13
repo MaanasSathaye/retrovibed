@@ -118,7 +118,10 @@ func DebugRequest(original http.Handler) http.Handler {
 		for idx, c := range req.Cookies() {
 			log.Println("COOKIE:", idx, ":", c.Name)
 		}
+
 		original.ServeHTTP(resp, req)
+
+		log.Println("DERP DERP", resp.Header())
 	})
 }
 
