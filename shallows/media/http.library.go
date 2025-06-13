@@ -110,9 +110,6 @@ func (t *HTTPLibrary) Bind(r *mux.Router) {
 		)
 		return &md, library.MetadataFindByID(ctx, t.q, strings.TrimPrefix(s, "m/")).Scan(&md)
 	}))))
-	// ).Then(http.FileServerFS(fsx.VirtualAsFSWithRewrite(t.mediastorage, func(s string) string {
-	// 	return strings.TrimPrefix(s, "m/")
-	// }))))
 }
 
 func (t *HTTPLibrary) delete(w http.ResponseWriter, r *http.Request) {

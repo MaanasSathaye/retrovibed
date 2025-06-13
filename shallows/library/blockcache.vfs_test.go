@@ -5,10 +5,10 @@ import (
 	"crypto/md5"
 	"io"
 	"io/fs"
-	"os"
 	"strings"
 	"testing"
 
+	"github.com/retrovibed/retrovibed/blockcache"
 	"github.com/retrovibed/retrovibed/internal/cryptox"
 	"github.com/retrovibed/retrovibed/internal/fsx"
 	"github.com/retrovibed/retrovibed/internal/md5x"
@@ -32,7 +32,13 @@ func TestVStorageFS(t *testing.T) {
 			storage := fsx.DirVirtual(t.TempDir())
 			require.NoError(t, testx.Fake(&md, library.MetadataOptionTestDefaults))
 			require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, md).Scan(&md))
-			require.NoError(t, os.WriteFile(storage.Path(md.ID), testx.IOBytes(io.TeeReader(cryptox.NewChaCha8(t.Name()), expected)), 0600))
+
+			dcache, err := blockcache.NewDirectoryCache(storage.Path(md.ID))
+			require.NoError(t, err)
+
+			n, err := io.Copy(io.NewOffsetWriter(dcache, 0), io.TeeReader(io.LimitReader(cryptox.NewChaCha8(t.Name()), int64(md.Bytes)), expected))
+			require.NoError(t, err)
+			require.Equal(t, md.Bytes, uint64(n))
 
 			fsys := library.New(storage, func(ctx context.Context, s string) (*library.Metadata, error) {
 				var (
@@ -42,20 +48,20 @@ func TestVStorageFS(t *testing.T) {
 			})
 
 			file, err := fsys.Open(md.ID)
-			require.NoError(t, err, "Open should not return an error on success")
-			require.NotNil(t, file, "Open should return a non-nil fs.File on success")
+			require.NoError(t, err)
+			require.NotNil(t, file)
 
 			// Verify the returned file's properties via its Stat() method
 			fileInfo, err := file.Stat()
-			require.NoError(t, err, "Stat() on opened file should not return an error")
-			require.NotNil(t, fileInfo, "Stat() should return non-nil FileInfo")
+			require.NoError(t, err)
+			require.NotNil(t, fileInfo)
 
 			require.Equal(t, md.ID, fileInfo.Name())
 			require.EqualValues(t, md.Bytes, fileInfo.Size())
 			require.Equal(t, md.CreatedAt, fileInfo.ModTime())
 			require.Equal(t, fs.FileMode(0600), fileInfo.Mode(), "File.Mode should be 0600 for regular file")
-			require.False(t, fileInfo.IsDir(), "File.IsDir should be false for a regular file")
-			require.Nil(t, fileInfo.Sys(), "File.Sys should be nil")
+			require.False(t, fileInfo.IsDir())
+			require.Nil(t, fileInfo.Sys())
 
 			// ensure we can read the data
 			require.Equal(t, md5x.FormatUUID(expected), testx.IOMD5(file))

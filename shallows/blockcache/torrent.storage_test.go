@@ -2,6 +2,7 @@ package blockcache_test
 
 import (
 	"crypto/md5"
+	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/autobind"
+	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/james-lawrence/torrent/torrenttest"
 	"github.com/retrovibed/retrovibed/blockcache"
@@ -115,4 +117,41 @@ func testClientTransfer(t *testing.T, seedercfg, leechercfg torrent.ClientConfig
 
 func TestClientTransferDefault(t *testing.T) {
 	testClientTransfer(t, torrent.ClientConfigNoop, torrent.ClientConfigNoop)
+}
+
+func TestTorrentFileSystem(t *testing.T) {
+	dir := t.TempDir()
+	info, err := torrenttest.RandomMulti(dir, 5, bytesx.KiB, bytesx.MiB)
+	require.NoError(t, err)
+
+	bcache, err := blockcache.NewDirectoryCache(dir)
+	require.NoError(t, err)
+	fsys := blockcache.TorrentFilesystem(bcache, info)
+
+	count := 0
+	err = fs.WalkDir(fsys, ".", func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		// log.Println("DERP DERP", path, d.Name())
+
+		if d.IsDir() {
+			// log.Println("Directory", path)
+			return nil
+		}
+
+		for d := range metainfo.Files(info) {
+			if path == d.Path {
+				count++
+				return nil
+				// } else {
+				// 	log.Println("sad", d.Path)
+			}
+		}
+
+		return nil
+	})
+	require.NoError(t, err)
+	require.Equal(t, 5, count)
 }

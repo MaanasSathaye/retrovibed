@@ -3,7 +3,6 @@ package library
 import (
 	"context"
 	"io/fs"
-	"log"
 	"time"
 
 	"github.com/retrovibed/retrovibed/blockcache"
@@ -27,7 +26,7 @@ func (t vstoragefs) Open(name string) (fs.File, error) {
 	if err != nil {
 		return nil, err
 	}
-	log.Println("opening", name, "as", t.Virtual.Path(md.ID), md.DiskOffset, md.Bytes)
+	// log.Println("opening", name, "as", t.Virtual.Path(md.ID), md.DiskOffset, md.Bytes)
 
 	dcache, err := blockcache.NewDirectoryCache(t.Virtual.Path(md.ID))
 	if err != nil {

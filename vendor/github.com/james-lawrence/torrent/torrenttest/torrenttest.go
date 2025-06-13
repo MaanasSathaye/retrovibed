@@ -20,7 +20,7 @@ import (
 func Random(dir string, n int64, options ...metainfo.Option) (info *metainfo.Info, digested hash.Hash, err error) {
 	digested = md5.New()
 
-	src, err := IOTorrent(dir, io.TeeReader(rand.Reader, digested), n)
+	src, err := IOTorrent(dir, io.TeeReader(rand.Reader, digested), n, false)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -53,13 +53,13 @@ func RandomMulti(dir string, n int, min int64, max int64, options ...metainfo.Op
 		return nil, err
 	}
 
-	addfile := func() error {
-		src, err := IOTorrent(root, rand.Reader, mrand.Int64N(max-min)+min)
+	addfile := func(idx int) error {
+		src, err := IOTorrent(root, rand.Reader, mrand.Int64N(max-min)+min, idx == 0 || mrand.Int64N(100)%10 == 0)
 		return errorsx.Compact(err, src.Close())
 	}
 
 	for i := 0; i < n; i++ {
-		if err := addfile(); err != nil {
+		if err := addfile(i); err != nil {
 			return nil, err
 		}
 	}
@@ -85,7 +85,15 @@ func RandomMulti(dir string, n int, min int64, max int64, options ...metainfo.Op
 }
 
 // RandomDataTorrent generates a torrent from the provided io.Reader
-func IOTorrent(dir string, src io.Reader, n int64) (d *os.File, err error) {
+func IOTorrent(dir string, src io.Reader, n int64, nested bool) (d *os.File, err error) {
+	if nested {
+		for i, depth := int32(0), mrand.Int32N(4)+1; i < depth; i++ {
+			if dir, err = os.MkdirTemp(dir, "*"); err != nil {
+				return nil, err
+			}
+		}
+	}
+
 	if d, err = os.CreateTemp(dir, "random.torrent.*.bin"); err != nil {
 		return d, err
 	}

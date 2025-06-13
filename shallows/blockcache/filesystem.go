@@ -6,12 +6,15 @@ import (
 	"io/fs"
 	"log"
 	"path/filepath"
+	"strings"
 	"sync/atomic"
 	"time"
 
+	"github.com/porfirion/trie"
+
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/internal/langx"
-	"github.com/retrovibed/retrovibed/internal/slicesx"
+	"github.com/retrovibed/retrovibed/internal/stringsx"
 )
 
 type Info struct {
@@ -147,10 +150,15 @@ func (t *File) Seek(offset int64, whence int) (int64, error) {
 	}
 }
 
+func NewDirEntry(ts time.Time, path string, mod fs.FileMode, opts ...FileOption) *Dir {
+	return &Dir{
+		File: NewFile(nil, ts, path, 0, mod|fs.ModeDir, opts...),
+	}
+}
+
 type Dir struct {
 	*File
-	index int
-	ent   []*File
+	ent []fs.DirEntry
 }
 
 // ReadDir reads the contents of the directory and returns
@@ -169,29 +177,26 @@ type Dir struct {
 // If it encounters an error before the end of the directory,
 // ReadDir returns the DirEntry list read until that point and a non-nil error.
 func (t Dir) ReadDir(n int) (z []fs.DirEntry, err error) {
+	// log.Println("READDIR", t.Path, n, t.index.Load(), len(t.ent))
+	// defer log.Println("READDIR COMPLETED")
 	if n <= 0 {
-		ents := slicesx.MapTransform(func(fn *File) fs.DirEntry {
-			return fn
-		}, t.ent...)
-		return ents, nil
+		return t.ent, nil
 	}
 
 	if len(t.ent) == 0 {
 		return nil, io.EOF
 	}
 
-	m := min(len(t.ent)-t.index, n)
+	m := min(len(t.ent)-int(t.index.Load()), n)
 	if m == 0 {
 		return nil, io.EOF
 	}
 
-	return slicesx.MapTransform(func(fn *File) fs.DirEntry {
-		return fn
-	}, t.ent[t.index:m]...), nil
+	return t.ent[t.index.Load():m], nil
 }
 
 type FS struct {
-	dirent []*File
+	tree   *trie.Trie[*Dir]
 	mapped map[string]*File
 	cache  *DirCache
 }
@@ -203,26 +208,35 @@ func (t FS) Open(name string) (fs.File, error) {
 		return &dup, nil
 	}
 
-	if filepath.Base(t.cache.root) == name {
-		return Dir{
-			ent:  t.dirent,
-			File: NewFile(t.cache, time.Now(), name, 0, fs.ModeDir|(0700&fs.ModePerm)),
-		}, nil
+	if v, ok := t.tree.Get([]byte(name)); ok {
+		return v, nil
 	}
 
+	rooted := "./" + name
+	if v, ok := t.tree.Get([]byte(rooted)); ok {
+		return v, nil
+	}
+
+	// log.Println("Open", name)
+	// t.tree.Iterate(func(prefix []byte, value *Dir) {
+	// 	log.Println("DERP", string(prefix), rooted, string(prefix) == name, string(prefix) == rooted)
+	// })
 	return nil, fs.ErrNotExist
 }
 
 // Stat implements fs.StatFS.
 func (t FS) Stat(name string) (fs.FileInfo, error) {
-	if filepath.Base(t.cache.root) == name {
-		return Info{File: NewFile(t.cache, time.Now(), name, 0, fs.ModeDir|(0700&fs.ModePerm))}, nil
-	}
-
 	if f, ok := t.mapped[name]; ok {
 		dup := *f
 		return Info{File: &dup}, nil
 	}
+
+	if v, ok := t.tree.Get([]byte(name)); ok {
+		dup := *v.File
+		return Info{File: &dup}, nil
+	}
+
+	// log.Println("STAT", name)
 
 	return nil, fs.ErrNotExist
 }
@@ -242,14 +256,27 @@ func TorrentFilesystem(d *DirCache, info *metainfo.Info) FS {
 	return NewFS(d, contents...)
 }
 
-func NewFS(d *DirCache, fns ...*File) FS {
+func NewFS(dcache *DirCache, fns ...*File) FS {
 	contents := make(map[string]*File, max(len(fns), 1))
-	for _, fn := range fns {
-		contents[fn.Path] = fn
+	fstree := &trie.Trie[*Dir]{}
 
-		for _, d := range filepath.SplitList(filepath.Dir(fn.Path)) {
-			log.Println("dirs", d)
+	for _, fn := range fns {
+		fn.Path = strings.Replace(fn.Path, filepath.Base(dcache.root), ".", 1)
+		contents[fn.Path] = fn
+		var prev fs.DirEntry = fn
+		for d, _ := filepath.Split(fn.Path); stringsx.Present(d); d, _ = filepath.Split(d) {
+			d = strings.TrimSuffix(d, string(filepath.Separator))
+			n := NewDirEntry(fn.ts, d, 0700)
+			n.ent = append(n.ent, prev)
+			if old := fstree.Put([]byte(d), n); old != nil {
+				if old.IsDir() {
+					n.ent = append(old.ent, n.ent...)
+				}
+			}
+			prev = n
+			// log.Println("dir", d, len(n.ent))
 		}
 	}
-	return FS{cache: d, mapped: contents, dirent: fns}
+
+	return FS{cache: dcache, mapped: contents, tree: fstree}
 }

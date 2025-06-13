@@ -41,8 +41,8 @@ type importPeer struct {
 	Magnets   string `arg:"" name:"magnets" help:"file containing magnet links to download, defaults to stdin" default:""`
 }
 
-func (t importPeer) torrents(tstore fsx.Virtual) iter.Seq[torrent.Metadata] {
-	return func(yield func(torrent.Metadata) bool) {
+func (t importPeer) torrents(tstore fsx.Virtual) iter.Seq2[string, torrent.Metadata] {
+	return func(yield func(string, torrent.Metadata) bool) {
 		src := os.Stdin
 
 		if stringsx.Present(t.Magnets) {
@@ -71,7 +71,7 @@ func (t importPeer) torrents(tstore fsx.Virtual) iter.Seq[torrent.Metadata] {
 				log.Println("torrent info unavailable", infopath)
 			}
 
-			if !yield(magnet) {
+			if !yield(s.Text(), magnet) {
 				return
 			}
 		}
@@ -83,6 +83,10 @@ func (t importPeer) torrents(tstore fsx.Virtual) iter.Seq[torrent.Metadata] {
 }
 
 func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
+	type workload struct {
+		magnet string
+		meta   torrent.Metadata
+	}
 
 	var (
 		db        *sql.DB
@@ -112,9 +116,6 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	if err != nil {
 		return errorsx.Wrap(err, "unable to resolve host")
 	}
-
-	// log.Println("DERP", ssh.FingerprintSHA256(id.PublicKey()), "->", int160.FromByteArray(peerid).String())
-	// log.Println("WAAAT", addrs)
 
 	tm := dht.DefaultMuxer().
 		Method(bep0051.Query, bep0051.NewEndpoint(bep0051.EmptySampler{}))
@@ -169,63 +170,72 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		Trusted: true,
 	}
 
-	arena := asynccompute.New(func(ctx context.Context, meta torrent.Metadata) error {
+	importfn := func(ctx context.Context, w workload) error {
 		var (
 			info *metainfo.Info
 		)
 
-		if len(meta.InfoBytes) == 0 {
+		if len(w.meta.InfoBytes) == 0 {
 			var (
 				cause error
 			)
-			log.Printf("awaiting torrent info %s\n", meta.ID)
+			log.Printf("awaiting torrent info %s\n", w.meta.ID)
 
-			info, cause = tclient.Info(ctx, meta, torrent.TunePeers(sourcepeer))
+			info, cause = tclient.Info(ctx, w.meta, torrent.TunePeers(sourcepeer))
 			if cause != nil {
-				return errorsx.Wrapf(cause, "failed to retrieve torrent info %s", meta.ID)
+				return errorsx.Wrapf(cause, "failed to retrieve torrent info %s", w.meta.ID)
 			}
 
-			log.Println("torrent info received", meta.ID.String(), spew.Sdump(meta.Metainfo()))
-			if meta, cause = torrent.NewFromInfo(info); err != nil {
-				return errorsx.Wrapf(cause, "failed to retrieve torrent info %s", meta.ID)
+			log.Println("torrent info received", w.meta.ID.String(), spew.Sdump(w.meta.Metainfo()))
+			if w.meta, cause = torrent.NewFromInfo(info); err != nil {
+				return errorsx.Wrapf(cause, "failed to retrieve torrent info %s", w.meta.ID)
 			}
-			if err = os.WriteFile(torrentstore.Path(fmt.Sprintf("%s.torrent", meta.ID)), errorsx.Must(metainfo.Encode(meta.Metainfo())), 0600); err != nil {
-				return errorsx.Wrapf(cause, "failed to record torrent %s %v", meta.ID, cause)
+			if err = os.WriteFile(torrentstore.Path(fmt.Sprintf("%s.torrent", w.meta.ID)), errorsx.Must(metainfo.Encode(w.meta.Metainfo())), 0600); err != nil {
+				return errorsx.Wrapf(cause, "failed to record torrent %s %v", w.meta.ID, cause)
 			}
 		} else {
-			log.Printf("torrent info available resuming %s %d\n", meta.ID, len(meta.InfoBytes))
-			if _info, cause := meta.Metainfo().UnmarshalInfo(); cause != nil {
-				return errorsx.Wrapf(cause, "failed to resume torrent %s", meta.ID)
+			log.Printf("torrent info available resuming %s %d\n", w.meta.ID, len(w.meta.InfoBytes))
+			if _info, cause := w.meta.Metainfo().UnmarshalInfo(); cause != nil {
+				return errorsx.Wrapf(cause, "failed to resume torrent %s", w.meta.ID)
 			} else {
 				info = &_info
 			}
 		}
 
 		lmd := tracking.NewMetadata(
-			&meta.ID,
+			&w.meta.ID,
 			tracking.MetadataOptionFromInfo(info),
-			tracking.MetadataOptionTrackers(meta.Trackers...),
+			tracking.MetadataOptionTrackers(w.meta.Trackers...),
 			tracking.MetadataOptionAutoDescription,
 		)
 
 		if cause := tracking.MetadataInsertWithDefaults(ctx, db, lmd).Scan(&lmd); cause != nil {
-			return errorsx.Wrapf(cause, "failed to record metadata %s", meta.ID.String())
+			return errorsx.Wrapf(cause, "failed to record metadata %s", w.meta.ID.String())
 		}
 
-		dl, _, cause := tclient.Start(meta, torrent.TuneVerifyFull, torrent.TunePeers(sourcepeer), torrent.TuneAutoDownload, torrent.TuneDisableTrackers)
+		dl, _, cause := tclient.Start(w.meta, torrent.TuneVerifyFull, torrent.TunePeers(sourcepeer), torrent.TuneAutoDownload, torrent.TuneDisableTrackers)
 		if cause != nil {
-			return errorsx.Wrapf(cause, "failed to start magnet %s - %T: %+v\n", meta.ID.String(), cause, cause)
+			return errorsx.Wrapf(cause, "failed to start magnet %s - %T: %+v\n", w.meta.ID.String(), cause, cause)
 		}
 
 		if cause := tracking.Download(ctx, db, rootstore, &lmd, dl); cause != nil {
-			return errorsx.Wrapf(cause, "failed to download %s %v", meta.ID.String(), cause)
+			return errorsx.Wrapf(cause, "failed to download %s %v", w.meta.ID.String(), cause)
+		}
+
+		return nil
+	}
+
+	arena := asynccompute.New(func(ctx context.Context, w workload) error {
+		if err := importfn(ctx, w); err != nil {
+			fmt.Println(w.magnet)
+			return err
 		}
 
 		return nil
 	})
 
-	for meta := range t.torrents(torrentstore) {
-		if err := arena.Run(gctx.Context, meta); err != nil {
+	for k, v := range t.torrents(torrentstore) {
+		if err := arena.Run(gctx.Context, workload{magnet: k, meta: v}); err != nil {
 			return errorsx.Compact(err, asynccompute.Shutdown(gctx.Context, arena))
 		}
 	}

@@ -2,10 +2,8 @@ package blockcache
 
 import (
 	"io"
-	"log"
 	"os"
 	"path/filepath"
-	"runtime/debug"
 	"strconv"
 
 	"github.com/retrovibed/retrovibed/internal/bytesx"
@@ -30,7 +28,7 @@ func OptionDirCacheBlockLength(n int64) OptionDirCache {
 
 func NewDirectoryCache(dir string, options ...OptionDirCache) (*DirCache, error) {
 	if err := os.MkdirAll(dir, 0700); err != nil {
-		return nil, errorsx.Wrap(err, "unable to ensure directory exists")
+		return nil, errorsx.Wrapf(err, "unable to ensure directory exists: %s", dir)
 	}
 
 	c := langx.Clone(DirCache{
@@ -60,10 +58,10 @@ func (t DirCache) offset(off int64) (int64, int64) {
 }
 
 func (t DirCache) ReadAt(p []byte, off int64) (n int, err error) {
-	defer func() {
-		log.Println("finished read", n, err)
-		debug.PrintStack()
-	}()
+	// defer func() {
+	// 	log.Println("finished read", n, err)
+	// 	debug.PrintStack()
+	// }()
 	readchunk := func(p []byte, off int64) (n int, err error) {
 		dst, err := os.Open(t.path(off))
 		if err != nil {
