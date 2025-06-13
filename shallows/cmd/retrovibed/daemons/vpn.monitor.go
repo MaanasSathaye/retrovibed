@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"path/filepath"
 	"time"
@@ -13,18 +14,28 @@ import (
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/fsnotifyx"
 	"github.com/retrovibed/retrovibed/internal/langx"
+	"github.com/retrovibed/retrovibed/internal/netx"
 	"github.com/retrovibed/retrovibed/internal/torrentx"
 	"github.com/retrovibed/retrovibed/internal/wireguardx"
 	"golang.zx2c4.com/wireguard/tun/netstack"
 )
 
-func VPNIP(ctx context.Context, wgnet *netstack.Net) error {
-	if wgnet == nil {
-		return nil
+func DefaultDialer(wgnet *netstack.Net) netx.Dialer {
+	if wgnet != nil {
+		return wgnet
+	}
+
+	return &net.Dialer{}
+}
+
+func PublicIP(ctx context.Context, d netx.Dialer) error {
+	if d == nil {
+		log.Println("DERP")
+		d = &net.Dialer{}
 	}
 
 	c := &http.Client{Transport: &http.Transport{
-		DialContext:           wgnet.DialContext,
+		DialContext:           d.DialContext,
 		ForceAttemptHTTP2:     true,
 		MaxIdleConns:          100,
 		IdleConnTimeout:       90 * time.Second,

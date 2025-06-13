@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -13,6 +14,7 @@ import (
 	"golang.org/x/crypto/ssh"
 	"golang.zx2c4.com/wireguard/tun/netstack"
 
+	"github.com/james-lawrence/torrent/connections"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/krpc"
 	"github.com/james-lawrence/torrent/metainfo"
@@ -28,6 +30,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/fsx"
 	"github.com/retrovibed/retrovibed/internal/httpx"
 	"github.com/retrovibed/retrovibed/internal/jwtx"
+	"github.com/retrovibed/retrovibed/internal/md5x"
 	"github.com/retrovibed/retrovibed/internal/netx"
 	"github.com/retrovibed/retrovibed/internal/slicesx"
 	"github.com/retrovibed/retrovibed/internal/timex"
@@ -51,12 +54,14 @@ import (
 type Command struct {
 	DisableMDNS       bool             `flag:"" name:"no-mdns" help:"disable the multicast dns service" default:"false" env:"${env_mdns_disabled}"`
 	AutoBootstrap     bool             `flag:"" name:"auto-bootstrap" help:"bootstrap from a predefined set of peers" default:"true" env:"${env_auto_bootstrap}"`
-	AutoDiscovery     bool             `flag:"" name:"auto-discovery" help:"EXPERIMENTAL: enable autodiscovery of content from peers" default:"false" env:"${env_auto_discovery}"`
+	AutoDiscovery     bool             `flag:"" name:"auto-discovery" help:"EXPERIMENTAL: enable automatic discovery of content from peers" default:"false" env:"${env_auto_discovery}"`
 	AutoDownload      bool             `flag:"" name:"auto-download" help:"EXPERIMENTAL: enable automatically downloading torrent from the downloads folder" default:"false"`
 	AutoIdentifyMedia bool             `flag:"" name:"auto-identify-media" help:"EXPERIMENTAL: enable automatically identifying media" default:"true" env:"${env_auto_identify_media}"`
+	AutoArchive       bool             `flag:"" name:"auto-archive" help:"EXPERIMENTAL: enable automatic archiving of eligible media" default:"false" env:"${env_auto_archive}"`
 	HTTP              cmdopts.Listener `flag:"" name:"http-address" help:"address to serve daemon api from" default:"tcp://:9998" env:"${env_daemon_socket}"`
 	SelfSignedHosts   []string         `flag:"" name:"self-signed-hosts" help:"comma seperated list of hosts to add to the sign signed certificate" env:"${env_self_signed_hosts}"`
 	TorrentPort       int              `flag:"" name:"torrent-port" help:"port to use for torrenting" env:"${env_torrent_port}" default:"10000"`
+	TorrentPrivate    bool             `flag:"" name:"torrent-private" help:"restrict torrent connections to private networks" env:"${env_torrent_private}" default:"false"`
 	TorrentPublicIP4  string           `flag:"" name:"torrent-ipv4" help:"public ipv4 address of the torrent" env:"${env_torrent_ipv4}"`
 	TorrentPublicIP6  string           `flag:"" name:"torrent-ipv6" help:"public ipv6 address of the torrent" env:"${env_torrent_ipv6}"`
 }
@@ -65,8 +70,9 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	var (
 		db           *sql.DB
 		torrentpeers                            = userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "torrent.peers")
-		peerid                                  = krpc.IdFromString(ssh.FingerprintSHA256(id.PublicKey()))
+		peerid                                  = krpc.IdFromString(md5x.String(ssh.FingerprintSHA256(id.PublicKey())))
 		bootstrap    torrent.ClientConfigOption = torrent.ClientConfigNoop
+		firewall     torrent.ClientConfigOption = torrent.ClientConfigNoop
 		tnetwork     torrent.Binder
 		wgnet        *netstack.Net
 	)
@@ -116,7 +122,16 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		bootstrap = torrent.ClientConfigBootstrapGlobal
 	}
 
-	rootstore := fsx.DirVirtual(userx.DefaultDataDirectory(userx.DefaultRelRoot()))
+	if t.TorrentPrivate {
+		log.Println("disabling public networks for torrent")
+		firewall = torrent.ClientConfigFirewall(connections.NewFirewall(
+			connections.Private{},
+			connections.BanInvalidPort{},
+			connections.NewBloomBanIP(10*time.Minute),
+		))
+	}
+
+	rootstore := fsx.DirVirtual(env.RootStorageDir())
 	mediastore := fsx.DirVirtual(env.MediaDir())
 	torrentstore := fsx.DirVirtual(env.TorrentDir())
 
@@ -142,7 +157,12 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 			return errorsx.Wrap(err, "unable to setup wireguard torrent socket")
 		}
 	} else {
-		log.Println("no wireguard configuration found at", path)
+		log.Println("no wireguard configuration found at", path, wgnet == nil)
+	}
+
+	var torrentlogging io.Writer = io.Discard
+	if envx.Boolean(false, env.TorrentLogging) {
+		torrentlogging = os.Stderr
 	}
 
 	torconfig := torrent.NewDefaultClientConfig(
@@ -150,13 +170,16 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		tstore,
 		torrent.ClientConfigPeerID(string(peerid[:])),
 		torrent.ClientConfigPortForward(true),
+		torrent.ClientConfigPortForward(false),
 		torrent.ClientConfigIPv4(t.TorrentPublicIP4),
 		torrent.ClientConfigIPv6(t.TorrentPublicIP6),
 		torrent.ClientConfigSeed(true),
-		torrent.ClientConfigDialer(wgnet),
-		torrent.ClientConfigInfoLogger(log.New(io.Discard, "[torrent] ", log.Flags())),
+		torrent.ClientConfigDialer(DefaultDialer(wgnet)),
+		torrent.ClientConfigInfoLogger(log.New(torrentlogging, "[torrent] ", log.Flags())),
+		torrent.ClientConfigDebugLogger(log.New(torrentlogging, "[torrent - debug] ", log.Flags())),
 		torrent.ClientConfigMuxer(tm),
 		torrent.ClientConfigBucketLimit(32),
+		torrent.ClientConfigMaxOutstandingRequests(512),
 		torrent.ClientConfigHTTPUserAgent("retrovibed/0.0"),
 		torrent.ClientConfigConnectionClosed(func(ih metainfo.Hash, stats torrent.ConnStats, remaining int) {
 			if stats.BytesWrittenData.Uint64() == 0 {
@@ -172,6 +195,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 			}
 		}),
 		bootstrap,
+		firewall,
 	)
 
 	log.Println("torrent specified public ip:", torconfig.PublicIP4(), torconfig.PublicIP6())
@@ -198,6 +222,20 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		}
 	} else {
 		log.Println("download folder monitoring disabled")
+	}
+
+	if t.AutoArchive {
+		if err := metaapi.Register(gctx.Context); err != nil {
+			return errorsx.Wrap(err, "unable to register with archival service")
+		}
+
+		contextx.WaitGroupAdd(gctx.Context, 1)
+		go func() {
+			defer contextx.WaitGroupDone(gctx.Context)
+			// errorsx.Log(library.NewDiskQuota(gctx.Context, rootstore, db))
+		}()
+	} else {
+		log.Println("automatic media archival is disabled")
 	}
 
 	{
@@ -241,8 +279,9 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		}
 	}()
 
-	go AnnounceSeeded(dctx, db, rootstore, tclient, tstore)
-	go ResumeDownloads(dctx, db, rootstore, tclient, tstore)
+	// go AnnounceSeeded(dctx, db, rootstore, tclient, tstore)
+	// go ResumeDownloads(dctx, db, rootstore, tclient, tstore)
+
 	if t.AutoIdentifyMedia {
 		go timex.NowAndEvery(gctx.Context, 15*time.Minute, func(ctx context.Context) error {
 			errorsx.Log(IdentifyTorrentyMedia(dctx, db))
@@ -252,7 +291,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		log.Println("auto identify media is disabled, to enable add --auto-identify-media. highly experimental.")
 	}
 
-	if err = VPNIP(dctx, wgnet); err != nil {
+	if err = PublicIP(dctx, DefaultDialer(wgnet)); err != nil {
 		log.Println("failed to lookup wireguard ip", err)
 	}
 

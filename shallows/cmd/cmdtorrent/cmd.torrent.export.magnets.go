@@ -2,6 +2,7 @@ package cmdtorrent
 
 import (
 	"database/sql"
+	"fmt"
 	"os"
 
 	"github.com/Masterminds/squirrel"
@@ -43,12 +44,12 @@ func (t exportMagnets) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) 
 
 	for md := range iter.Iter() {
 		md := metainfo.Magnet{
-			InfoHash:    metainfo.NewHashFromBytes(md.Infohash),
+			InfoHash:    metainfo.Hash(md.Infohash),
 			Trackers:    []string{md.Tracker},
 			DisplayName: md.Description,
 		}
 
-		if _, err = dst.WriteString(md.String()); err != nil {
+		if _, err = dst.WriteString(fmt.Sprintln(md.String())); err != nil {
 			return err
 		}
 

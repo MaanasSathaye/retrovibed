@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
 	"github.com/retrovibed/retrovibed/library"
@@ -34,6 +35,11 @@ func IdentifyTorrentyMedia(ctx context.Context, db sqlx.Queryer) error {
 
 		if known, err = library.DetectKnownMedia(ctx, db, md.Description); err != nil {
 			log.Println("unable to detect media for torrent", md.ID, md.Description, "|", md.Description, "|", err)
+			continue
+		}
+
+		if uuid.FromStringOrNil(known.UID).IsNil() {
+			log.Println("unable to detect media for torrent", md.ID, md.Description, "|", md.Description)
 			continue
 		}
 
