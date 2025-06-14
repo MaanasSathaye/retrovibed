@@ -117,7 +117,11 @@ func MetadataQueryHidden() squirrel.Sqlizer {
 }
 
 func MetadataQueryArchived() squirrel.Sqlizer {
-	return squirrel.Expr("library_metadata.achived_id != '00000000-0000-0000-0000-000000000000'")
+	return squirrel.Expr("library_metadata.archive_id != '00000000-0000-0000-0000-000000000000' AND library_metadata.archive_id != 'FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF'")
+}
+
+func MetadataQueryArchivable() squirrel.Sqlizer {
+	return squirrel.Expr("library_metadata.archive_id = 'FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF'")
 }
 
 func MetadataQueryShared() squirrel.Sqlizer {

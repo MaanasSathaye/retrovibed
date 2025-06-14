@@ -62,3 +62,11 @@ func IgnoreCancelled(err error) error {
 func IsCancelled(err error) bool {
 	return errors.Is(err, context.Canceled)
 }
+
+func Run(ctx context.Context, op func()) {
+	WaitGroupAdd(ctx, 1)
+	go func() {
+		defer WaitGroupDone(ctx)
+		op()
+	}()
+}

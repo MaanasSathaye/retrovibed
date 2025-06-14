@@ -230,11 +230,9 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 			return errorsx.Wrap(err, "unable to register with archival service")
 		}
 
-		contextx.WaitGroupAdd(gctx.Context, 1)
-		go func() {
-			defer contextx.WaitGroupDone(gctx.Context)
+		contextx.Run(gctx.Context, func() {
 			errorsx.Log(library.NewDiskQuota(gctx.Context, rootstore, db))
-		}()
+		})
 	} else {
 		log.Println("automatic media archival is disabled")
 	}

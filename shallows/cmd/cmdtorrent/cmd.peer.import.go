@@ -23,6 +23,7 @@ import (
 	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/internal/asynccompute"
+	"github.com/retrovibed/retrovibed/internal/contextx"
 	"github.com/retrovibed/retrovibed/internal/env"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/fsx"
@@ -31,6 +32,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/stringsx"
 	"github.com/retrovibed/retrovibed/internal/torrentx"
 	"github.com/retrovibed/retrovibed/internal/userx"
+	"github.com/retrovibed/retrovibed/library"
 	"github.com/retrovibed/retrovibed/tracking"
 	"golang.org/x/crypto/ssh"
 )
@@ -107,6 +109,10 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	if err := fsx.MkDirs(0700, torrentstore.Path()); err != nil {
 		return err
 	}
+
+	contextx.Run(gctx.Context, func() {
+		errorsx.Log(library.NewDiskQuota(gctx.Context, rootstore, db))
+	})
 
 	host, port, err := net.SplitHostPort(t.Peer)
 	if err != nil {
