@@ -181,7 +181,7 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 	log.Println("content transfer to library initiated", t.Metadata().ID.String())
 	defer log.Println("content transfer to library completed", t.Metadata().ID.String())
 
-	for tx, cause := range library.ImportFilesystem(ctx, ImportSymlink(torrentvfs, mediavfs), blockcache.TorrentFilesystem(bcache, t.Info()), ".") {
+	for tx, cause := range library.ImportFilesystem(ctx, ImportSymlink(int160.FromByteArray(t.Metadata().ID), torrentvfs, mediavfs), blockcache.TorrentFilesystem(bcache, t.Info()), ".") {
 		if cause != nil {
 			log.Println("import failed", cause)
 			err = errorsx.Compact(err, cause)
@@ -298,7 +298,7 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 	}
 }
 
-func ImportSymlink(srcvfs, vfs fsx.Virtual) library.ImportOp {
+func ImportSymlink(id int160.T, srcvfs, vfs fsx.Virtual) library.ImportOp {
 	return func(ctx context.Context, root fs.StatFS, path string) (*library.Transfered, error) {
 		tx, err := library.TransferedFromPath(root, path)
 		if err != nil {
@@ -322,17 +322,16 @@ func ImportSymlink(srcvfs, vfs fsx.Virtual) library.ImportOp {
 		}
 
 		uid := md5x.FormatUUID(tx.MD5)
-		blockpath := filepath.Dir(tx.Path)
 
 		if err := os.Remove(vfs.Path(uid)); fsx.IgnoreIsNotExist(err) != nil {
 			return nil, errorsx.Wrap(err, "unable to ensure symlink destination is available")
 		}
 
-		if err := os.Symlink(srcvfs.Path(blockpath), vfs.Path(uid)); err != nil {
-			return nil, errorsx.Wrapf(err, "unable to symlink to original location: %s -> %s", srcvfs.Path(blockpath), vfs.Path(uid))
+		if err := os.Symlink(srcvfs.Path(id.String()), vfs.Path(uid)); err != nil {
+			return nil, errorsx.Wrapf(err, "unable to symlink to original location: %s -> %s", srcvfs.Path(id.String()), vfs.Path(uid))
 		}
 
-		log.Printf("symlinked: %s -> %s\n", srcvfs.Path(blockpath), vfs.Path(uid))
+		log.Printf("symlinked: %s -> %s\n", srcvfs.Path(id.String()), vfs.Path(uid))
 
 		return tx, nil
 	}

@@ -19,6 +19,7 @@ import (
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/dht/krpc"
 	"github.com/james-lawrence/torrent/metainfo"
+	"github.com/retrovibed/retrovibed/authn"
 	"github.com/retrovibed/retrovibed/blockcache"
 	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
@@ -33,6 +34,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/torrentx"
 	"github.com/retrovibed/retrovibed/internal/userx"
 	"github.com/retrovibed/retrovibed/library"
+	"github.com/retrovibed/retrovibed/metaapi"
 	"github.com/retrovibed/retrovibed/tracking"
 	"golang.org/x/crypto/ssh"
 )
@@ -105,14 +107,25 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 
 	rootstore := fsx.DirVirtual(userx.DefaultDataDirectory(userx.DefaultRelRoot()))
 	torrentstore := fsx.DirVirtual(stringsx.FirstNonBlank(t.Directory, env.TorrentDir()))
+	mediastore := fsx.DirVirtual(env.MediaDir())
 
 	if err := fsx.MkDirs(0700, torrentstore.Path()); err != nil {
 		return err
 	}
 
-	contextx.Run(gctx.Context, func() {
-		errorsx.Log(library.NewDiskQuota(gctx.Context, rootstore, db))
-	})
+	c, err := authn.Oauth2HTTPClient(gctx.Context)
+	if err != nil {
+		return errorsx.Wrap(err, "failed to create oauth2 bearer token")
+	}
+
+	if t.Archive {
+		if err := metaapi.Register(gctx.Context); err != nil {
+			return errorsx.Wrap(err, "unable to register with archival service")
+		}
+		contextx.Run(gctx.Context, func() {
+			errorsx.Log(library.NewDiskQuota(gctx.Context, metaapi.JWTClient(c), mediastore, db))
+		})
+	}
 
 	host, port, err := net.SplitHostPort(t.Peer)
 	if err != nil {

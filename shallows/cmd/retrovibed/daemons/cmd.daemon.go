@@ -19,6 +19,7 @@ import (
 	"github.com/james-lawrence/torrent/dht/krpc"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
+	"github.com/retrovibed/retrovibed/authn"
 	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/downloads"
@@ -58,7 +59,7 @@ type Command struct {
 	AutoDiscovery     bool             `flag:"" name:"auto-discovery" help:"EXPERIMENTAL: enable automatic discovery of content from peers" default:"false" env:"${env_auto_discovery}"`
 	AutoDownload      bool             `flag:"" name:"auto-download" help:"EXPERIMENTAL: enable automatically downloading torrent from the downloads folder" default:"false"`
 	AutoIdentifyMedia bool             `flag:"" name:"auto-identify-media" help:"EXPERIMENTAL: enable automatically identifying media" default:"true" env:"${env_auto_identify_media}"`
-	AutoArchive       bool             `flag:"" name:"auto-archive" help:"EXPERIMENTAL: enable automatic archiving of eligible media" default:"false" env:"${env_auto_archive}"`
+	AutoArchive       bool             `flag:"" name:"auto-archive" help:"EXPERIMENTAL: enable automatic archiving of eligible media" default:"true" env:"${env_auto_archive}"`
 	HTTP              cmdopts.Listener `flag:"" name:"http-address" help:"address to serve daemon api from" default:"tcp://:9998" env:"${env_daemon_socket}"`
 	SelfSignedHosts   []string         `flag:"" name:"self-signed-hosts" help:"comma seperated list of hosts to add to the sign signed certificate" env:"${env_self_signed_hosts}"`
 	TorrentPort       int              `flag:"" name:"torrent-port" help:"port to use for torrenting" env:"${env_torrent_port}" default:"10000"`
@@ -230,8 +231,13 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 			return errorsx.Wrap(err, "unable to register with archival service")
 		}
 
+		c, err := authn.Oauth2HTTPClient(gctx.Context)
+		if err != nil {
+			return errorsx.Wrap(err, "failed to create oauth2 bearer token")
+		}
+
 		contextx.Run(gctx.Context, func() {
-			errorsx.Log(library.NewDiskQuota(gctx.Context, rootstore, db))
+			errorsx.Log(library.NewDiskQuota(gctx.Context, metaapi.JWTClient(c), mediastore, db))
 		})
 	} else {
 		log.Println("automatic media archival is disabled")
