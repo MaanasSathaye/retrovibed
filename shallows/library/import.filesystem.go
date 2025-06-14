@@ -184,7 +184,7 @@ func (t importer) Import(ctx context.Context, paths ...string) iter.Seq2[*Transf
 
 			for _, p := range paths {
 				if info, cause := t.root.Stat(p); errors.Is(cause, fs.ErrNotExist) {
-					err = errorsx.Wrap(cause, "ignoring")
+					err = errorsx.Wrapf(cause, "ignoring %s", p)
 					return
 				} else if cause != nil {
 					err = errorsx.Wrapf(cause, "failed %s", p)

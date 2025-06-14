@@ -181,7 +181,7 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 	log.Println("content transfer to library initiated", t.Metadata().ID.String())
 	defer log.Println("content transfer to library completed", t.Metadata().ID.String())
 
-	for tx, cause := range library.ImportFilesystem(ctx, ImportSymlink(torrentvfs, mediavfs), blockcache.TorrentFilesystem(bcache, t.Info()), t.Metadata().ID.String()) {
+	for tx, cause := range library.ImportFilesystem(ctx, ImportSymlink(torrentvfs, mediavfs), blockcache.TorrentFilesystem(bcache, t.Info()), ".") {
 		if cause != nil {
 			log.Println("import failed", cause)
 			err = errorsx.Compact(err, cause)
@@ -333,6 +333,7 @@ func ImportSymlink(srcvfs, vfs fsx.Virtual) library.ImportOp {
 		}
 
 		log.Printf("symlinked: %s -> %s\n", srcvfs.Path(blockpath), vfs.Path(uid))
+
 		return tx, nil
 	}
 }

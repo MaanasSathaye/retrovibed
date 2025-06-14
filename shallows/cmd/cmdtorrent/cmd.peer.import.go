@@ -38,6 +38,7 @@ import (
 type importPeer struct {
 	Peer      string `flag:"" name:"peer" help:"peer to connect to and download the provided torrents from" default:"localhost:10000"`
 	Directory string `flag:"" name:"directory" help:"specify the directory to download torrents into" default:""`
+	Archive   bool   `flag:"" name:"archive" help:"mark imported media for archival" default:"false"`
 	Magnets   string `arg:"" name:"magnets" help:"file containing magnet links to download, defaults to stdin" default:""`
 }
 
@@ -206,6 +207,7 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 			&w.meta.ID,
 			tracking.MetadataOptionFromInfo(info),
 			tracking.MetadataOptionTrackers(w.meta.Trackers...),
+			tracking.MetadataOptionAutoArchive(t.Archive),
 			tracking.MetadataOptionAutoDescription,
 		)
 

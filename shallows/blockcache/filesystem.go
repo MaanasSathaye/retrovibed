@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"log"
 	"path/filepath"
 	"strings"
 	"sync/atomic"
@@ -22,22 +21,22 @@ type Info struct {
 }
 
 func (t Info) ModTime() time.Time {
-	log.Println("Info.ModTime", t.ts)
+	// log.Println("Info.ModTime", t.ts)
 	return t.ts
 }
 
 func (t Info) Mode() fs.FileMode {
-	log.Println("Info.Mode", t.m)
+	// log.Println("Info.Mode", t.m)
 	return t.m
 }
 
 func (t Info) Size() int64 {
-	log.Println("Info.Size", t.Length)
+	// log.Println("Info.Size", t.Length)
 	return int64(t.Length)
 }
 
 func (t Info) Sys() any {
-	log.Println("Info.Sys")
+	// log.Println("Info.Sys")
 	return nil
 }
 
@@ -54,6 +53,14 @@ func WithInitialOffset(val uint64) FileOption {
 // WithInitialIndex sets the initial value of the atomic index field.
 func WithInitialIndex(val uint64) FileOption {
 	return func(f *File) {
+		f.index.Store(val)
+	}
+}
+
+// WithReset sets the initial value of the atomic index field.
+func WithReset(val uint64) FileOption {
+	return func(f *File) {
+		f.index = new(atomic.Uint64)
 		f.index.Store(val)
 	}
 }
@@ -78,6 +85,10 @@ type File struct {
 	m      fs.FileMode
 	index  *atomic.Uint64
 	ts     time.Time
+}
+
+func (t *File) Clone() *File {
+	return langx.Autoptr(langx.Clone(*t, WithReset(0)))
 }
 
 func (t *File) Info() (fs.FileInfo, error) {
@@ -177,8 +188,6 @@ type Dir struct {
 // If it encounters an error before the end of the directory,
 // ReadDir returns the DirEntry list read until that point and a non-nil error.
 func (t Dir) ReadDir(n int) (z []fs.DirEntry, err error) {
-	// log.Println("READDIR", t.Path, n, t.index.Load(), len(t.ent))
-	// defer log.Println("READDIR COMPLETED")
 	if n <= 0 {
 		return t.ent, nil
 	}
@@ -203,41 +212,44 @@ type FS struct {
 
 // Open implements fs.StatFS.
 func (t FS) Open(name string) (fs.File, error) {
-	if f, ok := t.mapped[name]; ok {
-		dup := *f
-		return &dup, nil
-	}
-
-	if v, ok := t.tree.Get([]byte(name)); ok {
-		return v, nil
-	}
-
 	rooted := "./" + name
+	if f, ok := t.mapped[rooted]; ok {
+		return f.Clone(), nil
+	}
+
 	if v, ok := t.tree.Get([]byte(rooted)); ok {
 		return v, nil
 	}
 
-	// log.Println("Open", name)
-	// t.tree.Iterate(func(prefix []byte, value *Dir) {
-	// 	log.Println("DERP", string(prefix), rooted, string(prefix) == name, string(prefix) == rooted)
-	// })
+	// handles the root directory "."
+	if v, ok := t.tree.Get([]byte(name)); ok {
+		return v, nil
+	}
+
 	return nil, fs.ErrNotExist
 }
 
 // Stat implements fs.StatFS.
 func (t FS) Stat(name string) (fs.FileInfo, error) {
-	if f, ok := t.mapped[name]; ok {
-		dup := *f
-		return Info{File: &dup}, nil
+	rooted := "./" + name
+
+	if f, ok := t.mapped[rooted]; ok {
+		return Info{File: f.Clone()}, nil
 	}
 
+	if v, ok := t.tree.Get([]byte(rooted)); ok {
+		return Info{File: v.Clone()}, nil
+	}
+
+	// handles the root directory "."
 	if v, ok := t.tree.Get([]byte(name)); ok {
-		dup := *v.File
-		return Info{File: &dup}, nil
+		return Info{File: v.Clone()}, nil
 	}
 
-	// log.Println("STAT", name)
-
+	// log.Println("STAT", name, rooted, slicesx.IterSlice(maps.Keys(t.mapped)))
+	// t.tree.Iterate(func(prefix []byte, value *Dir) {
+	// 	log.Println("DERP", string(prefix), rooted, string(prefix) == name, string(prefix) == rooted)
+	// })
 	return nil, fs.ErrNotExist
 }
 
@@ -245,13 +257,7 @@ func TorrentFilesystem(d *DirCache, info *metainfo.Info) FS {
 	prefix := filepath.Base(d.root)
 	contents := make([]*File, 0, max(len(info.Files), 1))
 	for fn := range metainfo.Files(info) {
-		contents = append(contents, &File{
-			cache:  d,
-			Path:   filepath.Join(prefix, fn.Path),
-			Offset: fn.Offset,
-			Length: fn.Length,
-			ts:     time.Now(),
-		})
+		contents = append(contents, NewFile(d, time.Now(), filepath.Join(prefix, fn.Path), fn.Length, 0600, WithInitialOffset(fn.Offset)))
 	}
 	return NewFS(d, contents...)
 }
@@ -274,7 +280,7 @@ func NewFS(dcache *DirCache, fns ...*File) FS {
 				}
 			}
 			prev = n
-			// log.Println("dir", d, len(n.ent))
+			// log.Println("dir", d, len(n.ent), n.ent[0].Name())
 		}
 	}
 
