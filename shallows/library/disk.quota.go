@@ -11,6 +11,7 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/retrovibed/retrovibed/deeppool"
 	"github.com/retrovibed/retrovibed/internal/backoffx"
+	"github.com/retrovibed/retrovibed/internal/contextx"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/fsx"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
@@ -81,7 +82,12 @@ func NewDiskQuota(ctx context.Context, c *http.Client, dir fsx.Virtual, q sqlx.Q
 			log.Println("usage", dir.Path(), usage.UsedPercent, usage.Fstype)
 		}
 
-		errorsx.Log(archive(attempt, delay))
+		if err := archive(attempt, delay); contextx.IsDeadlineExceeded(err) || contextx.IsCancelled(err) {
+			log.Println("archival completed", err)
+			return nil
+		} else if err != nil {
+			log.Println("archival failed", err)
+		}
 	}
 
 	return nil
