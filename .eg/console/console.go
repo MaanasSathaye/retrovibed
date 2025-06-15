@@ -135,7 +135,12 @@ func flatpak(final egflatpak.Module) *egflatpak.Builder {
 			"--filesystem=xdg-run/pipewire-0:ro",   // for mpv
 			"--filesystem=~/.duckdb:create",        // for duckdb
 			"--env=TMPDIR=/var/tmp/",               // enaure golang sets its os.TempDir() to a working value.
-			"--talk-name=org.freedesktop.portal.*", // enable standard desktop functionality. didnt seem to work. keeping for time being.
+			"--talk-name=org.freedesktop.portal.*", // enable standard desktop functionality.
+			"--share=ipc",                          // enable standard desktop functionality.
+			"--filesystem=xdg-run/gvfs",            // enable standard desktop functionality.
+			"--filesystem=xdg-run/gvfsd",           // enable standard desktop functionality. (probably unnnecessary)
+			"--talk-name=org.gtk.vfs",              // enable standard desktop functionality. (probably unnnecessary)
+			"--talk-name=org.gtk.vfs.*",            // enable standard desktop functionality. (probably unnnecessary)
 		)...)
 }
 

@@ -60,26 +60,30 @@ class _FileDropWell extends State<FileDropWell> {
       onDragDone: (evt) {
         loading(true);
         Future.wait(
-          evt.files.map((c) {
-            return c
-                .openRead(0, mimex.defaultMagicNumbersMaxLength)
-                .first
-                .then((v) => v.toList())
-                .then((bits) {
-                  return new DropItemFile(
-                    c.path,
-                    name: c.name,
-                    mimeType:
-                        mimex.fromFile(c.name, magicbits: bits).toString(),
-                  );
-                });
-          }),
-        ).then((files) {
-          final resolved = FilesEvent(files: files);
-          widget.onDropped(resolved).whenComplete(() {
-            loading(false);
-          });
-        });
+              evt.files.map((c) {
+                return c
+                    .openRead(0, mimex.defaultMagicNumbersMaxLength)
+                    .first
+                    .then((v) => v.toList())
+                    .then((bits) {
+                      return new DropItemFile(
+                        c.path,
+                        name: c.name,
+                        mimeType:
+                            mimex.fromFile(c.name, magicbits: bits).toString(),
+                      );
+                    });
+              }),
+            )
+            .then((files) {
+              final resolved = FilesEvent(files: files);
+              widget.onDropped(resolved).whenComplete(() {
+                loading(false);
+              });
+            })
+            .catchError((cause) {
+              print("failed to open file dialog ${cause}");
+            });
       },
       onDragEntered: (detail) {
         setState(() {
@@ -96,6 +100,7 @@ class _FileDropWell extends State<FileDropWell> {
         child: TextButton(
           onPressed: () {
             final XTypeGroup filter = XTypeGroup(
+              label: "Select File(s)",
               extensions: widget.extensions,
               mimeTypes: widget.mimetypes,
             );
@@ -120,6 +125,7 @@ class _FileDropWell extends State<FileDropWell> {
                               );
                             });
                       }).toList();
+
                   return Future.wait(eventfiles).then((files) {
                     final resolved = FilesEvent(files: files);
                     return widget.onDropped(resolved).whenComplete(() {

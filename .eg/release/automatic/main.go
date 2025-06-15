@@ -28,10 +28,10 @@ func main() {
 		eg.Module(
 			ctx,
 			deb,
-			// eg.Parallel(
-			// 	shallows.Generate,
-			// 	console.Generate,
-			// ),
+			eg.Parallel(
+				// shallows.Generate,
+				console.Generate,
+			),
 			eg.Parallel(
 				eg.Sequential(console.GenerateBinding, console.Build),
 				shallows.Compile(),
