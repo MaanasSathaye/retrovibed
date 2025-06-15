@@ -137,10 +137,10 @@ func flatpak(final egflatpak.Module) *egflatpak.Builder {
 			"--env=TMPDIR=/var/tmp/",               // enaure golang sets its os.TempDir() to a working value.
 			"--talk-name=org.freedesktop.portal.*", // enable standard desktop functionality.
 			"--share=ipc",                          // enable standard desktop functionality.
-			"--filesystem=xdg-run/gvfs",            // enable standard desktop functionality.
 			"--filesystem=xdg-run/gvfsd",           // enable standard desktop functionality. (probably unnnecessary)
-			"--talk-name=org.gtk.vfs",              // enable standard desktop functionality. (probably unnnecessary)
-			"--talk-name=org.gtk.vfs.*",            // enable standard desktop functionality. (probably unnnecessary)
+			// "--filesystem=xdg-run/gvfs",            // enable standard desktop functionality. (probably unnnecessary)
+			// "--talk-name=org.gtk.vfs",              // enable standard desktop functionality. (probably unnnecessary)
+			// "--talk-name=org.gtk.vfs.*",            // enable standard desktop functionality. (probably unnnecessary)
 		)...)
 }
 

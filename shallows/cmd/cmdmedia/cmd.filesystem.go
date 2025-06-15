@@ -3,6 +3,7 @@ package cmdmedia
 import (
 	"database/sql"
 	"errors"
+	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
@@ -19,10 +20,10 @@ import (
 )
 
 type importFilesystem struct {
-	DryRun         bool     `flag:"" name:"dry-run" help:"print what files would be imported but do not actually perform the import" default:"false"`
-	DeleteOriginal bool     `flag:"" name:"delete-original" short:"d" help:"after file is copied delete the original file from the disk" default:"false"`
-	Concurrency    uint16   `flag:"" name:"concurrency" help:"number of files to transfer concurrently, defaults to the number of cpus" default:"${vars_cores}"`
-	Paths          []string `arg:"" name:"paths" help:"files and folders to import" required:"true"`
+	DryRun         bool   `flag:"" name:"dry-run" help:"print what files would be imported but do not actually perform the import" default:"false"`
+	DeleteOriginal bool   `flag:"" name:"delete-original" short:"d" help:"after file is copied delete the original file from the disk" default:"false"`
+	Concurrency    uint16 `flag:"" name:"concurrency" help:"number of files to transfer concurrently, defaults to the number of cpus" default:"${vars_cores}"`
+	Path           string `arg:"" name:"path" help:"file or folder to import" required:"true"`
 }
 
 func (t importFilesystem) Run(gctx *cmdopts.Global) (err error) {
@@ -45,9 +46,9 @@ func (t importFilesystem) Run(gctx *cmdopts.Global) (err error) {
 		op = library.ImportCopyFile(vfs)
 	}
 
-	imp := library.NewImporter(op, nil /* TODO */, asynccompute.Workers[string](t.Concurrency))
+	imp := library.NewImporter(op, os.DirFS(t.Path).(fs.StatFS), asynccompute.Workers[string](t.Concurrency))
 
-	for tx, cause := range imp.Import(gctx.Context, t.Paths...) {
+	for tx, cause := range imp.Import(gctx.Context, ".") {
 		if cause != nil {
 			log.Println(cause)
 			err = errorsx.Compact(err, cause)

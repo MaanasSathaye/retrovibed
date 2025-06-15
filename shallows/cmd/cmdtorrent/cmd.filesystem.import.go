@@ -2,7 +2,9 @@ package cmdtorrent
 
 import (
 	"database/sql"
+	"io/fs"
 	"log"
+	"os"
 
 	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
@@ -15,7 +17,7 @@ import (
 )
 
 type importFilesystem struct {
-	Paths []string `arg:"" name:"paths" help:"files and folders to import" required:"true"`
+	Paths string `arg:"" name:"path" help:"file and folder to import" required:"true"`
 }
 
 func (t importFilesystem) Run(gctx *cmdopts.Global) (err error) {
@@ -38,7 +40,7 @@ func (t importFilesystem) Run(gctx *cmdopts.Global) (err error) {
 	}
 	op := tracking.ImportTorrent(db, mvfs, tvfs)
 
-	for tx, cause := range library.ImportFilesystem(gctx.Context, op, nil /* TODO */, t.Paths...) {
+	for tx, cause := range library.ImportFilesystem(gctx.Context, op, os.DirFS(t.Paths).(fs.StatFS), ".") {
 		if cause != nil {
 			log.Println(cause)
 			err = errorsx.Compact(err, cause)

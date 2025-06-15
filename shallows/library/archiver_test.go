@@ -4,11 +4,12 @@ import (
 	"context"
 	"crypto/md5"
 	"io"
-	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/blockcache"
 	"github.com/retrovibed/retrovibed/deeppool"
 	"github.com/retrovibed/retrovibed/internal/bytesx"
 	"github.com/retrovibed/retrovibed/internal/cryptox"
@@ -63,19 +64,26 @@ func TestArchive(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 		defer q.Close()
 
-		root := fsx.DirVirtual(t.TempDir())
-
 		require.NoError(t, testx.Fake(&v, library.MetadataOptionTestDefaults, func(md *library.Metadata) {
 			md.Bytes = 16 * bytesx.KiB
 		}))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, v).Scan(&v))
 
-		require.NoError(t, os.WriteFile(root.Path(v.ID), testx.IOBytes(
+		root := fsx.DirVirtual(filepath.Join(t.TempDir()))
+
+		bcache, err := blockcache.NewDirectoryCache(root.Path(v.ID))
+		require.NoError(t, err)
+
+		n, err := io.Copy(
+			io.NewOffsetWriter(bcache, 0),
 			io.TeeReader(
 				io.LimitReader(cryptox.NewChaCha8(v.ID), int64(v.Bytes)),
 				expected,
 			),
-		), 0600))
+		)
+		require.NoError(t, err)
+		require.Equal(t, v.Bytes, uint64(n))
+
 		archiver := &md5archive{
 			seed: uuidx.FirstNonZero(uuid.FromStringOrNil(v.EncryptionSeed), uuid.FromStringOrNil(v.ID)).Bytes(),
 		}
