@@ -30,7 +30,6 @@ func DefaultDialer(wgnet *netstack.Net) netx.Dialer {
 
 func PublicIP(ctx context.Context, d netx.Dialer) error {
 	if d == nil {
-		log.Println("DERP")
 		d = &net.Dialer{}
 	}
 

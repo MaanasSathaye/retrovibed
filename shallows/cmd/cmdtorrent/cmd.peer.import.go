@@ -19,12 +19,11 @@ import (
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/dht/krpc"
 	"github.com/james-lawrence/torrent/metainfo"
-	"github.com/retrovibed/retrovibed/authn"
 	"github.com/retrovibed/retrovibed/blockcache"
 	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/cmd/retrovibed/daemons"
 	"github.com/retrovibed/retrovibed/internal/asynccompute"
-	"github.com/retrovibed/retrovibed/internal/contextx"
 	"github.com/retrovibed/retrovibed/internal/env"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/fsx"
@@ -33,8 +32,6 @@ import (
 	"github.com/retrovibed/retrovibed/internal/stringsx"
 	"github.com/retrovibed/retrovibed/internal/torrentx"
 	"github.com/retrovibed/retrovibed/internal/userx"
-	"github.com/retrovibed/retrovibed/library"
-	"github.com/retrovibed/retrovibed/metaapi"
 	"github.com/retrovibed/retrovibed/tracking"
 	"golang.org/x/crypto/ssh"
 )
@@ -109,22 +106,12 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	torrentstore := fsx.DirVirtual(stringsx.FirstNonBlank(t.Directory, env.TorrentDir()))
 	mediastore := fsx.DirVirtual(env.MediaDir())
 
-	if err := fsx.MkDirs(0700, torrentstore.Path()); err != nil {
+	if err := fsx.MkDirs(0700, torrentstore.Path(), mediastore.Path()); err != nil {
 		return err
 	}
 
-	c, err := authn.Oauth2HTTPClient(gctx.Context)
-	if err != nil {
-		return errorsx.Wrap(err, "failed to create oauth2 bearer token")
-	}
-
 	if t.Archive {
-		if err := metaapi.Register(gctx.Context); err != nil {
-			return errorsx.Wrap(err, "unable to register with archival service")
-		}
-		contextx.Run(gctx.Context, func() {
-			errorsx.Log(library.NewDiskQuota(gctx.Context, metaapi.JWTClient(c), mediastore, db))
-		})
+		errorsx.Log(daemons.AutoArchival(gctx.Context, db, mediastore))
 	}
 
 	host, port, err := net.SplitHostPort(t.Peer)
@@ -148,8 +135,8 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		torrent.ClientConfigPEX(false),
 		torrent.ClientConfigSeed(false),
 		torrent.ClientConfigPortForward(true),
-		// torrent.ClientConfigInfoLogger(log.New(os.Stderr, "[torrent] ", log.Flags())),
-		// torrent.ClientConfigDebugLogger(log.New(os.Stderr, "[torrent-debug] ", log.Flags())),
+		torrent.ClientConfigInfoLogger(log.New(os.Stderr, "[torrent] ", log.Flags())),
+		torrent.ClientConfigDebugLogger(log.New(os.Stderr, "[torrent-debug] ", log.Flags())),
 		torrent.ClientConfigMuxer(tm),
 		torrent.ClientConfigBucketLimit(32),
 		torrent.ClientConfigHTTPUserAgent("retrovibed/0.0"),

@@ -83,7 +83,7 @@ class _ListDisplay extends State<ListDisplay> {
         .current()
         .then(
           (r) => setState(() {
-              _current = r.wireguard;
+            _current = r.wireguard;
           }),
         )
         .catchError((cause) {}, test: httpx.ErrorsTest.err404)
@@ -169,21 +169,20 @@ class _ListDisplay extends State<ListDisplay> {
       children: _res.items,
       flex: 1,
       ds.Table.expanded<api.Wireguard>(
-        (v) => RowDisplay(
-          current: v,
-          leading: [
-            IconCheckmark(
-              _current.id == v.id,
-              onTap: () {
-                return api.wireguard.touch(v.id).then((r) {
-                  setState(() {
-                    _current = v;
-                  });
-                });
-              },
-            ),
-          ],
-        ),
+        (v) {
+          final onTap = () {
+            return api.wireguard.touch(v.id).then((r) {
+              setState(() {
+                _current = v;
+              });
+            });
+          };
+          return RowDisplay(
+            current: v,
+            onTap: onTap,
+            leading: [IconCheckmark(_current.id == v.id, onTap: onTap)],
+          );
+        },
       ),
       empty: ds.FileDropWell(upload),
     );

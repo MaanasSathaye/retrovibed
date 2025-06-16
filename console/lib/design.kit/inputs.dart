@@ -3,3 +3,5 @@ void _notimplemented(String s) {
 }
 
 void defaulttap() => _notimplemented("tap not implemented");
+
+Future<void> defaulttapv() => Future.sync(() => _notimplemented("tap not implemented"));

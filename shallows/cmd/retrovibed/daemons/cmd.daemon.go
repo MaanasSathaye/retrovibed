@@ -19,7 +19,6 @@ import (
 	"github.com/james-lawrence/torrent/dht/krpc"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
-	"github.com/retrovibed/retrovibed/authn"
 	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/downloads"
@@ -39,7 +38,6 @@ import (
 	"github.com/retrovibed/retrovibed/internal/torrentx"
 	"github.com/retrovibed/retrovibed/internal/userx"
 	"github.com/retrovibed/retrovibed/internal/wireguardx"
-	"github.com/retrovibed/retrovibed/library"
 	"github.com/retrovibed/retrovibed/media"
 	"github.com/retrovibed/retrovibed/meta/identityssh"
 	"github.com/retrovibed/retrovibed/metaapi"
@@ -137,7 +135,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	mediastore := fsx.DirVirtual(env.MediaDir())
 	torrentstore := fsx.DirVirtual(env.TorrentDir())
 
-	if err := fsx.MkDirs(0700, rootstore.Path(), mediastore.Path(), torrentstore.Path()); err != nil {
+	if err := fsx.MkDirs(0700, rootstore.Path(), mediastore.Path(), torrentstore.Path(), wireguardx.ConfigDirectory()); err != nil {
 		return err
 	}
 
@@ -227,18 +225,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	}
 
 	if t.AutoArchive {
-		if err := metaapi.Register(gctx.Context); err != nil {
-			return errorsx.Wrap(err, "unable to register with archival service")
-		}
-
-		c, err := authn.Oauth2HTTPClient(gctx.Context)
-		if err != nil {
-			return errorsx.Wrap(err, "failed to create oauth2 bearer token")
-		}
-
-		contextx.Run(gctx.Context, func() {
-			errorsx.Log(library.NewDiskQuota(gctx.Context, metaapi.JWTClient(c), mediastore, db))
-		})
+		errorsx.Log(AutoArchival(gctx.Context, db, mediastore))
 	} else {
 		log.Println("automatic media archival is disabled")
 	}

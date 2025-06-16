@@ -6,13 +6,13 @@ class RowDisplay extends StatelessWidget {
   final Wireguard current;
   final List<Widget> leading;
   final List<Widget> trailing;
-  final void Function()? onTap;
+  final Future<void> Function()? onTap;
   const RowDisplay({
     super.key,
     required this.current,
     this.leading = const [],
     this.trailing = const [],
-    this.onTap = ds.defaulttap,
+    this.onTap = ds.defaulttapv,
   });
 
   @override
