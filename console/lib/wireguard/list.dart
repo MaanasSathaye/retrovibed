@@ -113,9 +113,11 @@ class _ListDisplay extends State<ListDisplay> {
                         req..files.add(v);
                         return req;
                       })
+                      .then((v) => api.wireguard.touch(v.wireguard.id).then((_) => v))
                       .then((uploaded) {
                         setState(() {
                           _res.items.add(uploaded.wireguard);
+                          _current = uploaded.wireguard;
                         });
                       })
                       .catchError((cause) {
