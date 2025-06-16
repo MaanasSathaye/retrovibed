@@ -77,7 +77,7 @@ func VPNReload(ctx context.Context, tnetwork torrent.Binder, tclient *torrent.Cl
 				return errorsx.Wrap(err, "unable to setup wireguard torrent socket")
 			}
 
-			dupped := langx.Clone(*torconfig, torrent.ClientConfigDialer(wgnet))
+			dupped := langx.Clone(*torconfig, torrent.ClientConfigDialer(wgnet), torrentx.DynamicIP(wcfg, wgnet, port))
 
 			nclient, err := tnetwork.Bind(torrent.NewClient(&dupped))
 			if err != nil {
@@ -86,6 +86,7 @@ func VPNReload(ctx context.Context, tnetwork torrent.Binder, tclient *torrent.Cl
 			tclient.Close()
 			tclient = nclient
 		}
+
 		return nil
 	}), "unable setup wireguard monitoring")
 }

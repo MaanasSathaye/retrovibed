@@ -73,6 +73,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		peerid                                  = krpc.IdFromString(md5x.String(ssh.FingerprintSHA256(id.PublicKey())))
 		bootstrap    torrent.ClientConfigOption = torrent.ClientConfigNoop
 		firewall     torrent.ClientConfigOption = torrent.ClientConfigNoop
+		dynamicip    torrent.ClientConfigOption = torrent.ClientConfigNoop
 		tnetwork     torrent.Binder
 		wgnet        *netstack.Net
 	)
@@ -156,6 +157,8 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		if wgnet, tnetwork, err = torrentx.WireguardSocket(wcfg, t.TorrentPort); err != nil {
 			return errorsx.Wrap(err, "unable to setup wireguard torrent socket")
 		}
+
+		dynamicip = torrentx.DynamicIP(wcfg, wgnet, t.TorrentPort)
 	} else {
 		log.Println("no wireguard configuration found at", path, wgnet == nil)
 	}
@@ -169,8 +172,6 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		torrent.NewMetadataCache(torrentstore.Path()),
 		tstore,
 		torrent.ClientConfigPeerID(string(peerid[:])),
-		torrent.ClientConfigPortForward(true),
-		torrent.ClientConfigPortForward(false),
 		torrent.ClientConfigIPv4(t.TorrentPublicIP4),
 		torrent.ClientConfigIPv6(t.TorrentPublicIP6),
 		torrent.ClientConfigSeed(true),
@@ -196,6 +197,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		}),
 		bootstrap,
 		firewall,
+		dynamicip,
 	)
 
 	log.Println("torrent specified public ip:", torconfig.PublicIP4(), torconfig.PublicIP6())

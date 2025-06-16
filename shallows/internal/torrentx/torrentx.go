@@ -1,16 +1,21 @@
 package torrentx
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"iter"
 	"log"
 	"net"
 	"net/netip"
 	"os"
+	"time"
 
 	"github.com/james-lawrence/torrent"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/langx"
+	"github.com/retrovibed/retrovibed/internal/natpmp"
+	"github.com/retrovibed/retrovibed/internal/netx"
 	"github.com/retrovibed/retrovibed/internal/slicesx"
 	"github.com/retrovibed/retrovibed/internal/stringsx"
 	"github.com/retrovibed/retrovibed/internal/wireguardx"
@@ -106,6 +111,49 @@ func WireguardSocket(wcfg *wireguardx.Config, port int) (_ *netstack.Net, _ torr
 	}
 
 	return tnet, torrent.NewSocketsBind(s1, s2), nil
+}
+
+func ExternalPort(wcfg *wireguardx.Config, d netx.Dialer, port int) (_zero netip.AddrPort, _ time.Duration, err error) {
+	dnsgateway := slicesx.FirstOrZero(wcfg.Interface.DNS...)
+
+	client := natpmp.NewClient(dnsgateway, natpmp.OptionTimeout(15*time.Second), natpmp.OptionDialer(d))
+
+	ex, err := client.GetExternalAddress()
+	if err != nil {
+		return _zero, 0, errorsx.Wrapf(err, "unable to determine external ip: %s", dnsgateway)
+	}
+
+	result, err := client.AddPortMapping("tcp", port, port, int(time.Hour/time.Second))
+	if err != nil {
+		return _zero, 0, errorsx.Wrapf(err, "unable to map port: %s", dnsgateway)
+	}
+
+	// log.Println("VPN Details", ex.ExternalIPAddress, result.InternalPort, "->", result.MappedExternalPort, result.PortMappingLifetimeInSeconds)
+	return netip.AddrPortFrom(netip.AddrFrom4(ex.ExternalIPAddress), result.MappedExternalPort), time.Duration(result.PortMappingLifetimeInSeconds) * time.Second, nil
+}
+
+func DynamicIP(wcfg *wireguardx.Config, d netx.Dialer, port int) torrent.ClientConfigOption {
+	return torrent.ClientConfigDynamicIP(func(ctx context.Context, c *torrent.Client) (iter.Seq[netip.AddrPort], error) {
+		return func(yield func(netip.AddrPort) bool) {
+			for {
+				addr, d, err := ExternalPort(wcfg, d, port)
+				if err != nil {
+					log.Println("failed to map ports", err)
+					time.Sleep(time.Minute)
+					continue
+				}
+
+				if !yield(addr) {
+					// log.Println("unable to yield address")
+					panic("unable to yield address")
+				}
+
+				log.Println("external network details", c.LocalPort(), "->", addr.String(), d)
+
+				time.Sleep(d)
+			}
+		}, nil
+	})
 }
 
 func NodesFromReply(ret dht.QueryResult) (retni []krpc.NodeInfo) {

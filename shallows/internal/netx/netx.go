@@ -17,8 +17,6 @@ type Dialer interface {
 
 func DefaultIfNil(d0, d1 Dialer) Dialer {
 	if d0 != nil {
-		log.Printf("GRRR %T - %t\n", d0, d0 == nil)
-		panic("fuck you")
 		return d0
 	}
 

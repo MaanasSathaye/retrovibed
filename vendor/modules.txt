@@ -428,7 +428,7 @@ github.com/james-lawrence/genieql/internal/userx
 github.com/james-lawrence/genieql/internal/wasidialect
 github.com/james-lawrence/genieql/internal/wasix/ffierrors
 github.com/james-lawrence/genieql/internal/wasix/ffiguest
-# github.com/james-lawrence/torrent v0.0.0-20250613001645-850be1082c24
+# github.com/james-lawrence/torrent v0.0.0-20250616181635-1dd0e2be7018
 ## explicit; go 1.24
 github.com/james-lawrence/torrent
 github.com/james-lawrence/torrent/autobind
