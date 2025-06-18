@@ -13,6 +13,7 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/deeppool"
 	"github.com/retrovibed/retrovibed/internal/debugx"
 	"github.com/retrovibed/retrovibed/internal/env"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
@@ -27,11 +28,7 @@ import (
 )
 
 func DeeppoolEndpoint() oauth2.Endpoint {
-	return EndpointSSHAuth("https://localhost:8081")
-}
-
-func Deeppool() string {
-	return "localhost:8081"
+	return EndpointSSHAuth(fmt.Sprintf("https://%s", deeppool.Deeppool()))
 }
 
 func HTTPClientDefaults() *http.Client {

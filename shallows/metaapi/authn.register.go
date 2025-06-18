@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/retrovibed/retrovibed/authn"
+	"github.com/retrovibed/retrovibed/deeppool"
 	"github.com/retrovibed/retrovibed/internal/httpx"
 )
 
@@ -20,7 +21,7 @@ func Register(ctx context.Context) error {
 		return err
 	}
 
-	resp, err := httpx.AsError(c.Post("https://localhost:8081/authn/ssh", "", nil))
+	resp, err := httpx.AsError(c.Post(fmt.Sprintf("https://%s/authn/ssh", deeppool.Deeppool()), "", nil))
 	if err != nil {
 		return err
 	}
@@ -33,7 +34,7 @@ func Register(ctx context.Context) error {
 		return nil
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "https://localhost:8081/authn/signup", nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("https://%s/authn/signup", deeppool.Deeppool()), nil)
 	if err != nil {
 		return err
 	}

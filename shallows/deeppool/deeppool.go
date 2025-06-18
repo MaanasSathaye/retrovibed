@@ -13,7 +13,7 @@ import (
 )
 
 func Deeppool() string {
-	return "localhost:8081"
+	return "api.retrovibe.space"
 }
 
 func NewArchiver(c *http.Client) Archiver {

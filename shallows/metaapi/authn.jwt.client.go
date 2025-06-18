@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/retrovibed/retrovibed/authn"
+	"github.com/retrovibed/retrovibed/deeppool"
 	"github.com/retrovibed/retrovibed/internal/httpx"
 	"golang.org/x/oauth2"
 )
@@ -17,7 +18,7 @@ func JWTClient(oauth2c *http.Client) *http.Client {
 		context.WithValue(context.Background(), oauth2.HTTPClient, authn.HTTPClientDefaults()),
 		&jwttokensource{
 			oauth2c:  oauth2c,
-			endpoint: fmt.Sprintf("https://%s", authn.Deeppool()),
+			endpoint: fmt.Sprintf("https://%s", deeppool.Deeppool()),
 		},
 	)
 }
