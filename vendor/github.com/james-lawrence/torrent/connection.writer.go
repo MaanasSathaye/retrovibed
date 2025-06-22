@@ -43,7 +43,10 @@ func RunHandshookConn(c *connection, t *torrent) error {
 			cancel(errorsx.Wrap(err, "error sending configuring connection"))
 			return
 		}
-		cancel(connwriterinit(ctx, c, 10*time.Second))
+
+		err := connwriterinit(ctx, c, 10*time.Second)
+		errorsx.Log(err)
+		cancel(err)
 	}()
 
 	if err := c.mainReadLoop(ctx); err != nil {
@@ -59,7 +62,7 @@ func RunHandshookConn(c *connection, t *torrent) error {
 func ConnExtensions(ctx context.Context, cn *connection) error {
 	log.Println("conn extensions initiated")
 	defer log.Println("conn extensions completed")
-	return cstate.Run(ctx, connexinit(cn, connexdht(cn, connexfast(cn, connflush(cn, nil)))))
+	return cstate.Run(ctx, connexinit(cn, connexdht(cn, connexfast(cn, connflush(cn, nil)))), cn.cfg.debug())
 }
 
 func connflush(cn *connection, n cstate.T) cstate.T {
@@ -194,7 +197,7 @@ func connwriterinit(ctx context.Context, cn *connection, to time.Duration) error
 		resync:           atomicx.Pointer(ts.Add(to)),
 	}
 
-	return cstate.Run(ctx, connWriterSyncChunks(ws))
+	return cstate.Run(ctx, connWriterSyncChunks(ws), cn.cfg.debug())
 }
 
 type writerstate struct {

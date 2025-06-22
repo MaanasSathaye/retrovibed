@@ -180,7 +180,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		torrent.ClientConfigDebugLogger(log.New(torrentlogging, "[torrent - debug] ", log.Flags())),
 		torrent.ClientConfigMuxer(tm),
 		torrent.ClientConfigBucketLimit(32),
-		torrent.ClientConfigMaxOutstandingRequests(512),
+		torrent.ClientConfigMaxOutstandingRequests(1024),
 		torrent.ClientConfigHTTPUserAgent("retrovibed/0.0"),
 		torrent.ClientConfigConnectionClosed(func(ih metainfo.Hash, stats torrent.ConnStats, remaining int) {
 			if stats.BytesWrittenData.Uint64() == 0 {
