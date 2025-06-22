@@ -73,7 +73,7 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, 
 
 	announcer := torrentx.AnnouncerFromClient(tclient)
 	nport := tclient.LocalPort()
-	pid := int160.FromByteArray(tclient.PeerID())
+	pid := tclient.PeerID()
 
 	for {
 		select {

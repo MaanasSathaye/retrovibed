@@ -26,7 +26,6 @@ func TestingConfig(t testing.TB, mdstore torrent.MetadataStore, store storage.Cl
 	return torrent.NewDefaultClientConfig(
 		mdstore,
 		store,
-		torrent.ClientConfigDHTEnabled(false),
 		torrent.ClientConfigPortForward(false),
 		torrent.ClientConfigDebugLogger(log.New(os.Stderr, "[debug] ", log.Flags())),
 		torrent.ClientConfigCompose(options...),
