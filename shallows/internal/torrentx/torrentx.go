@@ -56,7 +56,7 @@ func Autosocket(p int) (_ torrent.Binder, err error) {
 		s2 = sockets.New(s, &net.Dialer{})
 	}
 
-	return torrent.NewSocketsBind(s1, s2), nil
+	return torrent.NewSocketsBind(s1, s2).Options(torrent.BinderOptionDHT), nil
 }
 
 func WireguardSocket(wcfg *wireguardx.Config, port int) (_ *netstack.Net, _ torrent.Binder, err error) {
@@ -110,7 +110,7 @@ func WireguardSocket(wcfg *wireguardx.Config, port int) (_ *netstack.Net, _ torr
 		s2 = sockets.New(s, tnet)
 	}
 
-	return tnet, torrent.NewSocketsBind(s1, s2), nil
+	return tnet, torrent.NewSocketsBind(s1, s2).Options(torrent.BinderOptionDHT), nil
 }
 
 func ExternalPort(wcfg *wireguardx.Config, d netx.Dialer, port int) (_zero netip.AddrPort, _ time.Duration, err error) {
