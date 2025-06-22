@@ -12,10 +12,6 @@ import (
 	"github.com/retrovibed/retrovibed/internal/httpx"
 )
 
-func Deeppool() string {
-	return "api.retrovibe.space"
-}
-
 func NewArchiver(c *http.Client) Archiver {
 	return Archiver{
 		c:        c,

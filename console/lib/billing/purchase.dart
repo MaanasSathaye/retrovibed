@@ -20,6 +20,8 @@ class Purchase extends StatelessWidget {
         api.session(this.desired.id, options: [authn.Authenticated.bearer(context)]).then((v) {
           print("DERP DERP ${v}");
           launchUrl(Uri.https("google.com"));
+        }).catchError((cause) {
+          print("failed ${cause}");
         });
       },
       child: Text("upgrade"),

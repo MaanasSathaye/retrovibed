@@ -8,11 +8,16 @@ class Authenticated extends StatefulWidget {
   const Authenticated(this.child, {super.key});
 
   static Future<api.Session> session(BuildContext context) {
-    return context.findAncestorStateOfType<_AuthenticatedState>()?.current() ?? Future.value(api.Session());
+    return context.findAncestorStateOfType<_AuthenticatedState>()?.current() ??
+        Future.value(api.Session());
   }
 
   static httpx.Option bearer(BuildContext context) {
-    return httpx.Request.bearer(session(context).then((s) => s.token));
+    return httpx.Request.bearer(
+      session(context).then((s) {
+        return s.token;
+      }),
+    );
   }
 
   @override
@@ -29,7 +34,8 @@ class _AuthenticatedState extends State<Authenticated> {
       return Future.value(_current);
     }
 
-    return api.ssh()
+    return api
+        .ssh()
         .then<api.Session>((v) {
           switch (v.profiles.length) {
             case 0:
@@ -44,7 +50,10 @@ class _AuthenticatedState extends State<Authenticated> {
         })
         .then((v) {
           setState(() {
-            _expires = DateTime.fromMillisecondsSinceEpoch((Duration(seconds: v.expires.toInt()) - Duration(seconds: 60)).inMilliseconds);
+            _expires = DateTime.fromMillisecondsSinceEpoch(
+              (Duration(seconds: v.expires.toInt()) - Duration(seconds: 60))
+                  .inMilliseconds,
+            );
             _current = v;
           });
           return v;
@@ -63,9 +72,6 @@ class _AuthenticatedState extends State<Authenticated> {
 
   @override
   Widget build(BuildContext context) {
-    return ds.Overlay(
-      child: widget.child,
-      overlay: _cause,
-    );
+    return ds.Overlay(child: widget.child, overlay: _cause);
   }
 }

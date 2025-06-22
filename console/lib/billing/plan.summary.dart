@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/design.kit/forms.dart' as forms;
 
 PlanSummary free() => const PlanSummary(
-  id: "prod_SWPUSEgaKJygkf",
+  // id: "price_1RbMfLLGpJbWOTHPcZfC1tyP",
+  id:"",
   key: ValueKey("free"),
   storage: Text("none"),
   bandwidth: Text("none"),
@@ -11,16 +12,18 @@ PlanSummary free() => const PlanSummary(
 );
 
 PlanSummary basic() => const PlanSummary(
-  id: "prod_SWPVKrSbqVuFDC",
+  // id: "price_1RbMgjLGpJbWOTHPMAgX6j9y",
+  id:"price_1RbMCiQ24Bh46y1freKKOYHa",
   key: ValueKey("personal"),
   storage: Text("2TB included + \$0.20 each additional 128 GB"),
-  bandwidth: Text("128 GB / month"),
+  bandwidth: Text("64 GB / month"),
   price: Text("\$4/month"),
   mobile: Text("no"),
 );
 
 PlanSummary premium() => const PlanSummary(
-  id: "prod_SWPZljG0jYjrdl",
+  // id: "price_1RbMjyLGpJbWOTHP3Zmkd08T",
+  id:"price_1RbMF4Q24Bh46y1fmhthVSgC",
   key: ValueKey("premium"),
   storage: Text("4TB included + \$0.17 each additional 128 GB"),
   bandwidth: Text("no hard limits, but abuse will result in rate limits"),

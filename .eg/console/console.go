@@ -51,7 +51,7 @@ func GenerateBinding(ctx context.Context, _ eg.Op) error {
 	runtime := flutterRuntime()
 	return shell.Run(
 		ctx,
-		runtime.New("go -C retrovibedbind build -buildmode=c-shared --tags duckdb_use_lib -o ../build/nativelib/retrovibed.so ./..."),
+		runtime.New("go -C retrovibedbind build -buildmode=c-shared --tags duckdb_use_lib,localdev -o ../build/nativelib/retrovibed.so ./..."),
 		runtime.New("dart run ffigen --config ffigen.yaml"),
 	)
 }

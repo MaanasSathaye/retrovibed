@@ -30,11 +30,23 @@ class RegisteredState extends State<Registered> {
   @override
   void initState() {
     super.initState();
+
     api
         .lookup(options: [authn.Authenticated.bearer(context)])
         .then((v) {
+          print("DERP 1 ${v.billing.customerId}");
+          if (v.billing.customerId.isEmpty) {
+            return api
+                .create(options: [authn.Authenticated.bearer(context)])
+                .then((v) => v.billing);
+          }
+
+          return Future.value(v.billing);
+        })
+        .then((billing) {
+          print("DERP 2 ${billing}");
           setState(() {
-            current = v.billing;
+            current = billing;
           });
         })
         .catchError((cause) {
