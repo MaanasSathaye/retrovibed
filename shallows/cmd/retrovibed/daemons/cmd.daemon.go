@@ -147,7 +147,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	tm := dht.DefaultMuxer().
 		Method(bep0051.Query, bep0051.NewEndpoint(bep0051.EmptySampler{}))
 
-	if path := wireguardx.Latest(); fsx.Exists(path) && false {
+	if path := wireguardx.Latest(); fsx.Exists(path) {
 		wcfg, err := wireguardx.Parse(path)
 		if err != nil {
 			return errorsx.Wrapf(err, "unable to parse wireguard configuration: %s", path)
