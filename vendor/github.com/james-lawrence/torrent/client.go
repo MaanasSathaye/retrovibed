@@ -129,10 +129,11 @@ func (cl *Client) start(md Metadata, options ...Tuner) (dlt *torrent, added bool
 	cl.lock()
 	defer cl.unlock()
 
+	log.Println("attempting dht announce initiated")
 	cl.eachDhtServer(func(s *dht.Server) {
 		go dlt.dhtAnnouncer(s)
 	})
-
+	log.Println("attempting dht announce completed")
 	dlt.updateWantPeersEvent()
 
 	// Tickle Client.waitAccept, new torrent may want conns.

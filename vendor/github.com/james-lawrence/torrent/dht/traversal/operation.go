@@ -3,7 +3,9 @@ package traversal
 import (
 	"context"
 	"errors"
+	"log"
 	"sync/atomic"
+	"time"
 
 	"github.com/anacrolix/chansync"
 	"github.com/anacrolix/chansync/events"
@@ -148,6 +150,7 @@ func (op *Operation) AddNodes(nodes []types.AddrMaybeId) (added int) {
 	op.mu.Lock()
 	defer op.mu.Unlock()
 	before := op.unqueried.Len()
+	log.Println("Traversal Op add nodes", len(nodes))
 	for _, n := range nodes {
 		_ = op.addNodeLocked(n)
 	}
@@ -185,6 +188,8 @@ func (op *Operation) haveQuery() bool {
 }
 
 func (op *Operation) run() {
+	log.Println("Traversal Op Run initiated")
+	defer log.Println("Traversal Op Run completed")
 	defer close(op.stalled.Signal())
 	op.mu.Lock()
 	defer op.mu.Unlock()
@@ -231,6 +236,7 @@ func (op *Operation) Closest() *k_nearest_nodes.Type {
 
 func (op *Operation) startQuery() {
 	a := op.popClosestUnqueried()
+	log.Println("Traversal Querying", a.Addr)
 	op.markQueried(a.Addr)
 	op.outstanding++
 	go func() {
@@ -242,7 +248,7 @@ func (op *Operation) startQuery() {
 		}()
 		// log.Printf("traversal querying %v", a)
 		atomic.AddUint32(&op.stats.NumAddrsTried, 1)
-		ctx, cancel := context.WithCancel(context.Background())
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		go func() {
 			select {
 			case <-ctx.Done():

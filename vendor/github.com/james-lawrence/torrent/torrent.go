@@ -1125,7 +1125,11 @@ func (t *torrent) consumeDhtAnnouncePeers(ctx context.Context, pvs <-chan dht.Pe
 	// l := rate.NewLimiter(rate.Every(time.Minute), 1)
 	for {
 		select {
-		case v := <-pvs:
+		case v, ok := <-pvs:
+			if !ok {
+				return
+			}
+			log.Println("RECEIVED PEERS", ok, len(v.Peers), int160.FromByteArray(t.md.ID))
 			for _, cp := range v.Peers {
 				if cp.Port() == 0 {
 					// Can't do anything with this.
@@ -1168,10 +1172,12 @@ func (t *torrent) announceToDht(impliedPort bool, s *dht.Server) error {
 
 func (t *torrent) dhtAnnouncer(s *dht.Server) {
 	for {
+		log.Println("dht ancouncer waiting for peers event", int160.FromByteArray(s.ID()))
 		select {
 		case <-t.closed:
 			return
 		case <-t.wantPeersEvent:
+			log.Println("dht ancouncing peers wanted event", int160.FromByteArray(s.ID()))
 		}
 
 		t.stats.DHTAnnounce.Add(1)
@@ -1183,6 +1189,7 @@ func (t *torrent) dhtAnnouncer(s *dht.Server) {
 			t.cln.config.info().Println(t, errorsx.Wrap(err, "error announcing to DHT"))
 			time.Sleep(time.Second)
 		}
+		log.Println("dht ancouncing completed", int160.FromByteArray(s.ID()))
 	}
 }
 

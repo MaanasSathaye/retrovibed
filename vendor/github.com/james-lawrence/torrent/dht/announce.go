@@ -17,6 +17,7 @@ import (
 	dhtutil "github.com/james-lawrence/torrent/dht/k-nearest-nodes"
 	"github.com/james-lawrence/torrent/dht/krpc"
 	"github.com/james-lawrence/torrent/dht/traversal"
+	"github.com/james-lawrence/torrent/internal/langx"
 )
 
 // Maintains state for an ongoing Announce operation. An Announce is started by calling
@@ -83,17 +84,15 @@ func AnnouncePeer(implied bool, port int) AnnounceOpt {
 
 // Traverses the DHT graph toward nodes that store peers for the infohash, streaming them to the
 // caller.
-func (s *Server) AnnounceTraversal(ctx context.Context, infoHash [20]byte, opts ...AnnounceOpt) (_ *Announce, err error) {
-	a := &Announce{
+func (s *Server) AnnounceTraversal(ctx context.Context, id [20]byte, opts ...AnnounceOpt) (_ *Announce, err error) {
+	a := langx.Autoptr(langx.Clone(Announce{
 		Peers:    make(chan PeersValues),
 		server:   s,
-		infoHash: int160.FromByteArray(infoHash),
-	}
-	for _, opt := range opts {
-		opt(a)
-	}
+		infoHash: int160.FromByteArray(id),
+	}, opts...))
+
 	a.traversal = traversal.Start(traversal.OperationInput{
-		Target:     infoHash,
+		Target:     id,
 		DoQuery:    a.getPeers,
 		NodeFilter: s.TraversalNodeFilter,
 		DataFilter: func(data any) bool {
@@ -101,18 +100,23 @@ func (s *Server) AnnounceTraversal(ctx context.Context, infoHash [20]byte, opts 
 			return ok
 		},
 	})
+	log.Println("DHT TRAVERSAL CREATE")
 	nodes, err := s.TraversalStartingNodes()
 	if err != nil {
+		log.Println("UNABLE TO CREATE INITIAL TRAVERSAL NODES")
 		a.traversal.Stop()
 		return
 	}
+	log.Println("DHT TRAVERSAL NODES", len(nodes))
 	a.traversal.AddNodes(nodes)
 	go func() {
+		defer log.Println("DHT TRAVERSAL STOPPED", int160.FromByteArray(id))
 		select {
 		case <-a.traversal.Stalled():
 		case <-ctx.Done():
 		}
 
+		log.Println("DHT TRAVERSAL SHUTTING DOWN")
 		a.traversal.Stop()
 		<-a.traversal.Stopped()
 		if a.announcePeerOpts != nil {
@@ -161,7 +165,8 @@ func (a *Announce) announcePeer(ctx context.Context, peer dhtutil.Elem) error {
 
 func (a *Announce) getPeers(ctx context.Context, addr krpc.NodeAddr) traversal.QueryResult {
 	res := a.server.GetPeers(ctx, NewAddr(addr.UDP()), a.infoHash, a.scrape, QueryRateLimiting{})
-	if r := res.Reply.R; r != nil {
+	log.Println("GOT PEERS RESPONSE", a.infoHash, res.Reply.R == nil, len(langx.DerefOrZero(res.Reply.R).Values), len(langx.DerefOrZero(res.Reply.R).Nodes), len(langx.DerefOrZero(res.Reply.R).Nodes6))
+	if r := res.Reply.R; r != nil && len(r.Values) > 0 {
 		peersValues := PeersValues{
 			Peers: r.Values,
 			NodeInfo: krpc.NodeInfo{
