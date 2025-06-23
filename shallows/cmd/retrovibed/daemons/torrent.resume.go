@@ -34,8 +34,9 @@ func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual
 	iter := sqlx.Scan(tracking.MetadataSearch(ctx, db, q))
 
 	for md := range iter.Iter() {
-		log.Println("resuming", md.ID, md.Description, md.Private)
-		infopath := rootstore.Path("torrent", fmt.Sprintf("%s.torrent", metainfo.Hash(md.Infohash).String()))
+		id := metainfo.Hash(md.Infohash)
+		infopath := rootstore.Path("torrent", fmt.Sprintf("%s.torrent", id))
+		log.Println("resuming", md.ID, md.Description, md.Private, infopath)
 
 		metadata, err := torrent.New(
 			metainfo.Hash(md.Infohash),
@@ -48,7 +49,7 @@ func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual
 			log.Println(errorsx.Wrapf(err, "unable to create metadata from %s - %s", md.ID, infopath))
 			return
 		}
-		log.Println("WAAAAT", metadata.Trackers)
+
 		t, added, err := tclient.Start(metadata)
 		if err != nil {
 			log.Println(errorsx.Wrapf(err, "unable to start download %s - %s", md.ID, infopath))

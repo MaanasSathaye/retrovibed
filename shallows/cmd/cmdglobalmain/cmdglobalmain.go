@@ -3,6 +3,7 @@ package cmdglobalmain
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 	"net"
 	"os"
@@ -77,6 +78,7 @@ func Main(args ...string) {
 	shellCli.Cleanup = &sync.WaitGroup{}
 
 	log.SetFlags(log.Lshortfile | log.LUTC | log.Ltime)
+	log.SetPrefix(fmt.Sprintf("%d ", os.Getpid()))
 
 	go debugx.DumpOnSignal(shellCli.Context, syscall.SIGUSR2)
 	go cmdopts.Cleanup(shellCli.Context, shellCli.Shutdown, shellCli.Cleanup, os.Kill, os.Interrupt, syscall.SIGTERM)(func() {

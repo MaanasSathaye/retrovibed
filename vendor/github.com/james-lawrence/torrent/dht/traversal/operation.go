@@ -3,7 +3,6 @@ package traversal
 import (
 	"context"
 	"errors"
-	"log"
 	"sync/atomic"
 	"time"
 
@@ -150,7 +149,6 @@ func (op *Operation) AddNodes(nodes []types.AddrMaybeId) (added int) {
 	op.mu.Lock()
 	defer op.mu.Unlock()
 	before := op.unqueried.Len()
-	log.Println("Traversal Op add nodes", len(nodes))
 	for _, n := range nodes {
 		_ = op.addNodeLocked(n)
 	}
@@ -188,8 +186,6 @@ func (op *Operation) haveQuery() bool {
 }
 
 func (op *Operation) run() {
-	log.Println("Traversal Op Run initiated")
-	defer log.Println("Traversal Op Run completed")
 	defer close(op.stalled.Signal())
 	op.mu.Lock()
 	defer op.mu.Unlock()
@@ -236,7 +232,6 @@ func (op *Operation) Closest() *k_nearest_nodes.Type {
 
 func (op *Operation) startQuery() {
 	a := op.popClosestUnqueried()
-	log.Println("Traversal Querying", a.Addr)
 	op.markQueried(a.Addr)
 	op.outstanding++
 	go func() {

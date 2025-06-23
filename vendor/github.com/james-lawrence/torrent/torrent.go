@@ -1127,16 +1127,17 @@ func (t *torrent) consumeDhtAnnouncePeers(ctx context.Context, pvs <-chan dht.Pe
 		select {
 		case v, ok := <-pvs:
 			if !ok {
+				t.cln.config.debug().Println(int160.FromByteArray(t.md.ID), "peer events completed")
 				return
 			}
-			log.Println("RECEIVED PEERS", ok, len(v.Peers), int160.FromByteArray(t.md.ID))
+
 			for _, cp := range v.Peers {
 				if cp.Port() == 0 {
 					// Can't do anything with this.
 					continue
 				}
 
-				log.Println("adding peer", cp.AddrPort)
+				t.cln.config.debug().Println("adding peer", cp.AddrPort)
 				t.AddPeer(Peer{
 					IP:     cp.Addr().AsSlice(),
 					Port:   int(cp.Port()),
@@ -1172,24 +1173,24 @@ func (t *torrent) announceToDht(impliedPort bool, s *dht.Server) error {
 
 func (t *torrent) dhtAnnouncer(s *dht.Server) {
 	for {
-		log.Println("dht ancouncer waiting for peers event", int160.FromByteArray(s.ID()))
+		t.cln.config.debug().Println("dht ancouncer waiting for peers event", int160.FromByteArray(s.ID()))
 		select {
 		case <-t.closed:
 			return
 		case <-t.wantPeersEvent:
-			log.Println("dht ancouncing peers wanted event", int160.FromByteArray(s.ID()))
+			t.cln.config.debug().Println("dht ancouncing peers wanted event", int160.FromByteArray(s.ID()))
 		}
 
 		t.stats.DHTAnnounce.Add(1)
 
 		if err := t.announceToDht(true, s); errors.Is(err, dht.ErrDHTNoInitialNodes) {
-			t.cln.config.info().Println(t, err)
+			t.cln.config.errors().Println(t, err)
 			time.Sleep(time.Minute)
 		} else if err != nil {
-			t.cln.config.info().Println(t, errorsx.Wrap(err, "error announcing to DHT"))
+			t.cln.config.errors().Println(t, errorsx.Wrap(err, "error announcing to DHT"))
 			time.Sleep(time.Second)
 		}
-		log.Println("dht ancouncing completed", int160.FromByteArray(s.ID()))
+		t.cln.config.debug().Println("dht ancouncing completed", int160.FromByteArray(s.ID()))
 	}
 }
 

@@ -678,6 +678,7 @@ func (s *Server) SendToNode(ctx context.Context, b []byte, node Addr, maximum in
 		return false, err
 	}
 
+	// n, err := s.socket.WriteTo(b, node.Raw())
 	n, err := repeatsend(ctx, s.socket, node.Raw(), b, s.config.QueryResendDelay(), maximum)
 	if err != nil {
 		return false, err

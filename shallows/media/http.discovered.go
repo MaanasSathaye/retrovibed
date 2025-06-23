@@ -46,9 +46,9 @@ func HTTPDiscoveredOptionJWTSecret(j jwtx.SecretSource) HTTPDiscoveredOption {
 	}
 }
 
-func HTTPDiscoveredOptionTorrentStorage(vfs fsx.Virtual) HTTPDiscoveredOption {
+func HTTPDiscoveredOptionRootStorage(vfs fsx.Virtual) HTTPDiscoveredOption {
 	return func(t *HTTPDiscovered) {
-		t.mediastorage = vfs
+		t.rootstorage = vfs
 	}
 }
 
@@ -59,26 +59,26 @@ type download interface {
 
 func NewHTTPDiscovered(q sqlx.Queryer, d download, c storage.ClientImpl, options ...HTTPDiscoveredOption) *HTTPDiscovered {
 	svc := langx.Clone(HTTPDiscovered{
-		q:            q,
-		d:            d,
-		c:            c,
-		jwtsecret:    env.JWTSecret,
-		decoder:      formx.NewDecoder(),
-		mediastorage: fsx.DirVirtual(os.TempDir()),
-		fts:          duckdbx.NewLucene(),
+		q:           q,
+		d:           d,
+		c:           c,
+		jwtsecret:   env.JWTSecret,
+		decoder:     formx.NewDecoder(),
+		rootstorage: fsx.DirVirtual(os.TempDir()),
+		fts:         duckdbx.NewLucene(),
 	}, options...)
 
 	return &svc
 }
 
 type HTTPDiscovered struct {
-	q            sqlx.Queryer
-	d            download
-	c            storage.ClientImpl
-	jwtsecret    jwtx.SecretSource
-	decoder      *form.Decoder
-	mediastorage fsx.Virtual
-	fts          lucenex.Driver
+	q           sqlx.Queryer
+	d           download
+	c           storage.ClientImpl
+	jwtsecret   jwtx.SecretSource
+	decoder     *form.Decoder
+	rootstorage fsx.Virtual
+	fts         lucenex.Driver
 }
 
 func (t *HTTPDiscovered) Bind(r *mux.Router) {
@@ -151,7 +151,7 @@ func (t *HTTPDiscovered) upload(w http.ResponseWriter, r *http.Request) {
 	}
 	defer f.Close()
 
-	tmp, err := fsx.CreateTemp(t.mediastorage, "retrovibed.upload.*")
+	tmp, err := fsx.CreateTemp(t.rootstorage, "retrovibed.upload.*")
 	if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to create temporary file"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
@@ -205,7 +205,7 @@ func (t *HTTPDiscovered) upload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = os.Rename(tmp.Name(), t.mediastorage.Path(fmt.Sprintf("%s.torrent", metainfo.Hash(lmd.Infohash).String()))); err != nil {
+	if err = os.Rename(tmp.Name(), t.rootstorage.Path(fmt.Sprintf("%s.torrent", metainfo.Hash(lmd.Infohash).String()))); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to failed to record torrent file"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
@@ -225,7 +225,7 @@ func (t *HTTPDiscovered) upload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	go func() {
-		errorsx.Log(tracking.Download(context.Background(), t.q, t.mediastorage, &lmd, dl))
+		errorsx.Log(tracking.Download(context.Background(), t.q, t.rootstorage, &lmd, dl))
 	}()
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &MediaUploadResponse{
@@ -321,7 +321,7 @@ func (t *HTTPDiscovered) download(w http.ResponseWriter, r *http.Request) {
 
 	if added {
 		go func() {
-			errorsx.Log(tracking.Download(context.Background(), t.q, t.mediastorage, &meta, dl))
+			errorsx.Log(tracking.Download(context.Background(), t.q, t.rootstorage, &meta, dl))
 		}()
 	}
 

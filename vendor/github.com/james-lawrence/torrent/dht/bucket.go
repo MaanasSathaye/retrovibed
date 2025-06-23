@@ -31,7 +31,6 @@ func (b *bucket) NodeIter() iter.Seq[*node] {
 
 // Returns true if f returns true for all nodes. Iteration stops if f returns false.
 func (b *bucket) EachNode(f func(*node) bool) bool {
-
 	next, stop := iter.Pull(b.NodeIter())
 	defer stop()
 	for c := true; c; {
@@ -45,13 +44,7 @@ func (b *bucket) EachNode(f func(*node) bool) bool {
 			return false
 		}
 	}
-	// b._m.RLock()
-	// defer b._m.RUnlock()
-	// for n := range b.NodeIter() {
-	// 	if !f(n) {
-	// 		return false
-	// 	}
-	// }
+
 	return true
 }
 

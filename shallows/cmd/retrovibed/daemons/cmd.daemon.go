@@ -18,7 +18,7 @@ import (
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/krpc"
 	"github.com/james-lawrence/torrent/metainfo"
-	"github.com/retrovibed/retrovibed/blockcache"
+	"github.com/james-lawrence/torrent/storage"
 	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/downloads"
@@ -141,13 +141,13 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		return err
 	}
 
-	tstore := blockcache.NewTorrentFromVirtualFS(torrentstore)
-	// tstore := storage.NewFile(torrentstore.Path(), storage.FileOptionPathMakerInfohash)
+	// tstore := blockcache.NewTorrentFromVirtualFS(torrentstore)
+	tstore := storage.NewFile(torrentstore.Path(), storage.FileOptionPathMakerInfohash)
 
 	tm := dht.DefaultMuxer().
 		Method(bep0051.Query, bep0051.NewEndpoint(bep0051.EmptySampler{}))
 
-	if path := wireguardx.Latest(); fsx.Exists(path) {
+	if path := wireguardx.Latest(); fsx.Exists(path) && false {
 		wcfg, err := wireguardx.Parse(path)
 		if err != nil {
 			return errorsx.Wrapf(err, "unable to parse wireguard configuration: %s", path)
@@ -180,7 +180,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		torrent.ClientConfigInfoLogger(log.New(torrentlogging, "[torrent] ", log.Flags())),
 		torrent.ClientConfigDebugLogger(log.New(torrentlogging, "[torrent - debug] ", log.Flags())),
 		torrent.ClientConfigMuxer(tm),
-		torrent.ClientConfigBucketLimit(32),
+		torrent.ClientConfigBucketLimit(128),
 		torrent.ClientConfigMaxOutstandingRequests(int(t.TorrentMaxRequests)),
 		torrent.ClientConfigHTTPUserAgent("retrovibed/0.0"),
 		torrent.ClientConfigConnectionClosed(func(ih metainfo.Hash, stats torrent.ConnStats, remaining int) {
@@ -326,7 +326,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	metaapi.NewHTTPDaemons(db).Bind(metamux.PathPrefix("/d").Subrouter())
 	metaapi.NewHTTPAuthz(db).Bind(metamux.PathPrefix("/authz").Subrouter())
 	media.NewHTTPLibrary(db, mediastore).Bind(httpmux.PathPrefix("/m").Subrouter())
-	media.NewHTTPDiscovered(db, tclient, tstore, media.HTTPDiscoveredOptionTorrentStorage(torrentstore)).Bind(httpmux.PathPrefix("/d").Subrouter())
+	media.NewHTTPDiscovered(db, tclient, tstore, media.HTTPDiscoveredOptionRootStorage(rootstore)).Bind(httpmux.PathPrefix("/d").Subrouter())
 	media.NewHTTPRSSFeed(db).Bind(httpmux.PathPrefix("/rss").Subrouter())
 	media.NewHTTPKnown(db).Bind(httpmux.PathPrefix("/k").Subrouter())
 

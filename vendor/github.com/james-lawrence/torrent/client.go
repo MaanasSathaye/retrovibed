@@ -129,11 +129,10 @@ func (cl *Client) start(md Metadata, options ...Tuner) (dlt *torrent, added bool
 	cl.lock()
 	defer cl.unlock()
 
-	log.Println("attempting dht announce initiated")
 	cl.eachDhtServer(func(s *dht.Server) {
 		go dlt.dhtAnnouncer(s)
 	})
-	log.Println("attempting dht announce completed")
+
 	dlt.updateWantPeersEvent()
 
 	// Tickle Client.waitAccept, new torrent may want conns.
@@ -691,8 +690,7 @@ func (cl *Client) runReceivedConn(c *connection) {
 
 	t, err := cl.receiveHandshakes(c)
 	if err != nil {
-		cl.config.debug().Println(errorsx.Wrap(err, "error during handshake"))
-		cl.config.Handshaker.Release(c.conn, connections.BannedConnectionError(c.conn, err))
+		cl.config.Handshaker.Release(c.conn, connections.BannedConnectionError(c.conn, errorsx.Wrap(err, "error during handshake")))
 		return
 	}
 
