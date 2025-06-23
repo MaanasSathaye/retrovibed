@@ -37,12 +37,18 @@ func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual
 		log.Println("resuming", md.ID, md.Description, md.Private)
 		infopath := rootstore.Path("torrent", fmt.Sprintf("%s.torrent", metainfo.Hash(md.Infohash).String()))
 
-		metadata, err := torrent.New(metainfo.Hash(md.Infohash), torrent.OptionStorage(tstore), torrentx.OptionTracker(md.Tracker), torrentx.OptionInfoFromFile(infopath), torrent.OptionPublicTrackers(md.Private, tracking.PublicTrackers()...))
+		metadata, err := torrent.New(
+			metainfo.Hash(md.Infohash),
+			torrent.OptionStorage(tstore),
+			torrentx.OptionTracker(md.Tracker),
+			torrentx.OptionInfoFromFile(infopath),
+			torrent.OptionPublicTrackers(md.Private, tracking.PublicTrackers()...),
+		)
 		if err != nil {
 			log.Println(errorsx.Wrapf(err, "unable to create metadata from %s - %s", md.ID, infopath))
 			return
 		}
-
+		log.Println("WAAAAT", metadata.Trackers)
 		t, added, err := tclient.Start(metadata)
 		if err != nil {
 			log.Println(errorsx.Wrapf(err, "unable to start download %s - %s", md.ID, infopath))
@@ -55,7 +61,6 @@ func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual
 		}
 
 		go func(infopath string, md tracking.Metadata, dl torrent.Torrent) {
-			// errorsx.Log(errorsx.Wrap(tracking.Verify(ctx, dl), "failed to verify data"))
 			errorsx.Log(errorsx.Wrap(tracking.Download(ctx, db, rootstore, &md, dl), "resume failed"))
 			torrentx.RecordInfo(infopath, dl.Metadata())
 		}(infopath, md, t)

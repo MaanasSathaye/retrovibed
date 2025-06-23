@@ -43,10 +43,12 @@ class EndpointAuto extends StatefulWidget {
 }
 
 class _DaemonAuto extends State<EndpointAuto> {
-  Widget? _loading = ds.Loading.Icon;
+  bool _loading = true;
   ds.Error? _cause = null;
   api.Daemon? _res;
-  Widget Function(void Function(api.Daemon) connect, {void Function()? retry}) _preamble = (connect, {retry}) => mdns.NoLocalService(connect: connect, retry: retry);
+  Widget Function(void Function(api.Daemon) connect, {void Function()? retry})
+  _preamble =
+      (connect, {retry}) => mdns.NoLocalService(connect: connect, retry: retry);
 
   void setdaemon(api.Daemon? d) {
     if (d == null) return;
@@ -55,7 +57,7 @@ class _DaemonAuto extends State<EndpointAuto> {
 
   void refresh(Future<api.Daemon> pending) {
     setState(() {
-       _loading = ds.Loading.Icon;
+      _loading = true;
     });
 
     final reseterr = () {
@@ -67,9 +69,7 @@ class _DaemonAuto extends State<EndpointAuto> {
     pending
         .then((v) {
           final ips = [...widget.defaultips, v.hostname.split(":").first];
-          HttpOverrides.global = DaemonHttpOverrides(
-            ips: ips,
-          );
+          HttpOverrides.global = DaemonHttpOverrides(ips: ips);
           return api.healthz(host: v.hostname).then((value) => v);
         })
         .then((v) {
@@ -87,24 +87,43 @@ class _DaemonAuto extends State<EndpointAuto> {
         .catchError((e) {
           // no service known
           setState(() {
-            _preamble = (connect, {retry}) => mdns.InitialSetup(connect: (d) => refresh(Future.value(d)), retry: retry);
+            _preamble =
+                (connect, {retry}) => mdns.InitialSetup(
+                  connect: (d) => refresh(Future.value(d)),
+                  retry: retry,
+                );
           });
         }, test: httpx.ErrorsTest.err404)
         .catchError((e) {
           setState(() {
-            _cause = ds.Error.unauthorized(e, onTap: reseterr, color: Color.fromRGBO(0, 0, 0, 0.80), message: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SelectableText("you've attempted to access a system you havent been granted access to yet."),
-                SelectableText("provide the system's administrator with the following to be granted access:"),
-                SelectableText(retro.public_key()),
-              ],
-            ));
+            _cause = ds.Error.unauthorized(
+              e,
+              onTap: reseterr,
+              color: Color.fromRGBO(0, 0, 0, 0.80),
+              message: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SelectableText(
+                    "you've attempted to access a system you havent been granted access to yet.",
+                  ),
+                  SelectableText(
+                    "provide the system's administrator with the following to be granted access:",
+                  ),
+                  SelectableText(retro.public_key()),
+                ],
+              ),
+            );
           });
         }, test: httpx.ErrorsTest.unauthorized)
         .catchError((e) {
           setState(() {
-            _cause = ds.Error.unauthorized(e, onTap: reseterr, message: SelectableText("you've attempted to access a service you havent been granted access to yet."));
+            _cause = ds.Error.unauthorized(
+              e,
+              onTap: reseterr,
+              message: SelectableText(
+                "you've attempted to access a service you havent been granted access to yet.",
+              ),
+            );
           });
         }, test: httpx.ErrorsTest.forbidden)
         .catchError((e) {
@@ -117,9 +136,10 @@ class _DaemonAuto extends State<EndpointAuto> {
           setState(() {
             _cause = ds.Error.unknown(e, onTap: reseterr);
           });
-        }).whenComplete(() {
+        })
+        .whenComplete(() {
           setState(() {
-            _loading = null;
+            _loading = false;
           });
         });
   }
@@ -128,21 +148,38 @@ class _DaemonAuto extends State<EndpointAuto> {
   void initState() {
     super.initState();
     HttpOverrides.global = DaemonHttpOverrides(ips: widget.defaultips);
-    refresh(widget.latest().then((r) => r.daemon));
+    refresh(
+      widget.latest().then((r) => r.daemon).catchError((e) {
+        // no service known
+        return api.daemons
+            .create(
+              api.DaemonCreateRequest(
+                daemon: api.Daemon(hostname: httpx.localhost()),
+              ),
+            )
+            .then((v) => v.daemon);
+      }, test: httpx.ErrorsTest.err404),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return ds.Overlay(
-      child: _res == null ? mdns.MDNSDiscovery(
-        daemon: (d) {
-          setState(() {
-            _res = d;
-          });
-        },
-        preamble: _preamble,
-      ) : widget.child,
-      overlay: _cause ?? _loading,
+      child: ds.Loading(
+        loading: _loading,
+        child:
+            _res == null
+                ? mdns.MDNSDiscovery(
+                  daemon: (d) {
+                    setState(() {
+                      _res = d;
+                    });
+                  },
+                  preamble: _preamble,
+                )
+                : widget.child,
+      ),
+      overlay: _cause,
     );
   }
 }

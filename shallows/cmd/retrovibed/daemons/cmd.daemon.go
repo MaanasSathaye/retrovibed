@@ -18,7 +18,7 @@ import (
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/krpc"
 	"github.com/james-lawrence/torrent/metainfo"
-	"github.com/james-lawrence/torrent/storage"
+	"github.com/retrovibed/retrovibed/blockcache"
 	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/downloads"
@@ -141,8 +141,8 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		return err
 	}
 
-	// tstore := blockcache.NewTorrentFromVirtualFS(torrentstore)
-	tstore := storage.NewFile(torrentstore.Path(), storage.FileOptionPathMakerInfohash)
+	tstore := blockcache.NewTorrentFromVirtualFS(torrentstore)
+	// tstore := storage.NewFile(torrentstore.Path(), storage.FileOptionPathMakerInfohash)
 
 	tm := dht.DefaultMuxer().
 		Method(bep0051.Query, bep0051.NewEndpoint(bep0051.EmptySampler{}))
