@@ -122,7 +122,6 @@ func (t *HTTPLibrary) Bind(r *mux.Router) {
 			httpauth.AuthenticateWithToken(t.jwtsecret),
 			// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
 			httpx.Timeout10s(),
-			httpx.DebugRequest,
 		).Then(http.FileServerFS(fsx.VirtualAsFSWithRewrite(t.mediastorage, func(s string) string {
 			return strings.TrimPrefix(s, "m/")
 		}))))
