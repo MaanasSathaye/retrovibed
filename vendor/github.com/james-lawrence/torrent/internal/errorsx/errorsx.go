@@ -92,6 +92,7 @@ func (t unauthorized) Unauthorized() {
 
 // Timeout error.
 type Timeout interface {
+	error
 	Timedout() time.Duration
 }
 
@@ -110,6 +111,10 @@ type timeout struct {
 
 func (t timeout) Timedout() time.Duration {
 	return t.d
+}
+
+func (t timeout) Unwrap() error {
+	return t.error
 }
 
 // Notification presents an error that will be displayed to the user

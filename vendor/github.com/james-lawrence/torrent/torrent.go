@@ -1360,11 +1360,28 @@ func (t *torrent) initiateConn(ctx context.Context, peer Peer) {
 		return
 	}
 
-	t._halfOpenmu.Lock()
-	t.halfOpen[addr.String()] = peer
-	t._halfOpenmu.Unlock()
+	go func() {
+		for {
+			var (
+				timedout errorsx.Timeout
+			)
 
-	go t.cln.outgoingConnection(ctx, t, addr, peer.Source, peer.Trusted)
+			t._halfOpenmu.Lock()
+			t.halfOpen[addr.String()] = peer
+			t._halfOpenmu.Unlock()
+
+			// outgoing connection has a dial rate limit
+			if err := t.cln.outgoingConnection(ctx, t, addr, peer.Source, peer.Trusted); err == nil {
+				return
+			} else if errors.As(err, &timedout) {
+				log.Printf("timeout detected, reconnecting %T - %v - %s\n", err, err, timedout.Timedout())
+				time.Sleep(timedout.Timedout())
+			} else {
+				log.Printf("outgoing connection failed %T - %v\n", errorsx.Compact(errorsx.Unwrap(err), err), err)
+				return
+			}
+		}
+	}()
 }
 
 func (t *torrent) noLongerHalfOpen(addr string) {
