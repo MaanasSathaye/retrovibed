@@ -145,6 +145,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 
 	var tstore storage.ClientImpl = blockcache.NewTorrentFromVirtualFS(torrentstore)
 	if t.TorrentLegacyStorage {
+		log.Println("--------------------------------------- LEGACY STORAGE IN USE - NOT A SUPPORTED CONFIGURATION ---------------------------------------")
 		tstore = storage.NewFile(torrentstore.Path(), storage.FileOptionPathMakerInfohash)
 	}
 
