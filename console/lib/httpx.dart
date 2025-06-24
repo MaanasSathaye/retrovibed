@@ -3,6 +3,7 @@ import 'dart:core';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:retrovibed/retrovibed.dart' as retro;
+import 'package:flutter/foundation.dart' as foundation;
 
 var _host = localhost();
 
@@ -22,7 +23,7 @@ String localhost() {
 }
 
 String metaendpoint() {
-  return normalizeuri(Platform.environment["RETROVIBED_META_ENDPOINT"]) ?? "api.retrovibe.space";
+  return normalizeuri(Platform.environment["RETROVIBED_META_ENDPOINT"]) ?? (foundation.kDebugMode ? "localhost:8081" : "api.retrovibe.space");
 }
 
 void set(String uri) {
