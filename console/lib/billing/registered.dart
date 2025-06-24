@@ -34,7 +34,6 @@ class RegisteredState extends State<Registered> {
     api
         .lookup(options: [authn.Authenticated.bearer(context)])
         .then((v) {
-          print("DERP 1 ${v.billing.customerId}");
           if (v.billing.customerId.isEmpty) {
             return api
                 .create(options: [authn.Authenticated.bearer(context)])
@@ -44,7 +43,6 @@ class RegisteredState extends State<Registered> {
           return Future.value(v.billing);
         })
         .then((billing) {
-          print("DERP 2 ${billing}");
           setState(() {
             current = billing;
           });

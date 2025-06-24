@@ -18,8 +18,8 @@ class Purchase extends StatelessWidget {
     return TextButton(
       onPressed: current.key == desired.key ? null : () {
         api.session(this.desired.id, options: [authn.Authenticated.bearer(context)]).then((v) {
-          print("DERP DERP ${v}");
-          launchUrl(Uri.https("google.com"));
+          Uri q = Uri.parse(v.redirect);
+          launchUrl(q);
         }).catchError((cause) {
           print("failed ${cause}");
         });
