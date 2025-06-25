@@ -48,7 +48,28 @@ class RegisteredState extends State<Registered> {
           });
         })
         .catchError((cause) {
-          print("FAILED!!! ${cause}");
+          setState(() {
+            _cause = ds.Error.offline(
+              cause,
+              onTap:
+                  () => setState(() {
+                    _cause = null;
+                  }),
+            );
+          });
+        }, test: ds.ErrorTests.offline)
+        .catchError((cause) {
+          setState(() {
+            _cause = ds.Error.connectivity(
+              cause,
+              onTap:
+                  () => setState(() {
+                    _cause = null;
+                  }),
+            );
+          });
+        }, test: ds.ErrorTests.connectivity)
+        .catchError((cause) {
           setState(() {
             _cause = ds.Error.unknown(
               cause,

@@ -17,6 +17,7 @@ class Purchase extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextButton(
       onPressed: current.key == desired.key ? null : () {
+        print("desired plan ${this.desired.id}");
         api.session(this.desired.id, options: [authn.Authenticated.bearer(context)]).then((v) {
           Uri q = Uri.parse(v.redirect);
           launchUrl(q);

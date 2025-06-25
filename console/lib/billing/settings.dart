@@ -30,7 +30,7 @@ class _Settings extends State<Settings> {
             input: DropdownButton(
               alignment: Alignment.topLeft,
               isExpanded: true,
-              value: current,
+              value: desired,
               items: [
                 DropdownMenuItem(child: Text("free"), value: free()),
                 DropdownMenuItem(child: Text("basic"), value: basic()),
@@ -38,12 +38,12 @@ class _Settings extends State<Settings> {
               ],
               onChanged: (v) {
                 setState(() {
-                  current = v ?? current;
+                  desired = v ?? current;
                 });
               },
             ),
           ),
-          current,
+          desired,
           Purchase(current: current, desired: desired),
         ],
       ),

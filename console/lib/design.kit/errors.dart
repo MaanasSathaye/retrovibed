@@ -15,6 +15,11 @@ class ErrorTests {
             obj.osError?.errorCode == ENOROUTE);
   }
 
+  static bool connectivity(Object obj) {
+    if (obj is HandshakeException) return true;
+    return false;
+  }
+
   static bool dnsresolution(Object obj) {
     return obj is SocketException && (obj.osError?.errorCode == EDNSRESOLUTION);
   }
@@ -117,6 +122,16 @@ class Error extends StatelessWidget {
     return Error(
       child: SelectableText(
         "unable to connect to daemon, is it running? check ${obj.address?.address}:${obj.port}.",
+      ),
+      cause: obj,
+      onTap: onTap,
+    );
+  }
+
+  static Error connectivity(Object obj, {void Function()? onTap}) {
+    return Error(
+      child: SelectableText(
+        "unable to connect, seems like there is a general connectivity issue impacting the destination.",
       ),
       cause: obj,
       onTap: onTap,
