@@ -1,3 +1,5 @@
+
+import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart'; // Provides [Player], [Media], [Playlist] etc.
 import 'package:retrovibed/env.dart' as env;
@@ -25,6 +27,7 @@ TextScaler autoscaling(BuildContext context) {
 }
 
 void main() {
+  print("debug mode ${foundation.kDebugMode}");
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
 

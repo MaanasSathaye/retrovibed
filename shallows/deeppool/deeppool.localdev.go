@@ -3,5 +3,5 @@
 package deeppool
 
 func Deeppool() string {
-	return "localhost:8081"
+	return "api.retrovibe.space"
 }

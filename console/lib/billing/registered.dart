@@ -48,6 +48,7 @@ class RegisteredState extends State<Registered> {
           });
         })
         .catchError((cause) {
+          print("FAILED!!! ${cause}");
           setState(() {
             _cause = ds.Error.unknown(
               cause,

@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' as foundation;
 import 'package:retrovibed/design.kit/forms.dart' as forms;
 
 PlanSummary free() => const PlanSummary(
-  id:
-      foundation.kDebugMode
-          ? "price_1RbMBbQ24Bh46y1frv5Jj8J2" // dev
-          : "price_1RbMfLLGpJbWOTHPcZfC1tyP", // production
+  // id:
+  //     foundation.kDebugMode
+  //         ? "price_1RbMBbQ24Bh46y1frv5Jj8J2" // dev
+  id: "price_1RbMfLLGpJbWOTHPcZfC1tyP", // production
   key: ValueKey("free"),
   storage: Text("none"),
   bandwidth: Text("none"),
@@ -15,10 +14,10 @@ PlanSummary free() => const PlanSummary(
 );
 
 PlanSummary basic() => const PlanSummary(
-  id:
-      foundation.kDebugMode
-          ? "price_1RbMCiQ24Bh46y1freKKOYHa"
-          : "price_1RbMgjLGpJbWOTHPMAgX6j9y",
+  // id:
+  //     foundation.kDebugMode
+  //         ? "price_1RbMCiQ24Bh46y1freKKOYHa"
+  id: "price_1RbMgjLGpJbWOTHPMAgX6j9y",
   key: ValueKey("personal"),
   storage: Text("2TB included + \$0.20 each additional 128 GB"),
   bandwidth: Text("64 GB / month"),
@@ -27,10 +26,10 @@ PlanSummary basic() => const PlanSummary(
 );
 
 PlanSummary premium() => const PlanSummary(
-  id:
-      foundation.kDebugMode
-          ? "price_1RbMF4Q24Bh46y1fmhthVSgC"
-          : "price_1RbMjyLGpJbWOTHP3Zmkd08T",
+  // id:
+  //     foundation.kDebugMode
+  //         ? "price_1RbMF4Q24Bh46y1fmhthVSgC"
+  id: "price_1RbMjyLGpJbWOTHP3Zmkd08T",
   key: ValueKey("premium"),
   storage: Text("4TB included + \$0.17 each additional 128 GB"),
   bandwidth: Text("no hard limits, but abuse will result in rate limits"),
