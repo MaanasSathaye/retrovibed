@@ -171,6 +171,8 @@ github.com/marcboeker/go-duckdb v1.8.5 h1:tkYp+TANippy0DaIOP5OEfBEwbUINqiFqgwMQ4
 github.com/marcboeker/go-duckdb/arrowmapping v0.0.3/go.mod h1:nd0wRoAnCzKLB7qe1mmq+QzmsQxwSsPM1zYBELfKEAA=
 github.com/marcboeker/go-duckdb/mapping v0.0.3/go.mod h1:99cn5SsYaVaow4vxvUAzj04F3ilDnVerUpB8nA+91fY=
 github.com/marcboeker/go-duckdb/v2 v2.0.1/go.mod h1:kQObJkVeuGy6V+O9HABg/arnzl6gz7DBhq3h5ywsdeI=
+github.com/marcboeker/go-duckdb/v2 v2.3.0/go.mod h1:cz7TuiXkRXt/sit0XnthgFzMgmNips5wUPQQsgTPzco=
+github.com/marcboeker/go-duckdb/v2 v2.3.2/go.mod h1:VeXz9ZM6klNvICHrXEUzaHSgNqBeTdyMxr4CICw/UaY=
 github.com/marten-seemann/tcp v0.0.0-20210406111302-dfbc87cc63fd/go.mod h1:QuCEs1Nt24+FYQEqAAncTDPJIuGs+LxK1MCiFL25pMU=
 github.com/mattn/go-colorable v0.1.13/go.mod h1:7S9/ev0klgBDR4GtXTXX8a3vIGJpMovkB8vQcUbaXHg=
 github.com/mattn/go-sqlite3 v1.14.24/go.mod h1:Uh1q+B4BYcTPb+yiD3kU8Ct7aC0hY9fxUwlHK0RXw+Y=

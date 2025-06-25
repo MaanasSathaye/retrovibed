@@ -7,8 +7,8 @@ func Libduckdb() egflatpak.Module {
 		"cp -r . /app/lib",
 	).Sources(
 		egflatpak.SourceTarball(
-			"https://github.com/duckdb/duckdb/releases/download/v1.2.1/libduckdb-linux-amd64.zip",
-			"8dda081c84ef1da07f19f953ca95e1c6db9b6851e357444a751ad45be8a14d36",
+			"https://github.com/duckdb/duckdb/releases/download/v1.3.1/libduckdb-linux-amd64.zip",
+			"aa61ab7e300759d7af30e19b9367d7df6297fbdb2f674c140ee80dcad08a3123",
 			egflatpak.SourceOptions().Destination("duckdb.zip")...,
 		),
 	)...)
