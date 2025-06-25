@@ -50,12 +50,12 @@ class _DaemonAuto extends State<EndpointAuto> {
   _preamble =
       (connect, {retry}) => mdns.NoLocalService(connect: connect, retry: retry);
 
-  void setdaemon(api.Daemon? d) {
-    if (d == null) return;
-    refresh(Future.value(d));
+  Future<void> setdaemon(api.Daemon? d) {
+    if (d == null) return Future.value(null);
+    return refresh(Future.value(d));
   }
 
-  void refresh(Future<api.Daemon> pending) {
+  Future<void> refresh(Future<api.Daemon> pending) {
     setState(() {
       _loading = true;
     });
@@ -66,19 +66,13 @@ class _DaemonAuto extends State<EndpointAuto> {
       });
     };
 
-    pending
+    return pending
+        .then((v) {
+          return api.daemons.connectable(v);
+        })
         .then((v) {
           final ips = [...widget.defaultips, v.hostname.split(":").first];
           HttpOverrides.global = DaemonHttpOverrides(ips: ips);
-          return api.healthz(host: v.hostname).then((value) => v);
-        })
-        .then((v) {
-          return api.authz(host: v.hostname).then((value) => v);
-        })
-        .then((v) {
-          return api.daemons.touch(v.id).then((value) => v);
-        })
-        .then((v) {
           setState(() {
             httpx.set(v.hostname);
             _res = v;

@@ -145,6 +145,7 @@ class Error extends StatelessWidget {
     };
   }
 
+
   @override
   Widget build(BuildContext context) {
     final defaults = theming.Defaults.of(context);

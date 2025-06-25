@@ -6,7 +6,7 @@ import './api.dart' as api;
 import './daemon.manual.dart';
 
 class DaemonList extends StatefulWidget {
-  final void Function(api.Daemon v)? onTap;
+  final Future<api.Daemon> Function(api.Daemon v)? onTap;
   final void Function(api.Daemon d)? onRemove;
   final Future<api.DaemonSearchResponse> Function(api.DaemonSearchRequest)
   search;
@@ -129,20 +129,35 @@ class _DaemonList extends State<DaemonList> {
         ],
       ),
       ds.Table.inline<api.Daemon>(
-        (v) => _RowDisplay(
-          hostname: current,
-          current: v,
-          onTap: widget.onTap == null ? null : () {
-            widget.onTap!(v);
-            setState(() {});
-          },
-          onRemove: (api.Daemon d) {
-            return api.daemons.delete(d.id).then((v) {
-              _res.next.offset = _res.next.offset - 1;
-              refresh(_res.next);
-              return v.daemon;
-            });
-          },
+        (v) => ds.ErrorBoundary(
+          _RowDisplay(
+            hostname: current,
+            current: v,
+            // cause: _rowcause,
+            onTap:
+                widget.onTap == null
+                    ? null
+                    : () {
+                      return api.daemons
+                          .connectable(v)
+                          .then((v) {
+                            return widget.onTap!(v);
+                          })
+                          .then((v) {
+                            if (true) throw Exception("DERP DERP");
+                          })
+                          .whenComplete(() {
+                            setState(() {});
+                          });
+                    },
+            onRemove: (api.Daemon d) {
+              return api.daemons.delete(d.id).then((v) {
+                _res.next.offset = _res.next.offset - 1;
+                refresh(_res.next);
+                return v.daemon;
+              });
+            },
+          ),
         ),
       ),
     );
@@ -152,13 +167,12 @@ class _DaemonList extends State<DaemonList> {
 class _RowDisplay extends StatelessWidget {
   final String hostname;
   final api.Daemon current;
-  final void Function()? onTap;
+  final Future<api.Daemon> Function()? onTap;
   final Future<api.Daemon> Function(api.Daemon d)? onRemove;
-
   const _RowDisplay({
     required this.current,
     required this.hostname,
-    this.onTap = ds.defaulttap,
+    this.onTap,
     this.onRemove,
   });
 
@@ -167,7 +181,14 @@ class _RowDisplay extends StatelessWidget {
     final themex = ds.Defaults.of(context);
     return Container(
       child: InkWell(
-        onTap: onTap,
+        onTap:
+            onTap == null
+                ? null
+                : () {
+                  onTap!().catchError(
+                    ds.Error.boundary(context, current, ds.Error.unknown),
+                  );
+                },
         child: Row(
           spacing: themex.spacing!,
           children: [
@@ -182,7 +203,9 @@ class _RowDisplay extends StatelessWidget {
               IconButton(
                 onPressed: () {
                   onRemove!(current).catchError((cause) {
-                    ds.ErrorBoundary.of(context)?.onError(ds.Error.unknown(cause));
+                    ds.ErrorBoundary.of(
+                      context,
+                    )?.onError(ds.Error.unknown(cause));
                     throw cause;
                   }).ignore();
                 },

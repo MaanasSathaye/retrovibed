@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:http/http.dart' as http;
 import 'package:retrovibed/httpx.dart' as httpx;
@@ -8,22 +9,36 @@ import './meta.authz.pb.dart';
 export './meta.daemon.pb.dart';
 export './meta.authz.pb.dart';
 
-Future<http.Response> healthz({String? host}) async {
-  return http.Client()
-      .get(Uri.https(host ?? httpx.host(), "/healthz"))
-      .then(httpx.auto_error);
+Future<HttpClientResponse> healthz({String? host}) async {
+  final hostport = host ?? httpx.host();
+  final c = HttpClient();
+  c.badCertificateCallback = (X509Certificate cert, String _host, int port) {
+    final zhost = hostport.split(":").first;
+    return zhost == _host;
+  };
+  return c
+      .getUrl(Uri.https(hostport, "/healthz"))
+      .then(httpx.dart_io_auto_error);
 }
 
 Future<AuthzResponse> authz({String? host}) {
-  final _host = host ?? httpx.host();
-  return http.Client()
-      .get(
-        Uri.https(_host, "/meta/authz/"),
-        headers: {"Authorization": httpx.auto_bearer_host(host: _host)},
-      )
-      .then(httpx.auto_error)
-      .then((v) {
-        return AuthzResponse.create()..mergeFromProto3Json(jsonDecode(v.body));
+  final hostport = host ?? httpx.host();
+  final c = HttpClient();
+  c.badCertificateCallback = (X509Certificate cert, String _host, int port) {
+    final zhost = hostport.split(":").first;
+    return zhost == _host;
+  };
+  return c
+      .getUrl(Uri.https(hostport, "/meta/authz/"))
+      .then((r) {
+        r.headers.add("Authorization", httpx.auto_bearer_host(host: hostport));
+        return r;
+      })
+      .then(httpx.dart_io_auto_error)
+      .then((r) {
+        return r.transform(utf8.decoder).join().then((body) {
+          return AuthzResponse.create()..mergeFromProto3Json(jsonDecode(body));
+        });
       });
 }
 
@@ -67,18 +82,32 @@ abstract class daemons {
   }
 
   static Future<DaemonDisableResponse> touch(String id) async {
-    return http.Client()
-        .put(
-          Uri.https(httpx.localhost(), "/meta/d/${id}"),
-          headers: {"Authorization": httpx.auto_bearer()},
-        )
-        .then(httpx.auto_error)
-        .then((v) {
-          return Future.value(
-            DaemonDisableResponse.create()
-              ..mergeFromProto3Json(jsonDecode(v.body)),
-          );
+    final c = HttpClient();
+    c.badCertificateCallback = (X509Certificate cert, String _host, int port) {
+      return _host == "localhost" || _host == Platform.localHostname;
+    };
+    return c
+        .putUrl(Uri.https(httpx.localhost(), "/meta/d/${id}"))
+        .then((r) {
+          r.headers.add("Authorization", httpx.auto_bearer());
+          return r;
+        })
+        .then(httpx.dart_io_auto_error)
+        .then((r) {
+          return r.transform(utf8.decoder).join().then((body) {
+            return DaemonDisableResponse.create()
+              ..mergeFromProto3Json(jsonDecode(body));
+          });
         });
+  }
+
+
+  // check if the daemon is connectable.
+  static Future<Daemon> connectable(Daemon v) {
+        return healthz(host: v.hostname)
+        .then((_) => authz(host: v.hostname))
+        .then((_) => daemons.touch(v.id))
+        .then((_) => v);
   }
 
   static Future<DaemonDisableResponse> delete(String id) async {

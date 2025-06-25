@@ -38,7 +38,7 @@ class Display extends StatelessWidget {
               padding: defaults.padding,
               child: meta.DaemonList(
                 onTap: (d) {
-                  meta.EndpointAuto.of(context)?.setdaemon(d);
+                  return meta.EndpointAuto.of(context)?.setdaemon(d).then((_) => Future.value(d)) ?? Future.error(Exception("invalid widget tree missing meta.EndpointAuto"));
                 },
               ),
             ),
