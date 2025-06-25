@@ -6,7 +6,7 @@ toolchain go1.24.1
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
-	github.com/alecthomas/kong v1.11.0
+	github.com/alecthomas/kong v1.12.0
 	github.com/anacrolix/missinggo v1.3.0
 	github.com/anacrolix/utp v0.2.0
 	github.com/benbjohnson/immutable v0.4.3
@@ -21,11 +21,11 @@ require (
 	github.com/gorilla/schema v1.4.1
 	github.com/grindlemire/go-lucene v0.0.21
 	github.com/hashicorp/mdns v1.0.6
-	github.com/james-lawrence/genieql v0.0.0-20250326213227-2205a50ec4f9
-	github.com/james-lawrence/torrent v0.0.0-20250623211151-c355cc63edc4
+	github.com/james-lawrence/genieql v0.0.0-20250605152251-dee4282e5e2a
+	github.com/james-lawrence/torrent v0.0.0-20250624185810-11c3ac76178f
 	github.com/justinas/alice v1.2.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
-	github.com/marcboeker/go-duckdb/v2 v2.3.0
+	github.com/marcboeker/go-duckdb/v2 v2.3.2
 	github.com/mattn/go-isatty v0.0.20
 	github.com/onsi/ginkgo/v2 v2.23.4
 	github.com/onsi/gomega v1.37.0
@@ -73,12 +73,12 @@ require (
 	github.com/charmbracelet/x/exp/strings v0.0.0-20250313150240-c09addb0e197 // indirect
 	github.com/charmbracelet/x/term v0.2.1 // indirect
 	github.com/csnewman/flutter-go-bridge v0.2.0 // indirect
-	github.com/duckdb/duckdb-go-bindings v0.1.15 // indirect
-	github.com/duckdb/duckdb-go-bindings/darwin-amd64 v0.1.10 // indirect
-	github.com/duckdb/duckdb-go-bindings/darwin-arm64 v0.1.10 // indirect
-	github.com/duckdb/duckdb-go-bindings/linux-amd64 v0.1.10 // indirect
-	github.com/duckdb/duckdb-go-bindings/linux-arm64 v0.1.10 // indirect
-	github.com/duckdb/duckdb-go-bindings/windows-amd64 v0.1.10 // indirect
+	github.com/duckdb/duckdb-go-bindings v0.1.16 // indirect
+	github.com/duckdb/duckdb-go-bindings/darwin-amd64 v0.1.11 // indirect
+	github.com/duckdb/duckdb-go-bindings/darwin-arm64 v0.1.11 // indirect
+	github.com/duckdb/duckdb-go-bindings/linux-amd64 v0.1.11 // indirect
+	github.com/duckdb/duckdb-go-bindings/linux-arm64 v0.1.11 // indirect
+	github.com/duckdb/duckdb-go-bindings/windows-amd64 v0.1.11 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/ebitengine/purego v0.8.4 // indirect
 	github.com/edsrzf/mmap-go v1.2.0 // indirect
@@ -99,7 +99,7 @@ require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/pgtype v1.14.4 // indirect
-	github.com/jackc/pgx/v5 v5.7.4 // indirect
+	github.com/jackc/pgx/v5 v5.7.5 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.10 // indirect
@@ -107,8 +107,8 @@ require (
 	github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0 // indirect
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
-	github.com/marcboeker/go-duckdb/arrowmapping v0.0.8 // indirect
-	github.com/marcboeker/go-duckdb/mapping v0.0.9 // indirect
+	github.com/marcboeker/go-duckdb/arrowmapping v0.0.9 // indirect
+	github.com/marcboeker/go-duckdb/mapping v0.0.10 // indirect
 	github.com/mattn/go-localereader v0.0.1 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/mfridman/interpolate v0.0.2 // indirect
