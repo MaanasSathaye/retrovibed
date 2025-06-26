@@ -373,7 +373,6 @@ func (t *HTTPDiscovered) metadata(w http.ResponseWriter, r *http.Request) {
 
 func (t *HTTPDiscovered) downloading(w http.ResponseWriter, r *http.Request) {
 	var (
-		err error
 		msg DownloadSearchResponse = DownloadSearchResponse{
 			Next: &DownloadSearchRequest{
 				Limit: 100,
@@ -381,7 +380,7 @@ func (t *HTTPDiscovered) downloading(w http.ResponseWriter, r *http.Request) {
 		}
 	)
 
-	if err = t.decoder.Decode(msg.Next, r.Form); err != nil {
+	if err := t.decoder.Decode(msg.Next, r.Form); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to decode request"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
@@ -396,19 +395,19 @@ func (t *HTTPDiscovered) downloading(w http.ResponseWriter, r *http.Request) {
 		},
 	).OrderBy("downloaded = bytes, downloaded/bytes, created_at DESC").Offset(msg.Next.Offset * msg.Next.Limit).Limit(msg.Next.Limit)
 
-	err = sqlxx.ScanEach(tracking.MetadataSearch(r.Context(), t.q, q), func(p *tracking.Metadata) error {
-		tmp := langx.Clone(Download{}, DownloadOptionFromTorrentMetadata(langx.Clone(*p, tracking.MetadataOptionJSONSafeEncode)))
+	qq := sqlx.Scan(tracking.MetadataSearch(r.Context(), t.q, q))
+	for p := range qq.Iter() {
+		tmp := langx.Clone(Download{}, DownloadOptionFromTorrentMetadata(langx.Clone(p, tracking.MetadataOptionJSONSafeEncode)))
 		msg.Items = append(msg.Items, &tmp)
-		return nil
-	})
+	}
 
-	if err != nil {
+	if err := qq.Err(); err != nil {
 		log.Println(errorsx.Wrap(err, "encoding failed"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
-	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &msg); err != nil {
+	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &msg); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
 		return
 	}

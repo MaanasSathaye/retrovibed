@@ -15,6 +15,7 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/bep0051"
+	"github.com/james-lawrence/torrent/connections"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/dht/krpc"
@@ -37,10 +38,11 @@ import (
 )
 
 type importPeer struct {
-	Peer      string `flag:"" name:"peer" help:"peer to connect to and download the provided torrents from" default:"localhost:10000"`
-	Directory string `flag:"" name:"directory" help:"specify the directory to download torrents into" default:""`
-	Archive   bool   `flag:"" name:"archive" help:"mark imported media for archival" default:"false"`
-	Magnets   string `arg:"" name:"magnets" help:"file containing magnet links to download, defaults to stdin" default:""`
+	Peer           string `flag:"" name:"peer" help:"peer to connect to and download the provided torrents from" default:"localhost:10000"`
+	Directory      string `flag:"" name:"directory" help:"specify the directory to download torrents into" default:""`
+	Archive        bool   `flag:"" name:"archive" help:"mark imported media for archival" default:"false"`
+	Magnets        string `arg:"" name:"magnets" help:"file containing magnet links to download, defaults to stdin" default:""`
+	TorrentPrivate bool   `flag:"" name:"torrent-private" help:"restrict torrent connections to private networks" env:"${env_torrent_private}" default:"false"`
 }
 
 func (t importPeer) torrents(tstore fsx.Virtual) iter.Seq2[string, torrent.Metadata] {
@@ -95,6 +97,7 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		peerid    = krpc.IdFromString(md5x.String(ssh.FingerprintSHA256(id.PublicKey())))
 		tnetwork  torrent.Binder
 		bootstrap torrent.ClientConfigOption = torrent.ClientConfigNoop
+		firewall  torrent.ClientConfigOption = torrent.ClientConfigNoop
 	)
 
 	if db, err = cmdmeta.Database(gctx.Context); err != nil {
@@ -124,6 +127,15 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		return errorsx.Wrap(err, "unable to resolve host")
 	}
 
+	if t.TorrentPrivate {
+		log.Println("disabling public networks for torrent")
+		firewall = torrent.ClientConfigFirewall(connections.NewFirewall(
+			connections.Private{},
+			connections.BanInvalidPort{},
+			connections.NewBloomBanIP(10*time.Minute),
+		))
+	}
+
 	tm := dht.DefaultMuxer().
 		Method(bep0051.Query, bep0051.NewEndpoint(bep0051.EmptySampler{}))
 	tstore := blockcache.NewTorrentFromVirtualFS(torrentstore)
@@ -139,7 +151,7 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		torrent.ClientConfigInfoLogger(log.New(os.Stderr, "[torrent] ", log.Flags())),
 		torrent.ClientConfigDebugLogger(log.New(os.Stderr, "[torrent-debug] ", log.Flags())),
 		torrent.ClientConfigMuxer(tm),
-		torrent.ClientConfigBucketLimit(32),
+		torrent.ClientConfigBucketLimit(256),
 		torrent.ClientConfigHTTPUserAgent("retrovibed/0.0"),
 		torrent.ClientConfigConnectionClosed(func(ih metainfo.Hash, stats torrent.ConnStats, remaining int) {
 			if stats.BytesWrittenData.Uint64() == 0 {
@@ -161,6 +173,7 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 			}
 		}),
 		bootstrap,
+		firewall,
 	)
 
 	if tnetwork, err = torrentx.Autosocket(0); err != nil {

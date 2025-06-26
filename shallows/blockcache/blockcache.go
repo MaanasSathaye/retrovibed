@@ -90,6 +90,7 @@ func (t DirCache) ReadAt(p []byte, off int64) (n int, err error) {
 }
 
 func (t *DirCache) WriteAt(p []byte, off int64) (n int, err error) {
+
 	writechunk := func(p []byte, ioff int64) (n int, err error) {
 		path := t.path(ioff)
 
