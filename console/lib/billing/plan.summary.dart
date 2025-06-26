@@ -53,6 +53,14 @@ class PlanSummary extends StatelessWidget {
     required this.bandwidth,
   });
 
+  static PlanSummary fromID(String id) {
+    final _basic = basic();
+    final _premium = premium();
+    if (id == _basic.id) return _basic;
+    if (id == _premium.id) return _premium;
+    return free();
+  }
+
   @override
   Widget build(BuildContext context) {
     return forms.Container(

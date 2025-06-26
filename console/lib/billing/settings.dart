@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/design.kit/forms.dart' as forms;
 import './plan.summary.dart';
 import './purchase.dart';
+import './registered.dart';
 
 class Settings extends StatefulWidget {
   Settings({super.key});
@@ -17,6 +18,13 @@ class _Settings extends State<Settings> {
   void setState(VoidCallback fn) {
     if (!mounted) return;
     super.setState(fn);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    current = PlanSummary.fromID(Registered.of(context)?.current.planId ?? "");
+    desired = current;
   }
 
   @override
