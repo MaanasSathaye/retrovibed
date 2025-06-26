@@ -16,34 +16,40 @@ class _ControlState extends State<DownloadRowControls> {
 
   @override
   Widget build(BuildContext context) {
+    final defaults = ds.Defaults.of(context);
+    final pause = () {
+      setState(() => disabled = true);
+      api.discovered
+          .pause(widget.current.media.id)
+          .then((v) {
+            widget.onChange?.call(v.download);
+            setState(() => disabled = false);
+          })
+          .catchError((cause) {
+            setState(() {
+              disabled = false;
+              ds.ErrorBoundary.of(context)?.onError(ds.Error.unknown(cause));
+            });
+          });
+    };
+    final completed = () {
+      widget.onChange?.call(widget.current);
+    };
+
     final cursor =
         disabled ? SystemMouseCursors.forbidden : SystemMouseCursors.click;
-
+    final primaryicon =
+        widget.current.bytes == widget.current.downloaded
+            ? Icon(Icons.check, color: defaults.success)
+            : Icon(Icons.pause_circle_outline);
+    final primarytap =
+        widget.current.bytes == widget.current.downloaded ? pause : completed;
     return Row(
       children: [
         IconButton(
-          icon: Icon(Icons.pause_circle_outline),
+          icon: primaryicon,
           mouseCursor: cursor,
-          onPressed:
-              disabled
-                  ? null
-                  : () {
-                    setState(() => disabled = true);
-                    api.discovered
-                        .pause(widget.current.media.id)
-                        .then((v) {
-                          widget.onChange?.call(v.download);
-                          setState(() => disabled = false);
-                        })
-                        .catchError((cause) {
-                          setState(() {
-                            disabled = false;
-                            ds.ErrorBoundary.of(
-                              context,
-                            )?.onError(ds.Error.unknown(cause));
-                          });
-                        });
-                  },
+          onPressed: disabled ? null : primarytap,
         ),
       ],
     );

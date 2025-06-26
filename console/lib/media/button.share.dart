@@ -1,5 +1,6 @@
 import 'package:uuid/uuid.dart' as uuid;
 import 'package:flutter/material.dart';
+import 'package:retrovibed/designkit.dart' as ds;
 import './media.pb.dart';
 
 class ButtonShare extends StatelessWidget {
@@ -8,14 +9,16 @@ class ButtonShare extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final defaults = ds.Defaults.of(context);
     final theme = Theme.of(context);
+
     return IconButton(
       icon: Icon(Icons.share_outlined),
       color:
           uuid.UuidValue.fromString(current.torrentId) ==
                   uuid.Namespace.nil.uuidValue
               ? theme.disabledColor
-              : const Color.fromARGB(255, 0, 255, 17),
+              : defaults.success,
       onPressed: () {
         print(
           "sharing management is not let implemented ${current.id} - ${current.torrentId}",

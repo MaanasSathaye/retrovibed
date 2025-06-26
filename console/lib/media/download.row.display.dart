@@ -28,9 +28,14 @@ class _DownloadingState extends State<RefreshingDownload> {
         setState(() {
           current = r.download;
         });
-      }).catchError((cause) {
-        // signal upstream.
-      }, test: httpx.ErrorsTest.err404)
+      }).catchError(
+        ds.Error.boundary(
+              context,
+              null,
+              (_) => ds.Error.text("download has gone missing"),
+            ),
+            test: httpx.ErrorsTest.err404,
+      )
       .catchError((cause) {
         print("failed to retrieve updated download data ${cause}");
       });

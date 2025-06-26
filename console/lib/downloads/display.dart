@@ -12,13 +12,11 @@ class Display extends StatelessWidget {
 
     return Container(
       padding: defaults.padding,
-      child: ds.RefreshBoundary(
-        ListView(
-          children: [
-            DownloadingListDisplay(),
-            AvailableListDisplay(searchController: controller),
-          ],
-        ),
+      child: ListView(
+        children: [
+          ds.RefreshBoundary(DownloadingListDisplay()),
+          AvailableListDisplay(searchController: controller),
+        ],
       ),
     );
   }

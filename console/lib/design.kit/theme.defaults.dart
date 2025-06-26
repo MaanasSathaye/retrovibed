@@ -8,6 +8,7 @@ class Defaults extends ThemeExtension<Defaults> {
   final EdgeInsetsGeometry? margin;
   final Border? border;
   final Color? danger;
+  final Color? success;
   final Color? opaque;
 
   const Defaults({
@@ -15,6 +16,7 @@ class Defaults extends ThemeExtension<Defaults> {
     this.padding = const EdgeInsets.all(16.0),
     this.margin = const EdgeInsets.all(5.0),
     this.danger = const Color.fromRGBO(110, 1, 1, 0.75),
+    this.success =  const Color.fromARGB(255, 0, 255, 17),
     this.opaque = const Color.fromRGBO(0, 0, 0, 0.80),
     this.border = const Border.fromBorderSide(
       const BorderSide(color: Color(0xFF000000)),
@@ -38,6 +40,7 @@ class Defaults extends ThemeExtension<Defaults> {
       margin: margin ?? this.margin,
       border: border ?? this.border,
       danger: danger ?? this.danger,
+      success: success ?? this.success,
       opaque: opaque ?? this.opaque,
     );
   }
@@ -56,6 +59,7 @@ class Defaults extends ThemeExtension<Defaults> {
       margin: margin ?? other.margin,
       border: border ?? other.border,
       danger: danger ?? other.danger,
+      success: success ?? other.success,
       opaque: opaque ?? other.opaque,
       spacing: spacing ?? other.spacing,
     );
