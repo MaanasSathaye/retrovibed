@@ -161,17 +161,16 @@ class _DaemonAuto extends State<EndpointAuto> {
     return ds.Overlay(
       child: ds.Loading(
         loading: _loading,
-        child:
-            _res == null
-                ? mdns.MDNSDiscovery(
-                  daemon: (d) {
-                    setState(() {
-                      _res = d;
-                    });
-                  },
-                  preamble: _preamble,
-                )
-                : widget.child,
+        _res == null
+            ? mdns.MDNSDiscovery(
+              daemon: (d) {
+                setState(() {
+                  _res = d;
+                });
+              },
+              preamble: _preamble,
+            )
+            : widget.child,
       ),
       overlay: _cause,
     );

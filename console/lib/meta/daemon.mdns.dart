@@ -92,7 +92,7 @@ class _MDNSDiscovery extends State<MDNSDiscovery> {
     return ds.Loading(
       cause: _cause,
       loading: _loading,
-      child: Center(
+      Center(
         child: SizedBox.fromSize(
           size: Size(768, 512),
           child: widget.preamble(

@@ -23,6 +23,20 @@ Future<Session> current(String token) async {
       });
 }
 
+Future<Session> otp(Future<String> pending) async {
+  return pending.then((token) {
+    return http.Client()
+        .get(
+          Uri.https(httpx.metaendpoint(), "/authn/otp"),
+          headers: {"Authorization": bearer(token)},
+        )
+        .then(httpx.auto_error)
+        .then((v) {
+          return Session.create()..mergeFromProto3Json(jsonDecode(v.body));
+        });
+  });
+}
+
 Future<Authed> ssh() async {
   return http.Client()
       .post(

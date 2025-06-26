@@ -14,9 +14,8 @@ class Loading extends StatelessWidget {
   final Widget overlay;
   final Widget? cause;
 
-  const Loading({
+  const Loading(this.child, {
     super.key,
-    this.child,
     this.overlay = const Center(child: Loading.Icon),
     this.loading = false,
     this.cause = null,

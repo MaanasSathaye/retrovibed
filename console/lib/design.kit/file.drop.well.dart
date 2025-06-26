@@ -144,7 +144,7 @@ class _FileDropWell extends State<FileDropWell> {
           child: Row(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [ds.Loading(loading: _loading, child: widget.child)],
+            children: [ds.Loading(loading: _loading, widget.child)],
           ),
         ),
       ),

@@ -25,6 +25,10 @@ String metaendpoint() {
   return normalizeuri(Platform.environment["RETROVIBED_META_ENDPOINT"]) ?? "api.retrovibe.space";
 }
 
+String consoleendpoint() {
+  return "console.retrovibe.space";
+}
+
 void set(String uri) {
   _host = uri;
 }

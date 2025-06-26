@@ -38,7 +38,7 @@ class DownloadingListDisplay extends StatelessWidget {
         return ds.Loading(
           loading: snapshot.connectionState != ConnectionState.done,
           cause: ds.Error.maybeErr(snapshot.error),
-          child: ListView(shrinkWrap: true, children: snapshot.data ?? []),
+          ListView(shrinkWrap: true, children: snapshot.data ?? []),
         );
       },
     );

@@ -18,12 +18,8 @@ class Display extends StatelessWidget {
       child: ListView(
         children: [
           ds.Accordion(
-            disabled: Text("coming soon"),
-            description: Text("you"),
-            content: Container(
-              padding: defaults.padding,
-              child: profiles.Current(),
-            ),
+            description: Text("account"),
+            content: profiles.Current(),
           ),
           ds.Accordion(
             description: Text("RSS"),

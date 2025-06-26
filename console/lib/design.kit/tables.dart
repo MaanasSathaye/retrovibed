@@ -52,7 +52,7 @@ class Table<T> extends StatelessWidget {
     return ds.Loading(
       loading: loading,
       cause: cause,
-      child: Column(
+      Column(
         mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [

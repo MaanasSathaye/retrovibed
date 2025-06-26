@@ -57,7 +57,7 @@ class Display extends StatelessWidget {
 
         return ds.Loading(
           loading: snapshot.connectionState != ConnectionState.done,
-          child: GridView.count(
+          GridView.count(
             primary: false,
             padding: defaults.padding,
             crossAxisSpacing: 0,

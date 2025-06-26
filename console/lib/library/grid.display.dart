@@ -125,7 +125,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
     return ds.Loading(
       cause: _cause,
       loading: _loading,
-      child: Container(
+      Container(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

@@ -20,6 +20,12 @@ class Authenticated extends StatefulWidget {
     );
   }
 
+  static Future<String> bearerString(BuildContext context) {
+    return session(context).then((s) {
+      return s.token;
+    });
+  }
+
   @override
   State<Authenticated> createState() => _AuthenticatedState();
 }
