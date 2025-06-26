@@ -184,6 +184,7 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	if err != nil {
 		return errorsx.Wrap(err, "unable to bind torrent to socket")
 	}
+	defer tclient.Close()
 
 	sourcepeer := torrent.Peer{
 		IP:      addrs[0],

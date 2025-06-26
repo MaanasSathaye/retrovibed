@@ -3,6 +3,7 @@ package torrent
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"sync/atomic"
 	"syscall"
@@ -48,12 +49,12 @@ func RunHandshookConn(c *connection, t *torrent) error {
 
 	go func() {
 		err := connwriterinit(ctx, c, 10*time.Second)
-		err = errorsx.StdlibTimeout(err, retrydelay, syscall.ECONNRESET)
+		err = errorsx.StdlibTimeout(err, retrydelay, syscall.ECONNRESET, io.EOF)
 		cancel(err)
 	}()
 
 	if err := c.mainReadLoop(ctx); err != nil {
-		err = errorsx.StdlibTimeout(err, retrydelay, syscall.ECONNRESET)
+		err = errorsx.StdlibTimeout(err, retrydelay, syscall.ECONNRESET, io.EOF)
 		cancel(err)
 		c.cfg.Handshaker.Release(c.conn, err)
 		return errorsx.Wrap(err, "error during main read loop")
@@ -66,7 +67,7 @@ func RunHandshookConn(c *connection, t *torrent) error {
 func ConnExtensions(ctx context.Context, cn *connection) error {
 	log.Println("conn extensions initiated")
 	defer log.Println("conn extensions completed")
-	return cstate.Run(ctx, connexinit(cn, connexfast(cn, connexdht(cn, connflush(cn, nil)))), cn.cfg.debug())
+	return cstate.Run(ctx, connexfast(cn, connexinit(cn, connexdht(cn, connflush(cn, nil)))), cn.cfg.debug())
 }
 
 func connflush(cn *connection, n cstate.T) cstate.T {
@@ -145,11 +146,11 @@ func connexfast(cn *connection, n cstate.T) cstate.T {
 
 			cn.sentHaves.AddRange(0, cn.t.chunks.pieces)
 
-			for _, v := range cn.peerfastset.ToArray() {
-				if _, err := cn.Post(pp.NewAllowedFast(v)); err != nil {
-					return cstate.Failure(err)
-				}
-			}
+			// for _, v := range cn.peerfastset.ToArray() {
+			// 	if _, err := cn.Post(pp.NewAllowedFast(v)); err != nil {
+			// 		return cstate.Failure(err)
+			// 	}
+			// }
 
 			return n
 		default:

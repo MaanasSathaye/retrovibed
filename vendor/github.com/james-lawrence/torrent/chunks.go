@@ -2,6 +2,7 @@ package torrent
 
 import (
 	"fmt"
+	"log"
 	"math"
 	"sync"
 	"sync/atomic"
@@ -277,23 +278,17 @@ func (t *chunks) ChunksMissing(pid uint64) bool {
 	return bitmapx.Range(t.Range(pid)).AndCardinality(t.missing) > 0
 }
 
-func (t *chunks) MergeIntoMissing(m *roaring.Bitmap) {
+func (t *chunks) MergeInto(a, m *roaring.Bitmap) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
-
-	t.missing.Or(m)
-}
-
-func (t *chunks) MergeIntoUnverified(m *roaring.Bitmap) {
-	t.mu.Lock()
-	defer t.mu.Unlock()
-	t.unverified.Or(m)
+	a.Or(m)
 }
 
 func (t *chunks) InitFromMissing(m *roaring.Bitmap) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
+	log.Println("INITIALIZING")
 	t.missing.Or(m)
 	t.unverified = bitmapx.Fill(uint64(t.cmaximum))
 	t.unverified.AndNot(t.missing)
@@ -574,6 +569,7 @@ func (t *chunks) Readable() uint64 {
 	defer t.mu.RUnlock()
 
 	cpp := chunksPerPiece(t.meta.PieceLength, t.clength)
+	log.Printf("WTF u(%d) + min(cpp(%d) * c(%d), pieces(%d))\n", t.unverified.GetCardinality(), cpp, t.completed.GetCardinality(), t.pieces)
 	return t.unverified.GetCardinality() + min((uint64(cpp)*t.completed.GetCardinality()), t.pieces)
 }
 

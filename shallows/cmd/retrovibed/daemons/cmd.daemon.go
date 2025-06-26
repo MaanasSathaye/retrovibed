@@ -180,6 +180,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		torrent.ClientConfigPeerID(string(peerid[:])),
 		torrent.ClientConfigIPv4(t.TorrentPublicIP4),
 		torrent.ClientConfigIPv6(t.TorrentPublicIP6),
+		torrent.ClientConfigPEX(false),
 		torrent.ClientConfigSeed(true),
 		torrent.ClientConfigDialer(DefaultDialer(wgnet)),
 		torrent.ClientConfigInfoLogger(log.New(torrentlogging, "[torrent] ", log.Flags())),

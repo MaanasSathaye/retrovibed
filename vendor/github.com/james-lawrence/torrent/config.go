@@ -361,6 +361,16 @@ func ClientConfigPEX(b bool) ClientConfigOption {
 	}
 }
 
+func ClientConfigMetadata(b bool) ClientConfigOption {
+	return func(cc *ClientConfig) {
+		if b {
+			cc.extensions[pp.ExtensionNamePex] = pp.PEXExtendedID
+		} else {
+			delete(cc.extensions, pp.ExtensionNamePex)
+		}
+	}
+}
+
 func ClientConfigMaxOutstandingRequests(n int) ClientConfigOption {
 	return func(cc *ClientConfig) {
 		cc.maximumOutstandingRequests = n
