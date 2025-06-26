@@ -67,7 +67,7 @@ func RunHandshookConn(c *connection, t *torrent) error {
 func ConnExtensions(ctx context.Context, cn *connection) error {
 	log.Println("conn extensions initiated")
 	defer log.Println("conn extensions completed")
-	return cstate.Run(ctx, connexfast(cn, connexinit(cn, connexdht(cn, connflush(cn, nil)))), cn.cfg.debug())
+	return cstate.Run(ctx, connexinit(cn, connexfast(cn, connexdht(cn, connflush(cn, nil)))), cn.cfg.debug())
 }
 
 func connflush(cn *connection, n cstate.T) cstate.T {
@@ -232,7 +232,7 @@ func (t _connWriterClosed) Update(ctx context.Context, _ *cstate.Shared) (r csta
 	// delete requests that were requested beyond the timeout.
 	timedout := func(cn *connection, grace time.Duration) bool {
 		ts := time.Now()
-		return cn.lastUsefulChunkReceived.Add(grace).Before(ts) && cn.t.chunks.Missing() > 0
+		return cn.lastUsefulChunkReceived.Add(grace).Before(ts) && cn.t.chunks.Cardinality(cn.t.chunks.missing) > 0
 	}
 
 	if ws.closed.Load() {

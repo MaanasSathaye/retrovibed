@@ -2,7 +2,6 @@ package torrent
 
 import (
 	"fmt"
-	"log"
 	"math"
 	"sync"
 	"sync/atomic"
@@ -278,17 +277,23 @@ func (t *chunks) ChunksMissing(pid uint64) bool {
 	return bitmapx.Range(t.Range(pid)).AndCardinality(t.missing) > 0
 }
 
-func (t *chunks) MergeInto(a, m *roaring.Bitmap) {
+func (t *chunks) MergeIntoMissing(m *roaring.Bitmap) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
-	a.Or(m)
+
+	t.missing.Or(m)
+}
+
+func (t *chunks) MergeIntoUnverified(m *roaring.Bitmap) {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	t.unverified.Or(m)
 }
 
 func (t *chunks) InitFromMissing(m *roaring.Bitmap) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
-	log.Println("INITIALIZING")
 	t.missing.Or(m)
 	t.unverified = bitmapx.Fill(uint64(t.cmaximum))
 	t.unverified.AndNot(t.missing)
@@ -298,6 +303,12 @@ func (t *chunks) Intersects(a, b *roaring.Bitmap) bool {
 	t.mu.RLock()
 	defer t.mu.RUnlock()
 	return a.Intersects(b)
+}
+
+func (t *chunks) Clone(a *roaring.Bitmap) *roaring.Bitmap {
+	t.mu.RLock()
+	defer t.mu.RUnlock()
+	return a.Clone()
 }
 
 // ChunksAvailable returns true iff all the chunks for the given piece are awaiting
@@ -556,11 +567,10 @@ func (t *chunks) pend(r request) (changed bool) {
 	return changed
 }
 
-// Missing returns the number of missing chunks
-func (t *chunks) Missing() int {
+func (t *chunks) Cardinality(a *roaring.Bitmap) int {
 	t.mu.RLock()
 	defer t.mu.RUnlock()
-	return int(t.missing.GetCardinality())
+	return int(a.GetCardinality())
 }
 
 // returns number of pieces that are readable.
@@ -569,7 +579,6 @@ func (t *chunks) Readable() uint64 {
 	defer t.mu.RUnlock()
 
 	cpp := chunksPerPiece(t.meta.PieceLength, t.clength)
-	log.Printf("WTF u(%d) + min(cpp(%d) * c(%d), pieces(%d))\n", t.unverified.GetCardinality(), cpp, t.completed.GetCardinality(), t.pieces)
 	return t.unverified.GetCardinality() + min((uint64(cpp)*t.completed.GetCardinality()), t.pieces)
 }
 

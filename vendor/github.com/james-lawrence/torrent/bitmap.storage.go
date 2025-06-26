@@ -35,7 +35,7 @@ type bitmapfilestore struct {
 
 // Delete implements BitmapStore.
 func (t bitmapfilestore) Delete(id int160.T) error {
-	return os.Remove(t.path(id))
+	return errorsx.Ignore(os.Remove(t.path(id)), fs.ErrNotExist)
 }
 
 func (t bitmapfilestore) path(id int160.T) string {
@@ -46,7 +46,6 @@ func (t bitmapfilestore) Read(id int160.T) (*roaring.Bitmap, error) {
 	p := t.path(id)
 	src, err := os.Open(p)
 	if errors.Is(err, fs.ErrNotExist) {
-		log.Println("unable to locate bitmap", p, err)
 		return roaring.New(), nil
 	} else if err != nil {
 		return nil, errorsx.Wrapf(err, "unable to read bitmap from %s", p)
@@ -64,7 +63,6 @@ func (t bitmapfilestore) Read(id int160.T) (*roaring.Bitmap, error) {
 
 func (t bitmapfilestore) Write(id int160.T, bitmap *roaring.Bitmap) error {
 	p := t.path(id)
-	log.Println("WAKA WAKA WRITING BITMAP", p)
 	dst, err := os.OpenFile(p, os.O_CREATE|os.O_WRONLY|os.O_SYNC, 0600)
 	if err != nil {
 		return errorsx.Wrapf(err, "unable to write bitmap to %s", p)
