@@ -129,7 +129,6 @@ func ExternalPort(wcfg *wireguardx.Config, d netx.Dialer, port int) (_zero netip
 		return _zero, 0, errorsx.Wrapf(err, "unable to map port: %s", dnsgateway)
 	}
 
-	// log.Println("VPN Details", ex.ExternalIPAddress, result.InternalPort, "->", result.MappedExternalPort, result.PortMappingLifetimeInSeconds)
 	return netip.AddrPortFrom(netip.AddrFrom4(ex.ExternalIPAddress), result.MappedExternalPort), time.Duration(result.PortMappingLifetimeInSeconds) * time.Second, nil
 }
 
@@ -148,8 +147,6 @@ func DynamicIP(wcfg *wireguardx.Config, d netx.Dialer, port int) torrent.ClientC
 					// log.Println("unable to yield address")
 					panic("unable to yield address")
 				}
-
-				log.Println("external network details", c.LocalPort(), "->", addr.String(), d)
 
 				time.Sleep(d)
 			}

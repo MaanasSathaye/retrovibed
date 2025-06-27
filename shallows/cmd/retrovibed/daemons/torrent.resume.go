@@ -44,6 +44,7 @@ func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual
 			torrentx.OptionTracker(md.Tracker),
 			torrentx.OptionInfoFromFile(infopath),
 			torrent.OptionPublicTrackers(md.Private, tracking.PublicTrackers()...),
+			torrent.OptionDisplayName(md.Description),
 		)
 		if err != nil {
 			log.Println(errorsx.Wrapf(err, "unable to create metadata from %s - %s", md.ID, infopath))
