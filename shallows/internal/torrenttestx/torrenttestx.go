@@ -19,6 +19,7 @@ func QuickClient(t testing.TB, options ...torrent.ClientConfigOption) *torrent.C
 			torrent.NewDefaultClientConfig(
 				torrent.NewMetadataCache(cdir),
 				storage.NewFile(cdir),
+				torrent.ClientConfigCacheDirectory(cdir),
 				torrent.ClientConfigPeerID(krpc.RandomID().String()),
 				torrent.ClientConfigSeed(true),
 				torrent.ClientConfigInfoLogger(log.New(log.Writer(), "[torrent] ", log.Flags())),

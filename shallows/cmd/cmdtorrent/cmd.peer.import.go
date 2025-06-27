@@ -143,6 +143,7 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	torconfig := torrent.NewDefaultClientConfig(
 		torrent.NewMetadataCache(torrentstore.Path()),
 		tstore,
+		torrent.ClientConfigCacheDirectory(torrentstore.Path()),
 		torrent.ClientConfigDisableDynamicIP,
 		torrent.ClientConfigPeerID(int160.FromByteArray(peerid).String()),
 		torrent.ClientConfigPEX(false),

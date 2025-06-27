@@ -149,6 +149,8 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		tstore = storage.NewFile(torrentstore.Path(), storage.FileOptionPathMakerInfohash)
 	}
 
+	log.Printf("USING STORAGE %T - %s\n", tstore, torrentstore.Path())
+
 	tm := dht.DefaultMuxer().
 		Method(bep0051.Query, bep0051.NewEndpoint(bep0051.EmptySampler{}))
 
@@ -177,6 +179,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	torconfig := torrent.NewDefaultClientConfig(
 		torrent.NewMetadataCache(torrentstore.Path()),
 		tstore,
+		torrent.ClientConfigCacheDirectory(torrentstore.Path()),
 		torrent.ClientConfigPeerID(string(peerid[:])),
 		torrent.ClientConfigIPv4(t.TorrentPublicIP4),
 		torrent.ClientConfigIPv6(t.TorrentPublicIP6),
@@ -186,7 +189,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		torrent.ClientConfigInfoLogger(log.New(torrentlogging, "[torrent] ", log.Flags())),
 		torrent.ClientConfigDebugLogger(log.New(torrentlogging, "[torrent - debug] ", log.Flags())),
 		torrent.ClientConfigMuxer(tm),
-		torrent.ClientConfigBucketLimit(128),
+		torrent.ClientConfigBucketLimit(2048),
 		torrent.ClientConfigMaxOutstandingRequests(int(t.TorrentMaxRequests)),
 		torrent.ClientConfigHTTPUserAgent("retrovibed/0.0"),
 		torrent.ClientConfigConnectionClosed(func(ih metainfo.Hash, stats torrent.ConnStats, remaining int) {

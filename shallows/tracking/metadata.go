@@ -21,6 +21,8 @@ import (
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/blockcache"
 	"github.com/retrovibed/retrovibed/internal/duckdbx"
+	"github.com/retrovibed/retrovibed/internal/env"
+	"github.com/retrovibed/retrovibed/internal/envx"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/fsx"
 	"github.com/retrovibed/retrovibed/internal/langx"
@@ -237,15 +239,12 @@ func DescriptionFromPath(md *Metadata, path string) string {
 }
 
 func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torrent.Torrent) {
-	const (
-		statsfreq = 1 * time.Minute
-	)
-
 	var (
-		sub pubsub.Subscription
+		statsfreq = envx.Duration(1*time.Minute, env.TorrentDownloadStats)
+		sub       pubsub.Subscription
 	)
 
-	log.Println("monitoring download progress initiated", md.ID, md.Description, md.Tracker)
+	log.Println("monitoring download progress initiated", md.ID, md.Description, md.Tracker, statsfreq)
 	defer log.Println("monitoring download progress completed", md.ID, md.Description, md.Tracker)
 	// Revisit once resume is working.
 	if err := dl.Tune(torrent.TuneSubscribe(&sub)); err != nil {
@@ -266,6 +265,7 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 				"%s - %s: info(%t) seeding(%t), peers(%d:%d:%d) pieces(m%d:o%d:u%d:c%d - f%d)\n", md.ID, hex.EncodeToString(md.Infohash), info != nil, stats.Seeding, stats.ActivePeers, stats.PendingPeers, stats.TotalPeers,
 				stats.Missing, stats.Outstanding, stats.Unverified, stats.Completed, stats.Failed,
 			)
+
 			if err := dl.Tune(torrent.TuneNewConns); err != nil {
 				log.Println("unable to request new connections", err)
 				continue
@@ -284,17 +284,16 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 				continue
 			}
 
-			statst.Reset(statsfreq)
-
 			current := uint64(dl.BytesCompleted())
 			if md.Downloaded == current {
 				continue
 			}
 
+			statst.Reset(statsfreq)
 			stats := dl.Stats()
 
 			log.Printf(
-				"%s - %s: info(%t) seeding(%t), peers(%d:%d:%d) pieces(m%d:o%d:u%d:c%d - f%d)\n", md.ID, hex.EncodeToString(md.Infohash), true, stats.Seeding, stats.ActivePeers, stats.PendingPeers, stats.TotalPeers,
+				"%s - %s: info(%t) seeding(%t), peers(a%d:h%d:p%d:t%d) pieces(m%d:o%d:u%d:c%d - f%d)\n", md.ID, hex.EncodeToString(md.Infohash), true, stats.Seeding, stats.ActivePeers, stats.HalfOpenPeers, stats.PendingPeers, stats.TotalPeers,
 				stats.Missing, stats.Outstanding, stats.Unverified, stats.Completed, stats.Failed,
 			)
 

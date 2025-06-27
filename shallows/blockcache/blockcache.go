@@ -90,10 +90,9 @@ func (t DirCache) ReadAt(p []byte, off int64) (n int, err error) {
 }
 
 func (t *DirCache) WriteAt(p []byte, off int64) (n int, err error) {
-
 	writechunk := func(p []byte, ioff int64) (n int, err error) {
 		path := t.path(ioff)
-
+		// log.Println("----------------------------------------- WRITING CHUNK", path, len(p), ioff)
 		dst, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY, 0600)
 		if err != nil {
 			return 0, err

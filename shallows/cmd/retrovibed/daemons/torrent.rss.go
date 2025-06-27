@@ -1,9 +1,11 @@
 package daemons
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"iter"
 	"log"
 	"net/http"
@@ -172,8 +174,13 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Vir
 					log.Println("unable to retrieve feed", feed.ID, err)
 					continue
 				}
+				buf, err := io.ReadAll(resp.Body)
+				if err != nil {
+					log.Println("unable to read metainfo from response", feed.ID, err)
+					continue
+				}
 
-				md, err := metainfo.Load(resp.Body)
+				md, err := metainfo.Load(bytes.NewReader(buf))
 				if err != nil {
 					log.Println("unable to read metainfo from response", feed.ID, err)
 					continue
@@ -185,7 +192,7 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Vir
 					continue
 				}
 
-				if err = os.WriteFile(rootstore.Path("torrent", fmt.Sprintf("%s.torrent", md.HashInfoBytes().String())), md.InfoBytes, 0600); err != nil {
+				if err = os.WriteFile(rootstore.Path("torrent", fmt.Sprintf("%s.torrent", md.HashInfoBytes().String())), buf, 0600); err != nil {
 					log.Println("unable to persist torrent to disk", feed.ID, err)
 					continue
 				}
