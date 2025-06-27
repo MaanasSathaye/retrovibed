@@ -35,6 +35,8 @@ const (
 	TorrentPublicIP4      = "RETROVIBED_TORRENT_PUBLIC_IP4"               // specify the public ipv4 address the torrent service.
 	TorrentPublicIP6      = "RETROVIBED_TORRENT_PUBLIC_IP6"               // specify the public ipv6 address the torrent service.
 	TorrentLogging        = "RETROVIBED_TORRENT_LOGGING"                  // enable/disable torrent logging. strconv.ParseBool
+	TorrentPEX            = "RETROVIBED_TORRENT_PEX"                      // enable/disable torrent pex functionality. strconv.ParseBool
+	TorrentAllowSeeding   = "RETROVIBED_TORRENT_ALLOW_SEEDING"            // enable/disable torrent allow the daemon to seed. strconv.ParseBool
 	TorrentDownloadStats  = "RETROVIBED_TORRENT_DOWNLOAD_STATS_FREQUENCY" // adjust the frequency at which download stats are logged. time.Duration format.
 	TorrentPrivateNetwork = "RETROVIBED_TORRENT_PRIVATE"                  // specify that the torrent system should firewall to only private networks.
 	SelfSignedHosts       = "RETROVIBED_SELF_SIGNED_HOSTS"                // list of hosts to add to the self signed certificate.
