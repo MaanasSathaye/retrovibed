@@ -42,6 +42,9 @@ RETROVIBED_TORRENT_PUBLIC_IP6=""
 RETROVIBED_SELF_SIGNED_HOSTS=127.0.0.1
 EOF
 
+# generate an account. optional, essentially used to create a static id for your account.
+retrovibed identity generate {secret}
+
 # authorize initial users using ssh keys.
 retrovibed identity bootstrap public-key "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBEdpDo/fUPKK7OUuZ4VM6JeBJmyZ882tQYPBN6nQwIk"
 retrovibed identity bootstrap authorized-file /root/.ssh/authorized_keys
