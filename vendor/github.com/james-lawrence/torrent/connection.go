@@ -460,12 +460,12 @@ func (cn *connection) determineInterest(msg func(pp.Message) bool) (available *r
 		cn.cfg.debug().Printf("c(%p) seed(%t) nothing available to request\n", cn, cn.t.seeding())
 	}
 
-	if cn.PeerChoked && !cn.fastset.IsEmpty() {
-		cn.cfg.debug().Printf("c(%p) seed(%t) allowing fastset %d\n", cn, cn.t.seeding(), cn.fastset.GetCardinality())
-		available = cn.fastset
-	} else {
+	if !cn.PeerChoked {
 		cn.cfg.debug().Printf("c(%p) seed(%t) allowing claimed: %d\n", cn, cn.t.seeding(), cn.claimed.GetCardinality())
 		available = cn.claimed
+	} else {
+		cn.cfg.debug().Printf("c(%p) seed(%t) allowing fastset %d\n", cn, cn.t.seeding(), cn.fastset.GetCardinality())
+		available = cn.fastset
 	}
 
 	cn._mu.RLock()

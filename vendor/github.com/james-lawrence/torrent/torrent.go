@@ -1120,11 +1120,7 @@ func (t *torrent) seeding() bool {
 		return false
 	}
 
-	if t.chunks.Incomplete() {
-		return false
-	}
-
-	return true
+	return t.chunks.Readable() > 0
 }
 
 // Adds peers revealed in an announce until the announce ends, or we have
