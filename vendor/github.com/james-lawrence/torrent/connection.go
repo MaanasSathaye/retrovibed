@@ -3,7 +3,6 @@ package torrent
 import (
 	"bytes"
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -68,6 +67,7 @@ func newConnection(cfg *ClientConfig, nc net.Conn, outgoing bool, remote netip.A
 		claimed:                 roaring.NewBitmap(),
 		blacklisted:             roaring.NewBitmap(),
 		sentHaves:               roaring.NewBitmap(),
+		outstandingbitmap:       roaring.New(),
 		requests:                make(map[uint64]request, cfg.maximumOutstandingRequests),
 		PeerRequests:            make(map[request]struct{}, cfg.maximumOutstandingRequests),
 		drop:                    make(chan error, 1),
@@ -150,10 +150,13 @@ type connection struct {
 	PeerPrefersEncryption bool // as indicated by 'e' field in extension handshake
 
 	// bitmaps representing availability of chunks from the peer.
-	blacklisted *roaring.Bitmap // represents chunks which we've temporarily blacklisted.
-	claimed     *roaring.Bitmap // represents chunks which our peer claims to have available.
+	blacklisted       *roaring.Bitmap // represents chunks which we've temporarily blacklisted.
+	claimed           *roaring.Bitmap // represents chunks which our peer claims to have available.
+	outstandingbitmap *roaring.Bitmap
+
 	peerfastset *roaring.Bitmap // represents chunks which we allow our peer to request while choked.
 	fastset     *roaring.Bitmap // represents chunks which our peer will allow us to request while choked.
+
 	// pieces we've accepted chunks for from the peer.
 	touched *roaring.Bitmap
 
@@ -441,96 +444,6 @@ func (cn *connection) request(r request, mw messageWriter) bool {
 		Begin:  r.Begin,
 		Length: r.Length,
 	})
-}
-
-func (cn *connection) determineInterest(msg func(pp.Message) bool) (available *roaring.Bitmap) {
-	defer cn.cfg.debug().Printf("c(%p) seed(%t) interest completed\n", cn, cn.t.seeding())
-
-	if cn.uploadAllowed() {
-		if cn.Unchoke(msg) {
-			cn.cfg.debug().Printf("c(%p) seed(%t) allowing peer to make requests\n", cn, cn.t.seeding())
-		}
-	} else {
-		if cn.Choke(msg) {
-			cn.cfg.debug().Printf("c(%p) seed(%t) disallowing peer to make requests\n", cn, cn.t.seeding())
-		}
-	}
-
-	if !cn.SetInterested(cn.peerHasWantedPieces(), msg) {
-		cn.cfg.debug().Printf("c(%p) seed(%t) nothing available to request\n", cn, cn.t.seeding())
-	}
-
-	if !cn.PeerChoked {
-		cn.cfg.debug().Printf("c(%p) seed(%t) allowing claimed: %d\n", cn, cn.t.seeding(), cn.claimed.GetCardinality())
-		available = cn.claimed
-	} else {
-		cn.cfg.debug().Printf("c(%p) seed(%t) allowing fastset %d\n", cn, cn.t.seeding(), cn.fastset.GetCardinality())
-		available = cn.fastset
-	}
-
-	cn._mu.RLock()
-	defer cn._mu.RUnlock()
-	return bitmapx.AndNot(available, cn.blacklisted)
-}
-
-func (cn *connection) genrequests(available *roaring.Bitmap, msg func(pp.Message) bool) {
-	var (
-		err  error
-		reqs []request
-		req  request
-	)
-
-	// cn.cfg.debug().Printf("c(%p) seed(%t) make requests initated\n", cn, cn.t.seeding())
-	// defer cn.cfg.debug().Printf("c(%p) seed(%t) make requests completed\n", cn, cn.t.seeding())
-
-	if len(cn.requests) > cn.requestsLowWater || cn.t.chunks.Cardinality(cn.t.chunks.missing) == 0 {
-		return
-	}
-
-	filledBuffer := false
-
-	max := min(max(0, cn.PeerMaxRequests-len(cn.requests)), 64)
-	if reqs, err = cn.t.chunks.Pop(max, available); errors.As(err, &empty{}) {
-		if len(reqs) == 0 {
-			// clear the blacklist when we run out of work to do.
-			cn.cmu().Lock()
-			cn.blacklisted.Clear()
-			cn.cmu().Unlock()
-			cn.t.chunks.MergeInto(cn.t.chunks.missing, cn.t.chunks.failed)
-			cn.t.chunks.FailuresReset()
-			cn.cfg.debug().Printf("c(%p) seed(%t) available(%t) no work available", cn, cn.t.seeding(), !available.IsEmpty())
-			return
-		}
-	} else if err != nil {
-		cn.cfg.errors().Printf("failed to request piece: %T - %v\n", err, err)
-		return
-	}
-
-	cn.cfg.debug().Printf("%p seed(%t) filling buffer with requests %d - %d -> %d actual %d", cn, cn.t.seeding(), cn.PeerMaxRequests, len(cn.requests), max, len(reqs))
-
-	for max, req = range reqs {
-		if filledBuffer = !cn.request(req, msg); filledBuffer {
-			cn.cfg.debug().Printf("c(%p) seed(%t) done filling after(%d)\n", cn, cn.t.seeding(), max)
-			break
-		}
-
-		// cn.cfg.debug().Printf("c(%p) seed(%t) choked(%t) requested(%d, %d, %d)\n", cn, cn.t.seeding(), cn.PeerChoked, req.Index, req.Begin, req.Length)
-	}
-
-	// advance to just the unused chunks.
-	if max += 1; len(reqs) > max {
-		reqs = reqs[max:]
-		cn.cfg.debug().Printf("c(%p) seed(%t) filled - cleaning up %d reqs(%d)\n", cn, cn.t.seeding(), max, len(reqs))
-		// release any unused requests back to the queue.
-		cn.t.chunks.Retry(reqs...)
-	}
-
-	// If we didn't completely top up the requests, we shouldn't mark
-	// the low water, since we'll want to top up the requests as soon
-	// as we have more write buffer space.
-	if !filledBuffer {
-		cn.requestsLowWater = len(cn.requests) / 2
-	}
 }
 
 // connections check their own failures, this amortizes the cost of failures to
@@ -1293,16 +1206,6 @@ func (cn *connection) deleteAllRequests() {
 		cn.releaseRequest(r)
 	}
 	// cn.t.piecesM.Retry(reqs...)
-}
-
-func (cn *connection) postCancel(r request) bool {
-	if ok := cn.releaseRequest(r); !ok {
-		return false
-	}
-
-	cn.Post(makeCancelMessage(r))
-
-	return true
 }
 
 func (cn *connection) sendChunk(r request, msg func(pp.Message) bool) (more bool, err error) {

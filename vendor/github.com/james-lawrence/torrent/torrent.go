@@ -513,8 +513,6 @@ type torrent struct {
 	metadataCompletedChunks []bool
 	metadataChanged         sync.Cond
 
-	// Set when .Info is obtained.
-
 	// chunks management tracks the current status of the different chunks
 	chunks *chunks
 
