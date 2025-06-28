@@ -1,17 +1,18 @@
 package cmdtorrent
 
 import (
-	"database/sql"
 	"fmt"
 	"os"
+	"strings"
 
-	"github.com/Masterminds/squirrel"
+	"github.com/james-lawrence/torrent"
+	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
-	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
-	"github.com/retrovibed/retrovibed/internal/sqlx"
+	"github.com/retrovibed/retrovibed/internal/env"
+	"github.com/retrovibed/retrovibed/internal/errorsx"
+	"github.com/retrovibed/retrovibed/internal/fsx"
 	"github.com/retrovibed/retrovibed/internal/stringsx"
-	"github.com/retrovibed/retrovibed/tracking"
 )
 
 type exportMagnets struct {
@@ -19,18 +20,8 @@ type exportMagnets struct {
 }
 
 func (t exportMagnets) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
-	var (
-		db *sql.DB
-	)
-	if db, err = cmdmeta.Database(gctx.Context); err != nil {
-		return err
-	}
-	defer db.Close()
-
-	q := tracking.MetadataSearchBuilder().Where(
-		squirrel.And{
-			tracking.MetadataQuerySeeding(),
-		},
+	const (
+		suffix = ".torrent"
 	)
 
 	dst := os.Stdout
@@ -40,16 +31,43 @@ func (t exportMagnets) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) 
 		}
 	}
 
-	iter := sqlx.Scan(tracking.MetadataSearch(gctx.Context, db, q))
+	tvfs := fsx.DirVirtual(env.TorrentDir())
 
-	for md := range iter.Iter() {
-		md := metainfo.Magnet{
-			InfoHash:    metainfo.Hash(md.Infohash),
-			Trackers:    []string{md.Tracker},
-			DisplayName: md.Description,
+	mdcache := torrent.NewMetadataCache(tvfs.Path())
+
+	root, err := os.OpenRoot(tvfs.Path())
+	if err != nil {
+		return err
+	}
+
+	dir := fsx.Walk(root.FS())
+
+	for path := range dir.Walk() {
+		if !strings.HasSuffix(path, suffix) {
+			continue
 		}
 
-		if _, err = dst.WriteString(fmt.Sprintln(md.String())); err != nil {
+		id, err := int160.FromHexEncodedString(strings.TrimSuffix(path, suffix))
+		if err != nil {
+			return errorsx.Wrapf(err, "unable to read id from %s", path)
+		}
+
+		if !fsx.Exists(tvfs.Path(id.String())) {
+			continue
+		}
+
+		md, err := mdcache.Read(id)
+		if err != nil {
+			return errorsx.Wrapf(err, "unable to read medata of %s", id)
+		}
+
+		mg := metainfo.Magnet{
+			InfoHash:    metainfo.Hash(md.ID.Bytes()),
+			Trackers:    md.Trackers,
+			DisplayName: md.DisplayName,
+		}
+
+		if _, err = dst.WriteString(fmt.Sprintln(mg.String())); err != nil {
 			return err
 		}
 	}

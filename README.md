@@ -55,20 +55,18 @@ systemctl enable --now retrovibed.service
 #### manually moving a storage device.
 sometimes you'll want to move what device your service is running on and if you dont have all your data in the archive you'll have to copy it.
 
-here are the commands to do it.
-
-on the original device:
-```bash
-# shutdown retrovibed first (wont be necessary at some point in the future)
-retrovibed torrent export | ssh user@host "cat > ~/Downloads/retrovibed.magnets.txt"
-# restart retrovibed
-```
+here are the commands to do it:
 
 ```bash
 # bootstrap your identity on the new device.
 retrovibed identity generate {secret}
-cat ~/Downloads/retrovibed.magnets.txt | torrent import-peer --peer="host:1000"
 ```
+
+on the device you're exporting from:
+```bash
+retrovibed torrent export | ssh user@newdevicehost "retrovibed torrent import --peer='olddevicehost:port'"
+```
+
 
 #### install flatpak gui
 
