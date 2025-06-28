@@ -36,7 +36,8 @@ class _DownloadingListState extends State<DownloadingListDisplay> {
                             as Widget,
                   )
                   .toList(),
-        ).then((v) {
+        )
+        .then((v) {
           setState(() {
             items = v;
           });
@@ -57,7 +58,10 @@ class _DownloadingListState extends State<DownloadingListDisplay> {
   void initState() {
     super.initState();
     refresh();
-    period = Timer.periodic(const Duration(seconds: 2), (p) => setState(this.refresh));
+    period = Timer.periodic(
+      const Duration(seconds: 20),
+      (p) => setState(this.refresh),
+    );
   }
 
   @override
@@ -74,7 +78,10 @@ class _DownloadingListState extends State<DownloadingListDisplay> {
       builder: (BuildContext ctx, AsyncSnapshot<List<Widget>> snapshot) {
         return ds.Loading(
           cause: ds.Error.maybeErr(snapshot.error),
-          ListView(shrinkWrap: true, children: items),
+          ds.RefreshBoundary(
+            onReset: () => setState(this.refresh),
+            ListView(shrinkWrap: true, children: items),
+          ),
         );
       },
     );

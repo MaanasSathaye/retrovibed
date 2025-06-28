@@ -12,6 +12,7 @@ class FilesEvent {
 
 class FileDropWell extends StatefulWidget {
   final Widget child;
+  final Widget? loading;
   final Function()? onTap;
   final Future<Widget?> Function(FilesEvent i) onDropped;
   final List<String> mimetypes;
@@ -33,6 +34,7 @@ class FileDropWell extends StatefulWidget {
     this.mimetypes = const [],
     this.extensions = const [],
     this.onTap,
+    this.loading,
   });
 
   @override
@@ -44,21 +46,20 @@ class _FileDropWell extends State<FileDropWell> {
   bool _loading = false;
 
   @override
+  void setState(VoidCallback fn) {
+    if (!mounted) return;
+    super.setState(fn);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final loading = (bool b) {
-      if (!mounted) {
-        return;
-      }
-
-      setState(() {
-        _loading = b;
-      });
-    };
 
     return DropTarget(
       onDragDone: (evt) {
-        loading(true);
+        setState(() {
+          _loading = true;
+        });
         Future.wait(
               evt.files.map((c) {
                 return c
@@ -78,7 +79,9 @@ class _FileDropWell extends State<FileDropWell> {
             .then((files) {
               final resolved = FilesEvent(files: files);
               widget.onDropped(resolved).whenComplete(() {
-                loading(false);
+                setState(() {
+                  _loading = false;
+                });
               });
             })
             .catchError((cause) {
@@ -105,7 +108,9 @@ class _FileDropWell extends State<FileDropWell> {
               mimeTypes: widget.mimetypes,
             );
 
-            loading(true);
+            setState(() {
+              _loading = true;
+            });
             openFiles(acceptedTypeGroups: [filter])
                 .then((files) {
                   final eventfiles =
@@ -128,9 +133,7 @@ class _FileDropWell extends State<FileDropWell> {
 
                   return Future.wait(eventfiles).then((files) {
                     final resolved = FilesEvent(files: files);
-                    return widget.onDropped(resolved).whenComplete(() {
-                      loading(false);
-                    });
+                    return widget.onDropped(resolved);
                   });
                 })
                 .catchError((cause) {
@@ -138,13 +141,21 @@ class _FileDropWell extends State<FileDropWell> {
                   return ds.Error.unknown(cause);
                 })
                 .whenComplete(() {
-                  loading(false);
+                  setState(() {
+                    _loading = false;
+                  });
                 });
           },
           child: Row(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [ds.Loading(loading: _loading, widget.child)],
+            children: [
+              ds.Loading(
+                loading: _loading,
+                widget.child,
+                overlay: widget.loading ?? ds.Loading.Icon,
+              ),
+            ],
           ),
         ),
       ),

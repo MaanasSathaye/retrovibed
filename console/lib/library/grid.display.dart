@@ -155,6 +155,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                     child: IgnorePointer(
                       child: Icon(Icons.file_upload_outlined),
                     ),
+                    loading: ds.Loading.Sized(width: 12.0, height: 12.0),
                   ),
                   Icon(Icons.tune),
                 ],

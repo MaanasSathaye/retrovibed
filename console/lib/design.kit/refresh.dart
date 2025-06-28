@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 
 class RefreshBoundary extends StatefulWidget {
   final Widget child;
-  final UniqueKey id = UniqueKey();
-
-  RefreshBoundary(this.child, {super.key});
+  final void Function()? onReset;
+  RefreshBoundary(this.child, {super.key, this.onReset});
 
   static _RefreshBoundary? of(BuildContext context) {
     return context.findAncestorStateOfType<_RefreshBoundary>();
@@ -18,7 +17,7 @@ class _RefreshBoundary extends State<RefreshBoundary> {
   Key _refresh = UniqueKey();
 
   void reset() {
-    setState(() {
+    setState(widget.onReset ?? () {
       _refresh = UniqueKey();
     });
   }

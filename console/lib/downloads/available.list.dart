@@ -31,14 +31,14 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
     widget
         .search(_res.next)
         .then((v) {
-          if(!super.mounted) return;
+          if (!super.mounted) return;
           setState(() {
             _res = v;
             _loading = false;
           });
         })
         .catchError((e) {
-          if(!super.mounted) return;
+          if (!super.mounted) return;
           setState(() {
             _cause = ds.Error.unknown(e);
             _loading = false;
@@ -73,9 +73,11 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                         return req;
                       })
                       .then((uploaded) {
-                        return media.discovered.download(uploaded.media.id).then((_) {
-                          ds.RefreshBoundary.of(context)?.reset();
-                        });
+                        return media.discovered
+                            .download(uploaded.media.id)
+                            .then((_) {
+                              ds.RefreshBoundary.of(context)?.reset();
+                            });
                       })
                       .catchError((cause) {
                         setState(() {
@@ -89,14 +91,12 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
             .catchError((cause) {
               return ds.Error.unknown(cause);
             })
-            .whenComplete(
-              () {
-                if (!super.mounted) return;
-                setState(() {
-                  _loading = false;
-                });
-              },
-            );
+            .whenComplete(() {
+              if (!super.mounted) return;
+              setState(() {
+                _loading = false;
+              });
+            });
       });
     };
 
@@ -156,6 +156,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                 upload,
                 child: Icon(Icons.file_upload_outlined),
                 extensions: ["torrent"],
+                loading: ds.Loading.Sized(width: 12.0, height: 12.0),
               ),
             ],
           ),

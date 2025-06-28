@@ -143,6 +143,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
           empty: fixnum.Int64(_res.items.length) < _res.next.limit,
           trailing: ds.FileDropWell(
             upload,
+            loading: ds.Loading.Sized(width: 12.0, height: 12.0),
             child: IgnorePointer(child: Icon(Icons.file_upload_outlined)),
           ),
           autofocus: true,

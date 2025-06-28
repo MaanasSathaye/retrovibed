@@ -14,7 +14,7 @@ class Display extends StatelessWidget {
       padding: defaults.padding,
       child: ListView(
         children: [
-          ds.RefreshBoundary(DownloadingListDisplay()),
+          DownloadingListDisplay(),
           AvailableListDisplay(searchController: controller),
         ],
       ),

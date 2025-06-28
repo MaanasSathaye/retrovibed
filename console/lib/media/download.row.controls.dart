@@ -43,7 +43,7 @@ class _ControlState extends State<DownloadRowControls> {
             ? Icon(Icons.check, color: defaults.success)
             : Icon(Icons.pause_circle_outline);
     final primarytap =
-        widget.current.bytes == widget.current.downloaded ? pause : completed;
+        widget.current.bytes == widget.current.downloaded ? completed : pause;
     return Row(
       children: [
         IconButton(

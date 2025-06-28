@@ -86,6 +86,8 @@ class DownloadRowDisplay extends StatelessWidget {
           gap,
           Text(current.peers.toString()),
           gap,
+          Text("${((current.downloaded.toDouble() / current.bytes.toDouble()) * 100.0).toStringAsPrecision(5)}"),
+          gap,
           Expanded(
             child: LinearProgressIndicator(
               value:
