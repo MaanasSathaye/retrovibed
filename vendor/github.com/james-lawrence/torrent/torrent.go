@@ -1031,7 +1031,7 @@ func (t *torrent) needData() bool {
 		return true
 	}
 
-	return t.chunks.Cardinality(t.chunks.missing) != 0
+	return t.chunks.Incomplete()
 }
 
 // Don't call this before the info is available.
@@ -1116,7 +1116,11 @@ func (t *torrent) seeding() bool {
 		return false
 	}
 
-	if t.needData() {
+	if !t.haveInfo() {
+		return false
+	}
+
+	if t.chunks.Incomplete() {
 		return false
 	}
 
@@ -1376,7 +1380,7 @@ func (t *torrent) initiateConn(ctx context.Context, peer Peer) {
 	}
 
 	go func() {
-		for {
+		for range 5 {
 			var (
 				timedout errorsx.Timeout
 			)
@@ -1390,8 +1394,7 @@ func (t *torrent) initiateConn(ctx context.Context, peer Peer) {
 				return
 			} else if errors.As(err, &timedout) {
 				log.Printf("timeout detected, placing back in peerset %T - %v - %s - %t\n", err, err, timedout.Timedout(), peer.Trusted)
-				t.addPeer(peer)
-				return
+				continue
 			} else if errorsx.Ignore(err, context.DeadlineExceeded, context.Canceled) != nil {
 				log.Printf("outgoing connection failed %T - %v\n", errorsx.Compact(errorsx.Unwrap(err), err), err)
 				return
