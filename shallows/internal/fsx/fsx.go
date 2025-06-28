@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"iter"
 	"log"
 	"os"
 	"path/filepath"
@@ -171,4 +172,39 @@ func PrintFS(d fs.FS) {
 	if err != nil {
 		errorsx.Log(log.Output(2, fmt.Sprintln("fs walk failed", err)))
 	}
+}
+
+func Walk(d fs.FS) *Walker {
+	return &Walker{
+		root: d,
+	}
+}
+
+type Walker struct {
+	root   fs.FS
+	failed error
+}
+
+func (t *Walker) Walk() iter.Seq2[string, fs.DirEntry] {
+	return func(yield func(string, fs.DirEntry) bool) {
+		t.failed = fs.WalkDir(t.root, ".", func(path string, d fs.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+
+			if !yield(path, d) {
+				return fmt.Errorf("unable to yield path: %s", path)
+			}
+
+			if d.IsDir() && path != "." {
+				return fs.SkipDir
+			}
+
+			return nil
+		})
+	}
+}
+
+func (t *Walker) Err() error {
+	return t.failed
 }

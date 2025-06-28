@@ -1,6 +1,7 @@
 package torrent
 
 import (
+	"bytes"
 	"container/heap"
 	"context"
 	"errors"
@@ -14,6 +15,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/RoaringBitmap/roaring/v2"
 	"github.com/anacrolix/missinggo/pubsub"
 	"github.com/anacrolix/missinggo/slices"
 	"github.com/james-lawrence/torrent/bep0009"
@@ -329,6 +331,30 @@ func Verify(ctx context.Context, t Torrent) error {
 	}
 
 	return t.Tune(TuneVerifyFull)
+}
+
+// returns a bitmap of the verified data within the storage implementation.
+func VerifyStored(ctx context.Context, md *metainfo.MetaInfo, t io.ReaderAt) (missing *roaring.Bitmap, readable *roaring.Bitmap, _ error) {
+	info, err := metainfo.NewInfoFromReader(bytes.NewReader(md.InfoBytes))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	chunks := newChunks(langx.DefaultIfZero(defaultChunkSize, uint64(0)), info)
+	digests := newDigests(t, func(i int) *metainfo.Piece {
+		return langx.Autoptr(info.Piece(i))
+	}, func(idx int, cause error) func() {
+		chunks.Hashed(uint64(idx), cause)
+		return func() {}
+	})
+
+	digests.EnqueueBitmap(bitmapx.Fill(chunks.pieces))
+	digests.Wait()
+
+	chunks.MergeInto(chunks.missing, chunks.failed)
+	chunks.FailuresReset()
+
+	return chunks.missing, chunks.ReadableBitmap(), nil
 }
 
 func newTorrent(cl *Client, src Metadata) *torrent {
@@ -1120,6 +1146,7 @@ func (t *torrent) seeding() bool {
 		return false
 	}
 
+	log.Println("CHECKING IF READABLE DATA IS AVAILABLE", t.chunks.Readable())
 	return t.chunks.Readable() > 0
 }
 

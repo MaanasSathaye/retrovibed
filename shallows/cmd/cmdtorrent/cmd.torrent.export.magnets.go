@@ -52,7 +52,6 @@ func (t exportMagnets) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) 
 		if _, err = dst.WriteString(fmt.Sprintln(md.String())); err != nil {
 			return err
 		}
-
 	}
 
 	return nil
