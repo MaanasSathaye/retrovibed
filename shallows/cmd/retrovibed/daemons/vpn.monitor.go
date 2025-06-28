@@ -49,7 +49,7 @@ func PublicIP(ctx context.Context, d netx.Dialer) error {
 	return nil
 }
 
-func VPNReload(ctx context.Context, tnetwork torrent.Binder, tclient *torrent.Client, torconfig *torrent.ClientConfig, port int) error {
+func VPNReload(ctx context.Context, tnetwork torrent.Binder, tclient *torrent.Client, torconfig *torrent.ClientConfig, port uint16) error {
 	var previous = errorsx.Zero(filepath.EvalSymlinks(wireguardx.Latest()))
 
 	return errorsx.Wrap(fsnotifyx.OnceAndOnChange(ctx, wireguardx.Latest(), func(ictx context.Context, evt fsnotify.Event) error {

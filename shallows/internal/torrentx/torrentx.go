@@ -37,32 +37,37 @@ func AnnouncerFromClient(c *torrent.Client) tracker.Announce {
 	return c.Config().AnnounceRequest()
 }
 
-func Autosocket(p int) (_ torrent.Binder, err error) {
-	var (
-		s1, s2  sockets.Socket
-		tsocket *utp.Socket
-	)
-
-	tsocket, err = utp.NewSocket("udp", fmt.Sprintf(":%d", p))
-	if err != nil {
-		return nil, errorsx.Wrap(err, "unable to open utp socket")
+func localsocket(port uint16) (s0 *utp.Socket, s1 net.Listener, err error) {
+	if s0, err = utp.NewSocket("udp", fmt.Sprintf(":%d", port)); err != nil {
+		return nil, nil, errorsx.Wrap(err, "unable to open utp socket")
 	}
 
-	s1 = sockets.New(tsocket, tsocket)
-	if addr, ok := tsocket.Addr().(*net.UDPAddr); ok {
-		s, err := net.Listen("tcp", fmt.Sprintf(":%d", addr.Port))
-		if err != nil {
-			return nil, errorsx.Wrap(err, "unable to open tcp socket")
+	if addr, ok := s0.Addr().(*net.UDPAddr); ok {
+		if s1, err = net.Listen("tcp", fmt.Sprintf(":%d", addr.Port)); err != nil {
+			s0.Close()
+			return nil, nil, errorsx.Wrap(err, "unable to open tcp socket")
 		}
-		s2 = sockets.New(s, &net.Dialer{})
 	}
 
-	return torrent.NewSocketsBind(s1, s2).Options(torrent.BinderOptionDHT), nil
+	return s0, s1, nil
 }
 
-func WireguardSocket(wcfg *wireguardx.Config, port int) (_ *netstack.Net, _ torrent.Binder, err error) {
+func Autosocket(p uint16) (_ torrent.Binder, err error) {
 	var (
-		s1, s2    sockets.Socket
+		s1 *utp.Socket
+		s2 net.Listener
+	)
+
+	if s1, s2, err = localsocket(p); err != nil {
+		return nil, err
+	}
+
+	return torrent.NewSocketsBind(sockets.New(s1, s1), sockets.New(s2, &net.Dialer{})).Options(torrent.BinderOptionDHT), nil
+}
+
+func WireguardSocket(wcfg *wireguardx.Config, port uint16) (_ *netstack.Net, _ torrent.Binder, err error) {
+	var (
+		s0, s1    sockets.Socket
 		utpsocket *utp.Socket
 		// logger    = device.NewLogger(device.LogLevelError, "")
 		logger = device.NewLogger(device.LogLevelVerbose, "")
@@ -93,7 +98,7 @@ func WireguardSocket(wcfg *wireguardx.Config, port int) (_ *netstack.Net, _ torr
 		return nil, nil, errorsx.Wrap(err, "network device failed to come up")
 	}
 
-	conn, err := tnet.ListenUDP(&net.UDPAddr{Port: port})
+	conn, err := tnet.ListenUDP(&net.UDPAddr{Port: int(port)})
 	if err != nil {
 		return nil, nil, errorsx.Wrap(err, "failed to listen on port")
 	}
@@ -102,19 +107,19 @@ func WireguardSocket(wcfg *wireguardx.Config, port int) (_ *netstack.Net, _ torr
 		return nil, nil, errorsx.Wrap(err, "failed to create utp socket")
 	}
 
-	s1 = sockets.New(utpsocket, utpsocket)
+	s0 = sockets.New(utpsocket, utpsocket)
 	if addr, ok := utpsocket.Addr().(*net.UDPAddr); ok {
 		s, err := tnet.ListenTCP(&net.TCPAddr{Port: addr.Port})
 		if err != nil {
 			return nil, nil, errorsx.Wrap(err, "unable to open tcp socket")
 		}
-		s2 = sockets.New(s, tnet)
+		s1 = sockets.New(s, tnet)
 	}
 
-	return tnet, torrent.NewSocketsBind(s1, s2).Options(torrent.BinderOptionDHT), nil
+	return tnet, torrent.NewSocketsBind(s0, s1).Options(torrent.BinderOptionDHT), nil
 }
 
-func ExternalPort(wcfg *wireguardx.Config, d netx.Dialer, port int) (_zero netip.AddrPort, _ time.Duration, err error) {
+func ExternalPort(wcfg *wireguardx.Config, d netx.Dialer, port uint16) (_zero netip.AddrPort, _ time.Duration, err error) {
 	dnsgateway := slicesx.FirstOrZero(wcfg.Interface.DNS...)
 
 	client := natpmp.NewClient(dnsgateway, natpmp.OptionTimeout(15*time.Second), natpmp.OptionDialer(d))
@@ -124,7 +129,7 @@ func ExternalPort(wcfg *wireguardx.Config, d netx.Dialer, port int) (_zero netip
 		return _zero, 0, errorsx.Wrapf(err, "unable to determine external ip: %s", dnsgateway)
 	}
 
-	result, err := client.AddPortMapping("tcp", port, port, int(time.Hour/time.Second))
+	result, err := client.AddPortMapping("tcp", int(port), int(port), int(time.Hour/time.Second))
 	if err != nil {
 		return _zero, 0, errorsx.Wrapf(err, "unable to map port: %s", dnsgateway)
 	}
@@ -132,7 +137,7 @@ func ExternalPort(wcfg *wireguardx.Config, d netx.Dialer, port int) (_zero netip
 	return netip.AddrPortFrom(netip.AddrFrom4(ex.ExternalIPAddress), result.MappedExternalPort), time.Duration(result.PortMappingLifetimeInSeconds) * time.Second, nil
 }
 
-func DynamicIP(wcfg *wireguardx.Config, d netx.Dialer, port int) torrent.ClientConfigOption {
+func DynamicIP(wcfg *wireguardx.Config, d netx.Dialer, port uint16) torrent.ClientConfigOption {
 	return torrent.ClientConfigDynamicIP(func(ctx context.Context, c *torrent.Client) (iter.Seq[netip.AddrPort], error) {
 		return func(yield func(netip.AddrPort) bool) {
 			for {
