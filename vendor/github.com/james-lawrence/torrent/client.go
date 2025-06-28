@@ -3,6 +3,7 @@ package torrent
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
@@ -12,6 +13,7 @@ import (
 	"path/filepath"
 	"sync"
 	"sync/atomic"
+	"syscall"
 	"time"
 
 	"github.com/james-lawrence/torrent/connections"
@@ -685,13 +687,20 @@ func (cl *Client) receiveHandshakes(c *connection) (t *torrent, err error) {
 }
 
 func (cl *Client) runReceivedConn(c *connection) {
+	var (
+		timedout errorsx.Timeout
+	)
 	if err := c.conn.SetDeadline(time.Now().Add(cl.config.HandshakesTimeout)); err != nil {
 		cl.config.errors().Println(errorsx.Wrap(err, "failed setting handshake deadline"))
 		return
 	}
 
 	t, err := cl.receiveHandshakes(c)
-	if err != nil {
+
+	if err = errorsx.StdlibTimeout(err, 0, syscall.ECONNRESET); errors.As(err, &timedout) {
+		cl.config.Handshaker.Release(c.conn, err)
+		return
+	} else if err != nil {
 		cl.config.Handshaker.Release(c.conn, connections.NewBanned(c.conn, errorsx.Wrap(err, "error during handshake")))
 		return
 	}

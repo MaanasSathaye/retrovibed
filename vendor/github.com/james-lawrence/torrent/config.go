@@ -44,11 +44,8 @@ type ClientConfig struct {
 	UpnpID string
 
 	DhtStartingNodes func(network string) dht.StartingNodesGetter
-	// Never send chunks to peers.
-	NoUpload bool `long:"no-upload"`
 
-	// Upload even after there's nothing in it for us. By default uploading is
-	// not altruistic, we'll only upload to encourage the peer to reciprocate.
+	// allow uploading of data.
 	Seed bool `long:"seed"`
 
 	// Only applies to chunks uploaded to peers, to maintain responsiveness
@@ -415,7 +412,7 @@ func NewDefaultClientConfig(mdstore MetadataStore, store storage.ClientImpl, opt
 		},
 		UploadRateLimiter:   rate.NewLimiter(rate.Limit(128*bytesx.MiB), bytesx.MiB),
 		DownloadRateLimiter: rate.NewLimiter(rate.Limit(256*bytesx.MiB), bytesx.MiB),
-		dialRateLimiter:     rate.NewLimiter(rate.Inf, 128),
+		dialRateLimiter:     rate.NewLimiter(rate.Every(10*time.Millisecond), 128),
 		ConnTracker:         conntrack.NewInstance(),
 		HeaderObfuscationPolicy: HeaderObfuscationPolicy{
 			Preferred:        false,

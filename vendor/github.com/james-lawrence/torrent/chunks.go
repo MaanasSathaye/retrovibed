@@ -3,6 +3,7 @@ package torrent
 import (
 	"errors"
 	"fmt"
+	"log"
 	"math"
 	"sync"
 	"sync/atomic"
@@ -479,6 +480,7 @@ func (t *chunks) Pop(n int, available *roaring.Bitmap) (reqs []request, err erro
 			if emptyerr.Missing == 0 && emptyerr.Outstanding > 0 && i == 0 {
 				for _, req := range t.outstanding {
 					if available.Contains(uint32(t.requestCID(req))) {
+						log.Println("-------------------------------------------------------- RE REQUEST", req.Index, req.Begin, req.Length)
 						return []request{newRequest(req.Index, req.Begin, req.Length)}, nil
 					}
 				}

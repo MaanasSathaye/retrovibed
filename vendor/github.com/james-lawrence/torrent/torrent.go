@@ -502,7 +502,8 @@ type torrent struct {
 	peers          peerPool
 	wantPeersEvent chan struct{}
 
-	metainfoAvailable atomic.Bool
+	readabledataavailable atomic.Bool
+	metainfoAvailable     atomic.Bool
 
 	// The bencoded bytes of the info dict. This is actively manipulated if
 	// the info bytes aren't initially available, and we try to fetch them
@@ -1132,10 +1133,6 @@ func (t *torrent) seeding() bool {
 	default:
 	}
 
-	if t.cln.config.NoUpload {
-		return false
-	}
-
 	if !t.cln.config.Seed {
 		return false
 	}
@@ -1144,8 +1141,13 @@ func (t *torrent) seeding() bool {
 		return false
 	}
 
-	log.Println("CHECKING IF READABLE DATA IS AVAILABLE", t.chunks.Readable())
-	return t.chunks.Readable() > 0
+	if t.readabledataavailable.Load() {
+		return true
+	}
+
+	t.readabledataavailable.Store(t.chunks.Readable() > 0)
+
+	return t.readabledataavailable.Load()
 }
 
 // Adds peers revealed in an announce until the announce ends, or we have

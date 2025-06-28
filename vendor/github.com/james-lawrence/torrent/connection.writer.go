@@ -307,6 +307,10 @@ func (t _connWriterSyncChunks) Update(ctx context.Context, _ *cstate.Shared) (r 
 		}
 	}
 
+	if !dup.IsEmpty() {
+		ws.t.readabledataavailable.Store(true)
+	}
+
 	return next
 }
 

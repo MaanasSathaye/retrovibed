@@ -863,7 +863,7 @@ func (cn *connection) ReadOne(ctx context.Context, decoder *pp.Decoder) (msg pp.
 	case pp.Request:
 		r := newRequestFromMessage(&msg)
 		if err = cn.onReadRequest(r); err != nil {
-			return msg, err
+			return msg, errReadOne
 		}
 		cn.updateRequests()
 		return msg, nil
@@ -1063,10 +1063,6 @@ func (cn *connection) receiveChunk(msg *pp.Message) error {
 }
 
 func (cn *connection) uploadAllowed() bool {
-	if cn.cfg.NoUpload {
-		return false
-	}
-
 	return cn.t.seeding()
 }
 
@@ -1080,16 +1076,6 @@ func (cn *connection) setRetryUploadTimer(delay time.Duration) {
 
 // Also handles choking and unchoking of the remote peer.
 func (cn *connection) upload(msg func(pp.Message) bool) bool {
-	// defer log.Printf("c(%p) seed(%t) upload completed", cn, cn.cfg.Seed)
-
-	// if we dont want to upload to this peer then we choke them.
-	if !cn.uploadAllowed() {
-		cn.cfg.debug().Printf("c(%p) seed(%t) upload restricted - disallowed\n", cn, cn.t.seeding())
-		return cn.Choke(msg)
-	}
-
-	// cn.cfg.debug().Printf("c(%p) seed(%t) upload allowed\n", cn, cn.t.seeding())
-
 	cn.cmu().Lock()
 	defer cn.cmu().Unlock()
 
