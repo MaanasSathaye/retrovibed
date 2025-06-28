@@ -21,4 +21,9 @@ abstract class modals {
   }
 }
 
+abstract class buttons {
+  static IconButton refresh({required void Function()? onPressed}) {
+    return IconButton(onPressed: onPressed, icon: Icon(Icons.refresh));
+  }
+}
 const Widget? NullWidget = null;

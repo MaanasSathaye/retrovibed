@@ -9,11 +9,13 @@ class AvailableListDisplay extends StatefulWidget {
   final media.FnMediaSearch search;
   final media.FnUploadRequest upload;
   final TextEditingController? searchController;
+  final ValueNotifier<int>? events;
   const AvailableListDisplay({
     super.key,
     this.search = media.discovered.available,
     this.upload = media.discovered.upload,
     this.searchController,
+    this.events,
   });
 
   @override
@@ -27,18 +29,22 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
     next: media.media.request(limit: 32),
   );
 
+  @override
+  void setState(VoidCallback fn) {
+    if (!mounted) return;
+    super.setState(fn);
+  }
+
   void refresh() {
     widget
         .search(_res.next)
         .then((v) {
-          if (!super.mounted) return;
           setState(() {
             _res = v;
             _loading = false;
           });
         })
         .catchError((e) {
-          if (!super.mounted) return;
           setState(() {
             _cause = ds.Error.unknown(e);
             _loading = false;
@@ -50,6 +56,9 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
   void initState() {
     super.initState();
     refresh();
+    widget.events?.addListener(() {
+      refresh();
+    });
   }
 
   @override
@@ -76,7 +85,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                         return media.discovered
                             .download(uploaded.media.id)
                             .then((_) {
-                              ds.RefreshBoundary.of(context)?.reset();
+                              widget.events?.value += 1;
                             });
                       })
                       .catchError((cause) {
@@ -92,7 +101,6 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
               return ds.Error.unknown(cause);
             })
             .whenComplete(() {
-              if (!super.mounted) return;
               setState(() {
                 _loading = false;
               });
@@ -152,6 +160,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                         : null,
                 icon: Icon(Icons.arrow_right),
               ),
+              ds.buttons.refresh(onPressed: refresh),
               ds.FileDropWell(
                 upload,
                 child: Icon(Icons.file_upload_outlined),
@@ -173,8 +182,8 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
               () => media.discovered
                   .download(v.id)
                   .then((v) {
-                    refresh();
-                    ds.RefreshBoundary.of(context)?.reset();
+                    widget.events ?? refresh();
+                    widget.events?.value += 1;
                   })
                   .catchError((cause) {
                     ScaffoldMessenger.of(context).showSnackBar(

@@ -120,45 +120,50 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
     };
 
     return ds.Table(
-        loading: _loading,
-        cause: _cause,
-        leading: ds.SearchTray(
-          inputDecoration: InputDecoration(hintText: "search the library"),
-          controller: widget.controller,
-          focus: widget.focus,
-          onSubmitted: (v) {
-            setState(() {
-              _res.next.query = v;
-              _res.next.offset = fixnum.Int64(0);
-            });
-            refresh(_res.next);
-          },
-          next: (i) {
-            setState(() {
-              _res.next.offset = i;
-            });
-            refresh(_res.next);
-          },
-          current: _res.next.offset,
-          empty: fixnum.Int64(_res.items.length) < _res.next.limit,
-          trailing: ds.FileDropWell(
-            upload,
-            loading: ds.Loading.Sized(width: 12.0, height: 12.0),
-            child: IgnorePointer(child: Icon(Icons.file_upload_outlined)),
-          ),
-          autofocus: true,
+      loading: _loading,
+      cause: _cause,
+      leading: ds.SearchTray(
+        inputDecoration: InputDecoration(hintText: "search the library"),
+        controller: widget.controller,
+        focus: widget.focus,
+        onSubmitted: (v) {
+          setState(() {
+            _res.next.query = v;
+            _res.next.offset = fixnum.Int64(0);
+          });
+          refresh(_res.next);
+        },
+        next: (i) {
+          setState(() {
+            _res.next.offset = i;
+          });
+          refresh(_res.next);
+        },
+        current: _res.next.offset,
+        empty: fixnum.Int64(_res.items.length) < _res.next.limit,
+        trailing: Row(
+          children: [
+            ds.buttons.refresh(onPressed:  () => refresh(_res.next)),
+            ds.FileDropWell(
+              upload,
+              loading: ds.Loading.Sized(width: 12.0, height: 12.0),
+              child: IgnorePointer(child: Icon(Icons.file_upload_outlined)),
+            ),
+          ],
         ),
-        children: _res.items,
-        flex: 1,
-        ds.Table.expanded<media.Media>(
-          (v) => media.RowDisplay(
-            media: v,
-            leading: [Icon(mimex.icon(v.mimetype))],
-            trailing: [media.ButtonShare(current: v)],
-            onTap: media.PlayAction(context, v, _res),
-          ),
+        autofocus: true,
+      ),
+      children: _res.items,
+      flex: 1,
+      ds.Table.expanded<media.Media>(
+        (v) => media.RowDisplay(
+          media: v,
+          leading: [Icon(mimex.icon(v.mimetype))],
+          trailing: [media.ButtonShare(current: v)],
+          onTap: media.PlayAction(context, v, _res),
         ),
-        empty: ds.FileDropWell(upload),
-      );
+      ),
+      empty: ds.FileDropWell(upload),
+    );
   }
 }

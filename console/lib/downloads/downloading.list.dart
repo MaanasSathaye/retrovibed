@@ -5,9 +5,11 @@ import 'package:retrovibed/media.dart' as media;
 
 class DownloadingListDisplay extends StatefulWidget {
   final media.FnDownloadSearch search;
+  final ValueNotifier<int>? events;
   const DownloadingListDisplay({
     super.key,
     this.search = media.discovered.downloading,
+    this.events,
   });
 
   @override
@@ -18,6 +20,7 @@ class _DownloadingListState extends State<DownloadingListDisplay> {
   Future<List<Widget>> _pending = Future.value([]);
   List<Widget> items = [];
   Timer? period;
+
   @override
   void setState(VoidCallback fn) {
     if (!mounted) return;
@@ -62,6 +65,9 @@ class _DownloadingListState extends State<DownloadingListDisplay> {
       const Duration(seconds: 20),
       (p) => setState(this.refresh),
     );
+    widget.events?.addListener(() {
+      refresh();
+    });
   }
 
   @override
@@ -79,7 +85,10 @@ class _DownloadingListState extends State<DownloadingListDisplay> {
         return ds.Loading(
           cause: ds.Error.maybeErr(snapshot.error),
           ds.RefreshBoundary(
-            onReset: () => setState(this.refresh),
+            onReset: () {
+              widget.events ?? setState(this.refresh);
+              widget.events?.value += 1;
+            },
             ListView(shrinkWrap: true, children: items),
           ),
         );

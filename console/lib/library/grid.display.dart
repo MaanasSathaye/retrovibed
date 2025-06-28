@@ -150,6 +150,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
               empty: fixnum.Int64(_res.items.length) < _res.next.limit,
               trailing: Row(
                 children: [
+                  ds.buttons.refresh(onPressed: () => refresh(_res.next)),
                   ds.FileDropWell(
                     upload,
                     child: IgnorePointer(
