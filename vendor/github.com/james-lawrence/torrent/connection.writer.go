@@ -276,12 +276,9 @@ func (t _connWriterClosed) Update(ctx context.Context, _ *cstate.Shared) (r csta
 
 	// detect effectively dead connections
 	if timedout(ws.connection, ws.t.chunks.gracePeriod) {
-		ws.clearRequests(ws.dupRequests()...)
-		return cstate.Failure(
-			errorsx.Timedout(
-				errorsx.Errorf("c(%p) peer isnt sending chunks in a timely manner requests (%d > %d) last(%s)", ws, len(ws.requests), ws.PeerMaxRequests, ws.lastUsefulChunkReceived),
-				10*time.Second,
-			),
+		return cstate.Warning(
+			t.next,
+			errorsx.Errorf("c(%p) peer isnt sending chunks in a timely manner requests (%d > %d) last(%s)", ws, len(ws.requests), ws.PeerMaxRequests, ws.lastUsefulChunkReceived),
 		)
 	}
 
