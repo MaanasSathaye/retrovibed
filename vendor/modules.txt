@@ -2,7 +2,7 @@
 # github.com/Masterminds/squirrel v1.5.4
 ## explicit; go 1.14
 github.com/Masterminds/squirrel
-# github.com/RoaringBitmap/roaring/v2 v2.5.0
+# github.com/RoaringBitmap/roaring/v2 v2.6.0
 ## explicit; go 1.15
 github.com/RoaringBitmap/roaring/v2
 github.com/RoaringBitmap/roaring/v2/internal
@@ -424,7 +424,7 @@ github.com/james-lawrence/genieql/internal/userx
 github.com/james-lawrence/genieql/internal/wasidialect
 github.com/james-lawrence/genieql/internal/wasix/ffierrors
 github.com/james-lawrence/genieql/internal/wasix/ffiguest
-# github.com/james-lawrence/torrent v0.0.0-20250628020826-df3546429b0b
+# github.com/james-lawrence/torrent v0.0.0-20250629104336-ecc0c56821a3
 ## explicit; go 1.24
 github.com/james-lawrence/torrent
 github.com/james-lawrence/torrent/autobind
@@ -445,6 +445,7 @@ github.com/james-lawrence/torrent/dht/peer-store
 github.com/james-lawrence/torrent/dht/transactions
 github.com/james-lawrence/torrent/dht/traversal
 github.com/james-lawrence/torrent/dht/types
+github.com/james-lawrence/torrent/internal/asynccompute
 github.com/james-lawrence/torrent/internal/atomicx
 github.com/james-lawrence/torrent/internal/bytesx
 github.com/james-lawrence/torrent/internal/envx

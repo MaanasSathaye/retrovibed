@@ -3,7 +3,6 @@ package torrent
 import (
 	"errors"
 	"fmt"
-	"log"
 	"math"
 	"sync"
 	"sync/atomic"
@@ -221,6 +220,12 @@ func (t *chunks) Range(pid uint64) (_min, _max uint64) {
 	cidn := min(cid0+uint64(cpp), uint64(t.cmaximum))
 	// log.Println("range calc", t.meta.PieceLength, t.clength, cpp, t.cmaximum, "->", cid0, cidn, math.MaxUint32)
 	return cid0, cidn
+}
+
+func (t *chunks) lastChunk(pid int) int {
+	cpp := chunksPerPiece(t.meta.PieceLength, t.clength)
+	chunks := numChunks(t.meta.PieceLength, t.meta.PieceLength, t.clength)
+	return (pid * int(cpp)) + int(chunks-1)
 }
 
 func (t *chunks) request(cidx int64) (r request, err error) {
@@ -480,15 +485,14 @@ func (t *chunks) Pop(n int, available *roaring.Bitmap) (reqs []request, err erro
 			if emptyerr.Missing == 0 && emptyerr.Outstanding > 0 && i == 0 {
 				for _, req := range t.outstanding {
 					if available.Contains(uint32(t.requestCID(req))) {
-						log.Println("-------------------------------------------------------- RE REQUEST", req.Index, req.Begin, req.Length)
 						return []request{newRequest(req.Index, req.Begin, req.Length)}, nil
 					}
 				}
-
 			}
 
 			return reqs, emptyerr
 		} else if err != nil {
+			// log.Println("Popped empty", i, "<", n, ",", err)
 			return reqs, err
 		}
 

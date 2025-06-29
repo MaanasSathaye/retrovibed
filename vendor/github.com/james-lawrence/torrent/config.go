@@ -45,7 +45,8 @@ type ClientConfig struct {
 
 	DhtStartingNodes func(network string) dht.StartingNodesGetter
 
-	// allow uploading of data.
+	// Upload even after there's nothing in it for us. By default uploading is
+	// not altruistic, we'll only upload to encourage the peer to reciprocate.
 	Seed bool `long:"seed"`
 
 	// Only applies to chunks uploaded to peers, to maintain responsiveness
@@ -388,6 +389,16 @@ func ClientConfigCacheDirectory(s string) ClientConfigOption {
 	}
 }
 
+// specify dialing timeouts healthy timeout for when the the torrent has sufficient peers connected.
+// and starving when it lacks peers. defaults are 4 and 16 respectively. generally, when starving
+// you'll want to be more forgiving and set a larger timeout.
+func ClientConfigDialTimeouts(healthy, starving time.Duration) ClientConfigOption {
+	return func(cc *ClientConfig) {
+		cc.NominalDialTimeout = starving
+		cc.MinDialTimeout = healthy
+	}
+}
+
 // NewDefaultClientConfig default client configuration.
 func NewDefaultClientConfig(mdstore MetadataStore, store storage.ClientImpl, options ...ClientConfigOption) *ClientConfig {
 	cc := &ClientConfig{
@@ -412,7 +423,7 @@ func NewDefaultClientConfig(mdstore MetadataStore, store storage.ClientImpl, opt
 		},
 		UploadRateLimiter:   rate.NewLimiter(rate.Limit(128*bytesx.MiB), bytesx.MiB),
 		DownloadRateLimiter: rate.NewLimiter(rate.Limit(256*bytesx.MiB), bytesx.MiB),
-		dialRateLimiter:     rate.NewLimiter(rate.Every(10*time.Millisecond), 128),
+		dialRateLimiter:     rate.NewLimiter(rate.Limit(32), 128),
 		ConnTracker:         conntrack.NewInstance(),
 		HeaderObfuscationPolicy: HeaderObfuscationPolicy{
 			Preferred:        false,

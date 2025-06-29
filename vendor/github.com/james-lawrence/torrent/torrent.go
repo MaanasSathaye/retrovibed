@@ -340,7 +340,7 @@ func VerifyStored(ctx context.Context, md *metainfo.MetaInfo, t io.ReaderAt) (mi
 		return nil, nil, err
 	}
 
-	chunks := newChunks(langx.DefaultIfZero(defaultChunkSize, uint64(0)), info)
+	chunks := newChunks(defaultChunkSize, info)
 	digests := newDigests(t, func(i int) *metainfo.Piece {
 		return langx.Autoptr(info.Piece(i))
 	}, func(idx int, cause error) func() {
@@ -1141,6 +1141,8 @@ func (t *torrent) seeding() bool {
 		return false
 	}
 
+	// check if we have determined if readable data available.
+	// if not, check and store the result.
 	if t.readabledataavailable.Load() {
 		return true
 	}

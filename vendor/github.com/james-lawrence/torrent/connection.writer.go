@@ -194,8 +194,6 @@ func connexdht(cn *connection, n cstate.T) cstate.T {
 func connwriterinit(ctx context.Context, cn *connection, to time.Duration) error {
 	cn.cfg.debug().Printf("c(%p) writer initiated\n", cn)
 	defer cn.cfg.debug().Printf("c(%p) writer completed\n", cn)
-	defer cn.checkFailures()
-	defer cn.deleteAllRequests()
 
 	ts := time.Now()
 	ws := &writerstate{
@@ -206,6 +204,9 @@ func connwriterinit(ctx context.Context, cn *connection, to time.Duration) error
 		nextbitmap:       ts.Add(time.Minute),
 		resync:           atomicx.Pointer(ts.Add(to)),
 	}
+
+	defer cn.checkFailures()
+	defer cn.deleteAllRequests()
 
 	return cstate.Run(ctx, connWriterSyncChunks(ws), cn.cfg.debug())
 }
@@ -355,25 +356,25 @@ type _connwriterRequests struct {
 func (t _connwriterRequests) determineInterest(msg func(pp.Message) bool) (available *roaring.Bitmap) {
 	defer t.cfg.debug().Printf("c(%p) seed(%t) interest completed\n", t, t.t.seeding())
 
-	if t.uploadAllowed() {
+	if t.t.seeding() {
 		if t.Unchoke(msg) {
-			t.cfg.debug().Printf("c(%p) seed(%t) allowing peer to make requests\n", t, t.t.seeding())
+			t.cfg.debug().Printf("c(%p) seed(%t) allowing peer to make requests\n", t.connection, t.t.seeding())
 		}
 	} else {
 		if t.Choke(msg) {
-			t.cfg.debug().Printf("c(%p) seed(%t) disallowing peer to make requests\n", t, t.t.seeding())
+			t.cfg.debug().Printf("c(%p) seed(%t) disallowing peer to make requests\n", t.connection, t.t.seeding())
 		}
 	}
 
 	if !t.SetInterested(t.peerHasWantedPieces(), msg) {
-		t.cfg.debug().Printf("c(%p) seed(%t) nothing available to request\n", t, t.t.seeding())
+		t.cfg.debug().Printf("c(%p) seed(%t) nothing available to request\n", t.connection, t.t.seeding())
 	}
 
 	if !t.PeerChoked {
-		t.cfg.debug().Printf("c(%p) seed(%t) allowing claimed: %d\n", t, t.t.seeding(), t.claimed.GetCardinality())
+		t.cfg.debug().Printf("c(%p) seed(%t) allowing claimed: %d\n", t.connection, t.t.seeding(), t.claimed.GetCardinality())
 		available = t.claimed
 	} else {
-		t.cfg.debug().Printf("c(%p) seed(%t) allowing fastset %d\n", t, t.t.seeding(), t.fastset.GetCardinality())
+		t.cfg.debug().Printf("c(%p) seed(%t) allowing fastset %d\n", t.connection, t.t.seeding(), t.fastset.GetCardinality())
 		available = t.fastset
 	}
 

@@ -67,7 +67,6 @@ func newConnection(cfg *ClientConfig, nc net.Conn, outgoing bool, remote netip.A
 		claimed:                 roaring.NewBitmap(),
 		blacklisted:             roaring.NewBitmap(),
 		sentHaves:               roaring.NewBitmap(),
-		outstandingbitmap:       roaring.New(),
 		requests:                make(map[uint64]request, cfg.maximumOutstandingRequests),
 		PeerRequests:            make(map[request]struct{}, cfg.maximumOutstandingRequests),
 		drop:                    make(chan error, 1),
@@ -150,13 +149,10 @@ type connection struct {
 	PeerPrefersEncryption bool // as indicated by 'e' field in extension handshake
 
 	// bitmaps representing availability of chunks from the peer.
-	blacklisted       *roaring.Bitmap // represents chunks which we've temporarily blacklisted.
-	claimed           *roaring.Bitmap // represents chunks which our peer claims to have available.
-	outstandingbitmap *roaring.Bitmap
-
+	blacklisted *roaring.Bitmap // represents chunks which we've temporarily blacklisted.
+	claimed     *roaring.Bitmap // represents chunks which our peer claims to have available.
 	peerfastset *roaring.Bitmap // represents chunks which we allow our peer to request while choked.
 	fastset     *roaring.Bitmap // represents chunks which our peer will allow us to request while choked.
-
 	// pieces we've accepted chunks for from the peer.
 	touched *roaring.Bitmap
 
@@ -742,7 +738,7 @@ func (cn *connection) onReadRequest(r request) error {
 		return nil
 	}
 
-	if pending := len(cn.PeerRequests); pending > cn.PendingMaxRequests+maxRequestsGrace {
+	if pending := len(cn.PeerRequests); !cn.t.seeding() || pending > cn.PendingMaxRequests+maxRequestsGrace {
 		if cn.supported(pp.ExtensionBitFast) {
 			cn.cfg.debug().Printf("%p - onReadRequest: PeerRequests(%d) > maxRequests(%d), rejecting request\n", cn, pending, cn.PendingMaxRequests)
 			cn.reject(r)
@@ -861,9 +857,8 @@ func (cn *connection) ReadOne(ctx context.Context, decoder *pp.Decoder) (msg pp.
 		cn.updateRequests()
 		return msg, nil
 	case pp.Request:
-		r := newRequestFromMessage(&msg)
-		if err = cn.onReadRequest(r); err != nil {
-			return msg, errReadOne
+		if err = cn.onReadRequest(newRequestFromMessage(&msg)); err != nil {
+			return msg, err
 		}
 		cn.updateRequests()
 		return msg, nil
@@ -1062,10 +1057,6 @@ func (cn *connection) receiveChunk(msg *pp.Message) error {
 	return nil
 }
 
-func (cn *connection) uploadAllowed() bool {
-	return cn.t.seeding()
-}
-
 func (cn *connection) setRetryUploadTimer(delay time.Duration) {
 	if cn.uploadTimer == nil {
 		cn.uploadTimer = time.AfterFunc(delay, cn.respond.Broadcast)
@@ -1076,6 +1067,12 @@ func (cn *connection) setRetryUploadTimer(delay time.Duration) {
 
 // Also handles choking and unchoking of the remote peer.
 func (cn *connection) upload(msg func(pp.Message) bool) bool {
+	// TODO: we should reject requests
+	if cn.Choked {
+		cn.cfg.debug().Printf("c(%p) seed(%t) choked(%t) upload restricted - disallowed\n", cn, cn.t.seeding(), cn.Choked)
+		return true
+	}
+
 	cn.cmu().Lock()
 	defer cn.cmu().Unlock()
 
@@ -1107,6 +1104,7 @@ func (cn *connection) upload(msg func(pp.Message) bool) bool {
 			// an updated bitfield.
 			return cn.Choke(msg)
 		}
+
 		uploaded++
 		delete(cn.PeerRequests, r)
 
@@ -1185,13 +1183,10 @@ func (cn *connection) dupRequests() (requests []request) {
 }
 
 func (cn *connection) deleteAllRequests() {
-	// trace(fmt.Sprintf("c(%p) initiated", cn))
 	reqs := cn.dupRequests()
-	// defer trace(fmt.Sprintf("c(%p) completed reqs(%d)", cn, len(reqs)))
 	for _, r := range reqs {
 		cn.releaseRequest(r)
 	}
-	// cn.t.piecesM.Retry(reqs...)
 }
 
 func (cn *connection) sendChunk(r request, msg func(pp.Message) bool) (more bool, err error) {
