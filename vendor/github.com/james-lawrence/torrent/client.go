@@ -429,11 +429,7 @@ func (cl *Client) establishOutgoingConnEx(ctx context.Context, t *torrent, addr 
 		return nil, errorsx.Errorf("unable to dial due to no servers")
 	}
 
-	cl.config.debug().Println("dialing initiated", t.md.ID, cl.dynamicaddr.Load(), "->", addr)
-	dctx, dcancel := context.WithTimeout(ctx, t.dialTimeout())
-	defer dcancel()
-
-	if nc, err = cl.dialing.Dial(dctx, addr.String(), conns...); err != nil {
+	if nc, err = cl.dialing.Dial(ctx, t.dialTimeout(), addr.String(), conns...); err != nil {
 		cl.config.debug().Println("dialing failed", t.md.ID, cl.dynamicaddr.Load(), "->", addr, err)
 		return nil, err
 	}
@@ -630,7 +626,7 @@ func (cl *Client) runReceivedConn(c *connection) {
 	}
 
 	if err := RunHandshookConn(c, t); err != nil {
-		log.Printf("received connection failed %T - %v", err, err)
+		log.Printf("received connection failed %T - %v\n", err, err)
 	}
 }
 

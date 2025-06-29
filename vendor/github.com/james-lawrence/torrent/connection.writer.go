@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/RoaringBitmap/roaring/v2"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/james-lawrence/torrent/bencode"
 	"github.com/james-lawrence/torrent/bep0006"
 	pp "github.com/james-lawrence/torrent/btprotocol"
@@ -24,6 +25,8 @@ import (
 
 func RunHandshookConn(c *connection, t *torrent) error {
 	const retrydelay = 10 * time.Second
+
+	remotreaddr := c.conn.RemoteAddr()
 	c.setTorrent(t)
 
 	c.conn.SetWriteDeadline(time.Time{})
@@ -58,9 +61,10 @@ func RunHandshookConn(c *connection, t *torrent) error {
 
 	if err := c.mainReadLoop(ctx); err != nil {
 		err = errorsx.StdlibTimeout(err, retrydelay, syscall.ECONNRESET)
+		err = errorsx.Wrapf(err, "%s - %s: error during main read loop", c.PeerClientName, remotreaddr)
 		cancel(err)
 		c.cfg.Handshaker.Release(c.conn, err)
-		return errorsx.Wrapf(err, "%s - %s: error during main read loop", c.PeerClientName, c.conn.RemoteAddr())
+		return err
 	}
 
 	return context.Cause(ctx)
@@ -105,6 +109,8 @@ func connexinit(cn *connection, n cstate.T) cstate.T {
 			Ipv4:         pp.CompactIp(cn.cfg.publicIP4.To4()),
 			Ipv6:         cn.cfg.publicIP6.To16(),
 		}
+
+		cn.cfg.debug().Printf("c(%p) seed(%t) extended handshake: %s\n", cn, cn.t.seeding(), spew.Sdump(msg))
 
 		encoded, err := bencode.Marshal(msg)
 		if err != nil {
@@ -208,7 +214,7 @@ func connwriterinit(ctx context.Context, cn *connection, to time.Duration) error
 	defer cn.checkFailures()
 	defer cn.deleteAllRequests()
 
-	return cstate.Run(ctx, connWriterSyncChunks(ws), cn.cfg.debug())
+	return errorsx.LogErr(cstate.Run(ctx, connWriterSyncChunks(ws), cn.cfg.debug()))
 }
 
 type writerstate struct {
@@ -342,6 +348,7 @@ func (t _connWriterSyncComplete) Update(ctx context.Context, _ *cstate.Shared) (
 	}
 
 	ws.SetInterested(false, writer)
+
 	return next
 }
 
@@ -354,7 +361,7 @@ type _connwriterRequests struct {
 }
 
 func (t _connwriterRequests) determineInterest(msg func(pp.Message) bool) (available *roaring.Bitmap) {
-	defer t.cfg.debug().Printf("c(%p) seed(%t) interest completed\n", t, t.t.seeding())
+	defer t.cfg.debug().Printf("c(%p) seed(%t) interest completed\n", t.connection, t.t.seeding())
 
 	if t.t.seeding() {
 		if t.Unchoke(msg) {
@@ -393,13 +400,14 @@ func (t _connwriterRequests) genrequests(available *roaring.Bitmap, msg func(pp.
 	// cn.cfg.debug().Printf("c(%p) seed(%t) make requests initated\n", cn, cn.t.seeding())
 	// defer cn.cfg.debug().Printf("c(%p) seed(%t) make requests completed\n", cn, cn.t.seeding())
 
-	if len(t.requests) > t.requestsLowWater || t.t.chunks.Cardinality(t.t.chunks.missing) == 0 {
+	if available.IsEmpty() || len(t.requests) > t.requestsLowWater || t.t.chunks.Cardinality(t.t.chunks.missing) == 0 {
+		t.cfg.debug().Printf("%p seed(%t) avail(%d) || req(%d > %d) || have all data - skipping buffer fill", t.connection, t.t.seeding(), available.GetCardinality(), len(t.requests), t.requestsLowWater)
 		return
 	}
 
 	filledBuffer := false
 
-	max := min(max(0, t.PeerMaxRequests-len(t.requests)), 64)
+	max := max(0, t.PeerMaxRequests-len(t.requests))
 	if reqs, err = t.t.chunks.Pop(max, available); errors.As(err, &empty{}) {
 		if len(reqs) == 0 && !t.blacklisted.IsEmpty() {
 			// clear the blacklist when we run out of work to do.
@@ -408,7 +416,7 @@ func (t _connwriterRequests) genrequests(available *roaring.Bitmap, msg func(pp.
 			t.cmu().Unlock()
 			t.t.chunks.MergeInto(t.t.chunks.missing, t.t.chunks.failed)
 			t.t.chunks.FailuresReset()
-			t.cfg.debug().Printf("c(%p) seed(%t) available(%t) no work available", t, t.t.seeding(), !available.IsEmpty())
+			t.cfg.debug().Printf("c(%p) seed(%t) available(%t) no work available", t.connection, t.t.seeding(), !available.IsEmpty())
 			return
 		}
 	} else if err != nil {
@@ -416,11 +424,11 @@ func (t _connwriterRequests) genrequests(available *roaring.Bitmap, msg func(pp.
 		return
 	}
 
-	t.cfg.debug().Printf("%p seed(%t) filling buffer with requests %d - %d -> %d actual %d", t, t.t.seeding(), t.PeerMaxRequests, len(t.requests), max, len(reqs))
+	t.cfg.debug().Printf("%p seed(%t) avail(%d) filling buffer with requests %d - %d -> %d actual %d", t.connection, t.t.seeding(), available.GetCardinality(), t.PeerMaxRequests, len(t.requests), max, len(reqs))
 
 	for max, req = range reqs {
 		if filledBuffer = !t.request(req, msg); filledBuffer {
-			t.cfg.debug().Printf("c(%p) seed(%t) done filling after(%d)\n", t, t.t.seeding(), max)
+			t.cfg.debug().Printf("c(%p) seed(%t) done filling after(%d)\n", t.connection, t.t.seeding(), max)
 			break
 		}
 
@@ -430,7 +438,7 @@ func (t _connwriterRequests) genrequests(available *roaring.Bitmap, msg func(pp.
 	// advance to just the unused chunks.
 	if max += 1; len(reqs) > max {
 		reqs = reqs[max:]
-		t.cfg.debug().Printf("c(%p) seed(%t) filled - cleaning up %d reqs(%d)\n", t, t.t.seeding(), max, len(reqs))
+		t.cfg.debug().Printf("c(%p) seed(%t) filled - cleaning up %d reqs(%d)\n", t.connection, t.t.seeding(), max, len(reqs))
 		// release any unused requests back to the queue.
 		t.t.chunks.Retry(reqs...)
 	}
@@ -453,6 +461,7 @@ func (t _connwriterRequests) Update(ctx context.Context, _ *cstate.Shared) (r cs
 		}
 
 		ws.wroteMsg(&msg)
+		log.Println("DERP DERP", msg.Type, ws.writeBuffer.Len(), "<", ws.bufferLimit)
 		return ws.writeBuffer.Len() < ws.bufferLimit
 	}
 
@@ -540,13 +549,14 @@ type _connwriterCommitBitmap struct {
 
 func (t _connwriterCommitBitmap) Update(ctx context.Context, _ *cstate.Shared) cstate.T {
 	ws := t.writerstate
-	defer func() {
-		ws.nextbitmap = time.Now().Add(time.Minute)
-	}()
 
 	if ws.nextbitmap.After(time.Now()) {
 		return t.next
 	}
+
+	defer func() {
+		ws.nextbitmap = time.Now().Add(time.Minute)
+	}()
 
 	if err := ws.t.cln.torrents.Sync(int160.FromBytes(ws.t.md.ID.Bytes())); err != nil {
 		return cstate.Warning(t.next, errorsx.Wrap(err, "failed to sync bitmap to disk"))

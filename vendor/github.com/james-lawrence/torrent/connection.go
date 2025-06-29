@@ -769,9 +769,10 @@ func (cn *connection) onReadRequest(r request) error {
 }
 
 func (cn *connection) Flush() (int, error) {
-	// defer func() {
-	// 	log.Printf("c(%p) seed(%t) -------------------------------- flushed %d --------------------------------\n", cn, cn.t.seeding(), cn.writeBuffer.Len())
-	// }()
+	olen := cn.writeBuffer.Len()
+	defer func() {
+		log.Printf("c(%p) seed(%t) -------------------------------- flushed %d --------------------------------\n", cn, cn.t.seeding(), olen)
+	}()
 
 	cn.cmu().Lock()
 	buf := cn.writeBuffer.Bytes()
@@ -819,7 +820,7 @@ func (cn *connection) ReadOne(ctx context.Context, decoder *pp.Decoder) (msg pp.
 		return msg, fmt.Errorf("received fast extension message (type=%v) but extension is disabled", msg.Type)
 	}
 
-	cn.cfg.debug().Printf("(%d) c(%p) seed(%t) - RECEIVED MESSAGE: %s - pending(%d) - missing(%d) - failed(%d) - outstanding(%d) - unverified(%d) - completed(%d)\n", os.Getpid(), cn, cn.cfg.Seed, msg.Type, len(cn.requests), cn.t.chunks.Cardinality(cn.t.chunks.missing), cn.t.chunks.failed.GetCardinality(), len(cn.t.chunks.outstanding), cn.t.chunks.unverified.GetCardinality(), cn.t.chunks.completed.GetCardinality())
+	cn.cfg.debug().Printf("(%d) c(%p) seed(%t) remote(%s) - RECEIVED MESSAGE: %s - pending(%d) - missing(%d) - failed(%d) - outstanding(%d) - unverified(%d) - completed(%d)\n", os.Getpid(), cn, cn.cfg.Seed, cn.conn.RemoteAddr(), msg.Type, len(cn.requests), cn.t.chunks.Cardinality(cn.t.chunks.missing), cn.t.chunks.failed.GetCardinality(), len(cn.t.chunks.outstanding), cn.t.chunks.unverified.GetCardinality(), cn.t.chunks.completed.GetCardinality())
 
 	switch msg.Type {
 	case pp.Choke:
