@@ -134,10 +134,7 @@ func TestTorrentFileSystem(t *testing.T) {
 			return err
 		}
 
-		// log.Println("DERP DERP", path, d.Name())
-
 		if d.IsDir() {
-			// log.Println("Directory", path)
 			return nil
 		}
 
@@ -145,8 +142,6 @@ func TestTorrentFileSystem(t *testing.T) {
 			if path == d.Path {
 				count++
 				return nil
-				// } else {
-				// 	log.Println("sad", d.Path)
 			}
 		}
 

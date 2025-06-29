@@ -121,7 +121,7 @@ func DebugRequest(original http.Handler) http.Handler {
 
 		original.ServeHTTP(resp, req)
 
-		log.Println("DERP DERP", resp.Header())
+		log.Println("Request Header", resp.Header())
 	})
 }
 

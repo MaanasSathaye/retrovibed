@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/RoaringBitmap/roaring/v2"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/james-lawrence/torrent/bencode"
 	"github.com/james-lawrence/torrent/bep0006"
 	pp "github.com/james-lawrence/torrent/btprotocol"
@@ -110,7 +109,7 @@ func connexinit(cn *connection, n cstate.T) cstate.T {
 			Ipv6:         cn.cfg.publicIP6.To16(),
 		}
 
-		cn.cfg.debug().Printf("c(%p) seed(%t) extended handshake: %s\n", cn, cn.t.seeding(), spew.Sdump(msg))
+		// cn.cfg.debug().Printf("c(%p) seed(%t) extended handshake: %s\n", cn, cn.t.seeding(), spew.Sdump(msg))
 
 		encoded, err := bencode.Marshal(msg)
 		if err != nil {
@@ -165,7 +164,7 @@ func connexfast(cn *connection, n cstate.T) cstate.T {
 
 			return n
 		default:
-			cn.cfg.debug().Printf("c(%p) seed(%t) posting  bitfield: %d/%d\n", cn, cn.t.seeding(), readable, cn.t.chunks.cmaximum)
+			cn.cfg.debug().Printf("c(%p) seed(%t) posting bitfield: %d/%d\n", cn, cn.t.seeding(), readable, cn.t.chunks.cmaximum)
 			if _, err := cn.PostBitfield(); err != nil {
 				return cstate.Failure(err)
 			}
@@ -178,14 +177,15 @@ func connexfast(cn *connection, n cstate.T) cstate.T {
 func connexdht(cn *connection, n cstate.T) cstate.T {
 	return cstate.Fn(func(context.Context, *cstate.Shared) cstate.T {
 		dynamicaddr := langx.Autoderef(cn.dynamicaddr.Load())
-		if !(cn.extensions.Supported(cn.PeerExtensionBytes, pp.ExtensionBitDHT) && dynamicaddr.Port() > 0) {
-			cn.cfg.debug().Printf("posting dht not supported %t - %s\n", cn.extensions.Supported(cn.PeerExtensionBytes, pp.ExtensionBitDHT), dynamicaddr)
+		port := langx.DefaultIfZero(cn.t.cln.LocalPort16(), dynamicaddr.Port())
+		if !(cn.extensions.Supported(cn.PeerExtensionBytes, pp.ExtensionBitDHT) && port > 0) {
+			cn.cfg.debug().Printf("posting dht not supported extension supported(%t) - port(%d)\n", cn.extensions.Supported(cn.PeerExtensionBytes, pp.ExtensionBitDHT), port)
 			return n
 		}
 
 		defer log.Println("dht extension completed")
 
-		_, err := cn.Post(pp.NewPort(dynamicaddr.Port()))
+		_, err := cn.Post(pp.NewPort(port))
 		if err != nil {
 			return cstate.Failure(err)
 		}
@@ -197,9 +197,17 @@ func connexdht(cn *connection, n cstate.T) cstate.T {
 // Routine that writes to the peer. Some of what to write is buffered by
 // activity elsewhere in the Client, and some is determined locally when the
 // connection is writable.
-func connwriterinit(ctx context.Context, cn *connection, to time.Duration) error {
+func connwriterinit(ctx context.Context, cn *connection, to time.Duration) (err error) {
 	cn.cfg.debug().Printf("c(%p) writer initiated\n", cn)
 	defer cn.cfg.debug().Printf("c(%p) writer completed\n", cn)
+	defer func() {
+		// if we're closed that means the connection was shutdown
+		// and since we're just returning that means someone else already detected
+		// and reported the issue.
+		if cn.closed.Load() {
+			err = nil
+		}
+	}()
 
 	ts := time.Now()
 	ws := &writerstate{
@@ -213,7 +221,6 @@ func connwriterinit(ctx context.Context, cn *connection, to time.Duration) error
 
 	defer cn.checkFailures()
 	defer cn.deleteAllRequests()
-
 	return errorsx.LogErr(cstate.Run(ctx, connWriterSyncChunks(ws), cn.cfg.debug()))
 }
 
@@ -461,7 +468,6 @@ func (t _connwriterRequests) Update(ctx context.Context, _ *cstate.Shared) (r cs
 		}
 
 		ws.wroteMsg(&msg)
-		log.Println("DERP DERP", msg.Type, ws.writeBuffer.Len(), "<", ws.bufferLimit)
 		return ws.writeBuffer.Len() < ws.bufferLimit
 	}
 
@@ -480,15 +486,16 @@ func (t _connwriterRequests) Update(ctx context.Context, _ *cstate.Shared) (r cs
 		)
 	}
 
-	return connwriterKeepalive(ws)
+	return connwriterKeepalive(ws, connwriteridle(ws))
 }
 
-func connwriterKeepalive(ws *writerstate) cstate.T {
-	return _connwriterKeepalive{writerstate: ws}
+func connwriterKeepalive(ws *writerstate, n cstate.T) cstate.T {
+	return _connwriterKeepalive{writerstate: ws, next: n}
 }
 
 type _connwriterKeepalive struct {
 	*writerstate
+	next cstate.T
 }
 
 func (t _connwriterKeepalive) Update(ctx context.Context, _ *cstate.Shared) cstate.T {
@@ -499,14 +506,14 @@ func (t _connwriterKeepalive) Update(ctx context.Context, _ *cstate.Shared) csta
 	ws := t.writerstate
 
 	if time.Since(ws.lastwrite) < ws.keepAliveTimeout {
-		return connwriterFlush(connwriteridle(ws), ws)
+		return connwriterFlush(t.next, ws)
 	}
 
 	if _, err = ws.Post(pp.NewKeepAlive()); err != nil {
 		return cstate.Failure(errorsx.Wrap(err, "keepalive encoding failed"))
 	}
 
-	return connwriterFlush(connwriteridle(ws), ws)
+	return connwriterFlush(t.next, ws)
 }
 
 func connwriterFlush(n cstate.T, ws *writerstate) cstate.T {
@@ -564,6 +571,11 @@ func (t _connwriterCommitBitmap) Update(ctx context.Context, _ *cstate.Shared) c
 
 	return t.next
 }
+
+// func keepalive(ws *writerstate) cstate.T {
+// 	return cstate.Idle(connwriterKeepalive(ws, cstate.Fn(func(context.Context, *cstate.Shared) cstate.T { return keepalive(ws) })), ws.keepAliveTimeout/2, ws.connection.respond, ws.connection.t.chunks.cond)
+// }
+
 func connwriteridle(ws *writerstate) cstate.T {
 	return connwriterBitmap(cstate.Idle(connwriteractive(ws), ws.keepAliveTimeout/2, ws.connection.respond, ws.connection.t.chunks.cond), ws)
 }

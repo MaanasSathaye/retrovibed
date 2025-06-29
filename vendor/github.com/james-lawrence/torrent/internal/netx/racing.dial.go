@@ -25,6 +25,7 @@ func NewRacing(n uint16) *RacingDialer {
 			if err == nil {
 				select {
 				case <-ctx.Done():
+					errorsx.Log(c.Close())
 				case w.fastest <- c:
 					w.done(nil)
 				}
@@ -36,6 +37,7 @@ func NewRacing(n uint16) *RacingDialer {
 			w.failure.CompareAndSwap(nil, langx.Autoptr(err))
 			if atomic.AddUint64(w.outstanding, ^uint64(0)) == 0 {
 				w.done(err)
+				close(w.fastest)
 			}
 
 			return nil

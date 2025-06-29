@@ -1,7 +1,6 @@
 package torrent
 
 import (
-	"bufio"
 	"context"
 	"fmt"
 	"io"
@@ -21,8 +20,6 @@ import (
 	"github.com/james-lawrence/torrent/dht/krpc"
 	"github.com/james-lawrence/torrent/sockets"
 	"github.com/james-lawrence/torrent/storage"
-
-	"github.com/davecgh/go-spew/spew"
 
 	pp "github.com/james-lawrence/torrent/btprotocol"
 	"github.com/james-lawrence/torrent/internal/errorsx"
@@ -182,31 +179,6 @@ func (cl *Client) LocalPort16() (port uint16) {
 
 func (cl *Client) LocalPort() (port int) {
 	return int(cl.LocalPort16())
-}
-
-func writeDhtServerStatus(w io.Writer, s *dht.Server) {
-	dhtStats := s.Stats()
-	fmt.Fprintf(w, "\t# Nodes: %d (%d good, %d banned)\n", dhtStats.Nodes, dhtStats.GoodNodes, dhtStats.BadNodes)
-	fmt.Fprintf(w, "\tServer ID: %x\n", s.ID())
-	fmt.Fprintf(w, "\tAnnounces: %d\n", dhtStats.SuccessfulOutboundAnnouncePeerQueries)
-	fmt.Fprintf(w, "\tOutstanding transactions: %d\n", dhtStats.OutstandingTransactions)
-}
-
-// WriteStatus writes out a human readable status of the client, such as for writing to a
-// HTTP status page.
-func (cl *Client) WriteStatus(_w io.Writer) {
-	cl.rLock()
-	defer cl.rUnlock()
-	w := bufio.NewWriter(_w)
-	defer w.Flush()
-	fmt.Fprintf(w, "Listen port: %d\n", cl.LocalPort())
-	fmt.Fprintf(w, "Peer ID: %+q\n", cl.PeerID())
-	fmt.Fprintf(w, "Announce key: %x\n", -1) // removed the method from the client didnt belong here.
-	cl.eachDhtServer(func(s *dht.Server) {
-		fmt.Fprintf(w, "%s DHT server at %s:\n", s.Addr().Network(), s.Addr().String())
-		writeDhtServerStatus(w, s)
-	})
-	spew.Fdump(w, &cl.stats)
 }
 
 // NewClient create a new client from the provided config. nil is acceptable.
@@ -433,13 +405,20 @@ func (cl *Client) establishOutgoingConnEx(ctx context.Context, t *torrent, addr 
 		cl.config.debug().Println("dialing failed", t.md.ID, cl.dynamicaddr.Load(), "->", addr, err)
 		return nil, err
 	}
-	defer nc.Close()
+
+	defer func() {
+		if err != nil {
+			errorsx.Log(nc.Close())
+		}
+	}()
+
 	cl.config.debug().Println("dialing completed", t.md.ID, cl.dynamicaddr.Load(), "->", addr)
 
 	// This is a bit optimistic, but it looks non-trivial to thread this through the proxy code. Set
 	// it now in case we close the connection forthwith.
 	if tc, ok := nc.(*net.TCPConn); ok {
 		tc.SetLinger(0)
+		tc.SetKeepAlive(true)
 	}
 
 	dl := time.Now().Add(cl.config.HandshakesTimeout)

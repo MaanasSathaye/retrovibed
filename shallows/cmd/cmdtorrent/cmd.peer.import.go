@@ -38,11 +38,11 @@ import (
 )
 
 type importPeer struct {
-	Peer           string `flag:"" name:"peer" help:"peer to connect to and download the provided torrents from" default:"localhost:10000"`
-	Directory      string `flag:"" name:"directory" help:"specify the directory to download torrents into" default:""`
-	Archive        bool   `flag:"" name:"archive" help:"mark imported media for archival" default:"false"`
-	Magnets        string `arg:"" name:"magnets" help:"file containing magnet links to download, defaults to stdin" default:""`
-	TorrentPrivate bool   `flag:"" name:"torrent-private" help:"restrict torrent connections to private networks" env:"${env_torrent_private}" default:"false"`
+	Peer           []string `flag:"" name:"peer" help:"peer(s) to connect to and download the provided torrents from" default:"localhost:10000"`
+	Directory      string   `flag:"" name:"directory" help:"specify the directory to download torrents into" default:""`
+	Archive        bool     `flag:"" name:"archive" help:"mark imported media for archival" default:"false"`
+	Magnets        string   `arg:"" name:"magnets" help:"file containing magnet links to download, defaults to stdin" default:""`
+	TorrentPrivate bool     `flag:"" name:"torrent-private" help:"restrict torrent connections to private networks" env:"${env_torrent_private}" default:"false"`
 }
 
 func (t importPeer) torrents(tstore fsx.Virtual) iter.Seq2[string, torrent.Metadata] {
@@ -117,14 +117,23 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		errorsx.Log(daemons.AutoArchival(gctx.Context, db, mediastore))
 	}
 
-	host, port, err := net.SplitHostPort(t.Peer)
-	if err != nil {
-		return errorsx.Wrap(err, "unable to setup torrent client")
-	}
+	peers := make([]torrent.Peer, 0, 128)
+	for _, p := range t.Peer {
+		host, port, err := net.SplitHostPort(p)
+		if err != nil {
+			return errorsx.Wrap(err, "unable to setup torrent client")
+		}
 
-	addrs, err := net.DefaultResolver.LookupIP(gctx.Context, "ip4", host)
-	if err != nil {
-		return errorsx.Wrap(err, "unable to resolve host")
+		addrs, err := net.DefaultResolver.LookupIP(gctx.Context, "ip4", host)
+		if err != nil {
+			return errorsx.Wrap(err, "unable to resolve host")
+		}
+
+		peers = append(peers, torrent.Peer{
+			IP:      addrs[0],
+			Port:    langx.Must(strconv.Atoi(port)),
+			Trusted: true,
+		})
 	}
 
 	if t.TorrentPrivate {
@@ -187,12 +196,6 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	}
 	defer tclient.Close()
 
-	sourcepeer := torrent.Peer{
-		IP:      addrs[0],
-		Port:    langx.Must(strconv.Atoi(port)),
-		Trusted: true,
-	}
-
 	importfn := func(ctx context.Context, w workload) error {
 		var (
 			info *metainfo.Info
@@ -204,7 +207,7 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 			)
 			log.Printf("awaiting torrent info %s\n", w.meta.ID)
 
-			info, cause = tclient.Info(ctx, w.meta, torrent.TunePeers(sourcepeer))
+			info, cause = tclient.Info(ctx, w.meta, torrent.TunePeers(peers...))
 			if cause != nil {
 				return errorsx.Wrapf(cause, "failed to retrieve torrent info %s", w.meta.ID)
 			}
@@ -237,7 +240,7 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 			return errorsx.Wrapf(cause, "failed to record metadata %s", w.meta.ID.String())
 		}
 
-		dl, _, cause := tclient.Start(w.meta, torrent.TuneDisableTrackers, torrent.TunePeers(sourcepeer), torrent.TuneAutoDownload)
+		dl, _, cause := tclient.Start(w.meta, torrent.TuneDisableTrackers, torrent.TunePeers(peers...), torrent.TuneAutoDownload)
 		if cause != nil {
 			return errorsx.Wrapf(cause, "failed to start magnet %s - %T: %+v\n", w.meta.ID.String(), cause, cause)
 		}

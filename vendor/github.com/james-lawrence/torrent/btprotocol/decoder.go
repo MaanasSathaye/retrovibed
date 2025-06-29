@@ -20,7 +20,7 @@ func NewDecoder(i io.Reader, p *sync.Pool) *Decoder {
 }
 
 type Decoder struct {
-	R         io.Reader
+	R         *bufio.Reader
 	Pool      *sync.Pool
 	MaxLength Integer // TODO: Should this include the length header or not?
 }
@@ -57,6 +57,7 @@ func (d *Decoder) Decode(msg *Message) (err error) {
 			err = fmt.Errorf("%d bytes unused in message type %d - %s", r.N, msg.Type, msg.Type)
 		}
 	}()
+
 	msg.Keepalive = false
 	c, err := readByte(r)
 	if err != nil {

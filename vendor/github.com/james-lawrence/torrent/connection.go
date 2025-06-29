@@ -264,8 +264,9 @@ func (cn *connection) utp() bool {
 }
 
 func (cn *connection) Close() {
-	// trace(fmt.Sprintf("c(%p) initiated", cn))
-	// defer trace(fmt.Sprintf("c(%p) completed", cn))
+	// cn.cfg.debug().Output(2, fmt.Sprintf("c(%p) seed(%t) Close initiated\n", cn, cn.t.seeding()))
+	// defer cn.cfg.debug().Output(2, fmt.Sprintf("c(%p) seed(%t) Close initiated\n", cn, cn.t.seeding()))
+
 	defer cn.t.cln.event.Broadcast()
 	defer cn.deleteAllRequests()
 	cn.cmu().Lock()
@@ -294,7 +295,7 @@ func (cn *connection) PeerHasPiece(piece uint64) bool {
 
 // Writes a message into the write buffer.
 func (cn *connection) Post(msg pp.Message) (n int, err error) {
-	cn.cfg.debug().Output(2, fmt.Sprintf("c(%p) seed(%t) Post initiated: %s\n", cn, cn.t.seeding(), msg.Type))
+	// cn.cfg.debug().Output(2, fmt.Sprintf("c(%p) seed(%t) Post initiated: %s\n", cn, cn.t.seeding(), msg.Type))
 
 	encoded, err := msg.MarshalBinary()
 	if err != nil {
@@ -491,12 +492,10 @@ func (cn *connection) Have(piece uint64) (n int, err error) {
 }
 
 func (cn *connection) PostBitfield() (n int, err error) {
-	dup := cn.t.chunks.ReadableBitmap()
-	if dup.IsEmpty() {
-		dup = bitmapx.Zero(cn.t.chunks.pieces)
-	}
+	dup := cn.t.chunks.CompletedBitmap()
 
-	// cn.cfg.debug().Printf("c(%p) seed(%t) calculated bitfield: p(%d)/r(%d) - %v\n", cn, cn.t.seeding(), cn.t.chunks.pieces, dup.GetCardinality(), dup.ToArray())
+	// cn.cfg.debug().Printf("c(%p) seed(%t) calculated bitfield: p(%d)/r(%d)\n", cn, cn.t.seeding(), cn.t.chunks.pieces, dup.GetCardinality())
+
 	n, err = cn.Post(pp.NewBitField(cn.t.chunks.pieces, dup))
 	if err != nil {
 		return n, err
@@ -559,8 +558,13 @@ func (cn *connection) peerSentBitfield(bf []bool) error {
 	// wasted.
 	cn.raisePeerMinPieces(uint64(len(bf) - 7))
 	if cn.t.haveInfo() && len(bf) > int(cn.t.chunks.pieces) {
+		// qbittorrent and transmission close the connection here.
+		// I suspect other clients do as well as this would be a great way to fuck with a client.
+		// it also makes testing more robust.
+		return errorsx.Errorf("received a bitfield large than the number of pieces - %d / %d", len(bf), cn.t.chunks.pieces)
+		// old code for reference
 		// Ignore known excess pieces.
-		bf = bf[:cn.t.chunks.pieces]
+		// bf = bf[:cn.t.chunks.pieces]
 	}
 
 	for i, have := range bf {
@@ -769,10 +773,10 @@ func (cn *connection) onReadRequest(r request) error {
 }
 
 func (cn *connection) Flush() (int, error) {
-	olen := cn.writeBuffer.Len()
-	defer func() {
-		log.Printf("c(%p) seed(%t) -------------------------------- flushed %d --------------------------------\n", cn, cn.t.seeding(), olen)
-	}()
+	// olen := cn.writeBuffer.Len()
+	// defer func() {
+	// 	log.Printf("c(%p) seed(%t) -------------------------------- flushed %d --------------------------------\n", cn, cn.t.seeding(), olen)
+	// }()
 
 	cn.cmu().Lock()
 	buf := cn.writeBuffer.Bytes()
@@ -792,17 +796,23 @@ func (cn *connection) Flush() (int, error) {
 }
 
 func (cn *connection) ReadOne(ctx context.Context, decoder *pp.Decoder) (msg pp.Message, err error) {
-	// log.Printf("(%d) c(%p) seed(%t) - AWAITING MESSAGE: pending(%d) - missing(%d) - failed(%d) - outstanding(%d) - unverified(%d) - completed(%d)\n", os.Getpid(), cn, cn.cfg.Seed, len(cn.requests), cn.t.chunks.Missing(), cn.t.chunks.failed.GetCardinality(), len(cn.t.chunks.outstanding), cn.t.chunks.unverified.GetCardinality(), cn.t.chunks.completed.GetCardinality())
-	err = decoder.Decode(&msg)
-
 	// check for any error signals from the writer.
 	select {
-	case err := <-cn.drop:
-		return msg, err
+	case ierr := <-cn.drop:
+		return msg, ierr
 	case <-ctx.Done():
 		return msg, context.Cause(ctx)
 	default:
 	}
+
+	defer func() {
+		if err == nil {
+			return
+		}
+
+		// cn.cfg.debug().Printf("(%d) c(%p) seed(%t) remote(%s) - error during read %s - %T - %v\n", os.Getpid(), cn, cn.cfg.Seed, cn.conn.RemoteAddr(), msg.Type, errorsx.Unwrap(err), err)
+	}()
+	err = decoder.Decode(&msg)
 
 	if err != nil {
 		return msg, err
@@ -971,7 +981,6 @@ func (cn *connection) onReadExtendedMsg(id pp.ExtensionNumber, payload []byte) (
 		}
 
 		cn.requestPendingMetadata()
-
 		cn.sendInitialPEX()
 
 		// BUG no sending PEX updates yet
@@ -1069,8 +1078,8 @@ func (cn *connection) setRetryUploadTimer(delay time.Duration) {
 // Also handles choking and unchoking of the remote peer.
 func (cn *connection) upload(msg func(pp.Message) bool) bool {
 	// TODO: we should reject requests
-	if cn.Choked {
-		cn.cfg.debug().Printf("c(%p) seed(%t) choked(%t) upload restricted - disallowed\n", cn, cn.t.seeding(), cn.Choked)
+	if cn.Choked || cn.peerSentHaveAll {
+		cn.cfg.debug().Printf("c(%p) seed(%t) choked(%t) peer completed(%t) upload restricted - disallowed\n", cn, cn.t.seeding(), cn.Choked, cn.peerSentHaveAll)
 		return true
 	}
 
