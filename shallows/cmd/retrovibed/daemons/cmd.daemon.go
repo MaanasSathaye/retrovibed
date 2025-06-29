@@ -191,7 +191,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		torrent.ClientConfigDebugLogger(log.New(torrentlogging, "[torrent - debug] ", log.Flags())),
 		torrent.ClientConfigMuxer(tm),
 		torrent.ClientConfigBucketLimit(2048),
-		torrent.ClientConfigDialPoolSize(runtime.NumCPU()*128),
+		torrent.ClientConfigDialPoolSize(runtime.NumCPU()*48),
 		torrent.ClientConfigMaxOutstandingRequests(int(t.TorrentMaxRequests)),
 		torrent.ClientConfigHTTPUserAgent("retrovibed/0.0"),
 		torrent.ClientConfigConnectionClosed(func(ih metainfo.Hash, stats torrent.ConnStats, remaining int) {
