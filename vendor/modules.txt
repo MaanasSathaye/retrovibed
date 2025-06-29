@@ -424,7 +424,7 @@ github.com/james-lawrence/genieql/internal/userx
 github.com/james-lawrence/genieql/internal/wasidialect
 github.com/james-lawrence/genieql/internal/wasix/ffierrors
 github.com/james-lawrence/genieql/internal/wasix/ffiguest
-# github.com/james-lawrence/torrent v0.0.0-20250629202819-49d88ecf40dc
+# github.com/james-lawrence/torrent v0.0.0-20250629212127-5a979bd8685d
 ## explicit; go 1.24
 github.com/james-lawrence/torrent
 github.com/james-lawrence/torrent/autobind
@@ -447,6 +447,7 @@ github.com/james-lawrence/torrent/dht/traversal
 github.com/james-lawrence/torrent/dht/types
 github.com/james-lawrence/torrent/internal/asynccompute
 github.com/james-lawrence/torrent/internal/atomicx
+github.com/james-lawrence/torrent/internal/backoffx
 github.com/james-lawrence/torrent/internal/bytesx
 github.com/james-lawrence/torrent/internal/envx
 github.com/james-lawrence/torrent/internal/errorsx
@@ -455,6 +456,7 @@ github.com/james-lawrence/torrent/internal/netx
 github.com/james-lawrence/torrent/internal/slicesx
 github.com/james-lawrence/torrent/internal/stmutil
 github.com/james-lawrence/torrent/internal/stringsx
+github.com/james-lawrence/torrent/internal/timex
 github.com/james-lawrence/torrent/internal/userx
 github.com/james-lawrence/torrent/internal/utpx
 github.com/james-lawrence/torrent/internal/x/bitmapx
