@@ -221,6 +221,7 @@ func connwriterinit(ctx context.Context, cn *connection, to time.Duration) (err 
 
 	defer cn.checkFailures()
 	defer cn.deleteAllRequests()
+
 	return errorsx.LogErr(cstate.Run(ctx, connWriterSyncChunks(ws), cn.cfg.debug()))
 }
 
@@ -355,7 +356,6 @@ func (t _connWriterSyncComplete) Update(ctx context.Context, _ *cstate.Shared) (
 	}
 
 	ws.SetInterested(false, writer)
-
 	return next
 }
 
@@ -431,7 +431,7 @@ func (t _connwriterRequests) genrequests(available *roaring.Bitmap, msg func(pp.
 		return
 	}
 
-	t.cfg.debug().Printf("%p seed(%t) avail(%d) filling buffer with requests %d - %d -> %d actual %d", t.connection, t.t.seeding(), available.GetCardinality(), t.PeerMaxRequests, len(t.requests), max, len(reqs))
+	t.cfg.debug().Printf("c(%p) seed(%t) avail(%d) filling buffer with requests %d - %d -> %d actual %d", t.connection, t.t.seeding(), available.GetCardinality(), t.PeerMaxRequests, len(t.requests), max, len(reqs))
 
 	for max, req = range reqs {
 		if filledBuffer = !t.request(req, msg); filledBuffer {
@@ -571,11 +571,6 @@ func (t _connwriterCommitBitmap) Update(ctx context.Context, _ *cstate.Shared) c
 
 	return t.next
 }
-
-// func keepalive(ws *writerstate) cstate.T {
-// 	return cstate.Idle(connwriterKeepalive(ws, cstate.Fn(func(context.Context, *cstate.Shared) cstate.T { return keepalive(ws) })), ws.keepAliveTimeout/2, ws.connection.respond, ws.connection.t.chunks.cond)
-// }
-
 func connwriteridle(ws *writerstate) cstate.T {
 	return connwriterBitmap(cstate.Idle(connwriteractive(ws), ws.keepAliveTimeout/2, ws.connection.respond, ws.connection.t.chunks.cond), ws)
 }

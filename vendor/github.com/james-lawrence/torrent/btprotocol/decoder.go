@@ -57,7 +57,6 @@ func (d *Decoder) Decode(msg *Message) (err error) {
 			err = fmt.Errorf("%d bytes unused in message type %d - %s", r.N, msg.Type, msg.Type)
 		}
 	}()
-
 	msg.Keepalive = false
 	c, err := readByte(r)
 	if err != nil {

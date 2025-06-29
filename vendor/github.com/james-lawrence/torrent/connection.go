@@ -266,7 +266,6 @@ func (cn *connection) utp() bool {
 func (cn *connection) Close() {
 	// cn.cfg.debug().Output(2, fmt.Sprintf("c(%p) seed(%t) Close initiated\n", cn, cn.t.seeding()))
 	// defer cn.cfg.debug().Output(2, fmt.Sprintf("c(%p) seed(%t) Close initiated\n", cn, cn.t.seeding()))
-
 	defer cn.t.cln.event.Broadcast()
 	defer cn.deleteAllRequests()
 	cn.cmu().Lock()
@@ -494,8 +493,7 @@ func (cn *connection) Have(piece uint64) (n int, err error) {
 func (cn *connection) PostBitfield() (n int, err error) {
 	dup := cn.t.chunks.CompletedBitmap()
 
-	// cn.cfg.debug().Printf("c(%p) seed(%t) calculated bitfield: p(%d)/r(%d)\n", cn, cn.t.seeding(), cn.t.chunks.pieces, dup.GetCardinality())
-
+	cn.cfg.debug().Printf("c(%p) seed(%t) calculated bitfield: b(%d)/p(%d)\n", cn, cn.t.seeding(), dup.GetCardinality(), cn.t.chunks.pieces)
 	n, err = cn.Post(pp.NewBitField(cn.t.chunks.pieces, dup))
 	if err != nil {
 		return n, err
@@ -557,11 +555,11 @@ func (cn *connection) peerSentBitfield(bf []bool) error {
 	// We know that the last byte means that at most the last 7 bits are
 	// wasted.
 	cn.raisePeerMinPieces(uint64(len(bf) - 7))
-	if cn.t.haveInfo() && len(bf) > int(cn.t.chunks.pieces) {
+	if cn.t.haveInfo() && len(bf) > int(cn.t.chunks.pieces+7) {
 		// qbittorrent and transmission close the connection here.
 		// I suspect other clients do as well as this would be a great way to fuck with a client.
 		// it also makes testing more robust.
-		return errorsx.Errorf("received a bitfield large than the number of pieces - %d / %d", len(bf), cn.t.chunks.pieces)
+		return errorsx.Errorf("received a bitfield larger than the number of pieces - %d / %d - %v", len(bf), cn.t.chunks.pieces, bf)
 		// old code for reference
 		// Ignore known excess pieces.
 		// bf = bf[:cn.t.chunks.pieces]
@@ -796,23 +794,16 @@ func (cn *connection) Flush() (int, error) {
 }
 
 func (cn *connection) ReadOne(ctx context.Context, decoder *pp.Decoder) (msg pp.Message, err error) {
+	err = decoder.Decode(&msg)
+
 	// check for any error signals from the writer.
 	select {
-	case ierr := <-cn.drop:
-		return msg, ierr
+	case err := <-cn.drop:
+		return msg, err
 	case <-ctx.Done():
 		return msg, context.Cause(ctx)
 	default:
 	}
-
-	defer func() {
-		if err == nil {
-			return
-		}
-
-		// cn.cfg.debug().Printf("(%d) c(%p) seed(%t) remote(%s) - error during read %s - %T - %v\n", os.Getpid(), cn, cn.cfg.Seed, cn.conn.RemoteAddr(), msg.Type, errorsx.Unwrap(err), err)
-	}()
-	err = decoder.Decode(&msg)
 
 	if err != nil {
 		return msg, err
@@ -981,6 +972,7 @@ func (cn *connection) onReadExtendedMsg(id pp.ExtensionNumber, payload []byte) (
 		}
 
 		cn.requestPendingMetadata()
+
 		cn.sendInitialPEX()
 
 		// BUG no sending PEX updates yet

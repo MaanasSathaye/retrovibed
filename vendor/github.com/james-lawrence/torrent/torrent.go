@@ -1389,7 +1389,6 @@ func (t *torrent) SetMaxEstablishedConns(max int) (oldMax int) {
 	}
 	log.Println("done dropping connection")
 	t.openNewConns()
-
 	return oldMax
 }
 

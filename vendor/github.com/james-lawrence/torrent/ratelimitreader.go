@@ -20,6 +20,5 @@ func (t *rateLimitedReader) Read(b []byte) (n int, err error) {
 	}
 
 	time.Sleep(reserved.Delay())
-
 	return io.LimitReader(t.r, int64(m)).Read(b)
 }

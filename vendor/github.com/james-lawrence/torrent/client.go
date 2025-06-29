@@ -9,7 +9,6 @@ import (
 	"net"
 	"net/netip"
 	"path/filepath"
-	"runtime"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -197,7 +196,7 @@ func NewClient(cfg *ClientConfig) (_ *Client, err error) {
 		closed:   make(chan struct{}),
 		torrents: NewCache(cfg.defaultMetadata, NewBitmapCache(cfg.defaultCacheDirectory)),
 		_mu:      &sync.RWMutex{},
-		dialing:  netx.NewRacing(uint16(runtime.NumCPU())),
+		dialing:  netx.NewRacing(cfg.dialPoolSize), // four concurrent dials per cpu seems a reasonable starting point.
 	}
 	cl.event.L = cl.locker()
 
@@ -406,13 +405,12 @@ func (cl *Client) establishOutgoingConnEx(ctx context.Context, t *torrent, addr 
 		return nil, err
 	}
 
+	cl.config.debug().Println("dialing completed", t.md.ID, cl.dynamicaddr.Load(), "->", addr)
 	defer func() {
 		if err != nil {
 			errorsx.Log(nc.Close())
 		}
 	}()
-
-	cl.config.debug().Println("dialing completed", t.md.ID, cl.dynamicaddr.Load(), "->", addr)
 
 	// This is a bit optimistic, but it looks non-trivial to thread this through the proxy code. Set
 	// it now in case we close the connection forthwith.
