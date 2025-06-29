@@ -342,3 +342,25 @@ func NewUnrecoverable(err error) error {
 		cause: err,
 	}
 }
+
+// returns nil if the error matches any of the targets
+func Ignore(err error, targets ...error) error {
+	for _, target := range targets {
+		if errors.Is(err, target) {
+			return nil
+		}
+	}
+
+	return err
+}
+
+// returns true if the error matches any of the targets.
+func Is(err error, targets ...error) bool {
+	for _, target := range targets {
+		if errors.Is(err, target) {
+			return true
+		}
+	}
+
+	return false
+}
