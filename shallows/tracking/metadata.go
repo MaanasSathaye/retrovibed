@@ -119,6 +119,10 @@ func MetadataQueryNotPaused() squirrel.Sqlizer {
 	return squirrel.Expr("torrents_metadata.paused_at = 'infinity'")
 }
 
+func MetadataQueryNeedsVerification() squirrel.Sqlizer {
+	return squirrel.Expr("torrents_metadata.verify_at < NOW()")
+}
+
 func MetadataQuerySeeding() squirrel.Sqlizer {
 	return squirrel.Expr("torrents_metadata.seeding")
 }

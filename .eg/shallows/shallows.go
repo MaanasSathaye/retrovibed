@@ -39,7 +39,7 @@ func GenerateGogen(ctx context.Context, _ eg.Op) error {
 	gruntime := shellruntime()
 	return shell.Run(
 		ctx,
-		gruntime.New("go generate ./... && go fmt ./...").Timeout(15*time.Minute),
+		gruntime.New("go generate ./... && go fmt ./...").Timeout(30*time.Minute),
 	)
 }
 

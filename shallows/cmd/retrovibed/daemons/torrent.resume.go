@@ -73,6 +73,64 @@ func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual
 	errorsx.Log(errorsx.Wrap(iter.Err(), "failed to resume all downloads"))
 }
 
+func VerifyTorrents(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual, tclient *torrent.Client, tstore storage.ClientImpl) {
+	q := tracking.MetadataSearchBuilder().Where(
+		squirrel.And{
+			tracking.MetadataQueryInitiated(),
+			tracking.MetadataQueryNeedsVerification(),
+		},
+	)
+
+	iter := sqlx.Scan(tracking.MetadataSearch(ctx, db, q))
+
+	for md := range iter.Iter() {
+		id := metainfo.Hash(md.Infohash)
+		infopath := rootstore.Path("torrent", fmt.Sprintf("%s.torrent", id))
+		log.Println("resuming", md.ID, md.Description, md.Private, infopath)
+
+		metadata, err := torrent.New(
+			metainfo.Hash(md.Infohash),
+			torrent.OptionStorage(tstore),
+			torrentx.OptionTracker(md.Tracker),
+			torrentx.OptionInfoFromFile(infopath),
+			torrent.OptionPublicTrackers(md.Private, tracking.PublicTrackers()...),
+			torrent.OptionDisplayName(md.Description),
+		)
+		if err != nil {
+			log.Println(errorsx.Wrapf(err, "unable to create metadata from %s - %s", md.ID, infopath))
+			return
+		}
+
+		log.Println("verification initiated", md.ID, md.Description)
+		t, _, err := tclient.Start(metadata, torrent.TuneVerifySample(32))
+		if err != nil {
+			log.Println(errorsx.Wrapf(err, "unable to start download %s - %s", md.ID, infopath))
+			continue
+		}
+
+		if t.Info() == nil {
+			// ignoring for now
+			continue
+		}
+
+		log.Println("verification completed", md.ID, md.Description, t.BytesCompleted(), "/", t.Info().TotalLength())
+		if t.BytesCompleted() == int64(md.Downloaded) {
+			tclient.Stop(metadata)
+			continue
+		} else {
+			tclient.Stop(metadata)
+		}
+
+		if err := tracking.MetadataVerifyByID(ctx, db, md.ID, 0, uint64(t.BytesCompleted())).Scan(&md); err != nil {
+			log.Println(errorsx.Wrapf(err, "unable to update bytes completed during verification %s - %s", md.ID, infopath))
+			continue
+		}
+
+	}
+
+	errorsx.Log(errorsx.Wrap(iter.Err(), "failed to resume all downloads"))
+}
+
 func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, tclient *torrent.Client, tstore storage.ClientImpl) {
 	const limit = 128
 

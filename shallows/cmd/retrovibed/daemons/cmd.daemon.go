@@ -292,6 +292,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		}
 	}()
 
+	go VerifyTorrents(dctx, db, rootstore, tclient, tstore)
 	go AnnounceSeeded(dctx, db, rootstore, tclient, tstore)
 	go ResumeDownloads(dctx, db, rootstore, tclient, tstore)
 
