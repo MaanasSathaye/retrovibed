@@ -76,7 +76,7 @@ class MyApp extends StatelessWidget {
                                   return media.VideoScreen(
                                     env.Boolean(
                                           env.vars.AutoIdentifyMedia,
-                                          fallback: false,
+                                          fallback: true,
                                         )
                                         ? medialib.AvailableGridDisplay(
                                           focus: s.searchfocus,
