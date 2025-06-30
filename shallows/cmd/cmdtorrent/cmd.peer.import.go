@@ -23,7 +23,6 @@ import (
 	"github.com/retrovibed/retrovibed/blockcache"
 	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
-	"github.com/retrovibed/retrovibed/cmd/retrovibed/daemons"
 	"github.com/retrovibed/retrovibed/internal/asynccompute"
 	"github.com/retrovibed/retrovibed/internal/env"
 	"github.com/retrovibed/retrovibed/internal/envx"
@@ -33,8 +32,6 @@ import (
 	"github.com/retrovibed/retrovibed/internal/md5x"
 	"github.com/retrovibed/retrovibed/internal/stringsx"
 	"github.com/retrovibed/retrovibed/internal/torrentx"
-	"github.com/retrovibed/retrovibed/internal/userx"
-	"github.com/retrovibed/retrovibed/library"
 	"github.com/retrovibed/retrovibed/tracking"
 	"golang.org/x/crypto/ssh"
 )
@@ -115,7 +112,7 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	}
 	defer db.Close()
 
-	rootstore := fsx.DirVirtual(userx.DefaultDataDirectory(userx.DefaultRelRoot()))
+	// rootstore := fsx.DirVirtual(userx.DefaultDataDirectory(userx.DefaultRelRoot()))
 	torrentstore := fsx.DirVirtual(stringsx.FirstNonBlank(t.Directory, env.TorrentDir()))
 	mediastore := fsx.DirVirtual(env.MediaDir())
 
@@ -123,10 +120,10 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		return err
 	}
 
-	async := library.NewAsyncWakeup(gctx.Context)
-	if t.Archive {
-		errorsx.Log(daemons.AutoArchival(gctx.Context, db, mediastore, async, t.Archive))
-	}
+	// async := library.NewAsyncWakeup(gctx.Context)
+	// if t.Archive {
+	// 	errorsx.Log(daemons.AutoArchival(gctx.Context, db, mediastore, async, t.Archive))
+	// }
 
 	peers := make([]torrent.Peer, 0, 128)
 	for _, p := range t.Peer {
@@ -235,12 +232,13 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 				return errorsx.Wrapf(cause, "failed to record torrent %s %v", w.meta.ID, cause)
 			}
 		} else {
-			log.Printf("torrent info available resuming %s %d\n", w.meta.ID, len(w.meta.InfoBytes))
 			if _info, cause := w.meta.Metainfo().UnmarshalInfo(); cause != nil {
 				return errorsx.Wrapf(cause, "failed to resume torrent %s", w.meta.ID)
 			} else {
 				info = &_info
 			}
+
+			log.Printf("torrent info available resuming %s - %s - %d\n", w.meta.ID, info.Name, len(w.meta.InfoBytes))
 		}
 
 		lmd := tracking.NewMetadata(
@@ -255,18 +253,19 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 			return errorsx.Wrapf(cause, "failed to record metadata %s", w.meta.ID.String())
 		}
 
-		dl, _, cause := tclient.Start(w.meta, torrent.TuneDisableTrackers, torrent.TunePeers(peers...), torrent.TuneAutoDownload)
-		if cause != nil {
-			return errorsx.Wrapf(cause, "failed to start magnet %s - %T: %+v\n", w.meta.ID.String(), cause, cause)
+		if err := tracking.MetadataDownloadByID(ctx, db, lmd.ID).Scan(&lmd); err != nil {
+			return errorsx.Wrap(err, "unable to track download")
 		}
 
-		if cause := tracking.Download(ctx, db, rootstore, &lmd, dl); cause != nil {
-			return errorsx.Wrapf(cause, "failed to download %s %v", w.meta.ID.String(), cause)
-		}
+		// dctx, done := context.WithCancel(ctx)
+		// defer done()
+		// if cause := tracking.Download(dctx, db, rootstore, &lmd, dl); cause != nil {
+		// 	return errorsx.Wrapf(cause, "failed to download %s %v", w.meta.ID.String(), cause)
+		// }
 
-		if t.Archive {
-			async.Broadcast()
-		}
+		// if t.Archive {
+		// 	async.Broadcast()
+		// }
 
 		return nil
 	}
@@ -290,7 +289,8 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		return err
 	}
 
-	log.Println("SHUTTING DOWN ASYNC ARCHIVAL INITIATED")
-	defer log.Println("SHUTTING DOWN ASYNC ARCHIVAL COMPLETED")
-	return async.Close()
+	// log.Println("SHUTTING DOWN ASYNC ARCHIVAL INITIATED")
+	// defer log.Println("SHUTTING DOWN ASYNC ARCHIVAL COMPLETED")
+	// return async.Close()
+	return nil
 }

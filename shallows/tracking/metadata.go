@@ -307,6 +307,55 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 	}
 }
 
+func Monitor(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torrent.Torrent) {
+	var (
+		statsfreq = envx.Duration(1*time.Minute, env.TorrentDownloadStats)
+		sub       pubsub.Subscription
+	)
+
+	log.Println("monitoring download deadman switch initiated", md.ID, md.Description, md.Tracker, statsfreq)
+	defer log.Println("monitoring download deadman switch completed", md.ID, md.Description, md.Tracker)
+	// Revisit once resume is working.
+	if err := dl.Tune(torrent.TuneSubscribe(&sub)); err != nil {
+		log.Println("unable to subscribe", err)
+		return
+	}
+	defer sub.Close()
+
+	statst := time.NewTicker(statsfreq)
+	l := rate.NewLimiter(rate.Every(time.Second), 1)
+	for {
+		select {
+		case <-statst.C:
+			log.Println("NOTHING RECEIVED FOR TOO LONG")
+			return
+		case <-sub.Values:
+			if !l.Allow() {
+				continue
+			}
+
+			current := uint64(dl.BytesCompleted())
+			if md.Downloaded == current {
+				continue
+			}
+
+			statst.Reset(statsfreq)
+			stats := dl.Stats()
+
+			log.Printf(
+				"%s - %s: info(%t) seeding(%t), peers(a%d:h%d:p%d:t%d) pieces(m%d:o%d:u%d:c%d - f%d)\n", md.ID, hex.EncodeToString(md.Infohash), true, stats.Seeding, stats.ActivePeers, stats.HalfOpenPeers, stats.PendingPeers, stats.TotalPeers,
+				stats.Missing, stats.Outstanding, stats.Unverified, stats.Completed, stats.Failed,
+			)
+
+			if err := MetadataProgressByID(ctx, q, md.ID, uint16(stats.ActivePeers), current).Scan(md); err != nil {
+				log.Println("failed to update progress", err)
+			}
+		case <-ctx.Done():
+			return
+		}
+	}
+}
+
 func ImportSymlink(id int160.T, srcvfs, vfs fsx.Virtual) library.ImportOp {
 	critical := &sync.Mutex{}
 	return func(ctx context.Context, root fs.StatFS, path string) (*library.Transfered, error) {

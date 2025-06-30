@@ -139,12 +139,12 @@ func NewDiskQuota(ctx context.Context, c *http.Client, dir fsx.Virtual, q sqlx.Q
 		}
 	}
 
+	// signal everything is done so the close function returns
+	defer async.doneCond.Broadcast()
 	if err := untilClosed(); errorsx.Is(err, context.Canceled, context.DeadlineExceeded) {
 		log.Println("archival completed", err)
 		return nil
 	} else if errorsx.Is(err, errAsyncClosed) {
-		// signal everything is done so the close function returns
-		defer async.doneCond.Broadcast()
 		// run a final time to ensure everything is archived.
 		return errorsx.Ignore(archive(), context.Canceled, context.DeadlineExceeded)
 	} else {

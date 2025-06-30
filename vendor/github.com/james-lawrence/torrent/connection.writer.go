@@ -379,7 +379,7 @@ type _connwriterRequests struct {
 func (t _connwriterRequests) determineInterest(msg func(pp.Message) bool) (available *roaring.Bitmap) {
 	defer t.cfg.debug().Printf("c(%p) seed(%t) interest completed\n", t.connection, t.t.seeding())
 
-	if t.t.seeding() || t.chokeduntil.After(time.Now()) {
+	if t.t.seeding() || t.chokeduntil.After(time.Now()) || true {
 		if t.Unchoke(msg) {
 			t.cfg.debug().Printf("c(%p) seed(%t) allowing peer to make requests\n", t.connection, t.t.seeding())
 		}
