@@ -39,6 +39,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/torrentx"
 	"github.com/retrovibed/retrovibed/internal/userx"
 	"github.com/retrovibed/retrovibed/internal/wireguardx"
+	"github.com/retrovibed/retrovibed/library"
 	"github.com/retrovibed/retrovibed/media"
 	"github.com/retrovibed/retrovibed/meta/identityssh"
 	"github.com/retrovibed/retrovibed/metaapi"
@@ -245,7 +246,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	}
 
 	if t.AutoArchive {
-		errorsx.Log(AutoArchival(gctx.Context, db, mediastore))
+		errorsx.Log(AutoArchival(gctx.Context, db, mediastore, library.NewAsyncWakeup(gctx.Context), t.AutoArchive))
 	} else {
 		log.Println("automatic media archival is disabled")
 	}

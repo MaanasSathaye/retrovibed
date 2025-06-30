@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Masterminds/squirrel"
@@ -307,6 +308,7 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 }
 
 func ImportSymlink(id int160.T, srcvfs, vfs fsx.Virtual) library.ImportOp {
+	critical := &sync.Mutex{}
 	return func(ctx context.Context, root fs.StatFS, path string) (*library.Transfered, error) {
 		tx, err := library.TransferedFromPath(root, path)
 		if err != nil {
@@ -331,6 +333,8 @@ func ImportSymlink(id int160.T, srcvfs, vfs fsx.Virtual) library.ImportOp {
 
 		uid := md5x.FormatUUID(tx.MD5)
 
+		critical.Lock()
+		defer critical.Unlock()
 		if err := os.Remove(vfs.Path(uid)); fsx.IgnoreIsNotExist(err) != nil {
 			return nil, errorsx.Wrap(err, "unable to ensure symlink destination is available")
 		}

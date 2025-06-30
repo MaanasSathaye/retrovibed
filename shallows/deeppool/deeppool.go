@@ -7,6 +7,7 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+	"os"
 
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/httpx"
@@ -43,6 +44,7 @@ func (t Archiver) Upload(ctx context.Context, mimetype string, r io.Reader) (m *
 	if err != nil {
 		return nil, err
 	}
+	defer os.Remove(data.Name())
 	defer data.Close()
 
 	resp, err := httpx.AsError(t.c.Post(fmt.Sprintf("https://%s/m/", t.endpoint), contenttype, data))

@@ -26,6 +26,7 @@ import (
 	"github.com/retrovibed/retrovibed/cmd/retrovibed/daemons"
 	"github.com/retrovibed/retrovibed/internal/asynccompute"
 	"github.com/retrovibed/retrovibed/internal/env"
+	"github.com/retrovibed/retrovibed/internal/envx"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/fsx"
 	"github.com/retrovibed/retrovibed/internal/langx"
@@ -33,9 +34,16 @@ import (
 	"github.com/retrovibed/retrovibed/internal/stringsx"
 	"github.com/retrovibed/retrovibed/internal/torrentx"
 	"github.com/retrovibed/retrovibed/internal/userx"
+	"github.com/retrovibed/retrovibed/library"
 	"github.com/retrovibed/retrovibed/tracking"
 	"golang.org/x/crypto/ssh"
 )
+
+type logging interface {
+	Println(v ...interface{})
+	Printf(format string, v ...interface{})
+	Print(v ...interface{})
+}
 
 type importPeer struct {
 	Peer           []string `flag:"" name:"peer" help:"peer(s) to connect to and download the provided torrents from" default:"localhost:10000"`
@@ -100,6 +108,8 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		firewall  torrent.ClientConfigOption = torrent.ClientConfigNoop
 	)
 
+	gctx.Cleanup.Add(1)
+	defer gctx.Cleanup.Done()
 	if db, err = cmdmeta.Database(gctx.Context); err != nil {
 		return err
 	}
@@ -113,8 +123,9 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		return err
 	}
 
+	async := library.NewAsyncWakeup(gctx.Context)
 	if t.Archive {
-		errorsx.Log(daemons.AutoArchival(gctx.Context, db, mediastore))
+		errorsx.Log(daemons.AutoArchival(gctx.Context, db, mediastore, async, t.Archive))
 	}
 
 	peers := make([]torrent.Peer, 0, 128)
@@ -145,6 +156,10 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		))
 	}
 
+	var torrentlogging logging = torrent.LogDiscard()
+	if envx.Boolean(false, env.TorrentLogging) {
+		torrentlogging = log.New(os.Stderr, "[torrent] ", log.Flags())
+	}
 	tm := dht.DefaultMuxer().
 		Method(bep0051.Query, bep0051.NewEndpoint(bep0051.EmptySampler{}))
 	tstore := blockcache.NewTorrentFromVirtualFS(torrentstore)
@@ -158,8 +173,8 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		torrent.ClientConfigPEX(false),
 		torrent.ClientConfigSeed(false),
 		torrent.ClientConfigPortForward(true),
-		torrent.ClientConfigInfoLogger(log.New(os.Stderr, "[torrent] ", log.Flags())),
-		torrent.ClientConfigDebugLogger(log.New(os.Stderr, "[torrent-debug] ", log.Flags())),
+		torrent.ClientConfigInfoLogger(torrentlogging),
+		torrent.ClientConfigDebugLogger(torrentlogging),
 		torrent.ClientConfigMuxer(tm),
 		torrent.ClientConfigBucketLimit(256),
 		torrent.ClientConfigHTTPUserAgent("retrovibed/0.0"),
@@ -249,6 +264,10 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 			return errorsx.Wrapf(cause, "failed to download %s %v", w.meta.ID.String(), cause)
 		}
 
+		if t.Archive {
+			async.Broadcast()
+		}
+
 		return nil
 	}
 
@@ -267,5 +286,11 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		}
 	}
 
-	return asynccompute.Shutdown(gctx.Context, arena)
+	if err = asynccompute.Shutdown(gctx.Context, arena); err != nil {
+		return err
+	}
+
+	log.Println("SHUTTING DOWN ASYNC ARCHIVAL INITIATED")
+	defer log.Println("SHUTTING DOWN ASYNC ARCHIVAL COMPLETED")
+	return async.Close()
 }

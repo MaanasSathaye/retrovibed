@@ -125,7 +125,7 @@ func MetadataQueryArchivable() squirrel.Sqlizer {
 }
 
 func MetadataQueryShared() squirrel.Sqlizer {
-	return squirrel.Expr("library_metadata.torrent_id != '00000000-0000-0000-0000-000000000000'")
+	return squirrel.Expr("library_metadata.torrent_id != '00000000-0000-0000-0000-000000000000' AND library_metadata.archive_id != 'FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF'")
 }
 
 func MetadataQueryNotIndexed() squirrel.Sqlizer {

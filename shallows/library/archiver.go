@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 	"log"
+	"os"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/blockcache"
@@ -20,6 +21,8 @@ type archiver interface {
 }
 
 func Archive(ctx context.Context, q sqlx.Queryer, md Metadata, vfs fsx.Virtual, dst archiver) error {
+	log.Println("archive initiated", md.ID)
+	defer log.Println("archive completed", md.ID)
 	seed := cryptox.NewChaCha8(uuidx.FirstNonZero(uuid.FromStringOrNil(md.EncryptionSeed), uuid.FromStringOrNil(md.ID)).Bytes())
 
 	cache, err := blockcache.NewDirectoryCache(vfs.Path(md.ID))
@@ -36,6 +39,13 @@ func Archive(ctx context.Context, q sqlx.Queryer, md Metadata, vfs fsx.Virtual, 
 	if err != nil {
 		return err
 	}
-	log.Println("archive completed", md.ID)
+
 	return MetadataArchivedByID(ctx, q, md.ID, uploaded.Id, uploaded.Usage).Scan(&md)
+}
+
+func Reclaim(ctx context.Context, md Metadata, vfs fsx.Virtual) error {
+	log.Println("reclaiming disk space initiated", md.ID)
+	defer log.Println("reclaiming disk space completed", md.ID)
+
+	return errorsx.Wrap(os.RemoveAll(vfs.Path(md.ID)), "failed to reclaim disk space")
 }
