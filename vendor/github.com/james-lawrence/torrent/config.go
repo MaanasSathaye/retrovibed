@@ -2,9 +2,7 @@ package torrent
 
 import (
 	"context"
-	"io"
 	"iter"
-	"log"
 	"net"
 	"net/http"
 	"net/netip"
@@ -83,9 +81,9 @@ type ClientConfig struct {
 	CryptoSelector mse.CryptoSelector
 
 	DisableIPv4Peers bool
-	Logger           logger // standard logging for errors, defaults to stderr
-	Warn             logger // warn logging
-	Debug            logger // debug logging, defaults to discard
+	Logger           logging // standard logging for errors, defaults to stderr
+	Warn             logging // warn logging
+	Debug            logging // debug logging, defaults to discard
 
 	// HTTPProxy defines proxy for HTTP requests.
 	// Format: func(*Request) (*url.URL, error),
@@ -168,20 +166,20 @@ func (cfg *ClientConfig) AnnounceRequest() tracker.Announce {
 	}
 }
 
-func (cfg *ClientConfig) errors() llog {
-	return llog{logger: cfg.Logger}
+func (cfg *ClientConfig) errors() logging {
+	return cfg.Logger
 }
 
-func (cfg *ClientConfig) warn() llog {
-	return llog{logger: cfg.Warn}
+func (cfg *ClientConfig) warn() logging {
+	return cfg.Warn
 }
 
-func (cfg *ClientConfig) info() llog {
-	return llog{logger: cfg.Logger}
+func (cfg *ClientConfig) info() logging {
+	return cfg.Logger
 }
 
-func (cfg *ClientConfig) debug() llog {
-	return llog{logger: cfg.Debug}
+func (cfg *ClientConfig) debug() logging {
+	return cfg.Debug
 }
 
 // ClientConfigOption options for the client configuration
@@ -255,13 +253,13 @@ func ClientConfigBucketLimit(i int) ClientConfigOption {
 }
 
 // ClientConfigInfoLogger set the info logger
-func ClientConfigInfoLogger(l *log.Logger) ClientConfigOption {
+func ClientConfigInfoLogger(l logging) ClientConfigOption {
 	return func(c *ClientConfig) {
 		c.Logger = l
 	}
 }
 
-func ClientConfigDebugLogger(l *log.Logger) ClientConfigOption {
+func ClientConfigDebugLogger(l logging) ClientConfigOption {
 	return func(c *ClientConfig) {
 		c.Debug = l
 	}
@@ -410,6 +408,14 @@ func ClientConfigDialPoolSize[T constraints.Integer](n T) ClientConfigOption {
 	}
 }
 
+// specify the low and high watermarks for torrent peering
+func ClientConfigPeerLimits[T constraints.Integer](low, high T) ClientConfigOption {
+	return func(cc *ClientConfig) {
+		cc.TorrentPeersLowWater = int(low)
+		cc.TorrentPeersHighWater = int(high)
+	}
+}
+
 // NewDefaultClientConfig default client configuration.
 func NewDefaultClientConfig(mdstore MetadataStore, store storage.ClientImpl, options ...ClientConfigOption) *ClientConfig {
 	cc := &ClientConfig{
@@ -425,8 +431,8 @@ func NewDefaultClientConfig(mdstore MetadataStore, store storage.ClientImpl, opt
 		NominalDialTimeout:             16 * time.Second,
 		MinDialTimeout:                 4 * time.Second,
 		HalfOpenConnsPerTorrent:        32,
-		TorrentPeersHighWater:          512,
-		TorrentPeersLowWater:           128,
+		TorrentPeersHighWater:          128,
+		TorrentPeersLowWater:           48,
 		HandshakesTimeout:              4 * time.Second,
 		dynamicip:                      UPnPPortForward,
 		DhtStartingNodes: func(network string) dht.StartingNodesGetter {
@@ -443,7 +449,7 @@ func NewDefaultClientConfig(mdstore MetadataStore, store storage.ClientImpl, opt
 		},
 		CryptoSelector:   mse.DefaultCryptoSelector,
 		CryptoProvides:   mse.AllSupportedCrypto,
-		Logger:           log.New(io.Discard, "[torrent] ", log.Flags()),
+		Logger:           discard{},
 		Warn:             discard{},
 		Debug:            discard{},
 		DHTAnnouncePeer:  func(ih metainfo.Hash, ip net.IP, port int, portOk bool) {},

@@ -3,7 +3,6 @@ package daemons
 import (
 	"context"
 	"database/sql"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -52,6 +51,12 @@ import (
 
 	"github.com/gorilla/mux"
 )
+
+type logging interface {
+	Println(v ...interface{})
+	Printf(format string, v ...interface{})
+	Print(v ...interface{})
+}
 
 type Command struct {
 	DisableMDNS          bool             `flag:"" name:"no-mdns" help:"disable the multicast dns service" default:"false" env:"${env_mdns_disabled}"`
@@ -172,9 +177,9 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		log.Println("no wireguard configuration found at", path, wgnet == nil)
 	}
 
-	var torrentlogging io.Writer = io.Discard
+	var torrentlogging logging = torrent.LogDiscard()
 	if envx.Boolean(false, env.TorrentLogging) {
-		torrentlogging = os.Stderr
+		torrentlogging = log.New(os.Stderr, "[torrent] ", log.Flags())
 	}
 
 	torconfig := torrent.NewDefaultClientConfig(
@@ -187,12 +192,13 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		torrent.ClientConfigPEX(envx.Boolean(true, env.TorrentPEX)),
 		torrent.ClientConfigSeed(envx.Boolean(true, env.TorrentAllowSeeding)),
 		torrent.ClientConfigDialer(DefaultDialer(wgnet)),
-		torrent.ClientConfigInfoLogger(log.New(torrentlogging, "[torrent] ", log.Flags())),
-		torrent.ClientConfigDebugLogger(log.New(torrentlogging, "[torrent - debug] ", log.Flags())),
+		torrent.ClientConfigInfoLogger(torrentlogging),
+		torrent.ClientConfigDebugLogger(torrentlogging),
 		torrent.ClientConfigMuxer(tm),
 		torrent.ClientConfigBucketLimit(2048),
-		torrent.ClientConfigDialPoolSize(runtime.NumCPU()*48),
+		torrent.ClientConfigDialPoolSize(runtime.NumCPU()),
 		torrent.ClientConfigMaxOutstandingRequests(int(t.TorrentMaxRequests)),
+		torrent.ClientConfigPeerLimits(48, 128),
 		torrent.ClientConfigHTTPUserAgent("retrovibed/0.0"),
 		torrent.ClientConfigConnectionClosed(func(ih metainfo.Hash, stats torrent.ConnStats, remaining int) {
 			if stats.BytesWrittenData.Uint64() == 0 {
