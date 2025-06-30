@@ -418,7 +418,7 @@ func (t _connwriterRequests) genrequests(available *roaring.Bitmap, msg func(pp.
 		return
 	}
 
-	if ts := langx.Autoderef(t.lastRejectReceived.Load()); ts.Before(time.Now().Add(time.Minute)) {
+	if ts := langx.Autoderef(t.lastRejectReceived.Load()); ts.After(time.Now().Add(time.Minute)) {
 		t.cfg.debug().Printf("c(%p) seed(%t) skipping buffer fill - recently saw a rejection (%s)", t.connection, t.t.seeding(), time.Since(ts))
 		return
 	}
@@ -430,7 +430,7 @@ func (t _connwriterRequests) genrequests(available *roaring.Bitmap, msg func(pp.
 
 	filledBuffer := false
 
-	max := max(0, t.PeerMaxRequests-len(t.requests))
+	max := max(0, t.PeerMaxRequests-len(t.requests)) / 2
 	if reqs, err = t.t.chunks.Pop(max, available); errors.As(err, &empty{}) {
 		if len(reqs) == 0 && !t.blacklisted.IsEmpty() {
 			// clear the blacklist when we run out of work to do.
