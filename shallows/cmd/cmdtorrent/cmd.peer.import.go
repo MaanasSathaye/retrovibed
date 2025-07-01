@@ -5,6 +5,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"io"
 	"iter"
 	"log"
 	"net"
@@ -29,6 +30,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/envx"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/fsx"
+	"github.com/retrovibed/retrovibed/internal/iox"
 	"github.com/retrovibed/retrovibed/internal/langx"
 	"github.com/retrovibed/retrovibed/internal/md5x"
 	"github.com/retrovibed/retrovibed/internal/stringsx"
@@ -260,7 +262,12 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 			return errorsx.Wrapf(cause, "failed to start magnet %s - %T: %+v\n", w.meta.ID.String(), cause, cause)
 		}
 
-		if cause := tracking.Download(ctx, db, rootstore, &lmd, dl); cause != nil {
+		// give each torrent a minute of no writing activity before giving up importing it.
+		// it'll continue to try in the background but the import process will context.
+		dctx, done := context.WithCancel(ctx)
+		dst := iox.NewTimeoutWriter(done, time.Minute, io.Discard)
+		if cause := tracking.DownloadInto(dctx, db, rootstore, &lmd, dl, dst); cause != nil {
+			log.Println("DOWNLOAD FAILED", err)
 			return errorsx.Wrapf(cause, "failed to download %s %v", w.meta.ID.String(), cause)
 		}
 

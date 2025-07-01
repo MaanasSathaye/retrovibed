@@ -161,10 +161,9 @@ func Verify(ctx context.Context, t torrent.Torrent) error {
 	return torrent.Verify(ctx, t)
 }
 
-func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata, t torrent.Torrent) (err error) {
+func DownloadInto(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata, t torrent.Torrent, dst io.Writer) (err error) {
 	var (
 		downloaded int64
-		mhash      = md5.New()
 	)
 
 	pctx, done := context.WithCancel(ctx)
@@ -181,7 +180,7 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 	}
 
 	// just copying as we receive data to block until done.
-	if downloaded, err = torrent.DownloadInto(ctx, mhash, t, torrent.TuneAnnounceUntilComplete, torrent.TuneNewConns); err != nil {
+	if downloaded, err = torrent.DownloadInto(ctx, dst, t, torrent.TuneAnnounceUntilComplete, torrent.TuneNewConns); err != nil {
 		return errorsx.Wrap(err, "download failed")
 	}
 
@@ -234,6 +233,13 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 	return nil
 }
 
+func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata, t torrent.Torrent) (err error) {
+	var (
+		mhash = md5.New()
+	)
+	return DownloadInto(ctx, q, vfs, md, t, mhash)
+}
+
 func DescriptionFromPath(md *Metadata, path string) string {
 	tmp := filepath.Base(path)
 	if hex.EncodeToString(md.Infohash) == tmp {
@@ -284,55 +290,6 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 			if err := MetadataProgressByID(ctx, q, md.ID, uint16(stats.ActivePeers), current).Scan(md); err != nil {
 				log.Println("failed to update progress", err)
 			}
-		case <-sub.Values:
-			if !l.Allow() {
-				continue
-			}
-
-			current := uint64(dl.BytesCompleted())
-			if md.Downloaded == current {
-				continue
-			}
-
-			statst.Reset(statsfreq)
-			stats := dl.Stats()
-
-			log.Printf(
-				"%s - %s: info(%t) seeding(%t), peers(a%d:h%d:p%d:t%d) pieces(m%d:o%d:u%d:c%d - f%d)\n", md.ID, hex.EncodeToString(md.Infohash), true, stats.Seeding, stats.ActivePeers, stats.HalfOpenPeers, stats.PendingPeers, stats.TotalPeers,
-				stats.Missing, stats.Outstanding, stats.Unverified, stats.Completed, stats.Failed,
-			)
-
-			if err := MetadataProgressByID(ctx, q, md.ID, uint16(stats.ActivePeers), current).Scan(md); err != nil {
-				log.Println("failed to update progress", err)
-			}
-		case <-ctx.Done():
-			return
-		}
-	}
-}
-
-func Monitor(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torrent.Torrent) {
-	var (
-		statsfreq = envx.Duration(1*time.Minute, env.TorrentDownloadStats)
-		sub       pubsub.Subscription
-	)
-
-	log.Println("monitoring download deadman switch initiated", md.ID, md.Description, md.Tracker, statsfreq)
-	defer log.Println("monitoring download deadman switch completed", md.ID, md.Description, md.Tracker)
-	// Revisit once resume is working.
-	if err := dl.Tune(torrent.TuneSubscribe(&sub)); err != nil {
-		log.Println("unable to subscribe", err)
-		return
-	}
-	defer sub.Close()
-
-	statst := time.NewTicker(statsfreq)
-	l := rate.NewLimiter(rate.Every(time.Second), 1)
-	for {
-		select {
-		case <-statst.C:
-			log.Println("NOTHING RECEIVED FOR TOO LONG")
-			return
 		case <-sub.Values:
 			if !l.Allow() {
 				continue

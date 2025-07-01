@@ -86,7 +86,7 @@ func Main(args ...string) {
 	})
 
 	go debugx.OnSignal(shellCli.Context, func(ctx context.Context) error {
-		dctx, done := context.WithTimeout(ctx, envx.Duration(15*time.Second, "DEEPPOOL_PROFILING_DURATION"))
+		dctx, done := context.WithTimeout(ctx, envx.Duration(time.Minute, "DEEPPOOL_PROFILING_DURATION"))
 		defer done()
 
 		log.Println("PROFILING INITIATED")

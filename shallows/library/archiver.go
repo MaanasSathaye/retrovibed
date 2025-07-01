@@ -40,7 +40,7 @@ func Archive(ctx context.Context, q sqlx.Queryer, md Metadata, vfs fsx.Virtual, 
 		return err
 	}
 
-	return MetadataArchivedByID(ctx, q, md.ID, uploaded.Id, uploaded.Usage).Scan(&md)
+	return MetadataArchivedByID(ctx, sqlx.Debug(q), md.ID, uploaded.Id, uploaded.Usage).Scan(&md)
 }
 
 func Reclaim(ctx context.Context, md Metadata, vfs fsx.Virtual) error {

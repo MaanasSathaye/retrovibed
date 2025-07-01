@@ -1,10 +1,13 @@
 package iox
 
 import (
+	"context"
 	"errors"
 	"io"
+	"log"
 	"os"
 	"sync/atomic"
+	"time"
 )
 
 // IgnoreEOF returns nil if err is io.EOF
@@ -141,4 +144,29 @@ func (me *SectionWriter) WriteAt(b []byte, off int64) (n int, err error) {
 		b = b[:me.len-off]
 	}
 	return me.w.WriteAt(b, me.off+off)
+}
+
+func NewTimeoutWriter(timedout context.CancelFunc, d time.Duration, dst io.Writer) *TimeoutWriter {
+	m := time.NewTimer(d)
+	go func() {
+		<-m.C
+		timedout()
+	}()
+	return &TimeoutWriter{
+		d:     d,
+		m:     m,
+		inner: dst,
+	}
+}
+
+type TimeoutWriter struct {
+	d     time.Duration
+	m     *time.Timer
+	inner io.Writer
+}
+
+func (t TimeoutWriter) Write(b []byte) (n int, err error) {
+	log.Println("DERP DERP")
+	t.m.Reset(t.d)
+	return t.inner.Write(b)
 }
