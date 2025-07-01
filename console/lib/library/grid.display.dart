@@ -158,7 +158,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                     ),
                     loading: ds.Loading.Sized(width: 12.0, height: 12.0),
                   ),
-                  Icon(Icons.tune),
+                  ds.buttons.settings(onPressed: () { print("settings not implement for media");}),
                 ],
               ),
               autofocus: true,

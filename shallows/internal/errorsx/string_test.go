@@ -32,5 +32,4 @@ func TestString(t *testing.T) {
 		assert.True(t, errors.Is(wrapped, local))
 		assert.True(t, errors.Is(wrapped, local))
 	})
-
 }

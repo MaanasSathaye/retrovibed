@@ -3,6 +3,7 @@ package torrent
 import (
 	"errors"
 	"io"
+	"log"
 	"sync"
 	"sync/atomic"
 
@@ -31,7 +32,7 @@ func (t *blockingreader) ReadAt(p []byte, offset int64) (n int, err error) {
 	pid := uint64(t.c.meta.OffsetToIndex(offset))
 
 	once := sync.OnceFunc(func() {
-		// log.Println("enqueuing chunk", pid, offset, t.c.missing.String(), t.c.unverified.String())
+		log.Println("enqueuing chunk", pid, offset, t.c)
 		t.d.Enqueue(pid)
 	})
 

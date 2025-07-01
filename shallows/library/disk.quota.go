@@ -34,9 +34,10 @@ func (t *AsyncWakeup) Close() error {
 func NewAsyncWakeup(ctx context.Context) *AsyncWakeup {
 	ictx, done := context.WithCancel(ctx)
 	q := make(chan error, 1)
+	wakeup := sync.NewCond(&sync.Mutex{})
 	donecond := sync.NewCond(&sync.Mutex{})
 	a := &AsyncWakeup{
-		Cond:     sync.NewCond(&sync.Mutex{}),
+		Cond:     wakeup,
 		doneCond: donecond,
 		C:        q,
 		cleanup: sync.OnceFunc(func() {
@@ -45,6 +46,7 @@ func NewAsyncWakeup(ctx context.Context) *AsyncWakeup {
 			select {
 			case q <- errAsyncClosed:
 				log.Println("async wakeup sent closed error")
+				wakeup.Broadcast()
 			case <-ctx.Done():
 				log.Println("async wakeup parent context was cancelled")
 			}
@@ -54,10 +56,6 @@ func NewAsyncWakeup(ctx context.Context) *AsyncWakeup {
 			close(q)
 		}),
 	}
-	go func() {
-		<-ictx.Done()
-		a.Broadcast()
-	}()
 
 	go func() {
 		for {
@@ -143,7 +141,6 @@ func NewDiskQuota(ctx context.Context, c *http.Client, dir fsx.Virtual, q sqlx.Q
 	// signal everything is done so the close function returns
 	defer async.doneCond.Broadcast()
 	if err := untilClosed(); errorsx.Is(err, context.Canceled, context.DeadlineExceeded) {
-		log.Println("archival completed", err)
 		return nil
 	} else if errorsx.Is(err, errAsyncClosed) {
 		// run a final time to ensure everything is archived.

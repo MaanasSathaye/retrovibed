@@ -13,7 +13,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/bep0051"
 	"github.com/james-lawrence/torrent/connections"
@@ -80,9 +79,9 @@ func (t importPeer) torrents(tstore fsx.Virtual) iter.Seq2[string, torrent.Metad
 			infopath := tstore.Path(fmt.Sprintf("%s.torrent", magnet.ID))
 			if _, err := os.Stat(infopath); err == nil {
 				magnet.InfoBytes, _ = os.ReadFile(infopath)
-				log.Println("loaded existing torrent info", infopath)
+				// log.Println("loaded existing torrent info", infopath)
 			} else {
-				log.Println("torrent info unavailable", infopath)
+				// log.Println("torrent info unavailable", infopath)
 			}
 
 			if !yield(s.Text(), magnet) {
@@ -126,9 +125,7 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	}
 
 	async := library.NewAsyncWakeup(gctx.Context)
-	if t.Archive {
-		errorsx.Log(daemons.AutoArchival(gctx.Context, db, mediastore, async, t.Archive))
-	}
+	errorsx.Log(daemons.AutoArchival(gctx.Context, db, mediastore, async, t.Archive))
 
 	peers := make([]torrent.Peer, 0, 128)
 	for _, p := range t.Peer {
@@ -178,7 +175,7 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		torrent.ClientConfigInfoLogger(torrentlogging),
 		torrent.ClientConfigDebugLogger(torrentlogging),
 		torrent.ClientConfigMuxer(tm),
-		torrent.ClientConfigBucketLimit(256),
+		torrent.ClientConfigMaxOutstandingRequests(2048),
 		torrent.ClientConfigHTTPUserAgent("retrovibed/0.0"),
 		torrent.ClientConfigConnectionClosed(func(ih metainfo.Hash, stats torrent.ConnStats, remaining int) {
 			if stats.BytesWrittenData.Uint64() == 0 {
@@ -213,23 +210,31 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	}
 	defer tclient.Close()
 
-	importfn := func(ctx context.Context, w workload) error {
+	importfn := func(ctx context.Context, w workload) (err error) {
 		var (
 			info *metainfo.Info
 		)
+
+		log.Println("import initiated", w.meta.ID)
+		defer log.Println("import completed", w.meta.ID)
+		defer func() {
+			if err == nil {
+				return
+			}
+		}()
 
 		if len(w.meta.InfoBytes) == 0 {
 			var (
 				cause error
 			)
-			log.Printf("awaiting torrent info %s\n", w.meta.ID)
+			// log.Printf("awaiting torrent info %s\n", w.meta.ID)
 
 			info, cause = tclient.Info(ctx, w.meta, torrent.TunePeers(peers...))
 			if cause != nil {
 				return errorsx.Wrapf(cause, "failed to retrieve torrent info %s", w.meta.ID)
 			}
 
-			log.Println("torrent info received", w.meta.ID.String(), spew.Sdump(w.meta.Metainfo()))
+			// log.Println("torrent info received", w.meta.ID.String(), spew.Sdump(w.meta.Metainfo()))
 			if w.meta, cause = torrent.NewFromInfo(info); err != nil {
 				return errorsx.Wrapf(cause, "failed to retrieve torrent info %s", w.meta.ID)
 			}
@@ -237,7 +242,7 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 				return errorsx.Wrapf(cause, "failed to record torrent %s %v", w.meta.ID, cause)
 			}
 		} else {
-			log.Printf("torrent info available resuming %s %d\n", w.meta.ID, len(w.meta.InfoBytes))
+			// log.Printf("torrent info available resuming %s %d\n", w.meta.ID, len(w.meta.InfoBytes))
 			if _info, cause := w.meta.Metainfo().UnmarshalInfo(); cause != nil {
 				return errorsx.Wrapf(cause, "failed to resume torrent %s", w.meta.ID)
 			} else {
@@ -257,7 +262,8 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 			return errorsx.Wrapf(cause, "failed to record metadata %s", w.meta.ID.String())
 		}
 
-		dl, _, cause := tclient.Start(w.meta, torrent.TuneDisableTrackers, torrent.TunePeers(peers...), torrent.TuneAutoDownload)
+		log.Println("---------------------------------- starting", w.meta.ID)
+		dl, _, cause := tclient.Start(w.meta, torrent.TuneDisableTrackers, torrent.TunePeers(peers...), torrent.TuneVerifyFull)
 		if cause != nil {
 			return errorsx.Wrapf(cause, "failed to start magnet %s - %T: %+v\n", w.meta.ID.String(), cause, cause)
 		}
@@ -266,11 +272,16 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		// it'll continue to try in the background but the import process will context.
 		dctx, done := context.WithCancel(ctx)
 		dst := iox.NewTimeoutWriter(done, time.Minute, io.Discard)
+		log.Println("---------------------------------- downloading", w.meta.ID)
 		if cause := tracking.DownloadInto(dctx, db, rootstore, &lmd, dl, dst); cause != nil {
-			log.Println("DOWNLOAD FAILED", err)
 			return errorsx.Wrapf(cause, "failed to download %s %v", w.meta.ID.String(), cause)
 		}
 
+		if cause := tclient.Stop(w.meta); cause != nil {
+			return errorsx.Wrapf(cause, "failed to shutdown torrent %s %v", w.meta.ID.String(), cause)
+		}
+
+		log.Println("---------------------------------- COMPLETED", w.meta.ID)
 		if t.Archive {
 			async.Broadcast()
 		}
@@ -297,7 +308,5 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		return err
 	}
 
-	log.Println("SHUTTING DOWN ASYNC ARCHIVAL INITIATED")
-	defer log.Println("SHUTTING DOWN ASYNC ARCHIVAL COMPLETED")
 	return async.Close()
 }

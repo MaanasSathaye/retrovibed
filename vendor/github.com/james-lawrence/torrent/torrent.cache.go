@@ -124,9 +124,6 @@ func (t *memoryseeding) Load(cl *Client, id int160.T) (_ *torrent, cached bool, 
 		return x, true, nil
 	}
 
-	t._mu.Lock()
-	defer t._mu.Unlock()
-
 	md, err := t.MetadataStore.Read(id)
 	if err != nil {
 		return nil, false, err

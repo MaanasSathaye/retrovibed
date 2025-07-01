@@ -5,10 +5,10 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+	"log"
 	"runtime"
 	"sync"
 	"sync/atomic"
-	"time"
 
 	"github.com/RoaringBitmap/roaring/v2"
 	"github.com/james-lawrence/torrent/dht/int160"
@@ -34,6 +34,8 @@ func newDigestsFromTorrent(t *torrent) digests {
 					return
 				}
 
+				log.Printf("%s recording bitmap initiated\n", t.chunks)
+				defer log.Printf("%s recording bitmap completed\n", t.chunks)
 				id := int160.FromByteArray(t.md.ID)
 				if err := t.cln.torrents.bm.Write(id, t.chunks.ReadableBitmap()); err != nil {
 					t.cln.config.errors().Printf("failed to record missing chunks bitmap: %s - %v\n", id, err)
@@ -50,26 +52,25 @@ func newDigests(iora io.ReaderAt, retrieve func(int) *metainfo.Piece, complete f
 
 	// log.Printf("new digest %T\n", iora)
 	return digests{
-		ReaderAt:  iora,
-		retrieve:  retrieve,
-		complete:  complete,
-		pending:   newBitQueue(),
-		c:         sync.NewCond(&sync.Mutex{}),
-		lastwrite: time.Now(),
+		ReaderAt: iora,
+		retrieve: retrieve,
+		complete: complete,
+		pending:  newBitQueue(),
+		c:        sync.NewCond(&sync.Mutex{}),
 	}
 }
 
 // digests is responsible correctness of received data.
 type digests struct {
-	ReaderAt  io.ReaderAt
-	lastwrite time.Time
-	retrieve  func(int) *metainfo.Piece
-	complete  func(int, error) func()
+	ReaderAt io.ReaderAt
+	retrieve func(int) *metainfo.Piece
+	complete func(int, error) func()
 	// marks whether digest is actively processing.
 	reaping int64
 	// cache of the pieces that need to be verified.
-	pending *bitQueue
-	c       *sync.Cond
+	pending   *bitQueue
+	c         *sync.Cond
+	completed atomic.Uint64
 }
 
 // Enqueue a piece to check its completed digest.
@@ -135,9 +136,8 @@ func (t *digests) check(idx int) {
 	trackmissing := t.complete(idx, nil)
 
 	// persist missing chunks to disk
-	if ts := time.Now(); t.lastwrite.Before(ts.Add(time.Minute)) {
+	if ts := t.completed.Add(1); ts%100 == 0 {
 		trackmissing()
-		t.lastwrite = ts
 	}
 }
 

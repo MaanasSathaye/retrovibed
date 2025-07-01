@@ -39,6 +39,9 @@ func PrepareDefaultFeeds(ctx context.Context, q sqlx.Queryer) error {
 		feeds []tracking.RSS
 	)
 
+	log.Println("syncing default rss feeds initialized")
+	defer log.Println("syncing default rss feeds completed")
+
 	encoded, err := fsx.AutoCached(userx.DefaultConfigDir(userx.DefaultRelRoot(), "default.feeds.json"), func() (_ []byte, _ error) {
 		return json.Marshal([]tracking.RSS{
 			{

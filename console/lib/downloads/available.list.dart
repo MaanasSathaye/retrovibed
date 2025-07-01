@@ -167,6 +167,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                 extensions: ["torrent"],
                 loading: ds.Loading.Sized(width: 12.0, height: 12.0),
               ),
+              ds.buttons.settings(onPressed: () { print("settings not implement for downloads availability");}),
             ],
           ),
           Row(

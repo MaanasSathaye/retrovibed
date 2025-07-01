@@ -363,7 +363,7 @@ func (cl *Client) incomingConnection(nc net.Conn) {
 	defer nc.Close()
 	if tc, ok := nc.(*net.TCPConn); ok {
 		tc.SetLinger(0)
-		tc.SetKeepAlive(true)
+		// tc.SetKeepAlive(true)
 	}
 
 	addrport, err := netx.AddrPort(nc.RemoteAddr())
@@ -416,7 +416,7 @@ func (cl *Client) establishOutgoingConnEx(ctx context.Context, t *torrent, addr 
 	// it now in case we close the connection forthwith.
 	if tc, ok := nc.(*net.TCPConn); ok {
 		tc.SetLinger(0)
-		tc.SetKeepAlive(true)
+		// tc.SetKeepAlive(true)
 	}
 
 	dl := time.Now().Add(cl.config.HandshakesTimeout)

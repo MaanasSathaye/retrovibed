@@ -726,8 +726,6 @@ func (t *chunks) Hashed(pid uint64, cause error) {
 }
 
 func (t *chunks) Complete(pid uint64) (changed bool) {
-	// trace(fmt.Sprintf("initiated: %p", t.mu.(*DebugLock).m))
-	// defer trace(fmt.Sprintf("completed: %p", t.mu.(*DebugLock).m))
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
@@ -737,8 +735,6 @@ func (t *chunks) Complete(pid uint64) (changed bool) {
 		tmp := t.missing.CheckedRemove(uint32(cidx))
 		tmp = t.unverified.CheckedRemove(uint32(cidx)) || tmp
 		changed = changed || tmp
-
-		// log.Output(2, fmt.Sprintf("c(%p) marked completed: (%020d - %d) r(%d,%d,%d)\n", t, r.Digest, cidx, r.Index, r.Begin, r.Length))
 	}
 
 	t.completed.AddInt(int(pid))
@@ -779,4 +775,19 @@ func (t *chunks) ChunksFailed(pid uint64) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 	t.failed.AddRange(t.Range(pid))
+}
+
+func (t *chunks) String() string {
+	t.mu.RLock()
+	defer t.mu.RUnlock()
+	return fmt.Sprintf(
+		"chunk(%p) m(%d) f(%d) o(%d) u(%d) c(%d) p(%d)",
+		t,
+		t.missing.GetCardinality(),
+		t.failed.GetCardinality(),
+		len(t.outstanding),
+		t.unverified.GetCardinality(),
+		t.completed.GetCardinality(),
+		t.pieces,
+	)
 }

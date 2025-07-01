@@ -4,10 +4,11 @@ import (
 	"context"
 	"errors"
 	"io"
-	"log"
 	"os"
 	"sync/atomic"
 	"time"
+
+	"github.com/retrovibed/retrovibed/internal/errorsx"
 )
 
 // IgnoreEOF returns nil if err is io.EOF
@@ -166,7 +167,24 @@ type TimeoutWriter struct {
 }
 
 func (t TimeoutWriter) Write(b []byte) (n int, err error) {
-	log.Println("DERP DERP")
 	t.m.Reset(t.d)
 	return t.inner.Write(b)
+}
+
+type readCompositeCloser struct {
+	io.Reader
+	closefn []func() error
+}
+
+func (t readCompositeCloser) Close() (err error) {
+	for _, fn := range t.closefn {
+		err = errorsx.Compact(err, fn())
+	}
+	return err
+}
+
+// WriteNopCloser returns a WriteCloser with a no-op Close method wrapping
+// the provided Writer w.
+func ReaderCompositeCloser(w io.Reader, closers ...func() error) io.ReadCloser {
+	return readCompositeCloser{Reader: w, closefn: closers}
 }

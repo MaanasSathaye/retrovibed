@@ -1,13 +1,13 @@
 package httpx
 
 import (
+	"context"
 	"fmt"
+	"io"
 	"mime/multipart"
 	"net/textproto"
-	"os"
 	"strings"
 
-	"github.com/retrovibed/retrovibed/internal/envx"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/iox"
 )
@@ -26,26 +26,19 @@ func NewMultipartHeader(mimetype string, fieldname string, filename string) text
 	return h
 }
 
-func Multipart(do func(*multipart.Writer) error) (contentType string, _ *os.File, err error) {
-	buffer, err := os.CreateTemp(envx.String("", "CACHE_DIRECTORY"), "multipart.upload.bin.")
-	if err != nil {
-		return "", nil, errorsx.Wrap(err, "unable to create tmpfile buffer")
-	}
+func Multipart(do func(*multipart.Writer) error) (contentType string, _ io.ReadCloser, err error) {
+	r, w := io.Pipe()
 
-	mw := multipart.NewWriter(buffer)
+	mw := multipart.NewWriter(w)
 
-	if err = do(mw); err != nil {
-		return "", nil, err
-	}
+	ctx, done := context.WithCancelCause(context.Background())
+	go func() {
+		err := do(mw)
+		done(errorsx.Compact(err, mw.Close(), w.CloseWithError(err)))
+	}()
 
-	// Close the form
-	if err = mw.Close(); err != nil {
-		return "", nil, errorsx.Wrap(err, "unable to close writer request")
-	}
-
-	if err = iox.Rewind(buffer); err != nil {
-		return "", nil, errorsx.Wrap(err, "rewind buffer")
-	}
-
-	return mw.FormDataContentType(), buffer, nil
+	return mw.FormDataContentType(), iox.ReaderCompositeCloser(r, func() error {
+		done(nil)
+		return context.Cause(ctx)
+	}, r.Close), nil
 }
