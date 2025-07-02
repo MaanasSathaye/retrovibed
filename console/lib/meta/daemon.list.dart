@@ -133,7 +133,6 @@ class _DaemonList extends State<DaemonList> {
           _RowDisplay(
             hostname: current,
             current: v,
-            // cause: _rowcause,
             onTap:
                 widget.onTap == null
                     ? null
@@ -143,9 +142,9 @@ class _DaemonList extends State<DaemonList> {
                           .then((v) {
                             return widget.onTap!(v);
                           })
-                          .then((v) {
-                            if (true) throw Exception("DERP DERP");
-                          })
+                          // .then((v) {
+                          //   if (true) throw Exception("DERP DERP");
+                          // })
                           .whenComplete(() {
                             setState(() {});
                           });
@@ -185,7 +184,10 @@ class _RowDisplay extends StatelessWidget {
             onTap == null
                 ? null
                 : () {
-                  onTap!().catchError(
+                  onTap!()
+                  .catchError(ds.Error.boundary(context, current, ds.Error.offline), test: ds.ErrorTests.offline)
+                  .catchError(ds.Error.boundary(context, current, ds.Error.connectivity), test: ds.ErrorTests.connectivity)
+                  .catchError(
                     ds.Error.boundary(context, current, ds.Error.unknown),
                   );
                 },

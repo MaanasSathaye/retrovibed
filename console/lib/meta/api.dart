@@ -16,9 +16,15 @@ Future<HttpClientResponse> healthz({String? host}) async {
     final zhost = hostport.split(":").first;
     return zhost == _host;
   };
-  return c
-      .getUrl(Uri.https(hostport, "/healthz"))
-      .then(httpx.dart_io_auto_error);
+
+  return c.getUrl(Uri.https(hostport, "/healthz"))
+      .then((req) {
+        req.followRedirects = false;
+        return req;
+      })
+      .then(httpx.dart_io_auto_error).timeout(Duration(seconds: 3)).catchError((cause) {
+        throw cause;
+      });
 }
 
 Future<AuthzResponse> authz({String? host}) {
@@ -101,10 +107,9 @@ abstract class daemons {
         });
   }
 
-
   // check if the daemon is connectable.
   static Future<Daemon> connectable(Daemon v) {
-        return healthz(host: v.hostname)
+    return healthz(host: v.hostname)
         .then((_) => authz(host: v.hostname))
         .then((_) => daemons.touch(v.id))
         .then((_) => v);

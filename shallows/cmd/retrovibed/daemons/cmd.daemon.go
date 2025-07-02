@@ -12,6 +12,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/justinas/alice"
 	"golang.org/x/crypto/ssh"
+	"golang.org/x/time/rate"
 	"golang.zx2c4.com/wireguard/tun/netstack"
 
 	"github.com/james-lawrence/torrent/connections"
@@ -197,10 +198,10 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		torrent.ClientConfigDebugLogger(torrentlogging),
 		torrent.ClientConfigMuxer(tm),
 		torrent.ClientConfigBucketLimit(256),
-		torrent.ClientConfigMaxOutstandingRequests(2048),
 		torrent.ClientConfigDialPoolSize(runtime.NumCPU()),
+		torrent.ClientConfigDialRateLimit(rate.NewLimiter(rate.Limit(32), 4)),
 		torrent.ClientConfigMaxOutstandingRequests(int(t.TorrentMaxRequests)),
-		torrent.ClientConfigPeerLimits(48, 128),
+		torrent.ClientConfigPeerLimits(runtime.NumCPU()/2, runtime.NumCPU()),
 		torrent.ClientConfigHTTPUserAgent("retrovibed/0.0"),
 		torrent.ClientConfigConnectionClosed(func(ih metainfo.Hash, stats torrent.ConnStats, remaining int) {
 			if stats.BytesWrittenData.Uint64() == 0 {
