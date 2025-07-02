@@ -200,6 +200,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		torrent.ClientConfigBucketLimit(256),
 		torrent.ClientConfigDialPoolSize(runtime.NumCPU()),
 		torrent.ClientConfigDialRateLimit(rate.NewLimiter(rate.Limit(32), 4)),
+		torrent.ClientConfigPeerLimits(12, 24),
 		torrent.ClientConfigMaxOutstandingRequests(int(t.TorrentMaxRequests)),
 		torrent.ClientConfigPeerLimits(runtime.NumCPU()/2, runtime.NumCPU()),
 		torrent.ClientConfigHTTPUserAgent("retrovibed/0.0"),
