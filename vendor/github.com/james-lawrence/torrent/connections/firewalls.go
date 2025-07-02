@@ -150,7 +150,7 @@ func NewFirewall(rules ...Firewall) FirewallStateful {
 func AutoFirewall() FirewallStateful {
 	return NewFirewall(
 		BanInvalidPort{},
-		NewBloomBanIP(time.Hour),
+		NewBloomBanIP(10*time.Minute),
 	)
 }
 

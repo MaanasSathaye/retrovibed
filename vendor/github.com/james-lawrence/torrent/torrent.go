@@ -939,7 +939,7 @@ func (t *torrent) pieceLength(piece uint64) pp.Integer {
 	if piece == t.chunks.pieces-1 {
 		ret := pp.Integer(t.info.TotalLength() % t.info.PieceLength)
 		if ret == 0 {
-			panic("invalid zero length for final piece")
+			return pp.Integer(t.info.PieceLength)
 		}
 
 		return ret
@@ -1003,7 +1003,6 @@ func (t *torrent) openNewConns() {
 		p  Peer
 	)
 
-	defer t.updateWantPeersEvent()
 	for {
 		if !t.wantConns() {
 			t.cln.config.debug().Println("openNewConns: connections not wanted")
@@ -1015,7 +1014,7 @@ func (t *torrent) openNewConns() {
 			return
 		}
 
-		t.cln.config.debug().Printf("initiating connection to peer %p %x %s %d\n", t, p.ID, p.IP, p.Port)
+		t.cln.config.debug().Printf("initiating connection to peer %p %s %d\n", t, p.IP, p.Port)
 		t.initiateConn(context.Background(), p)
 	}
 }

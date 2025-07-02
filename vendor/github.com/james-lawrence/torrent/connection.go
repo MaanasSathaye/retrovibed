@@ -66,12 +66,13 @@ func newConnection(cfg *ClientConfig, nc net.Conn, outgoing bool, remote netip.A
 		peerfastset:             roaring.NewBitmap(),
 		fastset:                 roaring.NewBitmap(),
 		claimed:                 roaring.NewBitmap(),
-		blacklisted:             roaring.NewBitmap(),
 		sentHaves:               roaring.NewBitmap(),
 		requests:                make(map[uint64]request, cfg.maximumOutstandingRequests),
 		PeerRequests:            make(map[request]struct{}, cfg.maximumOutstandingRequests),
 		PeerExtensionIDs:        make(map[pp.ExtensionName]pp.ExtensionNumber),
+		refreshrequestable:      atomicx.Pointer(ts),
 		lastMessageReceived:     atomicx.Pointer(ts),
+		lastRejectReceived:      atomicx.Pointer(ts),
 		lastUsefulChunkReceived: ts,
 		extensions:              extensions,
 		cfg:                     cfg,
@@ -113,8 +114,11 @@ type connection struct {
 	// other ConnStat instances as determined when the *torrent became known.
 	reconciledHandshakeStats bool
 
-	lastMessageReceived     *atomic.Pointer[time.Time]
-	lastRejectReceived      *atomic.Pointer[time.Time]
+	// track whenever AllowFast, BitField, Have messages have been received since the last cycle. which allows us to properly single changes.
+	refreshrequestable  *atomic.Pointer[time.Time]
+	lastMessageReceived *atomic.Pointer[time.Time]
+	lastRejectReceived  *atomic.Pointer[time.Time]
+
 	chunksRejected          atomic.Int32
 	chunksReceived          atomic.Int32
 	completedHandshake      time.Time
@@ -128,9 +132,11 @@ type connection struct {
 
 	lastStartedExpectingToReceiveChunks time.Time
 	cumulativeExpectedToReceiveChunks   time.Duration
+	chunksReceivedWhileExpecting        int64
 
-	Choked   bool // we have preventing the peer from making requests
-	requests map[uint64]request
+	Choked           bool // we have preventing the peer from making requests
+	requests         map[uint64]request
+	requestsLowWater int
 
 	// Indexed by metadata piece, set to true if posted and pending a
 	// response.
@@ -150,7 +156,6 @@ type connection struct {
 	PeerPrefersEncryption bool // as indicated by 'e' field in extension handshake
 
 	// bitmaps representing availability of chunks from the peer.
-	blacklisted *roaring.Bitmap // represents chunks which we've temporarily blacklisted.
 	claimed     *roaring.Bitmap // represents chunks which our peer claims to have available.
 	peerfastset *roaring.Bitmap // represents chunks which we allow our peer to request while choked.
 	fastset     *roaring.Bitmap // represents chunks which our peer will allow us to request while choked.
@@ -175,7 +180,6 @@ type connection struct {
 	PeerClientName     string
 
 	writeBuffer   *bytes.Buffer
-	uploadTimer   *time.Timer
 	respond       *sync.Cond
 	needsresponse atomic.Bool // used to track when responses need to be sent that might be missed by the respond condition.
 }
@@ -186,6 +190,7 @@ func (cn *connection) requestseq() iter.Seq[request] {
 			var (
 				req request
 			)
+
 			cn._mu.RLock()
 			for req = range cn.PeerRequests {
 				break
@@ -203,6 +208,7 @@ func (cn *connection) requestseq() iter.Seq[request] {
 		}
 	}
 }
+
 func (cn *connection) updateExpectingChunks() {
 	if cn.expectingChunks() {
 		if cn.lastStartedExpectingToReceiveChunks.IsZero() {
@@ -449,21 +455,6 @@ func (cn *connection) SetInterested(interested bool, msg func(pp.Message) bool) 
 // are okay.
 type messageWriter func(pp.Message) bool
 
-// Proxies the messageWriter's response.
-func (cn *connection) request(r request, mw messageWriter) bool {
-	cn.cmu().Lock()
-	cn.requests[r.Digest] = r
-	cn.cmu().Unlock()
-	cn.updateExpectingChunks()
-
-	return mw(pp.Message{
-		Type:   pp.Request,
-		Index:  r.Index,
-		Begin:  r.Begin,
-		Length: r.Length,
-	})
-}
-
 // connections check their own failures, this amortizes the cost of failures to
 // the connections themselves instead of bottlenecking at the torrent.
 func (cn *connection) checkFailures() error {
@@ -520,8 +511,9 @@ func (cn *connection) PostBitfield() (n int, err error) {
 }
 
 func (cn *connection) updateRequests() {
-	cn.needsresponse.Store(true)
-	cn.respond.Broadcast()
+	if cn.needsresponse.Swap(true) {
+		cn.respond.Broadcast()
+	}
 }
 
 func (cn *connection) peerPiecesChanged() {
@@ -553,7 +545,6 @@ func (cn *connection) peerSentHave(piece uint64) error {
 	cn.cmu().Lock()
 	for _, cidx := range cn.t.chunks.chunks(piece) {
 		cn.claimed.AddInt(cidx)
-		cn.blacklisted.Remove(uint32(cidx))
 	}
 	cn.cmu().Unlock()
 
@@ -817,7 +808,7 @@ func (cn *connection) ReadOne(ctx context.Context, decoder *pp.Decoder) (msg pp.
 	cn.lastMessageReceived.Store(langx.Autoptr(time.Now()))
 
 	if msg.Keepalive {
-		cn.cfg.debug().Printf("(%d) c(%p) seed(%t) - RECEIVED KEEPALIVE - missing(%d) - failed(%d) - outstanding(%d) - unverified(%d) - completed(%d)\n", os.Getpid(), cn, cn.cfg.Seed, cn.t.chunks.Cardinality(cn.t.chunks.missing), cn.t.chunks.failed.GetCardinality(), len(cn.t.chunks.outstanding), cn.t.chunks.unverified.GetCardinality(), cn.t.chunks.completed.GetCardinality())
+		cn.cfg.debug().Printf("(%d) c(%p) seed(%t) - RECEIVED KEEPALIVE - missing(%d) - failed(%d) - outstanding(%d) - unverified(%d) - completed(%d)\n", os.Getpid(), cn, cn.cfg.Seed, cn.t.chunks.Cardinality(cn.t.chunks.missing), cn.t.chunks.Cardinality(cn.t.chunks.failed), len(cn.t.chunks.outstanding), cn.t.chunks.Cardinality(cn.t.chunks.unverified), cn.t.chunks.Cardinality(cn.t.chunks.completed))
 		return
 	}
 
@@ -825,7 +816,7 @@ func (cn *connection) ReadOne(ctx context.Context, decoder *pp.Decoder) (msg pp.
 		return msg, fmt.Errorf("received fast extension message (type=%v) but extension is disabled", msg.Type)
 	}
 
-	cn.cfg.debug().Printf("(%d) c(%p) seed(%t) remote(%s) - RECEIVED MESSAGE: %s - pending(%d) - missing(%d) - failed(%d) - outstanding(%d) - unverified(%d) - completed(%d)\n", os.Getpid(), cn, cn.cfg.Seed, cn.conn.RemoteAddr(), msg.Type, len(cn.requests), cn.t.chunks.Cardinality(cn.t.chunks.missing), cn.t.chunks.failed.GetCardinality(), len(cn.t.chunks.outstanding), cn.t.chunks.unverified.GetCardinality(), cn.t.chunks.completed.GetCardinality())
+	cn.cfg.debug().Printf("(%d) c(%p) seed(%t) remote(%s) - RECEIVED MESSAGE: %s - pending(%d) - missing(%d) - failed(%d) - outstanding(%d) - unverified(%d) - completed(%d)\n", os.Getpid(), cn, cn.cfg.Seed, cn.conn.RemoteAddr(), msg.Type, len(cn.requests), cn.t.chunks.Cardinality(cn.t.chunks.missing), cn.t.chunks.Cardinality(cn.t.chunks.failed), len(cn.t.chunks.outstanding), cn.t.chunks.Cardinality(cn.t.chunks.unverified), cn.t.chunks.Cardinality(cn.t.chunks.completed))
 
 	switch msg.Type {
 	case pp.Choke:
@@ -854,13 +845,24 @@ func (cn *connection) ReadOne(ctx context.Context, decoder *pp.Decoder) (msg pp.
 		if err = cn.peerSentHave(uint64(msg.Index)); err != nil {
 			return msg, err
 		}
-		cn.updateRequests()
+
+		now := time.Now()
+		if ts := cn.refreshrequestable.Swap(langx.Autoptr(now.Add(30 * time.Millisecond))); ts.After(now) {
+			cn.updateRequests()
+		}
+
 		return msg, nil
 	case pp.Bitfield:
+
 		if err = cn.peerSentBitfield(msg.Bitfield); err != nil {
 			return msg, err
 		}
-		cn.updateRequests()
+
+		now := time.Now()
+		if ts := cn.refreshrequestable.Swap(langx.Autoptr(now.Add(30 * time.Millisecond))); ts.After(now) {
+			cn.updateRequests()
+		}
+
 		return msg, nil
 	case pp.Request:
 		if err = cn.onReadRequest(newRequestFromMessage(&msg)); err != nil {
@@ -923,10 +925,15 @@ func (cn *connection) ReadOne(ctx context.Context, decoder *pp.Decoder) (msg pp.
 		cn.clearRequests(req)
 		return msg, nil
 	case pp.AllowedFast:
-		defer cn.updateRequests()
 		cn._mu.Lock()
 		cn.fastset.AddRange(cn.t.chunks.Range(uint64(msg.Index)))
 		cn._mu.Unlock()
+
+		now := time.Now()
+		if ts := cn.refreshrequestable.Swap(langx.Autoptr(now.Add(30 * time.Millisecond))); ts.After(now) {
+			cn.updateRequests()
+		}
+
 		return msg, nil
 	case pp.Extended:
 		defer cn.updateRequests()
@@ -959,6 +966,7 @@ func (cn *connection) mainReadLoop(ctx context.Context) (err error) {
 			return context.Cause(ctx)
 		default:
 		}
+
 	}
 }
 
@@ -1071,8 +1079,6 @@ func (cn *connection) receiveChunk(msg *pp.Message) error {
 	cn.touched.AddInt(cn.t.chunks.requestCID(req))
 	cn.cmu().Unlock()
 
-	// cn.t.publishPieceChange(uint64(req.Index))
-
 	return nil
 }
 
@@ -1095,9 +1101,6 @@ func (cn *connection) clearRequests(reqs ...request) (ok bool) {
 			return false
 		}
 
-		// add requests that have been released to the reject set to prevent them from
-		// being requested from this connection until rejected is reset.
-		cn.blacklisted.AddInt(cn.t.chunks.requestCID(r))
 		delete(cn.requests, r.Digest)
 		return true
 	}
@@ -1159,6 +1162,7 @@ func (cn *connection) sendChunk(r request, msg func(pp.Message) bool) (more bool
 	} else if err == io.EOF {
 		err = nil
 	}
+
 	more = msg(pp.NewPiece(r.Index, r.Begin, b))
 	cn.lastChunkSent = time.Now()
 	return more, nil

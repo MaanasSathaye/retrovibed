@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
-	"log"
 	"runtime"
 	"sync"
 	"sync/atomic"
@@ -34,8 +33,6 @@ func newDigestsFromTorrent(t *torrent) digests {
 					return
 				}
 
-				log.Printf("%s recording bitmap initiated\n", t.chunks)
-				defer log.Printf("%s recording bitmap completed\n", t.chunks)
 				id := int160.FromByteArray(t.md.ID)
 				if err := t.cln.torrents.bm.Write(id, t.chunks.ReadableBitmap()); err != nil {
 					t.cln.config.errors().Printf("failed to record missing chunks bitmap: %s - %v\n", id, err)

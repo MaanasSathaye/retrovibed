@@ -14,7 +14,6 @@ import (
 
 // Creates a pool of go routines for dialing addresses allowing for dialing over
 // a set of different networks and picking the fastest one.
-// note: any tcp connections get set linger(0)
 func NewRacing(n uint16) *RacingDialer {
 	return &RacingDialer{
 		arena: asynccompute.New(func(ctx context.Context, w racingdialworkload) error {
@@ -29,13 +28,13 @@ func NewRacing(n uint16) *RacingDialer {
 				case w.fastest <- c:
 					w.done(nil)
 				}
-				atomic.AddUint64(w.outstanding, ^uint64(0))
+				w.outstanding.Add(^uint32(0))
 
 				return nil
 			}
 
 			w.failure.CompareAndSwap(nil, langx.Autoptr(err))
-			if atomic.AddUint64(w.outstanding, ^uint64(0)) == 0 {
+			if w.outstanding.Add(^uint32(0)) == 0 {
 				w.done(err)
 				close(w.fastest)
 			}
@@ -56,7 +55,7 @@ func initRacingDial(address string, d time.Duration, n uint64, done context.Canc
 		fastest:     make(chan net.Conn, 1),
 		failure:     atomicx.Pointer[error](nil),
 		done:        done,
-		outstanding: langx.Autoptr(n),
+		outstanding: atomicx.Uint32(n),
 	}
 }
 
@@ -67,7 +66,7 @@ type racingdialworkload struct {
 	done        context.CancelCauseFunc
 	failure     *atomic.Pointer[error]
 	fastest     chan net.Conn
-	outstanding *uint64
+	outstanding *atomic.Uint32
 }
 
 type RacingDialer struct {

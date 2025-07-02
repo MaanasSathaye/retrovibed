@@ -438,10 +438,10 @@ func NewDefaultClientConfig(mdstore MetadataStore, store storage.ClientImpl, opt
 		DhtStartingNodes: func(network string) dht.StartingNodesGetter {
 			return func() ([]dht.Addr, error) { return nil, nil }
 		},
-		UploadRateLimiter:   rate.NewLimiter(rate.Limit(128*bytesx.MiB), 64*bytesx.KiB),
+		UploadRateLimiter:   rate.NewLimiter(rate.Limit(128*bytesx.MiB), bytesx.MiB),
 		DownloadRateLimiter: rate.NewLimiter(rate.Limit(256*bytesx.MiB), bytesx.MiB),
 		dialRateLimiter:     rate.NewLimiter(rate.Limit(32), 128),
-		dialPoolSize:        uint16(runtime.NumCPU() * 32),
+		dialPoolSize:        uint16(runtime.NumCPU()),
 		ConnTracker:         conntrack.NewInstance(),
 		HeaderObfuscationPolicy: HeaderObfuscationPolicy{
 			Preferred:        false,
