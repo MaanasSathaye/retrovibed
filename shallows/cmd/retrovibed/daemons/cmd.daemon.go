@@ -66,7 +66,7 @@ type Command struct {
 	AutoDiscovery        bool             `flag:"" name:"auto-discovery" help:"EXPERIMENTAL: enable automatic discovery of content from peers" default:"false" env:"${env_auto_discovery}"`
 	AutoDownload         bool             `flag:"" name:"auto-download" help:"EXPERIMENTAL: enable automatically downloading torrent from the downloads folder" default:"false"`
 	AutoIdentifyMedia    bool             `flag:"" name:"auto-identify-media" help:"EXPERIMENTAL: enable automatically identifying media" default:"false" env:"${env_auto_identify_media}"`
-	AutoArchive          bool             `flag:"" name:"auto-archive" help:"EXPERIMENTAL: enable automatic archiving of eligible media" default:"false" env:"${env_auto_archive}"`
+	AutoArchive          bool             `flag:"" name:"auto-archive" help:"enable automatic archiving of eligible media" default:"true" env:"${env_auto_archive}"`
 	HTTP                 cmdopts.Listener `flag:"" name:"http-address" help:"address to serve daemon api from" default:"tcp://:9998" env:"${env_daemon_socket}"`
 	SelfSignedHosts      []string         `flag:"" name:"self-signed-hosts" help:"comma seperated list of hosts to add to the sign signed certificate" env:"${env_self_signed_hosts}"`
 	TorrentPort          uint16           `flag:"" name:"torrent-port" help:"port to use for torrenting" env:"${env_torrent_port}" default:"10000"`
