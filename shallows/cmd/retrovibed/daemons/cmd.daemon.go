@@ -196,7 +196,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		torrent.ClientConfigInfoLogger(torrentlogging),
 		torrent.ClientConfigDebugLogger(torrentlogging),
 		torrent.ClientConfigMuxer(tm),
-		torrent.ClientConfigBucketLimit(2048),
+		torrent.ClientConfigBucketLimit(256),
 		torrent.ClientConfigMaxOutstandingRequests(2048),
 		torrent.ClientConfigDialPoolSize(runtime.NumCPU()),
 		torrent.ClientConfigMaxOutstandingRequests(int(t.TorrentMaxRequests)),

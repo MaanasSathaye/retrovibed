@@ -63,15 +63,12 @@ func RunHandshookConn(c *connection, t *torrent) error {
 	}()
 
 	if err := c.mainReadLoop(ctx); err != nil {
-		errorsx.Log(err)
 		// check for errors from the writer.
 		err = errorsx.Compact(context.Cause(ctx), err)
-		errorsx.Log(err)
 		err = errorsx.StdlibTimeout(err, retrydelay, syscall.ECONNRESET)
 		err = errorsx.Wrapf(err, "%s - %s: error during main read loop", c.PeerClientName, remotreaddr)
 		cancel(err)
 		c.cfg.Handshaker.Release(c.conn, err)
-		errorsx.Log(err)
 		return err
 	}
 
@@ -397,7 +394,6 @@ func (t _connwriterRequests) determineInterest(msg func(pp.Message) bool) (avail
 
 	if ts := langx.Autoderef(t.refreshavailable.Load()); ts.After(time.Now()) {
 		t.cfg.debug().Printf("c(%p) seed(%t) allowing cached %d - %s\n", t.connection, t.t.seeding(), t.cachedavailable.GetCardinality(), time.Until(ts))
-		t.cachedavailable.AndNot(t.blacklisted)
 		return t.cachedavailable
 	}
 

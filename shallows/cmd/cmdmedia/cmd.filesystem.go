@@ -85,7 +85,7 @@ func (t importFilesystem) Run(gctx *cmdopts.Global) (err error) {
 }
 
 type exportFilesystem struct {
-	DryRun bool   `flag:"" name:"dry-run" help:"print what files would be imported but do not actually perform the import" default:"false"`
+	DryRun bool   `flag:"" name:"dry-run" help:"print what files would be exported but do not actually perform the export" default:"false"`
 	Path   string `arg:"" name:"path" help:"directory to export into" required:"true"`
 }
 
