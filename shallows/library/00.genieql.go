@@ -25,7 +25,7 @@ func MetadataInsertWithDefaults(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a Metadata) NewMetadataScannerStaticRow,
 ) {
-	gql.Into("library_metadata").Default("created_at", "updated_at", "hidden_at", "tombstoned_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, archive_id = EXCLUDED.archive_id")
+	gql.Into("library_metadata").Default("created_at", "updated_at", "hidden_at", "tombstoned_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, archive_id = CASE WHEN archive_id IN ('ffffffff-ffff-ffff-ffff-ffffffffffff', '00000000-0000-0000-0000-000000000000') THEN EXCLUDED.archive_id ELSE archive_id END")
 }
 
 func MetadataDeleteByID(
@@ -103,6 +103,13 @@ func MetadataTransferKnownMediaIDFromTorrent(
 	pattern func(ctx context.Context, q sqlx.Queryer, ts time.Time) NewMetadataScannerStatic,
 ) {
 	gql = gql.Query(`UPDATE library_metadata SET updated_at = NOW(), known_media_id = t.known_media_id FROM torrents_metadata AS t WHERE t.id = library_metadata.torrent_id AND t."updated_at" >= {ts} AND library_metadata.known_media_id = 'ffffffff-ffff-ffff-ffff-ffffffffffff' AND t.known_media_id NOT IN ('ffffffff-ffff-ffff-ffff-ffffffffffff', '00000000-0000-0000-0000-000000000000') RETURNING ` + MetadataScannerStaticColumns)
+}
+
+func MetadataForTorrentArchiveRetrieval(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, infohash []byte, offset uint64, length uint64) NewMetadataScannerStatic,
+) {
+	gql = gql.Query(`SELECT ` + MetadataScannerStaticColumns + ` FROM library_metadata INNER JOIN torrents_metadata AS tmd ON library_metadata.torrent_id = tmd.id WHERE to_hex(tmd.infohash) = to_hex({infohash}) AND {offset} BETWEEN disk_offset AND library_metadata.bytes AND library_metadata.archive_id NOT IN ('ffffffff-ffff-ffff-ffff-ffffffffffff', '00000000-0000-0000-0000-000000000000')`)
 }
 
 func ScoredScanner(gql genieql.Scanner, pattern func(relevance float64)) {

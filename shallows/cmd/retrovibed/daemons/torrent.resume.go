@@ -24,10 +24,13 @@ import (
 
 func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual, tclient *torrent.Client, tstore storage.ClientImpl) {
 	q := tracking.MetadataSearchBuilder().Where(
-		squirrel.And{
-			tracking.MetadataQueryInitiated(),
-			tracking.MetadataQueryIncomplete(),
-			tracking.MetadataQueryNotPaused(),
+		squirrel.Or{
+			squirrel.And{
+				tracking.MetadataQueryInitiated(),
+				tracking.MetadataQueryIncomplete(),
+				tracking.MetadataQueryNotPaused(),
+			},
+			tracking.MetadataQueryNeedsVerification(),
 		},
 	)
 
@@ -114,18 +117,10 @@ func VerifyTorrents(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual,
 		}
 
 		log.Println("verification completed", md.ID, md.Description, t.BytesCompleted(), "/", t.Info().TotalLength())
-		if t.BytesCompleted() == int64(md.Downloaded) {
-			tclient.Stop(metadata)
-			continue
-		} else {
-			tclient.Stop(metadata)
-		}
-
 		if err := tracking.MetadataVerifyByID(ctx, db, md.ID, 0, uint64(t.BytesCompleted())).Scan(&md); err != nil {
 			log.Println(errorsx.Wrapf(err, "unable to update bytes completed during verification %s - %s", md.ID, infopath))
 			continue
 		}
-
 	}
 
 	errorsx.Log(errorsx.Wrap(iter.Err(), "failed to resume all downloads"))

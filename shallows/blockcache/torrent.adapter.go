@@ -7,6 +7,7 @@ import (
 	"github.com/james-lawrence/torrent/storage"
 
 	"github.com/retrovibed/retrovibed/internal/fsx"
+	"github.com/retrovibed/retrovibed/internal/sqlx"
 )
 
 func NewTorrentFromVirtualFS(v fsx.Virtual) *TorrentCacheStorage {
@@ -17,6 +18,7 @@ var _ storage.ClientImpl = &TorrentCacheStorage{}
 
 type TorrentCacheStorage struct {
 	v fsx.Virtual
+	q sqlx.Queryer
 }
 
 func (t *TorrentCacheStorage) OpenTorrent(info *metainfo.Info, infoHash metainfo.Hash) (storage.TorrentImpl, error) {

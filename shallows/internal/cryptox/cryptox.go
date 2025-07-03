@@ -71,6 +71,7 @@ func NewReaderChaCha20(prng, src io.Reader) (*cipher.StreamReader, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return &cipher.StreamReader{
 		S: s,
 		R: src,
@@ -92,6 +93,30 @@ func NewWriterChaCha20(prng io.Reader, dst io.Writer) (*cipher.StreamWriter, err
 	if err != nil {
 		return nil, err
 	}
+	return &cipher.StreamWriter{
+		S: s,
+		W: dst,
+	}, nil
+}
+
+func NewOffsetWriterChaCha20(prng io.Reader, dst io.Writer, offset uint32) (*cipher.StreamWriter, error) {
+	key := make([]byte, chacha20.KeySize)
+	if _, err := io.ReadFull(prng, key); err != nil {
+		return nil, err
+	}
+
+	nonce := make([]byte, chacha20.NonceSize)
+	if _, err := io.ReadFull(prng, nonce); err != nil {
+		return nil, err
+	}
+
+	s, err := chacha20.NewUnauthenticatedCipher(key, nonce)
+	if err != nil {
+		return nil, err
+	}
+
+	s.SetCounter(offset / 64)
+
 	return &cipher.StreamWriter{
 		S: s,
 		W: dst,

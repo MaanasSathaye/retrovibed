@@ -20,10 +20,6 @@ func AutoArchival(ctx context.Context, q sqlx.Queryer, mediastore fsx.Virtual, a
 		return errorsx.Wrap(err, "failed to create oauth2 bearer token")
 	}
 
-	if err := metaapi.Register(ctx); err != nil {
-		return errorsx.Wrap(err, "unable to register with archival service")
-	}
-
 	s := backoffx.New(
 		backoffx.Constant(time.Hour),
 		backoffx.Jitter(0.1),

@@ -82,7 +82,7 @@ func MetadataCompleteByID(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, id string, peers uint16, downloaded uint64, uploaded uint64) NewMetadataScannerStaticRow,
 ) {
-	gql = gql.Query(`UPDATE torrents_metadata SET updated_at = NOW(), downloaded = {downloaded}, uploaded = {uploaded}, peers = {peers}, seeding = (bytes == {downloaded}) WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
+	gql = gql.Query(`UPDATE torrents_metadata SET updated_at = NOW(), verify_at = NOW(), downloaded = {downloaded}, uploaded = {uploaded}, peers = {peers}, seeding = (bytes == {downloaded}) WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
 }
 
 func MetadataUploadedByID(

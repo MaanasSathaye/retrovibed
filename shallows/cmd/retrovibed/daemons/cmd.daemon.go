@@ -20,10 +20,12 @@ import (
 	"github.com/james-lawrence/torrent/dht/krpc"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
+	"github.com/retrovibed/retrovibed/authn"
 	"github.com/retrovibed/retrovibed/blockcache"
 	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/downloads"
+	"github.com/retrovibed/retrovibed/internal/bytesx"
 	"github.com/retrovibed/retrovibed/internal/contextx"
 	"github.com/retrovibed/retrovibed/internal/dhtx"
 	"github.com/retrovibed/retrovibed/internal/env"
@@ -152,9 +154,25 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	}
 
 	var tstore storage.ClientImpl = blockcache.NewTorrentFromVirtualFS(torrentstore)
+
 	if t.TorrentLegacyStorage {
 		log.Println("--------------------------------------- LEGACY STORAGE IN USE - NOT A SUPPORTED CONFIGURATION ---------------------------------------")
 		tstore = storage.NewFile(torrentstore.Path(), storage.FileOptionPathMakerInfohash)
+	}
+
+	if t.AutoArchive {
+		if err := metaapi.Register(gctx.Context); err != nil {
+			return errorsx.Wrap(err, "unable to register with archival service")
+		}
+
+		errorsx.Log(AutoArchival(gctx.Context, db, mediastore, library.NewAsyncWakeup(gctx.Context), t.AutoArchive))
+		c, err := authn.Oauth2HTTPClient(gctx.Context)
+		if err != nil {
+			return errorsx.Wrap(err, "failed to create oauth2 http client for archival")
+		}
+		tstore = library.NewTorrentStorage(metaapi.JWTClient(c), db, tstore)
+	} else {
+		log.Println("automatic media archival is disabled")
 	}
 
 	log.Printf("USING STORAGE %T - %s\n", tstore, torrentstore.Path())
@@ -203,7 +221,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		torrent.ClientConfigAcceptLimit(rate.NewLimiter(rate.Limit(runtime.NumCPU()), runtime.NumCPU()*4)),
 		torrent.ClientConfigMaxOutstandingRequests(int(t.TorrentMaxRequests)),
 		torrent.ClientConfigPeerLimits(runtime.NumCPU()/2, runtime.NumCPU()),
-		// torrent.ClientConfigUploadLimit(rate.NewLimiter(rate.Limit(256*bytesx.MiB), 256*bytesx.KiB)),
+		torrent.ClientConfigUploadLimit(rate.NewLimiter(rate.Limit(256*bytesx.MiB), 256*bytesx.KiB)),
 		torrent.ClientConfigHTTPUserAgent("retrovibed/0.0"),
 		torrent.ClientConfigConnectionClosed(func(ih metainfo.Hash, stats torrent.ConnStats, remaining int) {
 			if stats.BytesWrittenData.Uint64() == 0 {
@@ -247,12 +265,6 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		}
 	} else {
 		log.Println("download folder monitoring disabled")
-	}
-
-	if t.AutoArchive {
-		errorsx.Log(AutoArchival(gctx.Context, db, mediastore, library.NewAsyncWakeup(gctx.Context), t.AutoArchive))
-	} else {
-		log.Println("automatic media archival is disabled")
 	}
 
 	{
