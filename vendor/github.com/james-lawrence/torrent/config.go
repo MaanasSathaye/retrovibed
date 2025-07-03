@@ -66,6 +66,9 @@ type ClientConfig struct {
 
 	// Rate limit connection dialing
 	dialRateLimiter *rate.Limiter
+	// rate limit for accepting connections
+	acceptRateLimiter *rate.Limiter
+
 	// Number of dialing routines to run.
 	dialPoolSize uint16
 
@@ -416,6 +419,27 @@ func ClientConfigPeerLimits[T constraints.Integer](low, high T) ClientConfigOpti
 	}
 }
 
+// specify the global capacity for uploading pieces to peers.
+func ClientConfigUploadLimit(l *rate.Limiter) ClientConfigOption {
+	return func(cc *ClientConfig) {
+		cc.UploadRateLimiter = l
+	}
+}
+
+// specify the global capacity for downloading pieces from peers.
+func ClientConfigDownloadLimit(l *rate.Limiter) ClientConfigOption {
+	return func(cc *ClientConfig) {
+		cc.DownloadRateLimiter = l
+	}
+}
+
+// specify the global capacity for accepting inbound connections
+func ClientConfigAcceptLimit(l *rate.Limiter) ClientConfigOption {
+	return func(cc *ClientConfig) {
+		cc.acceptRateLimiter = l
+	}
+}
+
 // NewDefaultClientConfig default client configuration.
 func NewDefaultClientConfig(mdstore MetadataStore, store storage.ClientImpl, options ...ClientConfigOption) *ClientConfig {
 	cc := &ClientConfig{
@@ -442,6 +466,7 @@ func NewDefaultClientConfig(mdstore MetadataStore, store storage.ClientImpl, opt
 		DownloadRateLimiter: rate.NewLimiter(rate.Limit(256*bytesx.MiB), bytesx.MiB),
 		dialRateLimiter:     rate.NewLimiter(rate.Limit(32), 128),
 		dialPoolSize:        uint16(runtime.NumCPU()),
+		acceptRateLimiter:   rate.NewLimiter(rate.Limit(20), 12),
 		ConnTracker:         conntrack.NewInstance(),
 		HeaderObfuscationPolicy: HeaderObfuscationPolicy{
 			Preferred:        false,
