@@ -85,6 +85,7 @@ class _PlaylistState extends State<Playlist> {
   final FocusNode searchfocus = FocusNode();
   final FocusNode _selffocus = FocusNode();
   final player = Player();
+
   StreamIterator<Media> upcoming = StreamIterator(Stream.empty());
   Media? current;
   RingBuffer<Media> _upcoming = RingBuffer(128);

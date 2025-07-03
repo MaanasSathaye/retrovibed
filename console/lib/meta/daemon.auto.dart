@@ -159,7 +159,7 @@ class _DaemonAuto extends State<EndpointAuto> {
   @override
   Widget build(BuildContext context) {
     return ds.Overlay(
-      child: ds.Loading(
+      ds.Loading(
         loading: _loading,
         _res == null
             ? mdns.MDNSDiscovery(

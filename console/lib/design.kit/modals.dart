@@ -48,7 +48,7 @@ class NodeState extends State<Node> {
     final theme = Theme.of(context);
     final themex = Defaults.of(context);
     return screens.Overlay(
-      child: widget.child,
+      widget.child,
       overlay:
           current == null
               ? null
@@ -63,13 +63,18 @@ class NodeState extends State<Node> {
                     push(null);
                   }
                 },
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: theme.scaffoldBackgroundColor.withValues(
-                      alpha: themex.opaque?.a ?? 0.0,
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height,
+                  child: SingleChildScrollView(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: theme.scaffoldBackgroundColor.withValues(
+                          alpha: themex.opaque?.a ?? 0.0,
+                        ),
+                      ),
+                      child: current!,
                     ),
                   ),
-                  child: current!,
                 ),
               ),
       alignment: widget.alignment,

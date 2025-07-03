@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/library/known.media.card.dart';
 import 'package:retrovibed/media/media.pb.dart';
 import './api.dart' as api;
 
@@ -72,51 +73,21 @@ class _KnownMediaDisplayState extends State<KnownMediaDisplay> {
 
   @override
   Widget build(BuildContext context) {
-    final defaults = ds.Defaults.of(context);
-
-    return ds.Card(
-      onDoubleTap: widget.onDoubleTap,
-      leading: Center(
-        child: Text(
-          current.description,
-          overflow: TextOverflow.ellipsis,
-          maxLines: 1,
-        ),
-      ),
-      image: AspectRatio(
-        aspectRatio: 27 / 40,
-        child: Opacity(
-          opacity: 0.25,
-          child: SizedBox.expand(
-            child:
-                current.image == ""
-                    ? Icon(Icons.image_outlined, size: 128)
-                    : Image.network(current.image),
+    return KnownMediaCard(
+      current,
+      trailing: Row(
+        children: [
+          Flexible(
+            flex: 4,
+            child: Padding(
+              padding: EdgeInsets.only(top: 10.0),
+              child: Center(child: ds.Rating(rating: current.rating)),
+            ),
           ),
-        ),
+          Spacer(flex: 9),
+          IconButton(onPressed: widget.onSettings, icon: Icon(Icons.tune)),
+        ],
       ),
-      child: Container(
-        alignment: Alignment.topLeft,
-        child: Padding(
-          padding: defaults.padding ?? EdgeInsets.all(0.0),
-          child: Text(current.summary, textAlign: TextAlign.start),
-        ),
-      ),
-      trailing:
-          widget.trailing ??
-          Row(
-            children: [
-              Flexible(
-                flex: 4,
-                child: Padding(
-                  padding: EdgeInsets.only(top: 10.0),
-                  child: Center(child: ds.Rating(rating: current.rating)),
-                ),
-              ),
-              Spacer(flex: 9),
-              IconButton(onPressed: widget.onSettings, icon: Icon(Icons.tune)),
-            ],
-          ),
     );
   }
 }

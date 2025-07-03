@@ -170,7 +170,6 @@ class _ListDisplay extends State<ListDisplay> {
         autofocus: true,
       ),
       children: _res.items,
-      flex: 1,
       ds.Table.expanded<api.Wireguard>(
         (v) {
           final onTap = () {

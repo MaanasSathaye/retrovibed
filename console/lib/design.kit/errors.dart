@@ -67,8 +67,8 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
   @override
   Widget build(BuildContext context) {
     return screens.Overlay(
+      widget.child,
       key: _refresh,
-      child: widget.child,
       overlay: cause,
       alignment: widget.alignment,
       onTap: cause != null ? reset : null,

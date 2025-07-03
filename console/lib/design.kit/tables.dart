@@ -1,5 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:retrovibed/designkit.dart' as ds;
+import './errors.dart';
+import './theme.defaults.dart';
+import './inputs.dart';
+import './screens.dart' as screens;
+
+class TableRow extends StatelessWidget {
+  final List<Widget> children;
+  final void Function()? onTap;
+  const TableRow(this.children, {super.key, this.onTap = defaulttap});
+
+  @override
+  Widget build(BuildContext context) {
+    final themex = Theme.of(context);
+    final defaults = Defaults.of(context);
+    return Container(
+      padding: defaults.padding,
+      child: InkWell(
+        onTap: onTap,
+        hoverColor: themex.hoverColor,
+        mouseCursor: SystemMouseCursors.click,
+        borderRadius: BorderRadius.circular(defaults.spacing! / 2),
+        child: Row(spacing: defaults.spacing!, children: children),
+      ),
+    );
+  }
+}
 
 class Table<T> extends StatelessWidget {
   static Widget Function(List<T> i) expanded<T>(Widget Function(T i) render) {
@@ -16,7 +41,7 @@ class Table<T> extends StatelessWidget {
   static Widget Function(List<T> i) inline<T>(Widget Function(T i) render) {
     return (List<T> items) {
       return Column(
-        mainAxisSize: MainAxisSize.max,
+        mainAxisSize: MainAxisSize.min,
         children: items.map(render).toList(),
       );
     };
@@ -29,8 +54,7 @@ class Table<T> extends StatelessWidget {
   final Widget trailing;
   final Widget? overlay;
   final bool loading;
-  final ds.Error? cause;
-  final int flex;
+  final Error? cause;
 
   const Table(
     this.render, {
@@ -42,7 +66,6 @@ class Table<T> extends StatelessWidget {
     this.children = const [],
     this.loading = false,
     this.cause = null,
-    this.flex = 0,
   });
 
   @override
@@ -54,9 +77,10 @@ class Table<T> extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         leading,
-        ds.Overlay(
-          child: ds.Loading(loading: loading, cause: cause, content),
-          overlay: overlay,
+        screens.Loading(
+          screens.Overlay(content, overlay: overlay),
+          loading: loading,
+          cause: cause,
         ),
         trailing,
       ],

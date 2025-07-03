@@ -10,11 +10,7 @@ class Loading extends StatelessWidget {
   );
 
   static Widget Sized({double? width, double? height}) {
-    return Container(
-      width: width,
-      height: height,
-      child: Icon,
-    );
+    return Container(width: width, height: height, child: Icon);
   }
 
   final Widget? child;
@@ -32,10 +28,13 @@ class Loading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (loading) {
-      return Container(child: overlay, alignment: Alignment.center);
-    }
-
-    return s.Overlay(child: child ?? const SizedBox(), overlay: cause);
+    return s.Overlay(
+      Visibility(
+        visible: !loading,
+        maintainState: true, // Key: Keeps the state of widget.child when it's not visible
+        child: child ?? const SizedBox(), // The subtree you want to preserve
+      ),
+      overlay: loading ? overlay : cause,
+    );
   }
 }

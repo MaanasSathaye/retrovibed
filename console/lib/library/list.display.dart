@@ -154,7 +154,6 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
         autofocus: true,
       ),
       children: _res.items,
-      flex: 1,
       ds.Table.expanded<media.Media>(
         (v) => media.RowDisplay(
           media: v,

@@ -48,7 +48,8 @@ class _VideoState extends State<VideoScreen> {
 
     sub1 = widget.player.stream.playing.listen((state) {
       // prevents flashing to the search screen which switching tracks.
-      if (_playing && widget.player.state.playlist.medias.length == 0) return;
+      // if (_playing && widget.player.state.playlist.medias.length == 0) return;
+
       setState(() {
         _playing = state;
       });

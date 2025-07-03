@@ -78,6 +78,6 @@ class _AuthenticatedState extends State<Authenticated> {
 
   @override
   Widget build(BuildContext context) {
-    return ds.Overlay(child: widget.child, overlay: _cause);
+    return ds.Overlay(widget.child, overlay: _cause);
   }
 }

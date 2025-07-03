@@ -6,9 +6,9 @@ class Overlay extends StatelessWidget {
   final AlignmentGeometry alignment;
   final Function()? onTap;
 
-  const Overlay({
+  const Overlay(
+    this.child, {
     super.key,
-    required this.child,
     this.overlay,
     this.alignment = Alignment.center,
     this.onTap,
@@ -21,7 +21,6 @@ class Overlay extends StatelessWidget {
       alignment: alignment,
       children: [
         InkWell(onTap: onTap, child: child),
-        // Positioned.fill(child: overlay ?? const SizedBox())
         overlay ?? const SizedBox(),
       ],
     );

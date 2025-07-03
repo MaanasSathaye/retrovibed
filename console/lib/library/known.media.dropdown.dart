@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:retrovibed/designkit.dart' as ds;
-import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/httpx.dart' as httpx;
-import './known.table.row.dart';
+import 'known.media.card.dart';
 import './api.dart' as api;
 
 class KnownMediaDropdown extends StatefulWidget {
@@ -78,41 +77,59 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
 
   @override
   Widget build(BuildContext context) {
-    return forms.Container(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ds.SearchTray(
-            inputDecoration: InputDecoration(hintText: "search known media"),
-            controller: widget.controller,
-            focus: widget.focus,
-            onSubmitted: (v) {
-              setState(() {
-                _res.next.query = v;
-                _res.next.offset = fixnum.Int64(0);
-              });
-              refresh(_res.next);
+    final defaults = ds.Defaults.of(context);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ds.SearchTray(
+          inputDecoration: InputDecoration(hintText: "search known media"),
+          controller: widget.controller,
+          focus: widget.focus,
+          onSubmitted: (v) {
+            setState(() {
+              _res.next.query = v;
+              _res.next.offset = fixnum.Int64(0);
+            });
+            refresh(_res.next);
+          },
+          next: (i) {
+            setState(() {
+              _res.next.offset = i;
+            });
+            refresh(_res.next);
+          },
+          current: _res.next.offset,
+          empty: fixnum.Int64(_res.items.length) < _res.next.limit,
+          autofocus: true,
+        ),
+        ds.Loading(
+          loading: _loading,
+          cause: _cause,
+          GridView.builder(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            padding: defaults.padding,
+            itemCount: _res.items.length,
+            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: 633, // Maximum width of each item
+              crossAxisSpacing:
+                  (defaults.spacing ?? 0.0) / 2, // Spacing between columns
+              mainAxisSpacing:
+                  (defaults.spacing ?? 0.0) / 2, // Spacing between rows
+              childAspectRatio:
+                  16 / 9, // Aspect ratio of each grid item (width/height)
+            ),
+            itemBuilder: (context, index) {
+              var v = _res.items.elementAt(index);
+              return KnownMediaCard(
+                v,
+                onDoubleTap:
+                    widget.onChange == null ? null : () => widget.onChange!(v),
+              );
             },
-            next: (i) {
-              setState(() {
-                _res.next.offset = i;
-              });
-              refresh(_res.next);
-            },
-            current: _res.next.offset,
-            empty: fixnum.Int64(_res.items.length) < _res.next.limit,
-            autofocus: true,
           ),
-          Expanded(child: ds.Table(
-            loading: _loading,
-            cause: _cause,
-            children: _res.items,
-            flex: 1,
-            ds.Table.expanded<api.Known>((v) => KnownRow(current: v, onTap: widget.onChange == null ? null : () => widget.onChange!(v))),
-            empty: Center(child: Text("no known media")),
-          )),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
