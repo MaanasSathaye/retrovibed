@@ -66,11 +66,11 @@ type ClientConfig struct {
 
 	// Rate limit connection dialing
 	dialRateLimiter *rate.Limiter
-	// rate limit for accepting connections
-	acceptRateLimiter *rate.Limiter
-
 	// Number of dialing routines to run.
 	dialPoolSize uint16
+
+	// rate limit for accepting connections
+	acceptRateLimiter *rate.Limiter
 
 	bucketLimit int // maximum number of peers per bucket in the DHT.
 
@@ -465,8 +465,8 @@ func NewDefaultClientConfig(mdstore MetadataStore, store storage.ClientImpl, opt
 		UploadRateLimiter:   rate.NewLimiter(rate.Limit(128*bytesx.MiB), bytesx.MiB),
 		DownloadRateLimiter: rate.NewLimiter(rate.Limit(256*bytesx.MiB), bytesx.MiB),
 		dialRateLimiter:     rate.NewLimiter(rate.Limit(32), 128),
+		acceptRateLimiter:   rate.NewLimiter(rate.Limit(runtime.NumCPU()), runtime.NumCPU()),
 		dialPoolSize:        uint16(runtime.NumCPU()),
-		acceptRateLimiter:   rate.NewLimiter(rate.Limit(20), 12),
 		ConnTracker:         conntrack.NewInstance(),
 		HeaderObfuscationPolicy: HeaderObfuscationPolicy{
 			Preferred:        false,
