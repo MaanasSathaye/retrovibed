@@ -12,8 +12,6 @@ class Display extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final defaults = ds.Defaults.of(context);
-
     return SelectionArea(
       child: ListView(
         children: [
@@ -21,22 +19,20 @@ class Display extends StatelessWidget {
             description: Text("account"),
             content: profiles.Current(),
           ),
-          ds.Accordion(
-            description: Text("RSS"),
-            content: Container(
-              padding: defaults.padding,
-              child: rss.ListSearchable(),
-            ),
-          ),
+          ds.Accordion(description: Text("RSS"), content: rss.ListSearchable()),
           ds.Accordion(
             description: Text("Devices"),
-            content: Container(
-              padding: defaults.padding,
-              child: meta.DaemonList(
-                onTap: (d) {
-                  return meta.EndpointAuto.of(context)?.setdaemon(d).then((_) => Future.value(d)) ?? Future.error(Exception("invalid widget tree missing meta.EndpointAuto"));
-                },
-              ),
+            content: meta.DaemonList(
+              onTap: (d) {
+                return meta.EndpointAuto.of(
+                      context,
+                    )?.setdaemon(d).then((_) => Future.value(d)) ??
+                    Future.error(
+                      Exception(
+                        "invalid widget tree missing meta.EndpointAuto",
+                      ),
+                    );
+              },
             ),
           ),
           ds.Accordion(
@@ -50,18 +46,21 @@ class Display extends StatelessWidget {
             content: Column(children: [torrents.SettingsLeech()]),
           ),
           ds.Accordion(
-            description: Row(children: [Text("VPN - wireguard"),
-          ]),
+            description: Row(children: [Text("VPN - wireguard")]),
             content: Container(
               constraints: BoxConstraints(maxHeight: 512),
               child: wg.ListDisplay(),
             ),
           ),
           ds.Accordion(
-            description: Row(children: [Text("billing"), Spacer(), Text("opt in premium features")]),
-            content: billing.Registered(
-              billing.Settings(),
+            description: Row(
+              children: [
+                Text("billing"),
+                Spacer(),
+                Text("opt in premium features"),
+              ],
             ),
+            content: billing.Registered(billing.Settings()),
           ),
         ],
       ),

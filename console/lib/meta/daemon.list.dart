@@ -65,6 +65,25 @@ class _DaemonList extends State<DaemonList> {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    _optional =
+                        _optional != null
+                            ? null
+                            : ManualConfiguration(
+                              connect: (daemon) {
+                                setState(() {
+                                  _optional = null;
+                                  _res.next.offset = fixnum.Int64(0);
+                                });
+                                refresh(_res.next);
+                              },
+                            );
+                  });
+                },
+                icon: Icon(_optional == null ? Icons.add : Icons.remove),
+              ),
               Expanded(
                 child: TextField(
                   decoration: InputDecoration(hintText: "search servers"),
@@ -103,25 +122,6 @@ class _DaemonList extends State<DaemonList> {
                         }
                         : null,
                 icon: Icon(Icons.arrow_right),
-              ),
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    _optional =
-                        _optional != null
-                            ? null
-                            : ManualConfiguration(
-                              connect: (daemon) {
-                                setState(() {
-                                  _optional = null;
-                                  _res.next.offset = fixnum.Int64(0);
-                                });
-                                refresh(_res.next);
-                              },
-                            );
-                  });
-                },
-                icon: Icon(Icons.add),
               ),
             ],
           ),
@@ -185,11 +185,21 @@ class _RowDisplay extends StatelessWidget {
                 ? null
                 : () {
                   onTap!()
-                  .catchError(ds.Error.boundary(context, current, ds.Error.offline), test: ds.ErrorTests.offline)
-                  .catchError(ds.Error.boundary(context, current, ds.Error.connectivity), test: ds.ErrorTests.connectivity)
-                  .catchError(
-                    ds.Error.boundary(context, current, ds.Error.unknown),
-                  );
+                      .catchError(
+                        ds.Error.boundary(context, current, ds.Error.offline),
+                        test: ds.ErrorTests.offline,
+                      )
+                      .catchError(
+                        ds.Error.boundary(
+                          context,
+                          current,
+                          ds.Error.connectivity,
+                        ),
+                        test: ds.ErrorTests.connectivity,
+                      )
+                      .catchError(
+                        ds.Error.boundary(context, current, ds.Error.unknown),
+                      );
                 },
         child: Row(
           spacing: themex.spacing!,

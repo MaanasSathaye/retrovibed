@@ -16,13 +16,14 @@ class Overlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Stack(
-        fit: StackFit.passthrough,
-        alignment: alignment,
-        children: [child, Positioned.fill(child: overlay ?? const SizedBox())],
-      ),
+    return Stack(
+      fit: StackFit.passthrough,
+      alignment: alignment,
+      children: [
+        InkWell(onTap: onTap, child: child),
+        // Positioned.fill(child: overlay ?? const SizedBox())
+        overlay ?? const SizedBox(),
+      ],
     );
   }
 }

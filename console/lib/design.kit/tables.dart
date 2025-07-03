@@ -49,21 +49,17 @@ class Table<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final content = children.length == 0 ? empty : this.render(children);
 
-    return ds.Loading(
-      loading: loading,
-      cause: cause,
-      Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          leading,
-          Expanded(
-            flex: flex,
-            child: ds.Overlay(overlay: overlay, child: content),
-          ),
-          trailing,
-        ],
-      ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        leading,
+        ds.Overlay(
+          child: ds.Loading(loading: loading, cause: cause, content),
+          overlay: overlay,
+        ),
+        trailing,
+      ],
     );
   }
 }

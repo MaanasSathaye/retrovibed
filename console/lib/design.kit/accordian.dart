@@ -58,7 +58,10 @@ class _AccordionState extends State<Accordion> {
             trailing: icon,
           ),
         ),
-        content,
+        LimitedBox(
+          maxHeight: hidden ? 0.0 : MediaQuery.of(context).size.height,
+          child: content,
+        ),
       ],
     );
   }

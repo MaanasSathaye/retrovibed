@@ -15,9 +15,21 @@ class FeedRow extends StatelessWidget {
     return Row(
       spacing: themex.spacing ?? 0.0,
       children: [
-        if (current.hasDescription()) SelectableText(current.description),
-        SelectableText(current.url),
-        Spacer(),
+        if (current.hasDescription())
+          Expanded(
+            child: Text(
+              current.description,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        Expanded(
+          child: Text(
+            current.url,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
         if (current.autodownload) Icon(Icons.downloading_rounded),
         if (current.autoarchive) Icon(Icons.archive_outlined),
         if (current.contributing) Icon(Icons.handshake_outlined),

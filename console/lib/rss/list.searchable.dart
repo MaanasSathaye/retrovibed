@@ -25,6 +25,11 @@ class SearchableView extends State<ListSearchable> {
     items: [],
   );
 
+  void setState(VoidCallback fn) {
+    if (!mounted) return;
+    super.setState(fn);
+  }
+
   Future<api.FeedSearchResponse> refresh() {
     return widget
         .search(_res.next)
@@ -146,7 +151,7 @@ class SearchableView extends State<ListSearchable> {
       ),
       children: _res.items,
       (items) => Column(
-        mainAxisSize: MainAxisSize.max,
+        mainAxisSize: MainAxisSize.min,
         children:
             items
                 .map(
@@ -189,28 +194,31 @@ class _FeedCreate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theming = Theme.of(context);
     final themex = ds.Defaults.of(context);
-    return Center(
-      child: Column(
-        spacing: themex.spacing ?? 0.0,
-        children: [
-          FeedNew(current: current, onChange: onChange),
-          Row(
-            spacing: themex.spacing ?? 0.0,
-            children: [
-              Spacer(),
-              TextButton(onPressed: onCancel, child: Text("cancel")),
-              TextButton(
-                onPressed: () {
-                  onSubmit?.call(current);
-                },
-                child: Text("create"),
-              ),
-              Spacer(),
-            ],
-          ),
-        ],
-      ),
+    return Card(
+        color: theming.scaffoldBackgroundColor,
+        child: Column(
+          spacing: themex.spacing ?? 0.0,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            FeedNew(current: current, onChange: onChange),
+            Row(
+              spacing: themex.spacing ?? 0.0,
+              children: [
+                Spacer(),
+                TextButton(onPressed: onCancel, child: Text("cancel")),
+                TextButton(
+                  onPressed: () {
+                    onSubmit?.call(current);
+                  },
+                  child: Text("create"),
+                ),
+                Spacer(),
+              ],
+            ),
+          ],
+        ),
     );
   }
 }
