@@ -50,13 +50,14 @@ func HTTPLibraryOptionLegacy(b bool) HTTPLibraryOption {
 	}
 }
 
-func NewHTTPLibrary(q sqlx.Queryer, media fsx.Virtual, options ...HTTPLibraryOption) *HTTPLibrary {
+func NewHTTPLibrary(q sqlx.Queryer, media fsx.Virtual, deeppool *http.Client, options ...HTTPLibraryOption) *HTTPLibrary {
 	svc := langx.Clone(HTTPLibrary{
 		q:            q,
 		jwtsecret:    env.JWTSecret,
 		decoder:      formx.NewDecoder(),
 		mediastorage: media,
 		fts:          duckdbx.NewLucene(),
+		deeppool:     deeppool,
 	}, options...)
 
 	return &svc
@@ -66,6 +67,7 @@ type HTTPLibrary struct {
 	q            sqlx.Queryer
 	jwtsecret    jwtx.SecretSource
 	decoder      *form.Decoder
+	deeppool     *http.Client
 	mediastorage fsx.Virtual
 	fts          lucenex.Driver
 	legacy       bool
@@ -111,7 +113,7 @@ func (t *HTTPLibrary) Bind(r *mux.Router) {
 			httpauth.AuthenticateWithToken(t.jwtsecret),
 			// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
 			httpx.Timeout10s(),
-		).Then(http.FileServerFS(library.New(t.mediastorage, func(ctx context.Context, s string) (*library.Metadata, error) {
+		).Then(http.FileServerFS(library.New(t.deeppool, t.mediastorage, func(ctx context.Context, s string) (*library.Metadata, error) {
 			var (
 				md library.Metadata
 			)

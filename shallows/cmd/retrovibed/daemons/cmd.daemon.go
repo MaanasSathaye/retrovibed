@@ -89,6 +89,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		dynamicip    torrent.ClientConfigOption = torrent.ClientConfigNoop
 		tnetwork     torrent.Binder
 		wgnet        *netstack.Net
+		deepjwt      *http.Client = &http.Client{}
 	)
 
 	// envx.Debug(os.Environ()...)
@@ -170,7 +171,8 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		if err != nil {
 			return errorsx.Wrap(err, "failed to create oauth2 http client for archival")
 		}
-		tstore = library.NewTorrentStorage(metaapi.JWTClient(c), db, tstore)
+		deepjwt = metaapi.JWTClient(c)
+		tstore = library.NewTorrentStorage(deepjwt, db, tstore)
 	} else {
 		log.Println("automatic media archival is disabled")
 	}
@@ -360,7 +362,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	metaapi.NewHTTPUsermanagement(db).Bind(metamux.PathPrefix("/u12t").Subrouter())
 	metaapi.NewHTTPDaemons(db).Bind(metamux.PathPrefix("/d").Subrouter())
 	metaapi.NewHTTPAuthz(db).Bind(metamux.PathPrefix("/authz").Subrouter())
-	media.NewHTTPLibrary(db, mediastore, media.HTTPLibraryOptionLegacy(t.TorrentLegacyStorage)).Bind(httpmux.PathPrefix("/m").Subrouter())
+	media.NewHTTPLibrary(db, mediastore, deepjwt, media.HTTPLibraryOptionLegacy(t.TorrentLegacyStorage)).Bind(httpmux.PathPrefix("/m").Subrouter())
 	media.NewHTTPDiscovered(db, tclient, tstore, media.HTTPDiscoveredOptionRootStorage(rootstore)).Bind(httpmux.PathPrefix("/d").Subrouter())
 	media.NewHTTPRSSFeed(db).Bind(httpmux.PathPrefix("/rss").Subrouter())
 	media.NewHTTPKnown(db).Bind(httpmux.PathPrefix("/k").Subrouter())

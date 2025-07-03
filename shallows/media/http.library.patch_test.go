@@ -47,6 +47,7 @@ func TestMediaUpdate(t *testing.T) {
 	media.NewHTTPLibrary(
 		q,
 		nil,
+		nil,
 		media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 	).Bind(routes.PathPrefix("/").Subrouter())
 

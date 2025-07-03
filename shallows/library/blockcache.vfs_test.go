@@ -40,7 +40,7 @@ func TestVStorageFS(t *testing.T) {
 			require.NoError(t, err)
 			require.Equal(t, md.Bytes, uint64(n))
 
-			fsys := library.New(storage, func(ctx context.Context, s string) (*library.Metadata, error) {
+			fsys := library.New(nil, storage, func(ctx context.Context, s string) (*library.Metadata, error) {
 				var (
 					md library.Metadata
 				)

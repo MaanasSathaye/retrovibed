@@ -47,6 +47,7 @@ func TestLibraryUploadFile(t *testing.T) {
 	media.NewHTTPLibrary(
 		q,
 		vfs,
+		nil,
 		media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 	).Bind(routes.PathPrefix("/").Subrouter())
 
