@@ -152,10 +152,12 @@ class Error extends StatelessWidget {
   static Future<T> Function(Object obj) boundary<T, Y>(
     BuildContext context,
     T result,
-    Error Function(Y) onErr,
+    Error Function(Y, {void Function()? onTap}) onErr,
   ) {
     return (Object e) {
-      ErrorBoundary.of(context)?.onError(onErr(e as Y));
+      final b = ErrorBoundary.of(context);
+      final d = onErr(e as Y, onTap: b?.reset);
+      b?.onError(d);
       return Future.value(result);
     };
   }

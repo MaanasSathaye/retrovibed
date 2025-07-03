@@ -32,7 +32,7 @@ class _DownloadingState extends State<RefreshingDownload> {
         ds.Error.boundary(
               context,
               null,
-              (_) => ds.Error.text("download has gone missing"),
+              (_, {void Function()? onTap}) => ds.Error.text("download has gone missing"),
             ),
             test: httpx.ErrorsTest.err404,
       )

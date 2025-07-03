@@ -142,9 +142,6 @@ class _DaemonList extends State<DaemonList> {
                           .then((v) {
                             return widget.onTap!(v);
                           })
-                          // .then((v) {
-                          //   if (true) throw Exception("DERP DERP");
-                          // })
                           .whenComplete(() {
                             setState(() {});
                           });

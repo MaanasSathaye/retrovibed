@@ -15,14 +15,14 @@ class FeedRow extends StatelessWidget {
     return Row(
       spacing: themex.spacing ?? 0.0,
       children: [
-        if (current.hasDescription())
-          Expanded(
+        if (current.hasDescription()) Expanded(
             child: Text(
               current.description,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
           ),
+        if (current.hasDescription()) Spacer(),
         Expanded(
           child: Text(
             current.url,
@@ -30,9 +30,10 @@ class FeedRow extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
         ),
-        if (current.autodownload) Icon(Icons.downloading_rounded),
-        if (current.autoarchive) Icon(Icons.archive_outlined),
-        if (current.contributing) Icon(Icons.handshake_outlined),
+        Spacer(),
+        current.autodownload ? Icon(Icons.downloading_rounded) : SizedBox(width: 24.0, height: 24.0),
+        current.autoarchive ? Icon(Icons.archive_outlined) : SizedBox(width: 24.0, height: 24.0),
+        current.contributing ? Icon(Icons.handshake_outlined) :  SizedBox(width: 24.0, height: 24.0),
       ],
     );
   }
