@@ -64,7 +64,7 @@ class PlanSummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return forms.Container(
-      child: Column(
+      Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           forms.Field(label: Text("Price"), input: price),

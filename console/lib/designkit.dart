@@ -14,6 +14,7 @@ export 'design.kit/inputs.dart';
 export 'design.kit/search.tray.dart';
 export 'design.kit/card.dart';
 export 'design.kit/rating.dart';
+export 'design.kit/buttons.dart';
 
 abstract class modals {
   static _modals.NodeState? of(BuildContext context) {
@@ -21,13 +22,4 @@ abstract class modals {
   }
 }
 
-abstract class buttons {
-  static IconButton refresh({required void Function()? onPressed}) {
-    return IconButton(onPressed: onPressed, icon: Icon(Icons.refresh));
-  }
-
-  static IconButton settings({required void Function()? onPressed}) {
-    return IconButton(onPressed: onPressed, icon: Icon(Icons.tune));
-  }
-}
 const Widget? NullWidget = null;

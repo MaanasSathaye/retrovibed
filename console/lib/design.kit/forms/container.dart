@@ -6,7 +6,7 @@ class Container extends m.Container {
   final m.Widget child;
   final m.EdgeInsets? padding;
 
-  Container({super.key, super.decoration, required this.child, this.padding});
+  Container(this.child, {super.key, super.decoration, this.padding});
 
   @override
   m.Widget build(m.BuildContext context) {

@@ -18,6 +18,25 @@ const movie = Icons.movie;
 const audio = Icons.music_note_outlined;
 const binary = Icons.file_open_outlined;
 
+int checksumfor(IconData v) {
+  final movied = checksum(["video/ogg"]);
+  final audiod = checksum(["audio/"]);
+
+  if (v == movie) {
+    return movied;
+  }
+
+  if (v == audio) {
+    return audiod;
+  }
+
+  return -1;
+}
+
+int checksum(List<String> mimes) {
+  return Object.hashAllUnordered(mimes);
+}
+
 IconData icon(String mimetype) {
   if (mimetype.startsWith('video/')) {
     return movie;

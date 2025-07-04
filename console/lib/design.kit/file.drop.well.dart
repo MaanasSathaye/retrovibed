@@ -37,6 +37,24 @@ class FileDropWell extends StatefulWidget {
     this.loading,
   });
 
+  factory FileDropWell.icon(
+    Future<Widget?> Function(FilesEvent i) onDropped, {
+    Key? key,
+    List<String> mimetypes = const [],
+    List<String> extensions = const [],
+    Function()? onTap,
+  }) {
+    return FileDropWell(
+      onDropped,
+      key: key,
+      onTap: onTap,
+      child: IgnorePointer(child: Icon(Icons.file_upload_outlined)),
+      loading: ds.Loading.Sized(width: 12.0, height: 12.0),
+      mimetypes: mimetypes,
+      extensions: extensions,
+    );
+  }
+
   @override
   _FileDropWell createState() => _FileDropWell();
 }

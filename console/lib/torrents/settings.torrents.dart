@@ -14,7 +14,7 @@ class _EditView extends State<SettingsLeech> {
     return ConstrainedBox(
       constraints: BoxConstraints(minHeight: 32, minWidth: 32),
       child: forms.Container(
-        child: Column(
+        Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             forms.Field(

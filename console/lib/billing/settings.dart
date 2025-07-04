@@ -30,7 +30,7 @@ class _Settings extends State<Settings> {
   @override
   Widget build(BuildContext context) {
     return forms.Container(
-      child: Column(
+      Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           forms.Field(

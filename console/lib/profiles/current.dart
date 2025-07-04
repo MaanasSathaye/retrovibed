@@ -67,7 +67,7 @@ class _CurrentState extends State<Current> {
   Widget build(BuildContext context) {
     return forms.Container(
       padding: EdgeInsets.symmetric(horizontal: 10),
-      child: ds.Loading(
+      ds.Loading(
         cause: _cause,
         loading: _loading,
         Column(

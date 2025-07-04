@@ -20,7 +20,7 @@ class _ManualConfigurationView extends State<ManualConfiguration> {
   @override
   Widget build(BuildContext context) {
     return forms.Container(
-      child: Center(
+      Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

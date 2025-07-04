@@ -7,6 +7,7 @@ import 'package:retrovibed/library/known.media.dropdown.dart';
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/httpx.dart' as httpx;
 import './api.dart' as api;
+import './search.tuning.dart';
 
 class AvailableGridDisplay extends StatefulWidget {
   final media.FnMediaSearch search;
@@ -148,20 +149,17 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
               },
               current: _res.next.offset,
               empty: fixnum.Int64(_res.items.length) < _res.next.limit,
-              trailing: Row(
+              leading: Row(
                 children: [
-                  ds.buttons.refresh(onPressed: () => refresh(_res.next)),
-                  ds.FileDropWell(
-                    upload,
-                    child: IgnorePointer(
-                      child: Icon(Icons.file_upload_outlined),
-                    ),
-                    loading: ds.Loading.Sized(width: 12.0, height: 12.0),
-                  ),
-                  ds.buttons.settings(onPressed: () { print("settings not implement for media");}),
+                  ds.FileDropWell.icon(upload),
                 ],
               ),
               autofocus: true,
+              // tuning: SearchTuning(key:null, _res.next, onChange: (media.MediaSearchRequest n) {
+              //   setState(() {
+              //     _res.next = n;
+              //   });
+              // }),
             ),
             Expanded(
               child: GridView.builder(
