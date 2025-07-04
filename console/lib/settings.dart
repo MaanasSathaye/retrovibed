@@ -36,16 +36,6 @@ class Display extends StatelessWidget {
             ),
           ),
           ds.Accordion(
-            disabled: Text("coming soon"),
-            description: Text("storage"),
-            content: Container(),
-          ),
-          ds.Accordion(
-            disabled: Text("coming soon"),
-            description: Row(children: [Text("torrents")]),
-            content: Column(children: [torrents.SettingsLeech()]),
-          ),
-          ds.Accordion(
             description: Row(children: [Text("VPN - wireguard")]),
             content: Container(
               constraints: BoxConstraints(maxHeight: 512),
@@ -61,6 +51,21 @@ class Display extends StatelessWidget {
               ],
             ),
             content: billing.Registered(billing.Settings()),
+          ),
+          ds.Accordion(
+            disabled: Text("manage local and archive storage usage - currently in private alpha"),
+            description: Text("storage"),
+            content: Container(),
+          ),
+          ds.Accordion(
+            disabled: Text("manage torrent settings - currently in private alpha"),
+            description: Row(children: [Text("torrents")]),
+            content: Column(children: [torrents.SettingsLeech()]),
+          ),
+          ds.Accordion(
+            disabled: Text("manage permissions and access controls - currently in private alpha"),
+            description: Row(children: [Text("user management")]),
+            content: Column(children: [torrents.SettingsLeech()]),
           ),
         ],
       ),
