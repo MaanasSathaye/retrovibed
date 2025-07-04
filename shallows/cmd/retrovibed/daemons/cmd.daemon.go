@@ -223,7 +223,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		torrent.ClientConfigAcceptLimit(rate.NewLimiter(rate.Limit(runtime.NumCPU()), runtime.NumCPU()*4)),
 		torrent.ClientConfigMaxOutstandingRequests(int(t.TorrentMaxRequests)),
 		torrent.ClientConfigPeerLimits(runtime.NumCPU()/2, runtime.NumCPU()),
-		torrent.ClientConfigUploadLimit(rate.NewLimiter(rate.Limit(256*bytesx.MiB), 256*bytesx.KiB)),
+		torrent.ClientConfigUploadLimit(rate.NewLimiter(rate.Limit(256*bytesx.MiB), 256*bytesx.MiB)),
 		torrent.ClientConfigHTTPUserAgent("retrovibed/0.0"),
 		torrent.ClientConfigConnectionClosed(func(ih metainfo.Hash, stats torrent.ConnStats, remaining int) {
 			if stats.BytesWrittenData.Uint64() == 0 {

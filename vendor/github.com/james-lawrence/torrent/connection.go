@@ -44,7 +44,7 @@ const (
 	peerSourceDhtGetPeers     = "Hg" // Peers we found by searching a DHT.
 	peerSourceDhtAnnouncePeer = "Ha" // Peers that were announced to us by a DHT.
 	peerSourcePex             = "X"
-	writebufferscapacity      = 256 * bytesx.KiB
+	writebufferscapacity      = 512 * bytesx.KiB
 )
 
 func newConnection(cfg *ClientConfig, nc net.Conn, outgoing bool, remote netip.AddrPort, extensions *pp.ExtensionBits, localport uint16, dynamicaddr *atomic.Pointer[netip.AddrPort]) (c *connection) {
