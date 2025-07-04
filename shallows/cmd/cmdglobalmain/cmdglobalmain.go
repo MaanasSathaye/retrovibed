@@ -100,7 +100,7 @@ func Main(args ...string) {
 			}
 		)
 
-		path := userx.DefaultRuntimeDirectory(userx.DefaultRelRoot(), "profile.cfg")
+		path := userx.DefaultRuntimeDirectory("profile.cfg")
 		if err := json.Unmarshal(errorsx.Zero(fsx.AutoCached(path, func() ([]byte, error) { return json.Marshal(cfg) })), &cfg); err != nil {
 			log.Println("failed to load profiling configuration", err)
 		}
@@ -112,11 +112,11 @@ func Main(args ...string) {
 
 		switch cfg.Mode {
 		case "heap":
-			return debugx.Heap(envx.String(os.TempDir(), userx.DefaultRuntimeDirectory(userx.DefaultRelRoot())))(dctx)
+			return debugx.Heap(envx.String(os.TempDir(), userx.DefaultRuntimeDirectory()))(dctx)
 		case "mem":
-			return debugx.Memory(envx.String(os.TempDir(), userx.DefaultRuntimeDirectory(userx.DefaultRelRoot())))(dctx)
+			return debugx.Memory(envx.String(os.TempDir(), userx.DefaultRuntimeDirectory()))(dctx)
 		default:
-			return debugx.CPU(envx.String(os.TempDir(), userx.DefaultRuntimeDirectory(userx.DefaultRelRoot())))(dctx)
+			return debugx.CPU(envx.String(os.TempDir(), userx.DefaultRuntimeDirectory()))(dctx)
 		}
 	}, syscall.SIGUSR1)
 
