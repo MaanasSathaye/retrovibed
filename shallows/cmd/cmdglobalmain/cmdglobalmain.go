@@ -3,6 +3,7 @@ package cmdglobalmain
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net"
@@ -25,6 +26,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/env"
 	"github.com/retrovibed/retrovibed/internal/envx"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
+	"github.com/retrovibed/retrovibed/internal/fsx"
 	"github.com/retrovibed/retrovibed/internal/sshx"
 	"github.com/retrovibed/retrovibed/internal/stringsx"
 	"github.com/retrovibed/retrovibed/internal/userx"
@@ -86,19 +88,35 @@ func Main(args ...string) {
 	})
 
 	go debugx.OnSignal(shellCli.Context, func(ctx context.Context) error {
-		dctx, done := context.WithTimeout(ctx, envx.Duration(time.Minute, "DEEPPOOL_PROFILING_DURATION"))
+		type profilecfg struct {
+			Mode     string        `json:"mode,omitempty"`
+			Duration time.Duration `json:"duration,omitempty"`
+		}
+
+		var (
+			cfg = profilecfg{
+				Mode:     "cpu",
+				Duration: time.Minute,
+			}
+		)
+
+		path := userx.DefaultRuntimeDirectory(userx.DefaultRelRoot(), "profile.cfg")
+		if err := json.Unmarshal(errorsx.Zero(fsx.AutoCached(path, func() ([]byte, error) { return json.Marshal(cfg) })), &cfg); err != nil {
+			log.Println("failed to load profiling configuration", err)
+		}
+
+		dctx, done := context.WithTimeout(ctx, cfg.Duration)
 		defer done()
+		log.Println("PROFILING INITIATED", cfg.Mode, cfg.Duration)
+		defer log.Println("PROFILING COMPLETED", cfg.Mode, cfg.Duration)
 
-		log.Println("PROFILING INITIATED")
-		defer log.Println("PROFILING COMPLETED")
-
-		switch envx.String("cpu", "DEEPPOOL_PROFILING_STRATEGY") {
+		switch cfg.Mode {
 		case "heap":
-			return debugx.Heap(envx.String(os.TempDir(), "CACHE_DIRECTORY"))(dctx)
+			return debugx.Heap(envx.String(os.TempDir(), userx.DefaultRuntimeDirectory(userx.DefaultRelRoot())))(dctx)
 		case "mem":
-			return debugx.Memory(envx.String(os.TempDir(), "CACHE_DIRECTORY"))(dctx)
+			return debugx.Memory(envx.String(os.TempDir(), userx.DefaultRuntimeDirectory(userx.DefaultRelRoot())))(dctx)
 		default:
-			return debugx.CPU(envx.String(os.TempDir(), "CACHE_DIRECTORY"))(dctx)
+			return debugx.CPU(envx.String(os.TempDir(), userx.DefaultRuntimeDirectory(userx.DefaultRelRoot())))(dctx)
 		}
 	}, syscall.SIGUSR1)
 
