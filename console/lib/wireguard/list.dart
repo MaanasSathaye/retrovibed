@@ -162,10 +162,8 @@ class _ListDisplay extends State<ListDisplay> {
         },
         current: _res.next.offset,
         empty: _res.items.length < _res.next.limit.toInt(),
-        trailing: ds.FileDropWell(
+        leading: ds.FileDropWell.icon(
           upload,
-          child: IgnorePointer(child: Icon(Icons.file_upload_outlined)),
-          loading: ds.Loading.Sized(width: 12.0, height: 12.0),
         ),
         autofocus: true,
       ),

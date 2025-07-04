@@ -8,13 +8,13 @@ import 'package:retrovibed/mimex.dart' as mimex;
 class AvailableListDisplay extends StatefulWidget {
   final media.FnMediaSearch search;
   final media.FnUploadRequest upload;
-  final TextEditingController? searchController;
+  final TextEditingController? controller;
   final ValueNotifier<int>? events;
   const AvailableListDisplay({
     super.key,
     this.search = media.discovered.available,
     this.upload = media.discovered.upload,
-    this.searchController,
+    this.controller,
     this.events,
   });
 
@@ -35,9 +35,9 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
     super.setState(fn);
   }
 
-  void refresh() {
+  void refresh(media.MediaSearchRequest req) {
     widget
-        .search(_res.next)
+        .search(req)
         .then((v) {
           setState(() {
             _res = v;
@@ -55,9 +55,9 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
   @override
   void initState() {
     super.initState();
-    refresh();
+    refresh(_res.next);
     widget.events?.addListener(() {
-      refresh();
+      refresh(_res.next);
     });
   }
 
@@ -115,60 +115,28 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
       leading: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: widget.searchController,
-                  decoration: InputDecoration(
-                    hintText: "search available content",
-                  ),
-                  onChanged:
-                      (v) => setState(() {
-                        _res.next.query = v;
-                      }),
-                  onSubmitted: (v) {
-                    setState(() {
-                      _res.next.offset = fixnum.Int64(0);
-                    });
-                    refresh();
-                  },
-                ),
-              ),
-              IconButton(
-                onPressed:
-                    _res.next.offset > 0
-                        ? () {
-                          setState(() {
-                            _res.next.offset -= 1;
-                          });
-                          refresh();
-                        }
-                        : null,
-                icon: Icon(Icons.arrow_left),
-              ),
-              IconButton(
-                onPressed:
-                    _res.items.isNotEmpty
-                        ? () {
-                          setState(() {
-                            _res.next.offset += 1;
-                          });
-                          refresh();
-                        }
-                        : null,
-                icon: Icon(Icons.arrow_right),
-              ),
-              ds.buttons.refresh(onPressed: refresh),
-              ds.FileDropWell(
-                upload,
-                child: Icon(Icons.file_upload_outlined),
-                extensions: ["torrent"],
-                loading: ds.Loading.Sized(width: 12.0, height: 12.0),
-              ),
-              ds.buttons.settings(onPressed: () { print("settings not implement for downloads availability");}),
-            ],
+          ds.SearchTray(
+            inputDecoration: InputDecoration(
+              hintText: "search downloadable content",
+            ),
+            controller: widget.controller,
+            onSubmitted: (v) {
+              setState(() {
+                _res.next.query = v;
+                _res.next.offset = fixnum.Int64(0);
+              });
+              refresh(_res.next);
+            },
+            next: (i) {
+              setState(() {
+                _res.next.offset = i;
+              });
+              refresh(_res.next);
+            },
+            current: _res.next.offset,
+            empty: fixnum.Int64(_res.items.length) < _res.next.limit,
+            leading: Row(children: [ds.FileDropWell.icon(upload)]),
+            autofocus: true,
           ),
           Row(
             mainAxisSize: MainAxisSize.min,
@@ -183,7 +151,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
               () => media.discovered
                   .download(v.id)
                   .then((v) {
-                    widget.events ?? refresh();
+                    widget.events ?? refresh(_res.next);
                     widget.events?.value += 1;
                   })
                   .catchError((cause) {

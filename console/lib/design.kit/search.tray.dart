@@ -51,7 +51,7 @@ class SearchTray extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theming = Defaults.of(context);
-    print("DERP DERP ${tuningwidget.value == zerobox}");
+
     return Container(
       padding: theming.padding,
       child: Column(

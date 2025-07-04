@@ -35,7 +35,7 @@ class _DisplayState extends State<Display> {
       child: ListView(
         children: [
           DownloadingListDisplay(events: refresh),
-          AvailableListDisplay(searchController: controller, events: refresh),
+          AvailableListDisplay(controller: controller, events: refresh),
         ],
       ),
     );

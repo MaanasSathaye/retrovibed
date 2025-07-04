@@ -141,13 +141,10 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
         },
         current: _res.next.offset,
         empty: fixnum.Int64(_res.items.length) < _res.next.limit,
-        trailing: Row(
+        leading: Row(
           children: [
-            ds.buttons.refresh(onPressed:  () => refresh(_res.next)),
-            ds.FileDropWell(
+            ds.FileDropWell.icon(
               upload,
-              loading: ds.Loading.Sized(width: 12.0, height: 12.0),
-              child: IgnorePointer(child: Icon(Icons.file_upload_outlined)),
             ),
           ],
         ),
