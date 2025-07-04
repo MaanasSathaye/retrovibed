@@ -75,6 +75,7 @@ class _KnownMediaDisplayState extends State<KnownMediaDisplay> {
   Widget build(BuildContext context) {
     return KnownMediaCard(
       current,
+      onDoubleTap: widget.onDoubleTap,
       trailing: Row(
         children: [
           Flexible(
