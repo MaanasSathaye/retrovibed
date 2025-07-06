@@ -7,7 +7,7 @@ import 'package:retrovibed/library/known.media.dropdown.dart';
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/httpx.dart' as httpx;
 import './api.dart' as api;
-// import './search.tuning.dart';
+import './search.tuning.dart';
 
 class AvailableGridDisplay extends StatefulWidget {
   final media.FnMediaSearch search;
@@ -149,17 +149,19 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
               },
               current: _res.next.offset,
               empty: fixnum.Int64(_res.items.length) < _res.next.limit,
-              leading: Row(
-                children: [
-                  ds.FileDropWell.icon(upload),
-                ],
-              ),
+              leading: Row(children: [ds.FileDropWell.icon(upload)]),
               autofocus: true,
-              // tuning: SearchTuning(key:null, _res.next, onChange: (media.MediaSearchRequest n) {
-              //   setState(() {
-              //     _res.next = n;
-              //   });
-              // }),
+              tuning: LimitedBox(
+                maxHeight: 128.0,
+                child: SearchTuning(
+                  _res.next,
+                  onChange: (media.MediaSearchRequest n) {
+                    setState(() {
+                      _res.next = n;
+                    });
+                  },
+                ),
+              ),
             ),
             Expanded(
               child: GridView.builder(
@@ -191,14 +193,14 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                                     final replaced = _res.items.map(
                                       (o) => o.id == v.media.id ? v.media : o,
                                     );
-                                    print("old ${_res.items}\nnew ${replaced}");
+
                                     setState(() {
                                       _res = media.MediaSearchResponse(
                                         items: replaced,
                                         next: _res.next,
                                       );
                                     });
-                                    print("clearing modal");
+
                                     ds.modals.of(context)?.push(null);
                                   })
                                   .catchError((cause) {
@@ -222,7 +224,12 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                       );
                     default:
                       return KnownMediaDisplay(
-                        api.known.get(_media.knownMediaId).then((w) => (w.known..description = _media.description)),
+                        api.known
+                            .get(_media.knownMediaId)
+                            .then(
+                              (w) =>
+                                  (w.known..description = _media.description),
+                            ),
                         key: ValueKey(_media.id),
                         onDoubleTap: media.PlayAction(context, _media, _res),
                         onSettings: onSettings,

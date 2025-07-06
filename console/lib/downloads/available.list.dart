@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/mimex.dart' as mimex;
+import './search.tuning.dart';
 
 class AvailableListDisplay extends StatefulWidget {
   final media.FnMediaSearch search;
@@ -137,6 +138,17 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
             empty: fixnum.Int64(_res.items.length) < _res.next.limit,
             leading: Row(children: [ds.FileDropWell.icon(upload)]),
             autofocus: true,
+            tuning: LimitedBox(
+              maxHeight: 138.0,
+              child: SearchTuning(
+                _res.next,
+                onChange: (media.MediaSearchRequest n) {
+                  setState(() {
+                    _res.next = n;
+                  });
+                },
+              ),
+            ),
           ),
           Row(
             mainAxisSize: MainAxisSize.min,

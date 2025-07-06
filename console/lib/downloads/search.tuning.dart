@@ -21,6 +21,7 @@ class SearchTuning extends StatelessWidget {
               alignment: Alignment.topLeft,
               value: mimetypes,
               isExpanded: true,
+              isDense: true,
               items: [
                 DropdownMenuItem(
                   child: Text("all"),
@@ -56,6 +57,10 @@ class SearchTuning extends StatelessWidget {
               },
             ),
             label: Text("category"),
+          ),
+          forms.Field(
+            input: forms.Checkbox(value: false),
+            label: Text("completed"),
           ),
         ],
       ),
