@@ -50,6 +50,7 @@ type importPeer struct {
 	Peer           []string `flag:"" name:"peer" help:"peer(s) to connect to and download the provided torrents from" default:"localhost:10000"`
 	Directory      string   `flag:"" name:"directory" help:"specify the directory to download torrents into" default:""`
 	Archive        bool     `flag:"" name:"archive" help:"mark imported media for archival" default:"false"`
+	Reclaim        bool     `flag:"" name:"reclaim" help:"mark imported media for disk space reclaimation" default:"false"`
 	Magnets        string   `arg:"" name:"magnets" help:"file containing magnet links to download, defaults to stdin" default:""`
 	TorrentPrivate bool     `flag:"" name:"torrent-private" help:"restrict torrent connections to private networks" env:"${env_torrent_private}" default:"false"`
 }
@@ -125,7 +126,7 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	}
 
 	async := library.NewAsyncWakeup(gctx.Context)
-	errorsx.Log(daemons.AutoArchival(gctx.Context, db, mediastore, async, t.Archive))
+	errorsx.Log(daemons.AutoArchival(gctx.Context, db, mediastore, async, t.Reclaim))
 
 	peers := make([]torrent.Peer, 0, 128)
 	for _, p := range t.Peer {
