@@ -504,7 +504,7 @@ func (t _connwriterRequests) genrequests(available *roaring.Bitmap, msg func(pp.
 // Also handles choking and unchoking of the remote peer.
 func (t _connwriterRequests) upload(msg func(pp.Message) bool) (time.Duration, error) {
 	if t.Choked || t.peerSentHaveAll {
-		// t.cfg.debug().Printf("c(%p) seed(%t) choked(%t) peer completed(%t) req(%d) upload restricted - disallowed\n", t.connection, t.seed, t.Choked, t.peerSentHaveAll, len(t.PeerRequests))
+		t.cfg.debug().Printf("c(%p) seed(%t) choked(%t) peer completed(%t) req(%d) upload restricted - disallowed\n", t.connection, t.seed, t.Choked, t.peerSentHaveAll, len(t.PeerRequests))
 		return time.Minute, nil
 	}
 
@@ -512,8 +512,8 @@ func (t _connwriterRequests) upload(msg func(pp.Message) bool) (time.Duration, e
 		return time.Until(ts), nil
 	}
 
-	// t.cfg.debug().Printf("c(%p) seed(%t) req(%d) uploading - allowed\n", t.connection, t.seed, len(t.PeerRequests))
-	// defer t.cfg.debug().Printf("c(%p) seed(%t) req(%d) uploading - competed\n", t.connection, t.seed, len(t.PeerRequests))
+	t.cfg.debug().Printf("c(%p) seed(%t) req(%d) uploading - allowed\n", t.connection, t.seed, len(t.PeerRequests))
+	defer t.cfg.debug().Printf("c(%p) seed(%t) req(%d) uploading - competed\n", t.connection, t.seed, len(t.PeerRequests))
 
 	uploaded := 0
 	for r := range t.requestseq() {
