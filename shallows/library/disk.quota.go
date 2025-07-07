@@ -108,12 +108,12 @@ func NewDiskQuota(ctx context.Context, c *http.Client, dir fsx.Virtual, q sqlx.Q
 				continue
 			}
 
-			// if reclaimdisk {
-			// 	if err := Reclaim(ctx, md, dir); err != nil {
-			// 		errorsx.Log(errorsx.Wrapf(err, "disk reclaimation failed: %s", md.ID))
-			// 		continue
-			// 	}
-			// }
+			if reclaimdisk {
+				if err := Reclaim(ctx, md, dir); err != nil {
+					errorsx.Log(errorsx.Wrapf(err, "disk reclaimation failed: %s", md.ID))
+					continue
+				}
+			}
 
 			log.Println("------------------------- archivable completed", md.ID)
 		}

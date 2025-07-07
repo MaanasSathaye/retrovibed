@@ -95,7 +95,7 @@ func (t *HTTPDiscovered) Bind(r *mux.Router) {
 	r.Path("/available").Methods(http.MethodGet).Handler(alice.New(
 		httpx.ContextBufferPool512(),
 		httpx.ParseForm,
-		// httpauth.AuthenticateWithToken(t.jwtsecret),
+		httpauth.AuthenticateWithToken(t.jwtsecret),
 		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
 		httpx.Timeout2s(),
 	).ThenFunc(t.search))

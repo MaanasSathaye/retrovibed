@@ -47,5 +47,12 @@ func Reclaim(ctx context.Context, md Metadata, vfs fsx.Virtual) error {
 	log.Println("reclaiming disk space initiated", md.ID)
 	defer log.Println("reclaiming disk space completed", md.ID)
 
-	return errorsx.Wrap(os.RemoveAll(vfs.Path(md.ID)), "failed to reclaim disk space")
+	dst, err := os.Readlink(vfs.Path(md.ID))
+	if err != nil {
+		return errorsx.Wrap(err, "failed to resolve link")
+	}
+
+	log.Println("reclaiming", vfs.Path(md.ID), "->", dst)
+
+	return errorsx.Wrap(os.RemoveAll(dst), "failed to reclaim disk space")
 }

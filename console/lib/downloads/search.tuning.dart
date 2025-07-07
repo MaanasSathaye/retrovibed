@@ -3,6 +3,11 @@ import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/mimex.dart' as mimex;
 
+class queryparams {
+  List<String> mimetypes = [];
+  bool completed = false;
+}
+
 class SearchTuning extends StatelessWidget {
   final media.MediaSearchRequest current;
   final void Function(media.MediaSearchRequest r) onChange;
