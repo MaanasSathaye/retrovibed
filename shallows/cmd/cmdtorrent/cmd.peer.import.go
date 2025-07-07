@@ -263,7 +263,7 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 			return errorsx.Wrapf(cause, "failed to record metadata %s", w.meta.ID.String())
 		}
 
-		log.Println("---------------------------------- starting", w.meta.ID)
+		log.Println("---------------------------------- starting", w.meta.ID, lmd.Downloaded, lmd.Bytes)
 		dl, _, cause := tclient.Start(w.meta, torrent.TuneDisableTrackers, torrent.TunePeers(peers...), torrent.TuneVerifyFull)
 		if cause != nil {
 			return errorsx.Wrapf(cause, "failed to start magnet %s - %T: %+v\n", w.meta.ID.String(), cause, cause)
