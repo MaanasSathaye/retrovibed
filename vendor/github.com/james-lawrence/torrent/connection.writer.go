@@ -386,7 +386,7 @@ func (t _connwriterRequests) determineInterest(msg func(pp.Message) bool) *roari
 		}
 	} else {
 		if t.Choke(msg) {
-			t.cfg.debug().Printf("c(%p) seed(%t) disallowing peer to make requests\n", t.connection, t.seed)
+			t.cfg.debug().Printf("c(%p) seed(%t) disallowing peer to make requests - %s\n", t.connection, t.seed, time.Until(t.chokeduntil))
 		}
 	}
 
