@@ -402,6 +402,7 @@ func (cn *connection) Choke(msg messageWriter) (more bool) {
 			cn.reject(r)
 		}
 	} else {
+		cn.cfg.debug().Println("-------------------------------- clearing peer requests --------------------------------")
 		cn.PeerRequests = nil
 	}
 

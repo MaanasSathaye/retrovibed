@@ -513,7 +513,7 @@ func (t _connwriterRequests) upload(msg func(pp.Message) bool) (time.Duration, e
 	}
 
 	t.cfg.debug().Printf("c(%p) seed(%t) req(%d) uploading - allowed\n", t.connection, t.seed, len(t.PeerRequests))
-	defer t.cfg.debug().Printf("c(%p) seed(%t) req(%d) uploading - competed\n", t.connection, t.seed, len(t.PeerRequests))
+	defer t.cfg.debug().Printf("c(%p) seed(%t) req(%d) uploading - completed\n", t.connection, t.seed, len(t.PeerRequests))
 
 	uploaded := 0
 	for r := range t.requestseq() {
