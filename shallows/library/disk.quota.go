@@ -102,7 +102,7 @@ func NewDiskQuota(ctx context.Context, c *http.Client, dir fsx.Virtual, q sqlx.Q
 
 		v := sqlx.Scan(MetadataSearch(ctx, q, query))
 		for md := range v.Iter() {
-			log.Println("------------------------- archivable initiated", md.ID)
+			log.Println("------------------------- archivable initiated", md.ID, md.ArchiveID)
 			if err := Archive(ctx, q, md, dir, a); err != nil {
 				errorsx.Log(errorsx.Wrapf(err, "archival upload failed: %s", md.ID))
 				continue
