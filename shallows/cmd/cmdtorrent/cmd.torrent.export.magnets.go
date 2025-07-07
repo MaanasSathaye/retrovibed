@@ -2,6 +2,7 @@ package cmdtorrent
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strings"
 
@@ -16,7 +17,8 @@ import (
 )
 
 type exportMagnets struct {
-	Path string `arg:"" name:"path" help:"file to write magnet urls out to, defaults to stdout" default:"" required:"false"`
+	Path   string `arg:"" name:"path" help:"file to write magnet urls out to, defaults to stdout" default:"" required:"false"`
+	Legacy bool   `flag:"" name:"legacy" help:"enable legacy storage structure for migration" default:"false" hidden:"true"`
 }
 
 func (t exportMagnets) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
@@ -40,7 +42,14 @@ func (t exportMagnets) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) 
 		return err
 	}
 
+	// var tstore storage.ClientImpl = blockcache.NewTorrentFromVirtualFS(tvfs)
+	// if t.Legacy {
+	// 	log.Println("--------------------------------------- LEGACY STORAGE IN USE - NOT A SUPPORTED CONFIGURATION ---------------------------------------")
+	// 	tstore = storage.NewFile(tvfs.Path(), storage.FileOptionPathMakerInfohash)
+	// }
+
 	dir := fsx.Walk(root.FS())
+	bmc := torrent.NewBitmapCache(tvfs.Path())
 
 	for path := range dir.Walk() {
 		if !strings.HasSuffix(path, suffix) {
@@ -56,10 +65,42 @@ func (t exportMagnets) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) 
 			continue
 		}
 
+		bm, err := bmc.Read(id)
+		if err != nil {
+			log.Println(errorsx.Wrapf(err, "unable to open bitmap cache %s", id))
+			continue
+		}
+
+		if bm.GetCardinality() == 0 {
+			log.Println(errorsx.Wrapf(err, "bitmap - skipping due to no data available %s", id))
+			continue
+		}
+
 		md, err := mdcache.Read(id)
 		if err != nil {
 			return errorsx.Wrapf(err, "unable to read medata of %s", id)
 		}
+
+		// info, err := md.Metainfo().UnmarshalInfo()
+		// if err != nil {
+		// 	return errorsx.Wrapf(err, "unable to decode info of %s", id)
+		// }
+
+		// disk, err := tstore.OpenTorrent(&info, id.AsByteArray())
+		// if err != nil {
+		// 	log.Println(errorsx.Wrapf(err, "unable to open storage of %s", id))
+		// 	continue
+		// }
+
+		// missing, _, err := torrent.VerifyStored(gctx.Context, langx.Autoptr(md.Metainfo()), disk)
+		// if err != nil {
+		// 	return errorsx.Wrapf(err, "unable to verify data of %s", id)
+		// }
+
+		// if missing.GetCardinality() > 0 {
+		// 	log.Println("ignoring", id, "missing data", missing.GetCardinality())
+		// 	continue
+		// }
 
 		mg := metainfo.Magnet{
 			InfoHash:    metainfo.Hash(md.ID.Bytes()),

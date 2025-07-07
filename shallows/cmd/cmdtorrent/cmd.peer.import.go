@@ -53,6 +53,7 @@ type importPeer struct {
 	Reclaim        bool     `flag:"" name:"reclaim" help:"mark imported media for disk space reclaimation" default:"false"`
 	Magnets        string   `arg:"" name:"magnets" help:"file containing magnet links to download, defaults to stdin" default:""`
 	TorrentPrivate bool     `flag:"" name:"torrent-private" help:"restrict torrent connections to private networks" env:"${env_torrent_private}" default:"false"`
+	Concurrency    uint16   `flag:"" name:"concurrency" help:"specify the number of workers" default:"${vars_cores}"`
 }
 
 func (t importPeer) torrents(tstore fsx.Virtual) iter.Seq2[string, torrent.Metadata] {
@@ -297,7 +298,7 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		}
 
 		return nil
-	})
+	}, asynccompute.Workers[workload](t.Concurrency))
 
 	for k, v := range t.torrents(torrentstore) {
 		if err := arena.Run(gctx.Context, workload{magnet: k, meta: v}); err != nil {
