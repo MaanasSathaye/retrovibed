@@ -76,6 +76,7 @@ type Command struct {
 	TorrentPublicIP4     string           `flag:"" name:"torrent-ipv4" help:"public ipv4 address of the torrent" env:"${env_torrent_ipv4}"`
 	TorrentPublicIP6     string           `flag:"" name:"torrent-ipv6" help:"public ipv6 address of the torrent" env:"${env_torrent_ipv6}"`
 	TorrentMaxRequests   uint32           `flag:"" name:"torrent-max-outstanding" help:"maximum piece requests to allow" default:"1024"`
+	TorrentResume        bool             `flag:"" name:"torrent-resume" help:"enable announcing and resuming torrents" default:"true"`
 	TorrentLegacyStorage bool             `flag:"" name:"torrent-legacy-storage" help:"enable legacy storage structure for migration" default:"false" hidden:"true"`
 }
 
@@ -311,8 +312,11 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	}()
 
 	go VerifyTorrents(dctx, db, rootstore, tclient, tstore)
-	go AnnounceSeeded(dctx, db, rootstore, tclient, tstore)
-	go ResumeDownloads(dctx, db, rootstore, tclient, tstore)
+
+	if t.TorrentResume {
+		go AnnounceSeeded(dctx, db, rootstore, tclient, tstore)
+		go ResumeDownloads(dctx, db, rootstore, tclient, tstore)
+	}
 
 	if t.AutoIdentifyMedia {
 		go timex.NowAndEvery(gctx.Context, 15*time.Minute, func(ctx context.Context) error {
