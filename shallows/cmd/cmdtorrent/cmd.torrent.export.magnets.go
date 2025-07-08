@@ -72,7 +72,7 @@ func (t exportMagnets) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) 
 		}
 
 		if bm.GetCardinality() == 0 {
-			log.Println(errorsx.Wrapf(err, "bitmap - skipping due to no data available %s", id))
+			log.Printf("bitmap - skipping due to no data available %s\n", id)
 			continue
 		}
 
