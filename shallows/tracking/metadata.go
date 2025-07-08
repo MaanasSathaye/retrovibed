@@ -287,9 +287,12 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 				continue
 			}
 
-			if err := MetadataProgressByID(ctx, q, md.ID, uint16(stats.ActivePeers), current).Scan(md); err != nil {
+			uctx, done := context.WithTimeout(context.Background(), time.Second)
+			if err := MetadataProgressByID(uctx, q, md.ID, uint16(stats.ActivePeers), current).Scan(md); err != nil {
+				done()
 				log.Println("failed to update progress", err)
 			}
+			done()
 		case <-sub.Values:
 			if !l.Allow() {
 				continue

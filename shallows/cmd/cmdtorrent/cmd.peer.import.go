@@ -29,7 +29,6 @@ import (
 	"github.com/retrovibed/retrovibed/internal/envx"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/fsx"
-	"github.com/retrovibed/retrovibed/internal/iox"
 	"github.com/retrovibed/retrovibed/internal/langx"
 	"github.com/retrovibed/retrovibed/internal/md5x"
 	"github.com/retrovibed/retrovibed/internal/stringsx"
@@ -269,21 +268,24 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		if cause != nil {
 			return errorsx.Wrapf(cause, "failed to start magnet %s - %T: %+v\n", w.meta.ID.String(), cause, cause)
 		}
+		defer func() {
+			errorsx.Log(errorsx.Wrapf(tclient.Stop(w.meta), "failed to shutdown torrent %s %v", w.meta.ID.String(), cause))
+		}()
 
 		// give each torrent a minute of no writing activity before giving up importing it.
 		// it'll continue to try in the background but the import process will context.
-		dctx, done := context.WithCancel(ctx)
-		dst := iox.NewTimeoutWriter(done, time.Minute, io.Discard)
+		// dctx, done := context.WithCancel(ctx)
+		// dst := iox.NewTimeoutWriter(done, time.Minute, io.Discard)
 		log.Println("---------------------------------- downloading", w.meta.ID)
-		if cause := tracking.DownloadInto(dctx, db, rootstore, &lmd, dl, dst); cause != nil {
-			return errorsx.Wrapf(cause, "failed to download %s %v", w.meta.ID.String(), cause)
+		if cause := tracking.DownloadInto(ctx, db, rootstore, &lmd, dl, io.Discard); cause != nil {
+			return errorsx.LogErr(errorsx.Wrapf(cause, "failed to download %s %v", w.meta.ID.String(), cause))
 		}
 
 		if cause := tclient.Stop(w.meta); cause != nil {
-			return errorsx.Wrapf(cause, "failed to shutdown torrent %s %v", w.meta.ID.String(), cause)
+			return errorsx.LogErr(errorsx.Wrapf(cause, "failed to shutdown torrent %s %v", w.meta.ID.String(), cause))
 		}
 
-		log.Println("---------------------------------- COMPLETED", w.meta.ID)
+		log.Println("---------------------------------- COMPLETED", w.meta.ID, lmd.Downloaded, lmd.Bytes)
 		if t.Archive {
 			async.Broadcast()
 		}

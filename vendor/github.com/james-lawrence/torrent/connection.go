@@ -32,6 +32,7 @@ import (
 	"github.com/james-lawrence/torrent/internal/bytesx"
 	"github.com/james-lawrence/torrent/internal/errorsx"
 	"github.com/james-lawrence/torrent/internal/langx"
+	"github.com/james-lawrence/torrent/internal/timex"
 	"github.com/james-lawrence/torrent/internal/x/bitmapx"
 	"github.com/james-lawrence/torrent/mse"
 )
@@ -53,7 +54,8 @@ func newConnection(cfg *ClientConfig, nc net.Conn, outgoing bool, remote netip.A
 	ts := time.Now()
 	return &connection{
 		_mu:                     _mu,
-		respond:                 sync.NewCond(_mu),
+		upload:                  sync.NewCond(_mu),
+		request:                 sync.NewCond(_mu),
 		conn:                    nc,
 		outgoing:                outgoing,
 		Choked:                  true,
@@ -72,7 +74,7 @@ func newConnection(cfg *ClientConfig, nc net.Conn, outgoing bool, remote netip.A
 		requests:                make(map[uint64]request, cfg.maximumOutstandingRequests),
 		PeerRequests:            make(map[request]struct{}, cfg.maximumOutstandingRequests),
 		PeerExtensionIDs:        make(map[pp.ExtensionName]pp.ExtensionNumber),
-		refreshrequestable:      atomicx.Pointer(ts),
+		refreshrequestable:      atomicx.Pointer(timex.Inf()),
 		lastMessageReceived:     atomicx.Pointer(ts),
 		lastRejectReceived:      atomicx.Pointer(ts),
 		lastUsefulChunkReceived: ts,
@@ -105,6 +107,7 @@ type connection struct {
 	// limiting, deadlines etc.
 	w io.Writer
 	r io.Reader
+
 	// True if the connection is operating over MSE obfuscation.
 	headerEncrypted bool
 	cryptoMethod    mse.CryptoMethod
@@ -132,9 +135,8 @@ type connection struct {
 	lastBecameInterested time.Time
 	priorInterest        time.Duration
 
-	Choked           bool // we have preventing the peer from making requests
-	requests         map[uint64]request
-	requestsLowWater int
+	Choked   bool // we have prevented the peer from making requests
+	requests map[uint64]request
 
 	// Indexed by metadata piece, set to true if posted and pending a
 	// response.
@@ -178,7 +180,8 @@ type connection struct {
 	PeerClientName     string
 
 	currentbuffer *bytes.Buffer
-	respond       *sync.Cond
+	upload        *sync.Cond  // used to wake up the connection.reader
+	request       *sync.Cond  // used to wake up the connection.writer
 	needsresponse atomic.Bool // used to track when responses need to be sent that might be missed by the respond condition.
 }
 
@@ -247,7 +250,7 @@ func (cn *connection) resetclaimed() error {
 		cn.cmu().Unlock()
 	} else {
 		cn.cmu().Lock()
-		cn.t.chunks.fill(cn.claimed).Clear()
+		cn.claimed.Clear()
 		cn.cmu().Unlock()
 	}
 
@@ -404,7 +407,6 @@ func (cn *connection) Choke(msg messageWriter) error {
 			cn.reject(r)
 		}
 	} else {
-		cn.cfg.debug().Println("-------------------------------- clearing peer requests --------------------------------")
 		cn.PeerRequests = nil
 	}
 
@@ -471,40 +473,25 @@ func (cn *connection) checkFailures() error {
 		}
 	}
 
-	if cn.stats.PiecesDirtiedBad.Int64() > 10 {
+	if !cn.trusted && cn.stats.PiecesDirtiedBad.Int64() > 10 {
 		return connections.NewBanned(cn.conn, errorsx.New("too many bad pieces"))
 	}
 
 	return nil
 }
 
-func (cn *connection) Have(piece uint64) (n int, err error) {
-	cn.cmu().Lock()
-	added := cn.sentHaves.CheckedAdd(uint32(piece))
-	cn.cmu().Unlock()
-	if !added {
-		return 0, nil
-	}
-
-	return cn.Post(pp.NewHavePiece(piece))
-}
-
-func (cn *connection) PostBitfield() (n int, err error) {
-	dup := cn.t.chunks.CompletedBitmap()
-
+func (cn *connection) PostBitfield(dup *roaring.Bitmap) (n int, err error) {
 	cn.cfg.debug().Printf("c(%p) seed(%t) calculated bitfield: b(%d)/p(%d)\n", cn, cn.t.seeding(), dup.GetCardinality(), cn.t.chunks.pieces)
 	n, err = cn.Post(pp.NewBitField(cn.t.chunks.pieces, dup))
 	if err != nil {
 		return n, err
 	}
-
-	cn.sentHaves = bitmapx.Lazy(dup)
 	return n, nil
 }
 
 func (cn *connection) updateRequests() {
 	if !cn.needsresponse.Swap(true) {
-		cn.respond.Broadcast()
+		cn.upload.Broadcast()
 	}
 }
 
@@ -513,8 +500,10 @@ func (cn *connection) peerPiecesChanged() {
 		return
 	}
 
-	cn.t.event.Broadcast()
-	cn.updateRequests()
+	// cn.t.event.Broadcast()
+	cn.refreshrequestable.Store(langx.Autoptr(time.Now()))
+	cn.needsresponse.Store(true)
+	cn.request.Broadcast()
 }
 
 func (cn *connection) raisePeerMinPieces(newMin uint64) {
@@ -576,13 +565,12 @@ func (cn *connection) peerSentBitfield(bf []bool) error {
 	return nil
 }
 
-func (cn *connection) onPeerSentHaveAll() error {
+func (cn *connection) onPeerSentHaveAll() {
 	cn.cmu().Lock()
 	cn.peerSentHaveAll = true
 	cn.t.chunks.fill(cn.claimed)
 	cn.cmu().Unlock()
 	cn.peerPiecesChanged()
-	return nil
 }
 
 func (cn *connection) peerSentHaveNone() error {
@@ -766,16 +754,15 @@ func (cn *connection) onReadRequest(r request) error {
 }
 
 func (cn *connection) Flush() (int, error) {
-	// olen := cn.writeBuffer.Len()
-	// defer func() {
-	// 	log.Printf("c(%p) seed(%t) -------------------------------- flushed %d --------------------------------\n", cn, cn.t.seeding(), olen)
-	// }()
-
 	cn.cmu().Lock()
 	buf := cn.currentbuffer.Bytes()
 	cn.currentbuffer.Reset()
 	cn.cmu().Unlock()
 
+	return cn.FlushBuffer(buf)
+}
+
+func (cn *connection) FlushBuffer(buf []byte) (int, error) {
 	n, err := cn.w.Write(buf)
 	blen := len(buf)
 
@@ -799,6 +786,9 @@ func (cn *connection) ReadOne(ctx context.Context, decoder *pp.Decoder) (msg pp.
 	cn.lastMessageReceived.Store(langx.Autoptr(time.Now()))
 
 	if msg.Keepalive {
+		// TODO not sure if these are necessary confirm and cleanup later.
+		cn.request.Broadcast()
+		cn.upload.Broadcast()
 		cn.cfg.debug().Printf("(%d) c(%p) seed(%t) - RECEIVED KEEPALIVE - missing(%d) - failed(%d) - outstanding(%d) - unverified(%d) - completed(%d)\n", os.Getpid(), cn, cn.cfg.Seed, cn.t.chunks.Cardinality(cn.t.chunks.missing), cn.t.chunks.Cardinality(cn.t.chunks.failed), len(cn.t.chunks.outstanding), cn.t.chunks.Cardinality(cn.t.chunks.unverified), cn.t.chunks.Cardinality(cn.t.chunks.completed))
 		return
 	}
@@ -817,8 +807,7 @@ func (cn *connection) ReadOne(ctx context.Context, decoder *pp.Decoder) (msg pp.
 		return msg, nil
 	case pp.Unchoke:
 		cn.PeerChoked = false
-		cn.refreshrequestable.Swap(langx.Autoptr(time.Now().Add(30 * time.Millisecond)))
-		cn.updateRequests()
+		cn.peerPiecesChanged()
 		return msg, nil
 	case pp.Interested:
 		cn.PeerInterested = true
@@ -834,7 +823,7 @@ func (cn *connection) ReadOne(ctx context.Context, decoder *pp.Decoder) (msg pp.
 			return msg, err
 		}
 
-		cn.updateRequests()
+		cn.peerPiecesChanged()
 
 		return msg, nil
 	case pp.Bitfield:
@@ -842,9 +831,6 @@ func (cn *connection) ReadOne(ctx context.Context, decoder *pp.Decoder) (msg pp.
 		if err = cn.peerSentBitfield(msg.Bitfield); err != nil {
 			return msg, err
 		}
-
-		cn.refreshrequestable.Swap(langx.Autoptr(time.Now().Add(30 * time.Millisecond)))
-		cn.updateRequests()
 
 		return msg, nil
 	case pp.Request:
@@ -859,7 +845,7 @@ func (cn *connection) ReadOne(ctx context.Context, decoder *pp.Decoder) (msg pp.
 		}
 
 		cn.t.chunks.pool.Put(&msg.Piece)
-		cn.updateRequests()
+		cn.request.Broadcast()
 
 		return msg, nil
 	case pp.Cancel:
@@ -883,12 +869,7 @@ func (cn *connection) ReadOne(ctx context.Context, decoder *pp.Decoder) (msg pp.
 		return msg, nil
 	case pp.HaveAll:
 		// cn.cfg.debug().Println("peer claims it has everything")
-		if err = cn.onPeerSentHaveAll(); err != nil {
-			return msg, err
-		}
-
-		cn.refreshrequestable.Swap(langx.Autoptr(time.Now().Add(30 * time.Millisecond)))
-		cn.updateRequests()
+		cn.onPeerSentHaveAll()
 		return msg, nil
 	case pp.HaveNone:
 		// cn.cfg.debug().Println("peer claims it has nothing")
@@ -911,12 +892,13 @@ func (cn *connection) ReadOne(ctx context.Context, decoder *pp.Decoder) (msg pp.
 		cn.fastset.AddRange(cn.t.chunks.Range(uint64(msg.Index)))
 		cn._mu.Unlock()
 
-		cn.refreshrequestable.Swap(langx.Autoptr(time.Now().Add(30 * time.Millisecond)))
-		cn.updateRequests()
+		cn.peerPiecesChanged()
 
 		return msg, nil
 	case pp.Extended:
-		defer cn.updateRequests()
+		defer cn.request.Broadcast()
+		defer cn.upload.Broadcast()
+
 		if err = cn.onReadExtendedMsg(msg.ExtendedID, msg.ExtendedPayload); err != nil {
 			return msg, err
 		}
@@ -1121,25 +1103,6 @@ func (cn *connection) deleteAllRequests() {
 	for _, r := range reqs {
 		cn.releaseRequest(r)
 	}
-}
-
-func (cn *connection) sendChunk(r request, msg func(pp.Message) bool) (more bool, err error) {
-	// Count the chunk being sent, even if it isn't.
-	b := make([]byte, r.Length)
-	p := cn.t.info.Piece(int(r.Index))
-	n, err := cn.t.readAt(b, p.Offset()+int64(r.Begin))
-	if n != len(b) {
-		if err == nil {
-			panic("expected error")
-		}
-		return false, err
-	} else if err == io.EOF {
-		err = nil
-	}
-
-	more = msg(pp.NewPiece(r.Index, r.Begin, b))
-	cn.lastChunkSent = time.Now()
-	return more, nil
 }
 
 func (cn *connection) setTorrent(t *torrent) {

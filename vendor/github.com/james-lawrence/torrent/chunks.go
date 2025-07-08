@@ -235,6 +235,7 @@ func (t *chunks) request(cidx int64) (r request, err error) {
 	pidx := pindex(cidx, t.meta.PieceLength, t.clength)
 	start := chunkOffset(cidx, t.meta.PieceLength, t.clength)
 	length := chunkLength(t.meta.TotalLength(), cidx, t.meta.PieceLength, t.clength, cidx == t.cmaximum-1)
+
 	return newRequest(pp.Integer(pidx), pp.Integer(start), pp.Integer(length)), nil
 }
 
@@ -543,7 +544,7 @@ func (t *chunks) Readable() uint64 {
 	defer t.mu.RUnlock()
 
 	cpp := chunksPerPiece(t.meta.PieceLength, t.clength)
-	return t.unverified.GetCardinality() + min((uint64(cpp)*t.completed.GetCardinality()), t.pieces)
+	return t.unverified.GetCardinality() + min((uint64(cpp)*t.completed.GetCardinality()), uint64(t.cmaximum))
 }
 
 func (t *chunks) ReadableBitmap() *roaring.Bitmap {
@@ -563,13 +564,7 @@ func (t *chunks) CompletedBitmap() *roaring.Bitmap {
 	t.mu.RLock()
 	defer t.mu.RUnlock()
 
-	bm := bitmapx.Lazy(nil)
-	t.completed.Iterate(func(x uint32) bool {
-		bm.Add(x)
-		return true
-	})
-
-	return bm
+	return t.completed.Clone()
 }
 
 // returns true if any chunks are in incomplete states (missing, oustanding, unverified)
