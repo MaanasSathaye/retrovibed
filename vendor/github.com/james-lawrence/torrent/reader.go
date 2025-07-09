@@ -42,7 +42,6 @@ func (t *blockingreader) ReadAt(p []byte, offset int64) (n int, err error) {
 	t.c.cond.L.Unlock()
 	allowed = min(allowed, int64(len(p)))
 
-	// log.Println("reading", offset, allowed, len(p[:allowed]), len(p))
 	return t.TorrentImpl.ReadAt(p[:allowed], offset)
 }
 

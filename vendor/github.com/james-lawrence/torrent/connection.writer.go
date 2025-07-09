@@ -652,7 +652,6 @@ func connwriteridle(ws *writerstate) cstate.T {
 	}
 
 	ws.cfg.debug().Printf("c(%p) seed(%t) idling downloads(%t) %s - %s\n", ws.connection, ws.t.seeding(), !ws.PeerChoked, ws.t.chunks, mind)
-
 	return connWriterSyncBitfield(ws, connWriterInterested(ws, ws.Idler.Idle(connwriteractive(ws), mind)))
 }
 
