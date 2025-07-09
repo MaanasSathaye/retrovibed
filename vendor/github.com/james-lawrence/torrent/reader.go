@@ -3,9 +3,9 @@ package torrent
 import (
 	"errors"
 	"io"
-	"sync"
 	"sync/atomic"
 
+	"github.com/james-lawrence/torrent/internal/atomicx"
 	"github.com/james-lawrence/torrent/storage"
 )
 
@@ -24,19 +24,19 @@ type blockingreader struct {
 }
 
 func (t *blockingreader) ReadAt(p []byte, offset int64) (n int, err error) {
-	var allowed int64
-	t.c.cond.L.Lock()
+	var (
+		allowed int64
+		onceb   = atomicx.Bool(true)
+	)
+
 	pid := uint64(t.c.meta.OffsetToIndex(offset))
 
-	once := sync.OnceFunc(func() {
-		// log.Println("enqueuing chunk", pid, offset, t.c)
-		t.d.Enqueue(pid)
-	})
-
+	t.c.cond.L.Lock()
 	for allowed = t.c.DataAvailableForOffset(offset); allowed < 0; allowed = t.c.DataAvailableForOffset(offset) {
-		if t.c.ChunksAvailable(pid) {
-			once()
+		if t.c.ChunksAvailable(pid) && onceb.CompareAndSwap(true, false) {
+			t.d.Enqueue(pid)
 		}
+
 		t.c.cond.Wait()
 	}
 	t.c.cond.L.Unlock()
