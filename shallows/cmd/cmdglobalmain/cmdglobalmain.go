@@ -115,6 +115,10 @@ func Main(args ...string) {
 			return debugx.Heap(envx.String(os.TempDir(), userx.DefaultRuntimeDirectory()))(dctx)
 		case "mem":
 			return debugx.Memory(envx.String(os.TempDir(), userx.DefaultRuntimeDirectory()))(dctx)
+		case "alloc":
+			return debugx.Allocs(envx.String(os.TempDir(), userx.DefaultRuntimeDirectory()))(dctx)
+		case "block":
+			return debugx.Block(envx.String(os.TempDir(), userx.DefaultRuntimeDirectory()))(dctx)
 		default:
 			return debugx.CPU(envx.String(os.TempDir(), userx.DefaultRuntimeDirectory()))(dctx)
 		}

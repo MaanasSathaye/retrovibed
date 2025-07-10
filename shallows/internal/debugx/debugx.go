@@ -107,6 +107,18 @@ func Heap(dir string) func(context.Context) (err error) {
 	}
 }
 
+func Allocs(dir string) func(context.Context) (err error) {
+	return func(ctx context.Context) (err error) {
+		return run(ctx, dir, profile.MemProfileAllocs)
+	}
+}
+
+func Block(dir string) func(context.Context) (err error) {
+	return func(ctx context.Context) (err error) {
+		return run(ctx, dir, profile.BlockProfile)
+	}
+}
+
 func run(ctx context.Context, dir string, strategy func(*profile.Profile)) (err error) {
 	if err = os.MkdirAll(dir, 0700); err != nil {
 		return errorsx.Wrap(err, "unable to create profiling directory")
