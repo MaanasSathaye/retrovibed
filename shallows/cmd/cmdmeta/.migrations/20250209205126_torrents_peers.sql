@@ -1,8 +1,5 @@
 -- +goose Up
 -- +goose StatementBegin
-INSTALL inet;
-LOAD inet;
-
 CREATE TABLE torrents_peers (
     id UUID PRIMARY KEY NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
