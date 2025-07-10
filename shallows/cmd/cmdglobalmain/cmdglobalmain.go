@@ -111,6 +111,8 @@ func Main(args ...string) {
 		defer log.Println("PROFILING COMPLETED", cfg.Mode, cfg.Duration)
 
 		switch cfg.Mode {
+		case "trace":
+			return debugx.Trace(envx.String(os.TempDir(), userx.DefaultRuntimeDirectory()))(dctx)
 		case "heap":
 			return debugx.Heap(envx.String(os.TempDir(), userx.DefaultRuntimeDirectory()))(dctx)
 		case "mem":
