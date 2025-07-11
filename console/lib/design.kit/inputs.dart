@@ -80,8 +80,8 @@ class _ByteInputWidgetState extends State<ByteWidget> {
   void initState() {
     super.initState();
     _controller.addListener(_updateBytes);
-    final v = _bytes * _magnitude;
-    widget.onChange?.call(v);
+    // final v = _bytes * _magnitude;
+    // widget.onChange?.call(v);
   }
 
   @override
@@ -109,11 +109,6 @@ class _ByteInputWidgetState extends State<ByteWidget> {
   @override
   void reassemble() {
     super.reassemble();
-    // You might call setState here if you need to force a UI update
-    // based on changes that `build` itself won't pick up automatically.
-    // setState(() {
-    //   _bytes = widget.value;
-    // });
   }
 
   @override
@@ -129,11 +124,7 @@ class _ByteInputWidgetState extends State<ByteWidget> {
               FilteringTextInputFormatter.digitsOnly, // Allows only digits
             ],
             decoration:
-                _decoration ??
-                const InputDecoration(
-                  labelText: 'Value',
-                  border: OutlineInputBorder(),
-                ),
+                _decoration
           ),
         ),
         const SizedBox(width: 8),

@@ -6,7 +6,7 @@ import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/profiles.dart' as profiles;
 import 'package:retrovibed/billing.dart' as billing;
 import 'package:retrovibed/wireguard.dart' as wg;
-
+import 'package:retrovibed/storage.dart' as storage;
 class Display extends StatelessWidget {
   const Display({super.key});
 
@@ -55,7 +55,7 @@ class Display extends StatelessWidget {
           ds.Accordion(
             disabled: Text("manage local and archive storage usage - currently in private alpha"),
             description: Text("storage"),
-            content: Container(),
+            content: storage.Settings(),
           ),
           ds.Accordion(
             disabled: Text("manage torrent settings - currently in private alpha"),
