@@ -34,6 +34,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/stringsx"
 	"github.com/retrovibed/retrovibed/internal/timex"
 	"github.com/retrovibed/retrovibed/library"
+	"golang.org/x/exp/constraints"
 	"golang.org/x/time/rate"
 )
 
@@ -82,9 +83,27 @@ func MetadataOptionAutoArchive(b bool) func(*Metadata) {
 	}
 }
 
-func MetadataOptionJSONSafeEncode(p *Metadata) {
-	p.CreatedAt = timex.RFC3339NanoEncode(p.CreatedAt)
-	p.UpdatedAt = timex.RFC3339NanoEncode(p.UpdatedAt)
+func MetadataOptionBytes[T constraints.Integer](b T) func(*Metadata) {
+	return func(m *Metadata) {
+		m.Bytes = uint64(b)
+	}
+}
+
+func MetadataOptionDownloaded[T constraints.Integer](b T) func(*Metadata) {
+	return func(m *Metadata) {
+		m.Downloaded = uint64(b)
+	}
+}
+
+func MetadataOptionTestDefaults(m *Metadata) {
+	*m = NewMetadata(
+		langx.Autoptr(metainfo.NewHashFromBytes(int160.Random().Bytes())),
+	)
+}
+
+func MetadataOptionJSONSafeEncode(m *Metadata) {
+	m.CreatedAt = timex.RFC3339NanoEncode(m.CreatedAt)
+	m.UpdatedAt = timex.RFC3339NanoEncode(m.UpdatedAt)
 }
 
 func MetadataOptionAutoDescription(m *Metadata) {
