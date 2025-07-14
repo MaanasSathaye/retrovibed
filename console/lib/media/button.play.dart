@@ -32,13 +32,13 @@ Stream<mediakit.Media> range(MediaSearchResponse i, Media pos) async* {
   }
 }
 
-void Function()? PlayAction(BuildContext context, Media current, MediaSearchResponse s) {
+Future<void> Function()? PlayAction(BuildContext context, Media current, MediaSearchResponse s) {
   switch (mimex.icon(current.mimetype)) {
     case mimex.movie:
     case mimex.audio:
       final playlist = Playlist.of(context);
       return playlist == null ? null : () {
-        playlist.setPlaylist(range(s, current));
+        return Future.sync(() => playlist.setPlaylist(range(s, current)));
       };
     default:
       return null;

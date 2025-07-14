@@ -134,6 +134,13 @@ func MetadataQueryIncomplete() squirrel.Sqlizer {
 	return squirrel.Expr("torrents_metadata.downloaded < torrents_metadata.bytes")
 }
 
+func MetadataQueryCompleted(b bool) squirrel.Sqlizer {
+	if b {
+		return squirrel.Expr("torrents_metadata.downloaded = torrents_metadata.bytes")
+	}
+	return squirrel.Expr("torrents_metadata.downloaded < torrents_metadata.bytes")
+}
+
 func MetadataQueryNotPaused() squirrel.Sqlizer {
 	return squirrel.Expr("torrents_metadata.paused_at = 'infinity'")
 }

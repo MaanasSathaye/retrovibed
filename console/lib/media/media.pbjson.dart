@@ -159,19 +159,23 @@ const DownloadSearchRequest$json = {
   '1': 'DownloadSearchRequest',
   '2': [
     {'1': 'query', '3': 1, '4': 1, '5': 9, '10': 'query'},
+    {'1': 'mimetypes', '3': 2, '4': 3, '5': 9, '10': 'mimetypes'},
+    {'1': 'completed', '3': 3, '4': 1, '5': 8, '10': 'completed'},
     {'1': 'offset', '3': 900, '4': 1, '5': 4, '10': 'offset'},
     {'1': 'limit', '3': 901, '4': 1, '5': 4, '10': 'limit'},
   ],
   '9': [
-    {'1': 2, '2': 900},
+    {'1': 4, '2': 900},
     {'1': 902, '2': 1000},
   ],
 };
 
 /// Descriptor for `DownloadSearchRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List downloadSearchRequestDescriptor = $convert.base64Decode(
-    'ChVEb3dubG9hZFNlYXJjaFJlcXVlc3QSFAoFcXVlcnkYASABKAlSBXF1ZXJ5EhcKBm9mZnNldB'
-    'iEByABKARSBm9mZnNldBIVCgVsaW1pdBiFByABKARSBWxpbWl0SgUIAhCEB0oGCIYHEOgH');
+    'ChVEb3dubG9hZFNlYXJjaFJlcXVlc3QSFAoFcXVlcnkYASABKAlSBXF1ZXJ5EhwKCW1pbWV0eX'
+    'BlcxgCIAMoCVIJbWltZXR5cGVzEhwKCWNvbXBsZXRlZBgDIAEoCFIJY29tcGxldGVkEhcKBm9m'
+    'ZnNldBiEByABKARSBm9mZnNldBIVCgVsaW1pdBiFByABKARSBWxpbWl0SgUIBBCEB0oGCIYHEO'
+    'gH');
 
 @$core.Deprecated('Use downloadSearchResponseDescriptor instead')
 const DownloadSearchResponse$json = {

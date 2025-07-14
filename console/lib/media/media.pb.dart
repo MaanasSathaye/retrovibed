@@ -622,11 +622,15 @@ class Download extends $pb.GeneratedMessage {
 class DownloadSearchRequest extends $pb.GeneratedMessage {
   factory DownloadSearchRequest({
     $core.String? query,
+    $core.Iterable<$core.String>? mimetypes,
+    $core.bool? completed,
     $fixnum.Int64? offset,
     $fixnum.Int64? limit,
   }) {
     final result = create();
     if (query != null) result.query = query;
+    if (mimetypes != null) result.mimetypes.addAll(mimetypes);
+    if (completed != null) result.completed = completed;
     if (offset != null) result.offset = offset;
     if (limit != null) result.limit = limit;
     return result;
@@ -639,6 +643,8 @@ class DownloadSearchRequest extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DownloadSearchRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'media'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'query')
+    ..pPS(2, _omitFieldNames ? '' : 'mimetypes')
+    ..aOB(3, _omitFieldNames ? '' : 'completed')
     ..a<$fixnum.Int64>(900, _omitFieldNames ? '' : 'offset', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
     ..a<$fixnum.Int64>(901, _omitFieldNames ? '' : 'limit', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
     ..hasRequiredFields = false
@@ -670,21 +676,33 @@ class DownloadSearchRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   void clearQuery() => $_clearField(1);
 
+  @$pb.TagNumber(2)
+  $pb.PbList<$core.String> get mimetypes => $_getList(1);
+
+  @$pb.TagNumber(3)
+  $core.bool get completed => $_getBF(2);
+  @$pb.TagNumber(3)
+  set completed($core.bool value) => $_setBool(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasCompleted() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearCompleted() => $_clearField(3);
+
   @$pb.TagNumber(900)
-  $fixnum.Int64 get offset => $_getI64(1);
+  $fixnum.Int64 get offset => $_getI64(3);
   @$pb.TagNumber(900)
-  set offset($fixnum.Int64 value) => $_setInt64(1, value);
+  set offset($fixnum.Int64 value) => $_setInt64(3, value);
   @$pb.TagNumber(900)
-  $core.bool hasOffset() => $_has(1);
+  $core.bool hasOffset() => $_has(3);
   @$pb.TagNumber(900)
   void clearOffset() => $_clearField(900);
 
   @$pb.TagNumber(901)
-  $fixnum.Int64 get limit => $_getI64(2);
+  $fixnum.Int64 get limit => $_getI64(4);
   @$pb.TagNumber(901)
-  set limit($fixnum.Int64 value) => $_setInt64(2, value);
+  set limit($fixnum.Int64 value) => $_setInt64(4, value);
   @$pb.TagNumber(901)
-  $core.bool hasLimit() => $_has(2);
+  $core.bool hasLimit() => $_has(4);
   @$pb.TagNumber(901)
   void clearLimit() => $_clearField(901);
 }

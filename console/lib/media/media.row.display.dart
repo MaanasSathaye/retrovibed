@@ -6,29 +6,28 @@ class RowDisplay extends StatelessWidget {
   final Media media;
   final List<Widget> leading;
   final List<Widget> trailing;
-  final void Function()? onTap;
+  final Future<void> Function() onTap;
   const RowDisplay({
     super.key,
     required this.media,
     this.leading = const [],
     this.trailing = const [],
-    this.onTap = ds.defaulttap,
-  });
+    onTap,
+  }): onTap = onTap ?? ds.defaulttapv;
 
   @override
   Widget build(BuildContext context) {
     final themex = ds.Defaults.of(context);
-    List<Widget> children = List.from(leading);
-    children += [
-      Expanded(child: Text(media.description, overflow: TextOverflow.ellipsis)),
-    ];
-    children += trailing;
 
     return SelectionArea(child: Container(
       padding: themex.padding,
       child: InkWell(
-        onTap: onTap,
-        child: Row(spacing: themex.spacing!, children: children),
+        onTap: () => onTap(),
+        child: Row(spacing: themex.spacing!, children: [
+          ...leading,
+          Expanded(child: Text(media.description, overflow: TextOverflow.ellipsis)),
+          ...trailing
+        ]),
       ),
     ));
   }

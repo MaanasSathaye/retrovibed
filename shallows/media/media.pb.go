@@ -548,6 +548,8 @@ func (x *Download) GetPeers() uint32 {
 type DownloadSearchRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Query         string                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
+	Mimetypes     []string               `protobuf:"bytes,2,rep,name=mimetypes,proto3" json:"mimetypes,omitempty"`
+	Completed     bool                   `protobuf:"varint,3,opt,name=completed,proto3" json:"completed,omitempty"`
 	Offset        uint64                 `protobuf:"varint,900,opt,name=offset,proto3" json:"offset,omitempty"`
 	Limit         uint64                 `protobuf:"varint,901,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -589,6 +591,20 @@ func (x *DownloadSearchRequest) GetQuery() string {
 		return x.Query
 	}
 	return ""
+}
+
+func (x *DownloadSearchRequest) GetMimetypes() []string {
+	if x != nil {
+		return x.Mimetypes
+	}
+	return nil
+}
+
+func (x *DownloadSearchRequest) GetCompleted() bool {
+	if x != nil {
+		return x.Completed
+	}
+	return false
 }
 
 func (x *DownloadSearchRequest) GetOffset() uint64 {
@@ -945,11 +961,13 @@ const file_media_proto_rawDesc = "" +
 	"downloaded\x12\"\n" +
 	"\finitiated_at\x18\x04 \x01(\tR\finitiated_at\x12\x1c\n" +
 	"\tpaused_at\x18\x05 \x01(\tR\tpaused_at\x12\x14\n" +
-	"\x05peers\x18\x06 \x01(\rR\x05peers\"l\n" +
+	"\x05peers\x18\x06 \x01(\rR\x05peers\"\xa8\x01\n" +
 	"\x15DownloadSearchRequest\x12\x14\n" +
-	"\x05query\x18\x01 \x01(\tR\x05query\x12\x17\n" +
+	"\x05query\x18\x01 \x01(\tR\x05query\x12\x1c\n" +
+	"\tmimetypes\x18\x02 \x03(\tR\tmimetypes\x12\x1c\n" +
+	"\tcompleted\x18\x03 \x01(\bR\tcompleted\x12\x17\n" +
 	"\x06offset\x18\x84\a \x01(\x04R\x06offset\x12\x15\n" +
-	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x02\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"q\n" +
+	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x04\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"q\n" +
 	"\x16DownloadSearchResponse\x120\n" +
 	"\x04next\x18\x01 \x01(\v2\x1c.media.DownloadSearchRequestR\x04next\x12%\n" +
 	"\x05items\x18\x02 \x03(\v2\x0f.media.DownloadR\x05items\"\x19\n" +

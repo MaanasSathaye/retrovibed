@@ -125,10 +125,12 @@ abstract class media {
 abstract class discoveredsearch {
   static DownloadSearchRequest request({int limit = 0}) =>
       DownloadSearchRequest(limit: fixnum.Int64(limit));
+  static DownloadSearchResponse response({DownloadSearchRequest? next}) =>
+      DownloadSearchResponse(next: next ?? request(limit: 100), items: []);
 }
 
 abstract class discovered {
-  static Future<MediaSearchResponse> available(MediaSearchRequest req) async {
+  static Future<DownloadSearchResponse> available(DownloadSearchRequest req) async {
     final client = http.Client();
     return client
         .get(
@@ -142,7 +144,7 @@ abstract class discovered {
         .then(httpx.auto_error)
         .then((v) {
           return Future.value(
-            MediaSearchResponse.create()
+            DownloadSearchResponse.create()
               ..mergeFromProto3Json(jsonDecode(v.body)),
           );
         });

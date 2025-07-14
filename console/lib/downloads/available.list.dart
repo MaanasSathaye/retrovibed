@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
+
 import 'package:retrovibed/design.kit/file.drop.well.dart';
 import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:flutter/material.dart';
@@ -7,7 +10,7 @@ import 'package:retrovibed/mimex.dart' as mimex;
 import './search.tuning.dart';
 
 class AvailableListDisplay extends StatefulWidget {
-  final media.FnMediaSearch search;
+  final media.FnDownloadSearch search;
   final media.FnUploadRequest upload;
   final TextEditingController? controller;
   final ValueNotifier<int>? events;
@@ -26,8 +29,8 @@ class AvailableListDisplay extends StatefulWidget {
 class _AvailableListDisplay extends State<AvailableListDisplay> {
   bool _loading = true;
   ds.Error? _cause = null;
-  media.MediaSearchResponse _res = media.media.response(
-    next: media.media.request(limit: 32),
+  media.DownloadSearchResponse _res = media.discoveredsearch.response(
+    next: media.discoveredsearch.request(limit: 32),
   );
 
   @override
@@ -36,7 +39,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
     super.setState(fn);
   }
 
-  void refresh(media.MediaSearchRequest req) {
+  void refresh(media.DownloadSearchRequest req) {
     widget
         .search(req)
         .then((v) {
@@ -60,6 +63,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
     widget.events?.addListener(() {
       refresh(_res.next);
     });
+    print("SearchTuning initState called!"); // Add this line
   }
 
   @override
@@ -136,15 +140,19 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
             },
             current: _res.next.offset,
             empty: fixnum.Int64(_res.items.length) < _res.next.limit,
-            leading: Row(children: [ds.FileDropWell.icon(upload)]),
+            leading: ds.FileDropWell.icon(upload),
             autofocus: true,
             tuning: LimitedBox(
               maxHeight: 138.0,
               child: SearchTuning(
                 _res.next,
-                onChange: (media.MediaSearchRequest n) {
+                // key: ValueKey(md5.convert(_res.next.toString().codeUnits)),
+                key: ValueKey(_res.next.hashCode),
+                onChange: (media.DownloadSearchRequest n) {
+                  print("DERP DERP Z ${_res.next.completed} ${_res.next.hashCode} -> ${n.completed} ${n.hashCode}");
                   setState(() {
-                    _res.next = n;
+                    _res = _res.deepCopy();
+                    _res.next = n.deepCopy();
                   });
                 },
               ),
@@ -156,12 +164,12 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
           ),
         ],
       ),
-      ds.Table.expanded<media.Media>(
+      ds.Table.expanded<media.Download>(
         (v) => media.RowDisplay(
-          media: v,
+          media: v.media,
           onTap:
               () => media.discovered
-                  .download(v.id)
+                  .download(v.media.id)
                   .then((v) {
                     widget.events ?? refresh(_res.next);
                     widget.events?.value += 1;
@@ -172,7 +180,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                     );
                     return null;
                   }),
-          leading: [Icon(mimex.icon(v.mimetype))],
+          leading: [Icon(mimex.icon(v.media.mimetype))],
           trailing: [Icon(Icons.download)],
         ),
       ),

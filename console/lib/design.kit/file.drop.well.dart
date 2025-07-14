@@ -165,7 +165,7 @@ class _FileDropWell extends State<FileDropWell> {
                 });
           },
           child: Row(
-            mainAxisSize: MainAxisSize.max,
+            mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ds.Loading(
