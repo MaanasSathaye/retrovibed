@@ -317,6 +317,8 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	if t.TorrentResume {
 		go AnnounceSeeded(dctx, db, rootstore, tclient, tstore)
 		go ResumeDownloads(dctx, db, rootstore, tclient, tstore)
+	} else {
+		log.Println("announce/resume disabled")
 	}
 
 	if t.AutoIdentifyMedia {
