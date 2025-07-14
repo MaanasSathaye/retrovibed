@@ -107,6 +107,7 @@ func TestDiscoveredSearch(t *testing.T) {
 			tracking.MetadataOptionBytes(100),
 			tracking.MetadataOptionDownloaded(50),
 			tracking.MetadataOptionDescription("unique_query_term_video"),
+			tracking.MetadataOptionAutoDescription,
 			func(t *tracking.Metadata) { t.InitiatedAt = time.Now() },
 		))
 		require.NoError(t, tracking.MetadataInsertWithDefaults(ctx, q, mdMatch).Scan(&mdMatch))
@@ -118,6 +119,7 @@ func TestDiscoveredSearch(t *testing.T) {
 			tracking.MetadataOptionBytes(100),
 			tracking.MetadataOptionDownloaded(50),
 			tracking.MetadataOptionDescription("another_item_audio"),
+			tracking.MetadataOptionAutoDescription,
 			func(t *tracking.Metadata) { t.InitiatedAt = time.Now() },
 		))
 		require.NoError(t, tracking.MetadataInsertWithDefaults(ctx, q, mdNoMatch).Scan(&mdNoMatch))
@@ -159,7 +161,7 @@ func TestDiscoveredSearch(t *testing.T) {
 		err = json.NewDecoder(resp.Result().Body).Decode(&result)
 		require.NoError(t, err)
 
-		require.Len(t, result.Items, 2, "Expected 2 metadata items (both initiated and incomplete) in the search results")
+		require.Len(t, result.Items, 1, "Expected 1 items in the search results")
 		require.Equal(t, mdMatch.ID, result.Items[0].Media.Id, "Expected item to match the query")
 	})
 
