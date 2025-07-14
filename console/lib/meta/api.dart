@@ -17,12 +17,15 @@ Future<HttpClientResponse> healthz({String? host}) async {
     return zhost == _host;
   };
 
-  return c.getUrl(Uri.https(hostport, "/healthz"))
+  return c
+      .getUrl(Uri.https(hostport, "/healthz"))
       .then((req) {
         req.followRedirects = false;
         return req;
       })
-      .then(httpx.dart_io_auto_error).timeout(Duration(seconds: 3)).catchError((cause) {
+      .then(httpx.dart_io_auto_error)
+      // .timeout(Duration(seconds: 3))
+      .catchError((cause) {
         throw cause;
       });
 }
