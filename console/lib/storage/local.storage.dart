@@ -10,7 +10,7 @@ class LocalStorageSettings extends StatefulWidget {
 }
 
 class _LocalStorageSettings extends State<LocalStorageSettings> {
-  int _maximum = 0 * ds.bytesx.GiB;
+  // int _maximum = 0 * ds.bytesx.GiB;
 
   @override
   void setState(VoidCallback fn) {
@@ -37,9 +37,9 @@ class _LocalStorageSettings extends State<LocalStorageSettings> {
                 value: 256,
                 magnitude: ds.bytesx.GiB,
                 onChange: (v) {
-                  setState(() {
-                    _maximum = v;
-                  });
+                  // setState(() {
+                  //   _maximum = v;
+                  // });
                 },
               ),
             ),
