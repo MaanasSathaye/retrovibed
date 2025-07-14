@@ -141,7 +141,7 @@ func (t *digests) check(idx int) {
 
 func (t *digests) compute(p *metainfo.Piece) (ret metainfo.Hash, err error) {
 	var (
-		buf [64 * bytesx.KiB]byte
+		buf [32 * bytesx.KiB]byte
 	)
 	c := sha1.New()
 	plen := p.Length()

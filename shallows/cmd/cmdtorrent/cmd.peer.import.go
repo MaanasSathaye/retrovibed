@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/bep0051"
 	"github.com/james-lawrence/torrent/connections"
@@ -228,14 +229,14 @@ func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 			var (
 				cause error
 			)
-			// log.Printf("awaiting torrent info %s\n", w.meta.ID)
+			log.Printf("awaiting torrent info %s\n", w.meta.ID)
 
 			info, cause = tclient.Info(ctx, w.meta, torrent.TunePeers(peers...))
 			if cause != nil {
 				return errorsx.Wrapf(cause, "failed to retrieve torrent info %s", w.meta.ID)
 			}
 
-			// log.Println("torrent info received", w.meta.ID.String(), spew.Sdump(w.meta.Metainfo()))
+			log.Println("torrent info received", w.meta.ID.String(), spew.Sdump(w.meta.Metainfo()))
 			if w.meta, cause = torrent.NewFromInfo(info); err != nil {
 				return errorsx.Wrapf(cause, "failed to retrieve torrent info %s", w.meta.ID)
 			}
