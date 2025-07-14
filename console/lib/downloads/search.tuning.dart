@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/media.dart' as media;
-import 'package:retrovibed/mimex.dart' as mimex;
 
 class SearchTuning extends StatefulWidget {
   final media.DownloadSearchRequest current;
@@ -31,8 +30,6 @@ class _SearchTuningState extends State<SearchTuning> {
 
   @override
   Widget build(BuildContext context) {
-    final mimetypes = mimex.checksum(_current.mimetypes);
-    print("REBUILDING ${_current.hashCode}");
     return forms.Container(
       Column(
         mainAxisSize: MainAxisSize.min,

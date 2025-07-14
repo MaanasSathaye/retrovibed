@@ -8,7 +8,6 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
-	"os"
 	"testing"
 
 	"github.com/gofrs/uuid/v5"
@@ -30,7 +29,7 @@ import (
 func TestHTTPWireguardCreateUnparsable(t *testing.T) {
 	var (
 		claims jwt.RegisteredClaims
-		buf    *os.File
+		buf    io.ReadCloser
 		d      hash.Hash = md5.New()
 	)
 	ctx, done := testx.Context(t)
@@ -81,7 +80,7 @@ func TestHTTPWireguardCreate(t *testing.T) {
 	var (
 		result metaapi.WireguardUploadResponse
 		claims jwt.RegisteredClaims
-		buf    *os.File
+		buf    io.ReadCloser
 		d      hash.Hash = md5.New()
 	)
 	ctx, done := testx.Context(t)

@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'package:crypto/crypto.dart';
-
 import 'package:retrovibed/design.kit/file.drop.well.dart';
 import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:flutter/material.dart';
@@ -39,6 +36,12 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
     super.setState(fn);
   }
 
+  void resetcause() {
+    setState(() {
+      _cause = null;
+    });
+  }
+
   void refresh(media.DownloadSearchRequest req) {
     widget
         .search(req)
@@ -50,7 +53,9 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
         })
         .catchError((e) {
           setState(() {
-            _cause = ds.Error.unknown(e);
+            setState(() {
+              _cause = ds.Error.unknown(e, onTap: resetcause);
+            });
             _loading = false;
           });
         });
@@ -63,7 +68,6 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
     widget.events?.addListener(() {
       refresh(_res.next);
     });
-    print("SearchTuning initState called!"); // Add this line
   }
 
   @override
@@ -95,7 +99,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                       })
                       .catchError((cause) {
                         setState(() {
-                          _cause = ds.Error.unknown(cause);
+                          _cause = ds.Error.unknown(cause, onTap: resetcause);
                         });
                       });
                 });
@@ -103,7 +107,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
             )
             .then((v) => ds.NullWidget)
             .catchError((cause) {
-              return ds.Error.unknown(cause);
+              return ds.Error.unknown(cause, onTap: resetcause);
             })
             .whenComplete(() {
               setState(() {
@@ -146,10 +150,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
               maxHeight: 138.0,
               child: SearchTuning(
                 _res.next,
-                // key: ValueKey(md5.convert(_res.next.toString().codeUnits)),
-                key: ValueKey(_res.next.hashCode),
                 onChange: (media.DownloadSearchRequest n) {
-                  print("DERP DERP Z ${_res.next.completed} ${_res.next.hashCode} -> ${n.completed} ${n.hashCode}");
                   setState(() {
                     _res = _res.deepCopy();
                     _res.next = n.deepCopy();
