@@ -393,7 +393,7 @@ func (t *HTTPDiscovered) downloading(w http.ResponseWriter, r *http.Request) {
 			tracking.MetadataQueryIncomplete(),
 			tracking.MetadataQueryNotPaused(),
 		},
-	).OrderBy("downloaded < bytes, downloaded/bytes DESC").Offset(msg.Next.Offset * msg.Next.Limit).Limit(msg.Next.Limit)
+	).OrderBy("peers > 0 DESC, downloaded < bytes DESC, downloaded/bytes DESC").Offset(msg.Next.Offset * msg.Next.Limit).Limit(msg.Next.Limit)
 
 	qq := sqlx.Scan(tracking.MetadataSearch(r.Context(), t.q, q))
 	for p := range qq.Iter() {
