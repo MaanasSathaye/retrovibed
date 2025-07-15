@@ -24,13 +24,10 @@ import (
 
 func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual, tclient *torrent.Client, tstore storage.ClientImpl) {
 	q := tracking.MetadataSearchBuilder().Where(
-		squirrel.Or{
-			squirrel.And{
-				tracking.MetadataQueryInitiated(),
-				tracking.MetadataQueryIncomplete(),
-				tracking.MetadataQueryNotPaused(),
-			},
-			tracking.MetadataQueryNeedsVerification(),
+		squirrel.And{
+			tracking.MetadataQueryInitiated(),
+			tracking.MetadataQueryIncomplete(),
+			tracking.MetadataQueryNotPaused(),
 		},
 	)
 
