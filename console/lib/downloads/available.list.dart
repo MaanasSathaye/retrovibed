@@ -2,6 +2,7 @@ import 'package:retrovibed/design.kit/file.drop.well.dart';
 import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/mimex.dart' as mimex;
 import './search.tuning.dart';
@@ -42,9 +43,9 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
     });
   }
 
-  void refresh(media.DownloadSearchRequest req) {
-    widget
-        .search(req)
+  Future<void> refresh(media.DownloadSearchRequest req) {
+    return widget
+        .search(req, options: [authn.AuthzCache.bearer(context)])
         .then((v) {
           setState(() {
             _res = v;
@@ -134,7 +135,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                 _res.next.query = v;
                 _res.next.offset = fixnum.Int64(0);
               });
-              refresh(_res.next);
+              return refresh(_res.next);
             },
             next: (i) {
               setState(() {
@@ -152,8 +153,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                 _res.next,
                 onChange: (media.DownloadSearchRequest n) {
                   setState(() {
-                    _res = _res.deepCopy();
-                    _res.next = n.deepCopy();
+                    _res.next = n;
                   });
                 },
               ),

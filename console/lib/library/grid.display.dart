@@ -5,6 +5,7 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/library/known.media.display.dart';
 import 'package:retrovibed/library/known.media.dropdown.dart';
 import 'package:retrovibed/media.dart' as media;
+import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/httpx.dart' as httpx;
 import './api.dart' as api;
 import './search.tuning.dart';
@@ -44,9 +45,9 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
     });
   }
 
-  void refresh(media.MediaSearchRequest req) {
-    widget
-        .search(req)
+  Future<void> refresh(media.MediaSearchRequest req) {
+    return widget
+        .search(req, options: [authn.AuthzCache.bearer(context)])
         .then((v) {
           setState(() {
             _res = v;
@@ -139,7 +140,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                   _res.next.query = v;
                   _res.next.offset = fixnum.Int64(0);
                 });
-                refresh(_res.next);
+                return refresh(_res.next);
               },
               next: (i) {
                 setState(() {

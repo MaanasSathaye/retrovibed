@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/httpx.dart' as httpx;
 import './api.dart' as api;
 import './download.row.controls.dart';
@@ -24,7 +25,7 @@ class _DownloadingState extends State<RefreshingDownload> {
     super.initState();
     current = widget.current;
     timer = Timer.periodic(widget.interval, (t) {
-      api.discovered.get(widget.current.media.id).then((r) {
+      api.discovered.get(widget.current.media.id, options: [authn.AuthzCache.bearer(context)]).then((r) {
         setState(() {
           current = r.download;
         });

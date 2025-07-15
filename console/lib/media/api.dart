@@ -7,10 +7,10 @@ import 'package:retrovibed/httpx.dart' as httpx;
 export 'package:retrovibed/media/media.pb.dart';
 
 typedef FnMediaSearch =
-    Future<MediaSearchResponse> Function(MediaSearchRequest req);
+    Future<MediaSearchResponse> Function(MediaSearchRequest req, {List<httpx.Option> options});
 
 typedef FnDownloadSearch =
-    Future<DownloadSearchResponse> Function(DownloadSearchRequest req);
+    Future<DownloadSearchResponse> Function(DownloadSearchRequest req, {List<httpx.Option> options});
 
 typedef FnUploadRequest =
     Future<MediaUploadResponse> Function(
@@ -37,19 +37,19 @@ abstract class media {
   static MediaSearchResponse response({MediaSearchRequest? next}) =>
       MediaSearchResponse(next: next ?? request(limit: 100), items: []);
 
-  static Future<MediaSearchResponse> get(MediaSearchRequest req) async {
-    final client = http.Client();
-
-    return client
+  static Future<MediaSearchResponse> get(
+    MediaSearchRequest req,
+    {List<httpx.Option> options = const []}
+  ) async {
+    return httpx
         .get(
           Uri.https(
             httpx.host(),
             "/m/",
             jsonDecode(jsonEncode(req.toProto3Json())),
           ),
-          headers: {"Authorization": httpx.auto_bearer_host()},
+          options: options,
         )
-        .then(httpx.auto_error)
         .then((v) {
           return Future.value(
             MediaSearchResponse.create()
@@ -78,7 +78,7 @@ abstract class media {
         });
   }
 
-  static Future<MediaUpdateResponse> update(String id, Media upd ) async {
+  static Future<MediaUpdateResponse> update(String id, Media upd) async {
     final client = http.Client();
     return client
         .post(
@@ -130,18 +130,18 @@ abstract class discoveredsearch {
 }
 
 abstract class discovered {
-  static Future<DownloadSearchResponse> available(DownloadSearchRequest req) async {
-    final client = http.Client();
-    return client
-        .get(
+  static Future<DownloadSearchResponse> available(
+    DownloadSearchRequest req,
+    {List<httpx.Option> options = const []}
+  ) async {
+    return httpx.get(
           Uri.https(
             httpx.host(),
             "/d/available",
-            jsonDecode(jsonEncode(req.toProto3Json())),
+            httpx.params(req.toProto3Json()),
           ),
-          headers: {"Authorization": httpx.auto_bearer_host()},
+          options: options,
         )
-        .then(httpx.auto_error)
         .then((v) {
           return Future.value(
             DownloadSearchResponse.create()
@@ -152,19 +152,11 @@ abstract class discovered {
 
   static Future<DownloadSearchResponse> downloading(
     DownloadSearchRequest req,
+    {List<httpx.Option> options = const []}
   ) async {
-    final client = http.Client();
-    return client
-        .get(
-          Uri.https(
-            httpx.host(),
-            "/d/downloading",
-            jsonDecode(jsonEncode(req.toProto3Json())),
-          ),
-          headers: {"Authorization": httpx.auto_bearer_host()},
-        )
-        .then(httpx.auto_error)
-        .then((v) {
+      return httpx
+      .get(Uri.https(httpx.host(), "/d/downloading"), options: options)
+      .then((v) {
           return Future.value(
             DownloadSearchResponse.create()
               ..mergeFromProto3Json(jsonDecode(v.body)),
@@ -205,12 +197,13 @@ abstract class discovered {
         });
   }
 
-  static Future<DownloadMetadataResponse> get(String id) async {
-    final client = http.Client();
-    return client
-        .get(
+  static Future<DownloadMetadataResponse> get(
+    String id,
+    {List<httpx.Option> options = const []}
+  ) async {
+    return httpx.get(
           Uri.https(httpx.host(), "/d/${id}", null),
-          headers: {"Authorization": httpx.auto_bearer_host()},
+          options: options,
         )
         .then(httpx.auto_error)
         .then((v) {

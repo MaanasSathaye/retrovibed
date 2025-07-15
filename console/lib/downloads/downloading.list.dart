@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/media.dart' as media;
 
 class DownloadingListDisplay extends StatefulWidget {
@@ -29,7 +30,7 @@ class _DownloadingListState extends State<DownloadingListDisplay> {
 
   void refresh() {
     _pending = widget
-        .search(media.discoveredsearch.request(limit: 3))
+        .search(media.discoveredsearch.request(limit: 3), options: [authn.AuthzCache.bearer(context)])
         .then(
           (v) =>
               v.items

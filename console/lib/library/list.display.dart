@@ -41,8 +41,8 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
     });
   }
 
-  void refresh(media.MediaSearchRequest req) {
-    widget
+  Future<void> refresh(media.MediaSearchRequest req) {
+    return widget
         .search(req)
         .then((v) {
           setState(() {
@@ -131,7 +131,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
             _res.next.query = v;
             _res.next.offset = fixnum.Int64(0);
           });
-          refresh(_res.next);
+          return refresh(_res.next);
         },
         next: (i) {
           setState(() {

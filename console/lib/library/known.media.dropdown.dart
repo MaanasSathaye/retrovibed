@@ -43,8 +43,8 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
     });
   }
 
-  void refresh(api.KnownSearchRequest req) {
-    widget
+  Future<void> refresh(api.KnownSearchRequest req) {
+    return widget
         .search(req)
         .then((v) {
           setState(() {
@@ -90,7 +90,7 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
               _res.next.query = v;
               _res.next.offset = fixnum.Int64(0);
             });
-            refresh(_res.next);
+            return refresh(_res.next);
           },
           next: (i) {
             setState(() {

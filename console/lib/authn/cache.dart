@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/meta.dart' as _meta;
+import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authz.dart' as authz;
 
 class AuthzCache extends StatefulWidget {
@@ -9,6 +10,12 @@ class AuthzCache extends StatefulWidget {
 
   static _AuthzCache? of(BuildContext context) {
     return context.findAncestorStateOfType<_AuthzCache>();
+  }
+
+  static httpx.Option bearer(BuildContext context) {
+    return httpx.Request.bearer(
+      of(context)!.meta.token().then((v) => v.bearer),
+    );
   }
 
   @override
@@ -25,8 +32,9 @@ class _AuthzCache extends State<AuthzCache> {
         print("failed to refresh token cache ${e}");
         return authz.Bearer(c, "");
       }),
-      (c, ts) =>
-          DateTime.fromMillisecondsSinceEpoch(c.expires.toInt()).isBefore(ts),
+      (c, ts) {
+        return DateTime.fromMillisecondsSinceEpoch(c.expires.toInt() * 1000, isUtc: true).isBefore(ts);
+      },
     ),
   );
 

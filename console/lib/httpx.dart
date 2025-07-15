@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:core';
+import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:retrovibed/retrovibed.dart' as retro;
@@ -22,7 +23,8 @@ String localhost() {
 }
 
 String metaendpoint() {
-  return normalizeuri(Platform.environment["RETROVIBED_META_ENDPOINT"]) ?? "api.retrovibe.space";
+  return normalizeuri(Platform.environment["RETROVIBED_META_ENDPOINT"]) ??
+      "api.retrovibe.space";
 }
 
 String consoleendpoint() {
@@ -179,6 +181,14 @@ Future<Request> request(List<Option> options) {
     return p.then((r) {
       return opt(r);
     });
+  });
+}
+
+// convert dynamic objects to a map<String, String>
+Map<String, String> params(Object? m) {
+  return (jsonDecode(jsonEncode(m)) as Map<String, dynamic>).map((key, value) {
+    // Convert all other types (bool, int, double, String) to their string representation
+    return MapEntry(key, value.toString());
   });
 }
 

@@ -43,8 +43,8 @@ class _ListDisplay extends State<ListDisplay> {
     });
   }
 
-  void refresh(api.WireguardSearchRequest req) {
-    widget
+  Future<void> refresh(api.WireguardSearchRequest req) {
+    return widget
         .search(req)
         .then((v) {
           setState(() {
@@ -152,7 +152,7 @@ class _ListDisplay extends State<ListDisplay> {
             _res.next.query = v;
             _res.next.offset = ds.SearchTray.Zero;
           });
-          refresh(_res.next);
+          return refresh(_res.next);
         },
         next: (i) {
           setState(() {

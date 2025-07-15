@@ -20,7 +20,7 @@ class SearchTray extends StatefulWidget {
   final Widget leading;
   final Widget trailing;
   final Widget tuning;
-  final void Function(String i) onSubmitted;
+  final Future<void> Function(String i) onSubmitted;
   final void Function(fixnum.Int64 i) next;
   final fixnum.Int64 current;
   final bool empty;
