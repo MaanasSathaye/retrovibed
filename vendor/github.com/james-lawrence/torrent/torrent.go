@@ -246,12 +246,16 @@ func TuneVerifyAsync(t *torrent) {
 }
 
 // Verify a random selection of n pieces. will block until complete blocks.
-// if any of the sampled pieces failed it'll perform a full verify.
+// if any of the sampled pieces failed it'll perform a full verify. it always checks
+// the first and last piece regardless of the random set, as a result at most n+2 pieces
+// will be verified. this makes it easy to test certain behaviors live.
 // NOTE: torrents with a low completed rate will almost always performa full verify.
 // but since there will also be a smaller amount of data on disk this is a fair trade off.
 func TuneVerifySample(n uint64) Tuner {
 	return func(t *torrent) {
 		t.digests.EnqueueBitmap(bitmapx.Random(t.chunks.pieces, min(n, t.chunks.pieces)))
+		t.digests.Enqueue(0)
+		t.digests.Enqueue(t.chunks.pieces)
 		t.digests.Wait()
 
 		if t.chunks.failed.IsEmpty() {
