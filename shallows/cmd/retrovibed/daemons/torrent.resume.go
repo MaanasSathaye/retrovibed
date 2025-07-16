@@ -76,7 +76,6 @@ func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual
 func VerifyTorrents(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual, tclient *torrent.Client, tstore storage.ClientImpl) {
 	q := tracking.MetadataSearchBuilder().Where(
 		squirrel.And{
-			tracking.MetadataQueryInitiated(),
 			tracking.MetadataQueryNeedsVerification(),
 		},
 	)
@@ -86,7 +85,7 @@ func VerifyTorrents(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual,
 	for md := range iter.Iter() {
 		id := metainfo.Hash(md.Infohash)
 		infopath := rootstore.Path("torrent", fmt.Sprintf("%s.torrent", id))
-		log.Println("resuming", md.ID, md.Description, md.Private, infopath)
+		log.Println("verifying", md.ID, md.Description, md.Private, infopath)
 
 		metadata, err := torrent.New(
 			metainfo.Hash(md.Infohash),
@@ -109,6 +108,7 @@ func VerifyTorrents(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual,
 		}
 
 		if t.Info() == nil {
+			log.Println("verification ignored", md.ID, md.Description)
 			// ignoring for now
 			continue
 		}
