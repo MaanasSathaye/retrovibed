@@ -97,10 +97,15 @@ func (t importPeer) torrents(tstore fsx.Virtual) iter.Seq2[string, torrent.Metad
 	}
 }
 
-func (t importPeer) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
+func (t importPeer) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) {
 	type workload struct {
 		magnet string
 		meta   torrent.Metadata
+	}
+
+	id, err := sshid.Signer()
+	if err != nil {
+		return err
 	}
 
 	var (

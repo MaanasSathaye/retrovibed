@@ -61,10 +61,10 @@ func Profile(db *sql.DB) (err error) {
 }
 
 func Main(args ...string) {
+	var sshid cmdopts.SSHID
 	var shellCli struct {
 		cmdopts.Global
 		cmdopts.PeerID
-		cmdopts.SSHID
 		Version  cmdopts.Version     `cmd:"" help:"display versioning information"`
 		Identity cmdmeta.Identity    `cmd:"" help:"identity management commands"`
 		Media    cmdmedia.Commands   `cmd:"" help:"media management (import/export)"`
@@ -158,7 +158,7 @@ func Main(args ...string) {
 			&shellCli.PeerID,
 		),
 		kong.Bind(
-			&shellCli.SSHID,
+			&sshid,
 		),
 		kong.TypeMapper(reflect.TypeOf(&net.IP{}), kong.MapperFunc(cmdopts.ParseIP)),
 		kong.TypeMapper(reflect.TypeOf(&net.TCPAddr{}), kong.MapperFunc(cmdopts.ParseTCPAddr)),

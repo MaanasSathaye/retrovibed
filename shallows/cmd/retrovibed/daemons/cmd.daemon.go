@@ -81,11 +81,11 @@ type Command struct {
 	TorrentLegacyStorage bool             `flag:"" name:"torrent-legacy-storage" help:"enable legacy storage structure for migration" default:"false" hidden:"true"`
 }
 
-func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
+func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) {
 	var (
 		db           *sql.DB
+		id           ssh.Signer
 		torrentpeers                            = userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "torrent.peers")
-		peerid                                  = krpc.IdFromString(md5x.String(ssh.FingerprintSHA256(id.PublicKey())))
 		bootstrap    torrent.ClientConfigOption = torrent.ClientConfigNoop
 		firewall     torrent.ClientConfigOption = torrent.ClientConfigNoop
 		dynamicip    torrent.ClientConfigOption = torrent.ClientConfigNoop
@@ -95,6 +95,14 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	)
 
 	// envx.Debug(os.Environ()...)
+
+	if id, err = sshid.Signer(); err != nil {
+		return err
+	}
+
+	var (
+		peerid = krpc.IdFromString(md5x.String(ssh.FingerprintSHA256(id.PublicKey())))
+	)
 
 	sshjwt := jwtx.NewSSHSigner()
 	jwt.RegisterSigningMethod(sshjwt.Alg(), func() jwt.SigningMethod { return sshjwt })

@@ -61,14 +61,8 @@ func (t *PeerID) AfterApply() error {
 	return nil
 }
 
-type SSHID struct {
-	ssh.Signer
-}
+type SSHID struct{}
 
-func (t *SSHID) AfterApply() (err error) {
-	if t.Signer, err = sshx.AutoCached(sshx.NewKeyGen(), env.PrivateKeyPath()); err != nil {
-		return err
-	}
-
-	return nil
+func (t *SSHID) Signer() (signer ssh.Signer, err error) {
+	return sshx.AutoCached(sshx.NewKeyGen(), env.PrivateKeyPath())
 }

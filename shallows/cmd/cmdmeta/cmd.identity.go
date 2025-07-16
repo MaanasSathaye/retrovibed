@@ -33,7 +33,11 @@ type Identity struct {
 type IdenDisplay struct{}
 
 func (t IdenDisplay) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
-	return printIdentity(os.Stdout, id.Signer)
+	signer, err := id.Signer()
+	if err != nil {
+		return err
+	}
+	return printIdentity(os.Stdout, signer)
 }
 
 type GenerateID struct {
@@ -44,6 +48,10 @@ type GenerateID struct {
 func (t GenerateID) Run(gctx *cmdopts.Global) (err error) {
 	if fsx.Exists(env.PrivateKeyPath()) && !t.Force {
 		return errorsx.Errorf("an identity already exists at %s, use --force to overwrite, but maybe you should back it up first", env.PrivateKeyPath())
+	}
+
+	if err := os.Remove(env.PrivateKeyPath()); err != nil {
+		return errorsx.Wrap(err, "unable to remove old key")
 	}
 
 	id, err := sshx.AutoCached(sshx.NewKeyGenSeeded(t.Seed), env.PrivateKeyPath())
