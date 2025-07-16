@@ -13,6 +13,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
+	"github.com/retrovibed/retrovibed/blockcache"
 	"github.com/retrovibed/retrovibed/deeppool"
 	"github.com/retrovibed/retrovibed/internal/cryptox"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
@@ -23,18 +24,18 @@ import (
 
 func NewTorrentStorage(c *http.Client, q sqlx.Queryer, d storage.ClientImpl) *TorrentCacheStorage {
 	return &TorrentCacheStorage{
-		d: d,
-		c: c,
-		q: q,
-		m: &sync.Mutex{},
+		d:  d,
+		q:  q,
+		dl: deeppool.NewRanger(c),
+		m:  &sync.Mutex{},
 	}
 }
 
 type TorrentCacheStorage struct {
-	d storage.ClientImpl
-	q sqlx.Queryer
-	c *http.Client
-	m *sync.Mutex
+	d  storage.ClientImpl
+	q  sqlx.Queryer
+	dl downloader
+	m  *sync.Mutex
 }
 
 func (t *TorrentCacheStorage) OpenTorrent(info *metainfo.Info, id metainfo.Hash) (storage.TorrentImpl, error) {
@@ -47,7 +48,7 @@ func (t *TorrentCacheStorage) OpenTorrent(info *metainfo.Info, id metainfo.Hash)
 		id:          id,
 		TorrentImpl: impl,
 		q:           t.q,
-		c:           t.c,
+		dl:          t.dl,
 		m:           t.m,
 	}, nil
 }
@@ -57,7 +58,7 @@ func (t *TorrentCacheStorage) Close() error {
 }
 
 type fallback struct {
-	c *http.Client
+	dl downloader
 	storage.TorrentImpl
 	id metainfo.Hash
 	q  sqlx.Queryer
@@ -65,25 +66,21 @@ type fallback struct {
 }
 
 func (t *fallback) downloadChunk(prng *rand.ChaCha8, id string, offset uint64, length uint64) error {
-	log.Println("download initiated", id, offset, length)
-	defer log.Println("download completed", id, offset, length)
-	w, err := cryptox.NewWriterChaCha20(prng, io.NewOffsetWriter(t.TorrentImpl, int64(offset)))
+	// download a block length at a time.
+	doffset := (offset / blockcache.DefaultBlockLength) * blockcache.DefaultBlockLength
+	dlength := min(doffset+blockcache.DefaultBlockLength, length) % blockcache.DefaultBlockLength
+	if dlength == 0 {
+		dlength = blockcache.DefaultBlockLength
+	}
+
+	w, err := cryptox.NewOffsetWriterChaCha20(prng, io.NewOffsetWriter(t.TorrentImpl, int64(doffset)), uint32(doffset))
 	if err != nil {
 		return err
 	}
 	ctx, done := context.WithCancel(context.Background())
 	defer done()
 
-	return deeppool.NewRetrieval(t.c).Download(ctx, id, iox.NewTimeoutWriter(done, 3*time.Second, w))
-
-	// w, err := cryptox.NewOffsetWriterChaCha20(prng, io.NewOffsetWriter(t.TorrentImpl, int64(offset)), uint32(offset))
-	// if err != nil {
-	// 	return err
-	// }
-	// ctx, done := context.WithCancel(context.Background())
-	// defer done()
-
-	// return deeppool.NewRanger(t.c).Download(ctx, id, offset, length, iox.NewTimeoutWriter(done, 3*time.Second, w))
+	return t.dl.Download(ctx, id, doffset, doffset+dlength, iox.NewTimeoutWriter(done, 3*time.Second, w))
 }
 
 func (t *fallback) ReadAt(p []byte, off int64) (n int, err error) {
