@@ -69,6 +69,7 @@ type Command struct {
 	AutoDownload         bool             `flag:"" name:"auto-download" help:"EXPERIMENTAL: enable automatically downloading torrent from the downloads folder" default:"false"`
 	AutoIdentifyMedia    bool             `flag:"" name:"auto-identify-media" help:"EXPERIMENTAL: enable automatically identifying media" default:"false" env:"${env_auto_identify_media}"`
 	AutoArchive          bool             `flag:"" name:"auto-archive" help:"enable automatic archiving of eligible media" default:"true" env:"${env_auto_archive}"`
+	AutoReclaim          bool             `flag:"" name:"auto-reclaim" help:"EXPERIMENTAL: enable automatic reclaiming of disk space of archived media" default:"false" env:"${env_auto_reclaim}"`
 	HTTP                 cmdopts.Listener `flag:"" name:"http-address" help:"address to serve daemon api from" default:"tcp://:9998" env:"${env_daemon_socket}"`
 	SelfSignedHosts      []string         `flag:"" name:"self-signed-hosts" help:"comma seperated list of hosts to add to the sign signed certificate" env:"${env_self_signed_hosts}"`
 	TorrentPort          uint16           `flag:"" name:"torrent-port" help:"port to use for torrenting" env:"${env_torrent_port}" default:"10000"`
@@ -167,7 +168,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 			return errorsx.Wrap(err, "unable to register with archival service")
 		}
 
-		errorsx.Log(AutoArchival(gctx.Context, db, mediastore, library.NewAsyncWakeup(gctx.Context), t.AutoArchive))
+		errorsx.Log(AutoArchival(gctx.Context, db, mediastore, library.NewAsyncWakeup(gctx.Context), t.AutoReclaim))
 		c, err := authn.Oauth2HTTPClient(gctx.Context)
 		if err != nil {
 			return errorsx.Wrap(err, "failed to create oauth2 http client for archival")

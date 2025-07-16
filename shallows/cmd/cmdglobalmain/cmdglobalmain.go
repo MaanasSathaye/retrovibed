@@ -148,6 +148,7 @@ func Main(args ...string) {
 			"env_torrent_ipv6":        env.TorrentPublicIP6,
 			"env_auto_identify_media": env.AutoIdentifyMedia,
 			"env_auto_archive":        env.AutoArchive,
+			"env_auto_reclaim":        env.AutoReclaim,
 		},
 		kong.UsageOnError(),
 		kong.Bind(

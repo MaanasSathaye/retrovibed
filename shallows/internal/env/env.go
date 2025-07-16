@@ -28,6 +28,7 @@ const (
 	// enable multicast service discovery
 	MDNSDisabled            = "RETROVIBED_MDNS_DISABLED"                    // enable/disable multicast dns registration, allows for the frontend to automatically find daemons on the local network.
 	AutoArchive             = "RETROVIBED_MEDIA_AUTO_ARCHIVE"               // enable/disable automatic archiving of eligible media.
+	AutoReclaim             = "RETROVIBED_MEDIA_AUTO_RECLAIM"               // enable/disable automatic reclaiming of disk space for media that has been archived.
 	AutoIdentifyMedia       = "RETROVIBED_MEDIA_AUTO_IDENTIFY"              // enable/disable automatically identified media.
 	AutoDiscovery           = "RETROVIBED_TORRENT_AUTO_DISCOVERY"           // enable/disable automatically discovering torrents from peers.
 	AutoBootstrap           = "RETROVIBED_TORRENT_AUTO_BOOTSTRAP"           // enable/disable the predefined set of public swarms to bootstrap from.
