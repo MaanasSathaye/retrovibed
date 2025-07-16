@@ -47,8 +47,8 @@ func (t *DeeppoolReaderAtCache) downloadChunk(prng *rand.ChaCha8, id string, off
 		dlength = blockcache.DefaultBlockLength
 	}
 
-	// log.Println("download initiated", id, offset, length, "->", min(doffset+blockcache.DefaultBlockLength, length), "->", doffset, dlength)
-	// defer log.Println("download completed", id, doffset, dlength)
+	// log.Println("------------------------------ 0 download initiated", id, offset, length, "->", doffset, dlength)
+	// defer log.Println("------------------------------ 0 download completed", id, doffset, dlength)
 
 	w, err := cryptox.NewOffsetWriterChaCha20(prng, io.NewOffsetWriter(t.localstorage, int64(doffset)), uint32(doffset))
 	if err != nil {

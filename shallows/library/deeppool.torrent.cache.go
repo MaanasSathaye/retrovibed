@@ -73,6 +73,9 @@ func (t *fallback) downloadChunk(prng *rand.ChaCha8, id string, offset uint64, l
 		dlength = blockcache.DefaultBlockLength
 	}
 
+	// log.Println("------------------------------ 1 download initiated", id, offset, length, "->", doffset, dlength)
+	// defer log.Println("------------------------------ 1 download completed", id, doffset, dlength)
+
 	w, err := cryptox.NewOffsetWriterChaCha20(prng, io.NewOffsetWriter(t.TorrentImpl, int64(doffset)), uint32(doffset))
 	if err != nil {
 		return err
