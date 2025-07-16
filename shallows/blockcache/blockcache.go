@@ -16,7 +16,7 @@ type cache interface {
 	io.WriterAt
 }
 
-const defaultBlockLength = 32 * bytesx.MiB
+const DefaultBlockLength = 32 * bytesx.MiB
 
 type OptionDirCache func(*DirCache)
 
@@ -33,7 +33,7 @@ func NewDirectoryCache(dir string, options ...OptionDirCache) (*DirCache, error)
 
 	c := langx.Clone(DirCache{
 		root:        dir,
-		BlockLength: defaultBlockLength,
+		BlockLength: DefaultBlockLength,
 	}, options...)
 	return &c, nil
 }
