@@ -37,24 +37,24 @@ type DeeppoolReaderAtCache struct {
 func (t *DeeppoolReaderAtCache) downloadChunk(prng *rand.ChaCha8, id string, offset uint64, length uint64) error {
 	log.Println("download initiated", id, offset, length)
 	defer log.Println("download completed", id, offset, length)
-	// w, err := cryptox.NewWriterChaCha20(prng, io.NewOffsetWriter(t.localstorage, int64(offset)))
-	// if err != nil {
-	// 	return err
-	// }
-	// ctx, done := context.WithCancel(context.Background())
-	// defer done()
-
-	// return deeppool.NewRetrieval(t.c).Download(ctx, id, iox.NewTimeoutWriter(done, 3*time.Second, w))
-
-	// TODO simplify this down to being able to read random blocks.
-	w, err := cryptox.NewOffsetWriterChaCha20(prng, io.NewOffsetWriter(t.localstorage, int64(offset)), uint32(offset))
+	w, err := cryptox.NewWriterChaCha20(prng, io.NewOffsetWriter(t.localstorage, int64(offset)))
 	if err != nil {
 		return err
 	}
 	ctx, done := context.WithCancel(context.Background())
 	defer done()
 
-	return deeppool.NewRanger(t.c).Download(ctx, id, offset, length, iox.NewTimeoutWriter(done, 3*time.Second, w))
+	return deeppool.NewRetrieval(t.c).Download(ctx, id, iox.NewTimeoutWriter(done, 3*time.Second, w))
+
+	// // TODO simplify this down to being able to read random blocks.
+	// w, err := cryptox.NewOffsetWriterChaCha20(prng, io.NewOffsetWriter(t.localstorage, int64(offset)), uint32(offset))
+	// if err != nil {
+	// 	return err
+	// }
+	// ctx, done := context.WithCancel(context.Background())
+	// defer done()
+
+	// return deeppool.NewRanger(t.c).Download(ctx, id, offset, length, iox.NewTimeoutWriter(done, 3*time.Second, w))
 }
 
 func (t *DeeppoolReaderAtCache) ReadAt(p []byte, off int64) (n int, err error) {
