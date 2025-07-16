@@ -12,12 +12,13 @@ It allow supports community rss feeds of content, like linux ISOs, AI models, an
 to and donate your storage towards enabling distribution.
 
 #### features
+see the [site](https://retrovibe.space) for more details
 - [x] a builtin userspace wireguard vpn. bring any wireguard vpn provider. anonymize your sharing without any complicated or system wide changes.
 - [x] builtin media player, watch your personal music,video,images anywhere.
 - [x] builtin bittorrent, share your personal media with whoever you want.
 - [x] encrypts and offloads data to an archival service.
 - [x] rss feeds for subscribing to content.
-- [x] build a community to reduce costs for shared content.
+- [x] build a community to reduce costs for sharable content.
 
 #### community sharing
 
