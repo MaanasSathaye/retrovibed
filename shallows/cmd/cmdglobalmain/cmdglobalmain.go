@@ -33,6 +33,7 @@ import (
 	"github.com/retrovibed/retrovibed/meta/identityssh"
 	"github.com/willabides/kongplete"
 	"golang.org/x/crypto/ssh"
+	"golang.zx2c4.com/wireguard/device"
 
 	_ "github.com/benbjohnson/immutable"
 )
@@ -81,6 +82,8 @@ func Main(args ...string) {
 
 	log.SetFlags(log.Lshortfile | log.LUTC | log.Ltime)
 	log.SetPrefix(fmt.Sprintf("%d ", os.Getpid()))
+
+	log.Println("wireguard preallocated buffers per pool", device.PreallocatedBuffersPerPool)
 
 	go debugx.DumpOnSignal(shellCli.Context, syscall.SIGUSR2)
 	go cmdopts.Cleanup(shellCli.Context, shellCli.Shutdown, shellCli.Cleanup, os.Kill, os.Interrupt, syscall.SIGTERM)(func() {
