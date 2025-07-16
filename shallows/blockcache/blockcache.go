@@ -65,7 +65,7 @@ func (t DirCache) ReadAt(p []byte, off int64) (n int, err error) {
 	readchunk := func(p []byte, off int64) (n int, err error) {
 		dst, err := os.Open(t.path(off))
 		if err != nil {
-			return 0, err
+			return 0, errorsx.Wrapf(err, "unable to open for reading: offset(%d) n(%d)", off, len(p))
 		}
 		defer dst.Close()
 
@@ -95,7 +95,7 @@ func (t *DirCache) WriteAt(p []byte, off int64) (n int, err error) {
 		// log.Println("----------------------------------------- WRITING CHUNK", path, len(p), ioff)
 		dst, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY, 0600)
 		if err != nil {
-			return 0, err
+			return 0, errorsx.Wrapf(err, "unable to open for writing offset(%d) n(%d)", ioff, len(p))
 		}
 		defer dst.Close()
 

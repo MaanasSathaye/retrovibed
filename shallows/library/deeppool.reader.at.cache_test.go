@@ -131,6 +131,50 @@ func TestDeeppoolReaderAtDownload(t *testing.T) {
 		require.Equal(t, md5x.FormatUUID(digest), md5x.FormatUUID(downloaded))
 	})
 
+	t.Run("range read the 2nd 16 KiB middle block of the data", func(t *testing.T) {
+		const (
+			nlen = 128 * bytesx.MiB
+			clen = 33*bytesx.MiB + 16*bytesx.KiB
+		)
+
+		var ()
+
+		md := library.NewMetadata(uuidx.WithSuffix(1), library.MetadataOptionEncryptionSeed(md5x.String(t.Name())))
+		src, err := cryptox.NewReaderChaCha20(library.MetadataChaCha8(md), cryptox.NewChaCha8(t.Name()))
+		require.NoError(t, err)
+
+		routes := mux.NewRouter()
+		routes.Handle("/m/{id}/download", alice.New().ThenFunc(download(src, nlen)))
+
+		srv := httptest.NewServer(routes)
+		defer srv.Close()
+
+		c := &http.Client{}
+		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
+
+		var (
+			buf    bytes.Buffer
+			digest = md5.New()
+		)
+
+		_n, err := io.Copy(&buf, io.LimitReader(cryptox.NewChaCha8(t.Name()), nlen))
+		require.NoError(t, err)
+		require.EqualValues(t, nlen, _n)
+		require.EqualValues(t, nlen, len(buf.Bytes()))
+
+		_n, err = io.Copy(digest, io.NewSectionReader(bytes.NewReader(buf.Bytes()), clen, 16*bytesx.KiB))
+		require.NoError(t, err)
+		require.EqualValues(t, 16*bytesx.KiB, _n)
+
+		reader := library.NewDeeppoolReaderAt(c, md, testx.Must(blockcache.NewDirectoryCache(t.TempDir()))(t))
+
+		downloaded := md5.New()
+		n, err := io.Copy(downloaded, io.NewSectionReader(reader, clen, 16*bytesx.KiB))
+		require.NoError(t, err)
+		require.EqualValues(t, 16*bytesx.KiB, n)
+		require.Equal(t, md5x.FormatUUID(digest), md5x.FormatUUID(downloaded))
+	})
+
 	t.Run("range read the 2nd 16 KiB block of the data", func(t *testing.T) {
 		const (
 			nlen = 128 * bytesx.KiB
