@@ -44,7 +44,7 @@ class EndpointAuto extends StatefulWidget {
 
 class _DaemonAuto extends State<EndpointAuto> {
   bool _loading = true;
-  ds.Error? _cause = null;
+  Widget _cause = const SizedBox();
   api.Daemon? _res;
   Widget Function(void Function(api.Daemon) connect, {void Function()? retry})
   _preamble =
@@ -55,16 +55,16 @@ class _DaemonAuto extends State<EndpointAuto> {
     return refresh(Future.value(d));
   }
 
+  reseterr() {
+      setState(() {
+        _cause = const SizedBox();
+      });
+  }
+
   Future<void> refresh(Future<api.Daemon> pending) {
     setState(() {
       _loading = true;
     });
-
-    final reseterr = () {
-      setState(() {
-        _cause = null;
-      });
-    };
 
     return pending
         .then((v) {

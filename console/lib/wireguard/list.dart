@@ -26,7 +26,7 @@ class ListDisplay extends StatefulWidget {
 
 class _ListDisplay extends State<ListDisplay> {
   bool _loading = true;
-  ds.Error? _cause = null;
+  Widget _cause = const SizedBox();
   Wireguard _current = Wireguard();
   api.WireguardSearchResponse _res = api.wireguard.response(
     next: api.wireguard.request(limit: 32),
@@ -39,7 +39,7 @@ class _ListDisplay extends State<ListDisplay> {
 
   void reseterr() {
     setState(() {
-      _cause = null;
+      _cause = const SizedBox();
     });
   }
 

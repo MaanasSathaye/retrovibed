@@ -16,9 +16,10 @@ class ListSearchable extends StatefulWidget {
 }
 
 class SearchableView extends State<ListSearchable> {
+  static const zerooverlay = const SizedBox();
   bool _loading = true;
-  ds.Error? _cause = null;
-  Widget? _overlay = null;
+  Widget _cause = const SizedBox();
+  Widget _overlay = zerooverlay;
   api.Feed _created = api.Feed();
   api.FeedSearchResponse _res = api.FeedSearchResponse(
     next: api.FeedSearchRequest(query: '', offset: Int64(0), limit: Int64(10)),
@@ -58,7 +59,7 @@ class SearchableView extends State<ListSearchable> {
   }
 
   void resetleading() => setState(() {
-    _overlay = null;
+    _overlay = const SizedBox();
     _loading = false;
     _created = api.Feed();
   });
@@ -108,10 +109,10 @@ class SearchableView extends State<ListSearchable> {
           IconButton(
             onPressed: () {
               setState(() {
-                _overlay = _overlay == null ? feedproto : null;
+                _overlay = _overlay == zerooverlay ? feedproto : zerooverlay;
               });
             },
-            icon: Icon(_overlay == null ? Icons.add : Icons.remove),
+            icon: Icon(_overlay == zerooverlay ? Icons.add : Icons.remove),
           ),
           Expanded(
             child: TextField(

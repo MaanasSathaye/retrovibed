@@ -19,12 +19,18 @@ class Registered extends StatefulWidget {
 
 class RegisteredState extends State<Registered> {
   bool _loading = true;
-  Widget? _cause;
+  Widget _cause = const SizedBox();
   api.Billing current = api.Billing();
 
   void setState(VoidCallback fn) {
     if (!mounted) return;
     super.setState(fn);
+  }
+
+  void _clearCause() {
+    setState(() {
+      _cause = const SizedBox();
+    });
   }
 
   @override
@@ -51,10 +57,7 @@ class RegisteredState extends State<Registered> {
           setState(() {
             _cause = ds.Error.offline(
               cause,
-              onTap:
-                  () => setState(() {
-                    _cause = null;
-                  }),
+              onTap: _clearCause,
             );
           });
         }, test: ds.ErrorTests.offline)
@@ -62,10 +65,7 @@ class RegisteredState extends State<Registered> {
           setState(() {
             _cause = ds.Error.connectivity(
               cause,
-              onTap:
-                  () => setState(() {
-                    _cause = null;
-                  }),
+              onTap: _clearCause,
             );
           });
         }, test: ds.ErrorTests.connectivity)
@@ -73,10 +73,7 @@ class RegisteredState extends State<Registered> {
           setState(() {
             _cause = ds.Error.unknown(
               cause,
-              onTap:
-                  () => setState(() {
-                    _cause = null;
-                  }),
+              onTap: _clearCause,
             );
           });
         })

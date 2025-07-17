@@ -16,14 +16,14 @@ class Loading extends StatelessWidget {
   final Widget? child;
   final bool loading;
   final Widget overlay;
-  final Widget? cause;
+  final Widget cause;
 
   const Loading(
     this.child, {
     super.key,
     this.overlay = Loading.Icon,
     this.loading = false,
-    this.cause = null,
+    this.cause = const SizedBox(),
   });
 
   @override

@@ -26,7 +26,7 @@ class KnownMediaDropdown extends StatefulWidget {
 
 class _KnownMediaDropdown extends State<KnownMediaDropdown> {
   bool _loading = true;
-  ds.Error? _cause = null;
+  Widget _cause = const SizedBox();
   api.KnownSearchResponse _res = api.known.response(
     next: api.known.request(limit: 32),
   );
@@ -39,7 +39,7 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
 
   void reseterr() {
     setState(() {
-      _cause = null;
+      _cause = const SizedBox();
     });
   }
 

@@ -31,7 +31,7 @@ class Authenticated extends StatefulWidget {
 }
 
 class _AuthenticatedState extends State<Authenticated> {
-  Widget? _cause;
+  Widget _cause = const SizedBox();
   DateTime _expires = DateTime.timestamp();
   api.Session _current = api.Session();
 

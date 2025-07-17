@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import './errors.dart';
 import './theme.defaults.dart';
 import './inputs.dart';
 import './screens.dart' as screens;
@@ -52,9 +51,9 @@ class Table<T> extends StatelessWidget {
   final Widget empty;
   final Widget leading;
   final Widget trailing;
-  final Widget? overlay;
+  final Widget overlay;
   final bool loading;
-  final Error? cause;
+  final Widget cause;
 
   const Table(
     this.render, {
@@ -62,10 +61,10 @@ class Table<T> extends StatelessWidget {
     this.leading = const SizedBox(),
     this.trailing = const SizedBox(),
     this.empty = const SizedBox(),
-    this.overlay = null,
+    this.overlay = const SizedBox(),
     this.children = const [],
     this.loading = false,
-    this.cause = null,
+    this.cause = const SizedBox(),
   });
 
   @override

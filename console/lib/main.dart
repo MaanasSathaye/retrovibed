@@ -67,11 +67,10 @@ class MyApp extends StatelessWidget {
                             Tab(icon: Icon(Icons.settings)),
                           ],
                         ),
-                        body: TabBarView(
-                          children: [
-                            ds.ErrorBoundary(
-                              modals.Node(
-                                media.Playlist.wrap((ctx, s) {
+                        body: ds.ErrorBoundary(
+                            TabBarView(
+                              children: [
+                                modals.Node(media.Playlist.wrap((ctx, s) {
                                   return media.VideoScreen(
                                     env.Boolean(
                                           env.vars.AutoIdentifyMedia,
@@ -87,12 +86,11 @@ class MyApp extends StatelessWidget {
                                         ),
                                     s.player,
                                   );
-                                }),
-                              ),
-                            ),
-                            modals.Node(ds.ErrorBoundary(downloads.Display())),
-                            modals.Node(ds.ErrorBoundary(settings.Display())),
-                          ],
+                                })),
+                                modals.Node(downloads.Display()),
+                                modals.Node(settings.Display()),
+                              ],
+                          ),
                         ),
                       ),
                     ),

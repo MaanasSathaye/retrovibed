@@ -24,7 +24,7 @@ class DaemonList extends StatefulWidget {
 
 class _DaemonList extends State<DaemonList> {
   bool _loading = true;
-  ds.Error? _cause = null;
+  Widget _cause = const SizedBox();
   Widget? _optional = null;
   api.DaemonSearchResponse _res = api.daemons.response();
 

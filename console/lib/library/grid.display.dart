@@ -29,7 +29,7 @@ class AvailableGridDisplay extends StatefulWidget {
 
 class _AvailableGridDisplay extends State<AvailableGridDisplay> {
   bool _loading = true;
-  ds.Error? _cause = null;
+  Widget _cause = const SizedBox();
   media.MediaSearchResponse _res = media.media.response(
     next: media.media.request(limit: 32),
   );
@@ -41,7 +41,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
 
   void reseterr() {
     setState(() {
-      _cause = null;
+      _cause = const SizedBox();
     });
   }
 

@@ -14,7 +14,7 @@ class Current extends StatefulWidget {
 
 class _CurrentState extends State<Current> {
   bool _loading = true;
-  Widget? _cause;
+  Widget _cause = const SizedBox();
   authn.Session current = authn.Session();
 
   void setState(VoidCallback fn) {
@@ -25,7 +25,7 @@ class _CurrentState extends State<Current> {
   void refresh() {
     setState(() {
       _loading = true;
-      _cause = null;
+      _cause = const SizedBox();
     });
 
     authn.Authenticated.session(context)

@@ -25,7 +25,7 @@ class AvailableListDisplay extends StatefulWidget {
 
 class _AvailableListDisplay extends State<AvailableListDisplay> {
   bool _loading = true;
-  ds.Error? _cause = null;
+  Widget _cause = const SizedBox();
   media.MediaSearchResponse _res = media.media.response(
     next: media.media.request(limit: 32),
   );
@@ -37,7 +37,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
 
   void reseterr() {
     setState(() {
-      _cause = null;
+      _cause = const SizedBox();
     });
   }
 

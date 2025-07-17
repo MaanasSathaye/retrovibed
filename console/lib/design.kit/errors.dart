@@ -49,7 +49,6 @@ class ErrorBoundary extends StatefulWidget {
 
 class _ErrorBoundaryState extends State<ErrorBoundary> {
   Error? cause;
-  Key _refresh = UniqueKey();
 
   void onError(Error err) {
     setState(() {
@@ -60,7 +59,6 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
   void reset() {
     setState(() {
       cause = null;
-      _refresh = UniqueKey();
     });
   }
 
@@ -68,8 +66,7 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
   Widget build(BuildContext context) {
     return screens.Overlay.tappable(
       widget.child,
-      key: _refresh,
-      overlay: cause,
+      overlay: cause ?? const SizedBox(),
       alignment: widget.alignment,
       onTap: cause != null ? reset : null,
     );
@@ -77,6 +74,7 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
 }
 
 class Error extends StatelessWidget {
+  static const zero = const Error(child: const SizedBox());
   final Object? cause;
   final Widget child;
   final void Function()? onTap;
@@ -112,8 +110,8 @@ class Error extends StatelessWidget {
     );
   }
 
-  static Error? maybeErr(Object? obj, {void Function()? onTap}) {
-    if (obj == null) return null;
+  static Error maybeErr(Object? obj, {void Function()? onTap}) {
+    if (obj == null) return Error.zero;
     if (obj is Error) return obj;
     return unknown(obj, onTap: onTap);
   }

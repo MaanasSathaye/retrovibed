@@ -29,7 +29,6 @@ class _DisplayState extends State<Display> {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
-
     return Container(
       padding: defaults.padding,
       child: ListView(

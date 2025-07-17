@@ -23,7 +23,7 @@ class MDNSDiscovery extends StatefulWidget {
 class _MDNSDiscovery extends State<MDNSDiscovery> {
   static const String ServiceName = "_retrovibed._udp.local";
   bool _loading = true;
-  Widget? _cause = null;
+  Widget _cause = const SizedBox();
 
   void setState(VoidCallback fn) {
     if (!mounted) return;
@@ -98,14 +98,14 @@ class _MDNSDiscovery extends State<MDNSDiscovery> {
           child: widget.preamble(
             (daemon) {
               setState(() {
-                _cause = null;
+                _cause = const SizedBox();
               });
               widget.daemon(daemon);
             },
             retry: () {
               setState(() {
                 _loading = true;
-                _cause = null;
+                _cause = const SizedBox();
               });
               this.discover();
             },

@@ -27,7 +27,7 @@ class AvailableListDisplay extends StatefulWidget {
 
 class _AvailableListDisplay extends State<AvailableListDisplay> {
   bool _loading = true;
-  ds.Error? _cause = null;
+  Widget _cause = const SizedBox();
   media.DownloadSearchResponse _res = media.discoveredsearch.response(
     next: media.discoveredsearch.request(limit: 32),
   );
@@ -40,7 +40,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
 
   void resetcause() {
     setState(() {
-      _cause = null;
+      _cause = const SizedBox();
     });
   }
 
@@ -146,26 +146,18 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                 ds.FileDropWell.icon(upload),
                 ds.buttons.link(
                   onPressed: () {
-                    ;
                     ds.modals
                         .of(context)
                         ?.push(
-                          ds.build((ctx) {
-                            return FractionallySizedBox(
-                              widthFactor: 0.75,
-                              child: ds.layout((ctx, c) {
-                                print("DERPED ${c.biggest}");
-                                return Center(
-                                  child: MagnetDownloads(
-                                    onSubmitted: (derps) {
-                                      print("derps ${derps}");
-                                      ds.modals.of(context)?.reset();
-                                    },
-                                  ),
-                                );
-                              }),
-                            );
-                          }),
+                          FractionallySizedBox(
+                            widthFactor: 0.75,
+                            child: MagnetDownloads(
+                              onSubmitted: (derps) {
+                                print("derps ${derps}");
+                                ds.modals.of(context)?.reset();
+                              },
+                            ),
+                          ),
                         );
                   },
                 ),

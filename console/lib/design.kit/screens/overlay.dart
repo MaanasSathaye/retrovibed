@@ -2,25 +2,25 @@ import 'package:flutter/material.dart';
 
 class Overlay extends StatelessWidget {
   final Widget child;
-  final Widget? overlay;
+  final Widget overlay;
   final AlignmentGeometry alignment;
 
   const Overlay(
     this.child, {
     super.key,
-    this.overlay,
+    this.overlay = const SizedBox(),
     this.alignment = Alignment.center,
   });
 
   factory Overlay.tappable(
     Widget child, {
     Key? key,
-    Widget? overlay,
+    Widget overlay = const SizedBox(),
     AlignmentGeometry alignment = Alignment.center,
     required Function()? onTap,
   }) {
     return Overlay(
-      onTap == null ? child : InkWell(onTap: onTap, child: child),
+      InkWell(onTap: onTap, child: child),
       key: key,
       alignment: alignment,
       overlay: overlay,
@@ -32,10 +32,7 @@ class Overlay extends StatelessWidget {
     return Stack(
       fit: StackFit.passthrough,
       alignment: alignment,
-      children: [
-        child,
-        overlay ?? const SizedBox(),
-      ],
+      children: [child, overlay],
     );
   }
 }

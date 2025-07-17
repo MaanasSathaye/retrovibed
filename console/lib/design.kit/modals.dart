@@ -22,8 +22,9 @@ class Node extends StatefulWidget {
 }
 
 class NodeState extends State<Node> {
+  static const zeromodal = const SizedBox();
   final FocusNode _selffocus = FocusNode();
-  Widget? current;
+  Widget current = zeromodal;
 
   void setState(VoidCallback fn) {
     if (!mounted) return;
@@ -32,15 +33,14 @@ class NodeState extends State<Node> {
 
   void push(Widget? m) {
     setState(() {
-      current = m;
+      current = m ?? zeromodal;
     });
     _selffocus.requestFocus();
   }
 
   void reset() {
-    print("modal reset called");
     setState(() {
-      current = null;
+      current = zeromodal;
     });
   }
 
@@ -51,33 +51,33 @@ class NodeState extends State<Node> {
     final mq = MediaQuery.of(context);
     return screens.Overlay.tappable(
       widget.child,
-      overlay:
-          current == null
-              ? null
-              : KeyboardListener(
-                focusNode: _selffocus,
-                onKeyEvent: (event) {
-                  if (event is KeyDownEvent) {
-                    return;
-                  }
+      overlay: KeyboardListener(
+        focusNode: _selffocus,
+        onKeyEvent: (event) {
+          if (event is KeyDownEvent) {
+            return;
+          }
 
-                  if (event.logicalKey == LogicalKeyboardKey.escape) {
-                    push(null);
-                  }
-                },
-                child: Container(
-                  height: mq.size.height,
-                  width: mq.size.width,
-                  decoration: BoxDecoration(
-                    color: theme.scaffoldBackgroundColor.withValues(
-                      alpha: themex.opaque?.a ?? 0.0,
-                    ),
-                  ),
-                  child: Center(child: SingleChildScrollView(child: current!)),
-                ),
+          if (event.logicalKey == LogicalKeyboardKey.escape) {
+            push(null);
+          }
+        },
+        child: Visibility(
+          visible: current != zeromodal,
+          child: Container(
+            height: mq.size.height,
+            width: mq.size.width,
+            decoration: BoxDecoration(
+              color: theme.scaffoldBackgroundColor.withValues(
+                alpha: themex.opaque?.a ?? 0.0,
               ),
+            ),
+            child: Center(child: SingleChildScrollView(child: current)),
+          ),
+        ),
+      ),
       alignment: widget.alignment,
-      onTap: current != null ? reset : null,
+      onTap: current != zeromodal ? reset : null,
     );
   }
 }
