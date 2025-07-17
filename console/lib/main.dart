@@ -48,7 +48,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         darkTheme: ThemeData(
           brightness: Brightness.dark,
-          cardTheme: CardTheme(margin: EdgeInsets.all(10.0)),
+          cardTheme: CardThemeData(margin: EdgeInsets.all(10.0)),
           extensions: [theming.Defaults.defaults],
         ),
         themeMode: ThemeMode.dark,

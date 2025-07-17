@@ -76,19 +76,22 @@ class _SearchTrayState extends State<SearchTray> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Row(
-            // mainAxisSize: MainAxisSize.min,
+            mainAxisSize: MainAxisSize.min,
             children: [
               widget.leading,
               Expanded(
-                child: TextField(
-                  controller: widget.controller ?? _defaultController,
-                  decoration:
-                      widget.inputDecoration ??
-                      const InputDecoration(hintText: "search"),
-                  autofocus: widget.autofocus,
-                  focusNode: _focusNode,
-                  onSubmitted: widget.onSubmitted,
-                  enabled: !widget.disabled,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: theming.spacing ?? 0.0),
+                  child: TextField(
+                    controller: widget.controller ?? _defaultController,
+                    decoration:
+                        widget.inputDecoration ??
+                        const InputDecoration(hintText: "search"),
+                    autofocus: widget.autofocus,
+                    focusNode: _focusNode,
+                    onSubmitted: widget.onSubmitted,
+                    enabled: !widget.disabled,
+                  ),
                 ),
               ),
               IconButton(

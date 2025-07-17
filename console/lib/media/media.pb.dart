@@ -619,6 +619,100 @@ class Download extends $pb.GeneratedMessage {
   void clearPeers() => $_clearField(6);
 }
 
+class MagnetCreateRequest extends $pb.GeneratedMessage {
+  factory MagnetCreateRequest({
+    $core.String? uri,
+  }) {
+    final result = create();
+    if (uri != null) result.uri = uri;
+    return result;
+  }
+
+  MagnetCreateRequest._();
+
+  factory MagnetCreateRequest.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
+  factory MagnetCreateRequest.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'MagnetCreateRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'media'), createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'uri')
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  MagnetCreateRequest clone() => MagnetCreateRequest()..mergeFromMessage(this);
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  MagnetCreateRequest copyWith(void Function(MagnetCreateRequest) updates) => super.copyWith((message) => updates(message as MagnetCreateRequest)) as MagnetCreateRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static MagnetCreateRequest create() => MagnetCreateRequest._();
+  @$core.override
+  MagnetCreateRequest createEmptyInstance() => create();
+  static $pb.PbList<MagnetCreateRequest> createRepeated() => $pb.PbList<MagnetCreateRequest>();
+  @$core.pragma('dart2js:noInline')
+  static MagnetCreateRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<MagnetCreateRequest>(create);
+  static MagnetCreateRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get uri => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set uri($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasUri() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearUri() => $_clearField(1);
+}
+
+class MagnetCreateResponse extends $pb.GeneratedMessage {
+  factory MagnetCreateResponse({
+    Download? download,
+  }) {
+    final result = create();
+    if (download != null) result.download = download;
+    return result;
+  }
+
+  MagnetCreateResponse._();
+
+  factory MagnetCreateResponse.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
+  factory MagnetCreateResponse.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'MagnetCreateResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'media'), createEmptyInstance: create)
+    ..aOM<Download>(1, _omitFieldNames ? '' : 'download', subBuilder: Download.create)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  MagnetCreateResponse clone() => MagnetCreateResponse()..mergeFromMessage(this);
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  MagnetCreateResponse copyWith(void Function(MagnetCreateResponse) updates) => super.copyWith((message) => updates(message as MagnetCreateResponse)) as MagnetCreateResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static MagnetCreateResponse create() => MagnetCreateResponse._();
+  @$core.override
+  MagnetCreateResponse createEmptyInstance() => create();
+  static $pb.PbList<MagnetCreateResponse> createRepeated() => $pb.PbList<MagnetCreateResponse>();
+  @$core.pragma('dart2js:noInline')
+  static MagnetCreateResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<MagnetCreateResponse>(create);
+  static MagnetCreateResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Download get download => $_getN(0);
+  @$pb.TagNumber(1)
+  set download(Download value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasDownload() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearDownload() => $_clearField(1);
+  @$pb.TagNumber(1)
+  Download ensureDownload() => $_ensure(0);
+}
+
 class DownloadSearchRequest extends $pb.GeneratedMessage {
   factory DownloadSearchRequest({
     $core.String? query,

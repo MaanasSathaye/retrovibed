@@ -14,6 +14,7 @@ class FileDropWell extends StatefulWidget {
   final Widget child;
   final Widget? loading;
   final Function()? onTap;
+  final EdgeInsets? margin;
   final Future<Widget?> Function(FilesEvent i) onDropped;
   final List<String> mimetypes;
   final List<String> extensions;
@@ -35,6 +36,7 @@ class FileDropWell extends StatefulWidget {
     this.extensions = const [],
     this.onTap,
     this.loading,
+    this.margin,
   });
 
   factory FileDropWell.icon(
@@ -48,8 +50,8 @@ class FileDropWell extends StatefulWidget {
       onDropped,
       key: key,
       onTap: onTap,
-      child: IgnorePointer(child: Icon(Icons.file_upload_outlined)),
-      loading: ds.Loading.Sized(width: 12.0, height: 12.0),
+      child: Icon(Icons.file_upload_outlined, size: 24.0),
+      loading: ds.Loading.Sized(width: 24.0, height: 24.0),
       mimetypes: mimetypes,
       extensions: extensions,
     );
@@ -118,7 +120,8 @@ class _FileDropWell extends State<FileDropWell> {
       },
       child: Container(
         color: _dragging ? theme.highlightColor : null,
-        child: TextButton(
+        margin: widget.margin,
+        child: IconButton(
           onPressed: () {
             final XTypeGroup filter = XTypeGroup(
               label: "Select File(s)",
@@ -155,7 +158,6 @@ class _FileDropWell extends State<FileDropWell> {
                   });
                 })
                 .catchError((cause) {
-                  print("failed to open files ${cause}");
                   return ds.Error.unknown(cause);
                 })
                 .whenComplete(() {
@@ -164,16 +166,10 @@ class _FileDropWell extends State<FileDropWell> {
                   });
                 });
           },
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ds.Loading(
-                loading: _loading,
-                widget.child,
-                overlay: widget.loading ?? ds.Loading.Icon,
-              ),
-            ],
+          icon: ds.Loading(
+            loading: _loading,
+            widget.child,
+            overlay: widget.loading ?? ds.Loading.Icon,
           ),
         ),
       ),

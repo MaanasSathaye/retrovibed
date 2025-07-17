@@ -4,15 +4,28 @@ class Overlay extends StatelessWidget {
   final Widget child;
   final Widget? overlay;
   final AlignmentGeometry alignment;
-  final Function()? onTap;
 
   const Overlay(
     this.child, {
     super.key,
     this.overlay,
     this.alignment = Alignment.center,
-    this.onTap,
   });
+
+  factory Overlay.tappable(
+    Widget child, {
+    Key? key,
+    Widget? overlay,
+    AlignmentGeometry alignment = Alignment.center,
+    required Function()? onTap,
+  }) {
+    return Overlay(
+      onTap == null ? child : InkWell(onTap: onTap, child: child),
+      key: key,
+      alignment: alignment,
+      overlay: overlay,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +33,7 @@ class Overlay extends StatelessWidget {
       fit: StackFit.passthrough,
       alignment: alignment,
       children: [
-        InkWell(onTap: onTap, child: child),
+        child,
         overlay ?? const SizedBox(),
       ],
     );

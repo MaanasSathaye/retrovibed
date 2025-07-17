@@ -47,7 +47,7 @@ class NodeState extends State<Node> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final themex = Defaults.of(context);
-    return screens.Overlay(
+    return screens.Overlay.tappable(
       widget.child,
       overlay:
           current == null
