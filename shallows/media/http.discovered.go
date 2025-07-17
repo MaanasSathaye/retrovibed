@@ -3,6 +3,7 @@ package media
 import (
 	"context"
 	"crypto/md5"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -87,10 +88,15 @@ func (t *HTTPDiscovered) Bind(r *mux.Router) {
 	r.Path("/").Methods(http.MethodPost).Handler(alice.New(
 		httpx.ContextBufferPool512(),
 		httpx.ParseForm,
-		// httpauth.AuthenticateWithToken(t.jwtsecret),
+		httpauth.AuthenticateWithToken(t.jwtsecret),
 		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
 		httpx.TimeoutRollingWrite(3*time.Second),
 	).ThenFunc(t.upload))
+
+	r.Path("/magnet").Methods(http.MethodPost).Handler(alice.New(
+		httpx.ContextBufferPool512(),
+		httpx.Timeout2s(),
+	).ThenFunc(t.magnet))
 
 	r.Path("/available").Methods(http.MethodGet).Handler(alice.New(
 		httpx.ContextBufferPool512(),
@@ -131,6 +137,68 @@ func (t *HTTPDiscovered) Bind(r *mux.Router) {
 		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
 		httpx.Timeout2s(),
 	).ThenFunc(t.pause))
+}
+
+func (t *HTTPDiscovered) magnet(w http.ResponseWriter, r *http.Request) {
+	var (
+		msg MagnetCreateRequest
+		dl  torrent.Torrent
+	)
+
+	if err := json.NewDecoder(r.Body).Decode(&msg); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to parse magnet link request"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
+
+	m, err := metainfo.ParseMagnetURI(msg.Uri)
+	if err != nil {
+		log.Println(errorsx.Wrap(err, "unable to parse magnet link"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
+
+	lmd := tracking.NewMetadata(
+		langx.Autoptr(m.InfoHash),
+		tracking.MetadataOptionFromMagnet(&m),
+		tracking.MetadataOptionTrackers(m.Trackers...),
+		tracking.MetadataOptionAutoDescription,
+	)
+
+	if err = tracking.MetadataInsertWithDefaults(r.Context(), t.q, lmd).Scan(&lmd); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to record metadata record"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	metadata, err := torrent.New(metainfo.Hash(lmd.Infohash), torrent.OptionStorage(t.c), torrentx.OptionTracker(lmd.Tracker), torrent.OptionPublicTrackers(lmd.Private, tracking.PublicTrackers()...))
+	if err != nil {
+		log.Println(errorsx.Wrapf(err, "unable to create torrent from metadata %s", lmd.ID))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if dl, _, err = t.d.Start(metadata); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to start download"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	go func() {
+		errorsx.Log(tracking.Download(context.Background(), t.q, t.rootstorage, &lmd, dl))
+	}()
+
+	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &MagnetCreateResponse{
+		Download: langx.Autoptr(
+			langx.Clone(
+				Download{},
+				DownloadOptionFromTorrentMetadata(lmd),
+			),
+		),
+	}); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to write response"))
+		return
+	}
 }
 
 func (t *HTTPDiscovered) upload(w http.ResponseWriter, r *http.Request) {

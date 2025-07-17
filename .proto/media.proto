@@ -44,6 +44,14 @@ message Download {
   uint32 peers = 6 [ json_name = "peers" ];
 }
 
+message MagnetCreateRequest {
+  string uri = 1 [ json_name = "uri" ];
+}
+
+message MagnetCreateResponse {
+  Download download = 1 [ json_name = "download" ];
+}
+
 message DownloadSearchRequest {
   string query = 1 [ json_name = "query" ];
   repeated string mimetypes = 2 [ json_name = "mimetypes" ];

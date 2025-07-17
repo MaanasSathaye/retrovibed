@@ -52,6 +52,12 @@ func MetadataOptionFromInfo(i *metainfo.Info) func(*Metadata) {
 	}
 }
 
+func MetadataOptionFromMagnet(i *metainfo.Magnet) func(*Metadata) {
+	return func(m *Metadata) {
+		m.Description = strings.ToValidUTF8(i.DisplayName, "\uFFFD")
+	}
+}
+
 func MetadataOptionDescription(d string) func(*Metadata) {
 	return func(m *Metadata) {
 		m.Description = d
