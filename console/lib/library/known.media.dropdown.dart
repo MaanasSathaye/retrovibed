@@ -53,7 +53,7 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
           });
 
           widget.focus?.requestFocus();
-          ds.SearchTray.refocus(widget.controller);
+          ds.textediting.refocus(widget.controller);
         })
         .catchError((cause) {
           setState(() {

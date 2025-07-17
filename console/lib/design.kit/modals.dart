@@ -38,6 +38,7 @@ class NodeState extends State<Node> {
   }
 
   void reset() {
+    print("modal reset called");
     setState(() {
       current = null;
     });
@@ -47,6 +48,7 @@ class NodeState extends State<Node> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final themex = Defaults.of(context);
+    final mq = MediaQuery.of(context);
     return screens.Overlay.tappable(
       widget.child,
       overlay:
@@ -63,18 +65,15 @@ class NodeState extends State<Node> {
                     push(null);
                   }
                 },
-                child: SizedBox(
-                  height: MediaQuery.of(context).size.height,
-                  child: SingleChildScrollView(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: theme.scaffoldBackgroundColor.withValues(
-                          alpha: themex.opaque?.a ?? 0.0,
-                        ),
-                      ),
-                      child: current!,
+                child: Container(
+                  height: mq.size.height,
+                  width: mq.size.width,
+                  decoration: BoxDecoration(
+                    color: theme.scaffoldBackgroundColor.withValues(
+                      alpha: themex.opaque?.a ?? 0.0,
                     ),
                   ),
+                  child: Center(child: SingleChildScrollView(child: current!)),
                 ),
               ),
       alignment: widget.alignment,

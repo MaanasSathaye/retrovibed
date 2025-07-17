@@ -164,6 +164,20 @@ abstract class discovered {
         });
   }
 
+  static Future<DownloadSearchResponse> magnet(
+    DownloadSearchRequest req,
+    {List<httpx.Option> options = const []}
+  ) async {
+      return httpx
+      .get(Uri.https(httpx.host(), "/d/downloading"), options: options)
+      .then((v) {
+          return Future.value(
+            DownloadSearchResponse.create()
+              ..mergeFromProto3Json(jsonDecode(v.body)),
+          );
+        });
+  }
+
   static Future<MediaUploadResponse> upload(
     http.MultipartRequest Function(http.MultipartRequest req) mkreq,
   ) async {

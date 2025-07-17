@@ -1,4 +1,3 @@
-
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart'; // Provides [Player], [Media], [Playlist] etc.
@@ -57,21 +56,21 @@ class MyApp extends StatelessWidget {
             meta.EndpointAuto(
               authn.Authenticated(
                 authn.AuthzCache(
-                  modals.Node(
-                    media.Playlist(
-                      DefaultTabController(
-                        length: 3,
-                        child: Scaffold(
-                          appBar: TabBar(
-                            tabs: [
-                              Tab(icon: Icon(Icons.movie)),
-                              Tab(icon: Icon(Icons.download)),
-                              Tab(icon: Icon(Icons.settings)),
-                            ],
-                          ),
-                          body: TabBarView(
-                            children: [
-                              ds.ErrorBoundary(
+                  media.Playlist(
+                    DefaultTabController(
+                      length: 3,
+                      child: Scaffold(
+                        appBar: TabBar(
+                          tabs: [
+                            Tab(icon: Icon(Icons.movie)),
+                            Tab(icon: Icon(Icons.download)),
+                            Tab(icon: Icon(Icons.settings)),
+                          ],
+                        ),
+                        body: TabBarView(
+                          children: [
+                            ds.ErrorBoundary(
+                              modals.Node(
                                 media.Playlist.wrap((ctx, s) {
                                   return media.VideoScreen(
                                     env.Boolean(
@@ -90,10 +89,10 @@ class MyApp extends StatelessWidget {
                                   );
                                 }),
                               ),
-                              ds.ErrorBoundary(downloads.Display()),
-                              ds.ErrorBoundary(settings.Display()),
-                            ],
-                          ),
+                            ),
+                            modals.Node(ds.ErrorBoundary(downloads.Display())),
+                            modals.Node(ds.ErrorBoundary(settings.Display())),
+                          ],
                         ),
                       ),
                     ),

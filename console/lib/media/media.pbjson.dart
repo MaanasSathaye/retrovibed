@@ -154,6 +154,31 @@ final $typed_data.Uint8List downloadDescriptor = $convert.base64Decode(
     'ZWRfYXQYBCABKAlSDGluaXRpYXRlZF9hdBIcCglwYXVzZWRfYXQYBSABKAlSCXBhdXNlZF9hdB'
     'IUCgVwZWVycxgGIAEoDVIFcGVlcnM=');
 
+@$core.Deprecated('Use magnetCreateRequestDescriptor instead')
+const MagnetCreateRequest$json = {
+  '1': 'MagnetCreateRequest',
+  '2': [
+    {'1': 'uri', '3': 1, '4': 1, '5': 9, '10': 'uri'},
+  ],
+};
+
+/// Descriptor for `MagnetCreateRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List magnetCreateRequestDescriptor = $convert.base64Decode(
+    'ChNNYWduZXRDcmVhdGVSZXF1ZXN0EhAKA3VyaRgBIAEoCVIDdXJp');
+
+@$core.Deprecated('Use magnetCreateResponseDescriptor instead')
+const MagnetCreateResponse$json = {
+  '1': 'MagnetCreateResponse',
+  '2': [
+    {'1': 'download', '3': 1, '4': 1, '5': 11, '6': '.media.Download', '10': 'download'},
+  ],
+};
+
+/// Descriptor for `MagnetCreateResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List magnetCreateResponseDescriptor = $convert.base64Decode(
+    'ChRNYWduZXRDcmVhdGVSZXNwb25zZRIrCghkb3dubG9hZBgBIAEoCzIPLm1lZGlhLkRvd25sb2'
+    'FkUghkb3dubG9hZA==');
+
 @$core.Deprecated('Use downloadSearchRequestDescriptor instead')
 const DownloadSearchRequest$json = {
   '1': 'DownloadSearchRequest',

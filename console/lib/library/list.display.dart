@@ -51,7 +51,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
           });
 
           widget.focus?.requestFocus();
-          ds.SearchTray.refocus(widget.controller);
+          ds.textediting.refocus(widget.controller);
         })
         .catchError((cause) {
           setState(() {

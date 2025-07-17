@@ -22,4 +22,23 @@ abstract class modals {
   }
 }
 
+abstract class textediting {
+  static void refocus(TextEditingController? controller) {
+    if (controller == null) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.selection = TextSelection.fromPosition(
+        TextPosition(offset: controller.text.length),
+      );
+    });
+  }
+}
+
 const Widget? NullWidget = null;
+
+Widget build(Widget Function(BuildContext) b) {
+  return Builder(builder: b);
+}
+
+Widget layout(Widget Function(BuildContext, BoxConstraints) b) {
+  return LayoutBuilder(builder: b);
+}

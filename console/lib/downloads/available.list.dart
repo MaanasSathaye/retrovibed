@@ -6,6 +6,7 @@ import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/mimex.dart' as mimex;
 import './search.tuning.dart';
+import './magnet.links.dart';
 
 class AvailableListDisplay extends StatefulWidget {
   final media.FnDownloadSearch search;
@@ -78,11 +79,10 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
         _loading = true;
       });
 
-      final multiparts = v.files.map((c) {
-        return media.media.uploadable(c.path, c.name, c.mimeType!);
-      });
-
       return Future.microtask(() {
+        final multiparts = v.files.map((c) {
+          return media.media.uploadable(c.path, c.name, c.mimeType!);
+        });
         return Future.wait(
               multiparts.map((fv) {
                 return fv.then((v) {
@@ -97,11 +97,6 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                             .then((_) {
                               widget.events?.value += 1;
                             });
-                      })
-                      .catchError((cause) {
-                        setState(() {
-                          _cause = ds.Error.unknown(cause, onTap: resetcause);
-                        });
                       });
                 });
               }),
@@ -126,6 +121,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
         mainAxisSize: MainAxisSize.min,
         children: [
           ds.SearchTray(
+            autofocus: true,
             inputDecoration: InputDecoration(
               hintText: "search downloadable content",
             ),
@@ -145,8 +141,36 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
             },
             current: _res.next.offset,
             empty: fixnum.Int64(_res.items.length) < _res.next.limit,
-            leading: ds.FileDropWell.icon(upload),
-            autofocus: true,
+            leading: Row(
+              children: [
+                ds.FileDropWell.icon(upload),
+                ds.buttons.link(
+                  onPressed: () {
+                    ;
+                    ds.modals
+                        .of(context)
+                        ?.push(
+                          ds.build((ctx) {
+                            return FractionallySizedBox(
+                              widthFactor: 0.75,
+                              child: ds.layout((ctx, c) {
+                                print("DERPED ${c.biggest}");
+                                return Center(
+                                  child: MagnetDownloads(
+                                    onSubmitted: (derps) {
+                                      print("derps ${derps}");
+                                      ds.modals.of(context)?.reset();
+                                    },
+                                  ),
+                                );
+                              }),
+                            );
+                          }),
+                        );
+                  },
+                ),
+              ],
+            ),
             tuning: LimitedBox(
               maxHeight: 138.0,
               child: SearchTuning(

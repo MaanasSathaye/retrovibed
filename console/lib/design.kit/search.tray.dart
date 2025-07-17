@@ -6,15 +6,6 @@ import './buttons.dart';
 class SearchTray extends StatefulWidget {
   static fixnum.Int64 Zero = fixnum.Int64.ZERO;
 
-  static void refocus(TextEditingController? controller) {
-    if (controller == null) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.selection = TextSelection.fromPosition(
-        TextPosition(offset: controller.text.length),
-      );
-    });
-  }
-
   static Widget zerobox = const SizedBox();
 
   final Widget leading;

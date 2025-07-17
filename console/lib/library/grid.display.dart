@@ -55,7 +55,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
           });
 
           widget.focus?.requestFocus();
-          ds.SearchTray.refocus(widget.controller);
+          ds.textediting.refocus(widget.controller);
         })
         .catchError((cause) {
           setState(() {
@@ -174,8 +174,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                       (defaults.spacing ?? 0.0) / 2, // Spacing between columns
                   mainAxisSpacing:
                       (defaults.spacing ?? 0.0) / 2, // Spacing between rows
-                  childAspectRatio:
-                      16 / 9, // Aspect ratio of each grid item (width/height)
+                  childAspectRatio: 16 / 9, // Aspect ratio of each grid item (width/height)
                 ),
                 itemBuilder: (context, index) {
                   var _media = _res.items.elementAt(index);

@@ -1,16 +1,24 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:retrovibed/design.kit/theme.defaults.dart';
+
+class CancelIntent extends Intent {
+  const CancelIntent();
+}
 
 class ItemListManager<T> extends StatefulWidget {
-  final Future<T> Function(T) onSubmit;
+  final Function(List<T> items) onSubmitted;
   final Widget Function(T item) builder;
+  final Stream<T> stream;
+  final FocusNode? focus;
 
   const ItemListManager({
     super.key,
-    required this.onItemsUpdated,
-    required this.onAddItem,
+    required this.onSubmitted,
     required this.builder,
+    required this.stream,
+    this.focus,
   });
 
   @override
@@ -18,104 +26,98 @@ class ItemListManager<T> extends StatefulWidget {
 }
 
 class _ItemListManagerState<T> extends State<ItemListManager<T>> {
-  final List<T> _items = [];
-  late final FocusNode _focusNode;
-  bool _isLoading = false;
-  bool _isCancelled = false;
+  List<T> _items = [];
+  StreamSubscription<T>? _addItemSubscription;
+
+  @override
+  void setState(VoidCallback fn) {
+    if (!mounted) return;
+    super.setState(fn);
+  }
 
   @override
   void initState() {
     super.initState();
-    _focusNode = FocusNode();
+    _addItemSubscription = widget.stream.listen((item) {
+      setState(() {
+        _items.add(item);
+      });
+    });
   }
 
   @override
   void dispose() {
-    _focusNode.dispose();
+    _addItemSubscription?.cancel();
     super.dispose();
-  }
-
-  Future<void> _handleAddItem() async {
-    setState(() {
-      _isLoading = true;
-      _isCancelled = false;
-    });
-
-    try {
-      final item = await widget.onAddItem();
-      if (!_isCancelled) {
-        setState(() {
-          _items.add(item);
-        });
-      } else {
-        print('Operation cancelled, item discarded.');
-      }
-    } catch (e) {
-      print('Failed to add item: $e');
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
-  void _handleKey(RawKeyEvent event) {
-    if (event is RawKeyDownEvent &&
-        event.logicalKey == LogicalKeyboardKey.escape &&
-        _isLoading) {
-      setState(() {
-        _isCancelled = true;
-      });
-    }
-  }
-
-  void _removeItem(int index) {
-    setState(() {
-      _items.removeAt(index);
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return RawKeyboardListener(
-      focusNode: _focusNode,
-      autofocus: true,
-      onKey: _handleKey,
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _handleAddItem,
-                  child: const Text('Add Item Asynchronously'),
-                ),
-              ),
-              const SizedBox(width: 8.0),
-              if (_isLoading)
-                const SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(strokeWidth: 2.0),
-                ),
-            ],
+    final defaults = Defaults.of(context);
+    final submit = (List<T> items) {
+      if (!mounted) return;
+      widget.onSubmitted(items);
+    };
+
+    return Shortcuts(
+      shortcuts: <LogicalKeySet, Intent>{
+        LogicalKeySet(LogicalKeyboardKey.escape): const CancelIntent(),
+      },
+      child: Actions(
+        actions: <Type, Action<Intent>>{
+          CancelIntent: CallbackAction<CancelIntent>(
+            onInvoke: (intent) {
+              submit([]);
+              return null;
+            },
           ),
-          const SizedBox(height: 16.0),
-          Expanded(
-            child: ListView.builder(
+        },
+        child: Column(
+          spacing: defaults.spacing ?? 0.0,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListView.builder(
+              shrinkWrap: true,
               itemCount: _items.length,
               itemBuilder: (context, index) {
                 final item = _items[index];
-                return widget.itemBuilder(item);
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(child: widget.builder(item)),
+                    IconButton(
+                      icon: const Icon(Icons.remove),
+                      onPressed: () {
+                        setState(() {
+                          _items.removeAt(index);
+                          _items = _items;
+                        });
+                      },
+                    ),
+                  ],
+                );
               },
             ),
-          ),
-          const SizedBox(height: 16.0),
-          ElevatedButton(
-            onPressed: () => widget.onItemsUpdated(_items),
-            child: const Text('Update Parent'),
-          ),
-        ],
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    submit([]);
+                  },
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    submit(_items);
+                  },
+                  child: const Text('Submit'),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
