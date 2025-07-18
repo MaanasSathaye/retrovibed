@@ -51,7 +51,14 @@ final $typed_data.Uint8List daemonSearchRequestDescriptor = $convert.base64Decod
 const DaemonSearchResponse$json = {
   '1': 'DaemonSearchResponse',
   '2': [
-    {'1': 'next', '3': 1, '4': 1, '5': 11, '6': '.meta.DaemonSearchRequest', '10': 'next'},
+    {
+      '1': 'next',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.DaemonSearchRequest',
+      '10': 'next'
+    },
     {'1': 'items', '3': 2, '4': 3, '5': 11, '6': '.meta.Daemon', '10': 'items'},
   ],
 };
@@ -65,7 +72,14 @@ final $typed_data.Uint8List daemonSearchResponseDescriptor = $convert.base64Deco
 const DaemonCreateRequest$json = {
   '1': 'DaemonCreateRequest',
   '2': [
-    {'1': 'daemon', '3': 1, '4': 1, '5': 11, '6': '.meta.Daemon', '10': 'daemon'},
+    {
+      '1': 'daemon',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.Daemon',
+      '10': 'daemon'
+    },
   ],
 };
 
@@ -78,7 +92,14 @@ final $typed_data.Uint8List daemonCreateRequestDescriptor = $convert.base64Decod
 const DaemonCreateResponse$json = {
   '1': 'DaemonCreateResponse',
   '2': [
-    {'1': 'daemon', '3': 1, '4': 1, '5': 11, '6': '.meta.Daemon', '10': 'daemon'},
+    {
+      '1': 'daemon',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.Daemon',
+      '10': 'daemon'
+    },
   ],
 };
 
@@ -93,14 +114,21 @@ const DaemonDeleteRequest$json = {
 };
 
 /// Descriptor for `DaemonDeleteRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List daemonDeleteRequestDescriptor = $convert.base64Decode(
-    'ChNEYWVtb25EZWxldGVSZXF1ZXN0');
+final $typed_data.Uint8List daemonDeleteRequestDescriptor =
+    $convert.base64Decode('ChNEYWVtb25EZWxldGVSZXF1ZXN0');
 
 @$core.Deprecated('Use daemonDeleteResponseDescriptor instead')
 const DaemonDeleteResponse$json = {
   '1': 'DaemonDeleteResponse',
   '2': [
-    {'1': 'daemon', '3': 1, '4': 1, '5': 11, '6': '.meta.Daemon', '10': 'daemon'},
+    {
+      '1': 'daemon',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.Daemon',
+      '10': 'daemon'
+    },
   ],
 };
 
@@ -115,14 +143,21 @@ const DaemonLookupRequest$json = {
 };
 
 /// Descriptor for `DaemonLookupRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List daemonLookupRequestDescriptor = $convert.base64Decode(
-    'ChNEYWVtb25Mb29rdXBSZXF1ZXN0');
+final $typed_data.Uint8List daemonLookupRequestDescriptor =
+    $convert.base64Decode('ChNEYWVtb25Mb29rdXBSZXF1ZXN0');
 
 @$core.Deprecated('Use daemonLookupResponseDescriptor instead')
 const DaemonLookupResponse$json = {
   '1': 'DaemonLookupResponse',
   '2': [
-    {'1': 'daemon', '3': 1, '4': 1, '5': 11, '6': '.meta.Daemon', '10': 'daemon'},
+    {
+      '1': 'daemon',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.Daemon',
+      '10': 'daemon'
+    },
   ],
 };
 
@@ -135,7 +170,14 @@ final $typed_data.Uint8List daemonLookupResponseDescriptor = $convert.base64Deco
 const DaemonUpdateRequest$json = {
   '1': 'DaemonUpdateRequest',
   '2': [
-    {'1': 'daemon', '3': 1, '4': 1, '5': 11, '6': '.meta.Daemon', '10': 'daemon'},
+    {
+      '1': 'daemon',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.Daemon',
+      '10': 'daemon'
+    },
   ],
 };
 
@@ -148,7 +190,14 @@ final $typed_data.Uint8List daemonUpdateRequestDescriptor = $convert.base64Decod
 const DaemonUpdateResponse$json = {
   '1': 'DaemonUpdateResponse',
   '2': [
-    {'1': 'daemon', '3': 1, '4': 1, '5': 11, '6': '.meta.Daemon', '10': 'daemon'},
+    {
+      '1': 'daemon',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.Daemon',
+      '10': 'daemon'
+    },
   ],
 };
 
@@ -161,7 +210,14 @@ final $typed_data.Uint8List daemonUpdateResponseDescriptor = $convert.base64Deco
 const DaemonDisableRequest$json = {
   '1': 'DaemonDisableRequest',
   '2': [
-    {'1': 'daemon', '3': 1, '4': 1, '5': 11, '6': '.meta.Daemon', '10': 'daemon'},
+    {
+      '1': 'daemon',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.Daemon',
+      '10': 'daemon'
+    },
   ],
 };
 
@@ -174,7 +230,14 @@ final $typed_data.Uint8List daemonDisableRequestDescriptor = $convert.base64Deco
 const DaemonDisableResponse$json = {
   '1': 'DaemonDisableResponse',
   '2': [
-    {'1': 'daemon', '3': 1, '4': 1, '5': 11, '6': '.meta.Daemon', '10': 'daemon'},
+    {
+      '1': 'daemon',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.Daemon',
+      '10': 'daemon'
+    },
   ],
 };
 
@@ -182,4 +245,3 @@ const DaemonDisableResponse$json = {
 final $typed_data.Uint8List daemonDisableResponseDescriptor = $convert.base64Decode(
     'ChVEYWVtb25EaXNhYmxlUmVzcG9uc2USJAoGZGFlbW9uGAEgASgLMgwubWV0YS5EYWVtb25SBm'
     'RhZW1vbg==');
-

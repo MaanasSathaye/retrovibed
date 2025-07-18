@@ -41,14 +41,21 @@ const AccountLookupRequest$json = {
 };
 
 /// Descriptor for `AccountLookupRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List accountLookupRequestDescriptor = $convert.base64Decode(
-    'ChRBY2NvdW50TG9va3VwUmVxdWVzdA==');
+final $typed_data.Uint8List accountLookupRequestDescriptor =
+    $convert.base64Decode('ChRBY2NvdW50TG9va3VwUmVxdWVzdA==');
 
 @$core.Deprecated('Use accountLookupResponseDescriptor instead')
 const AccountLookupResponse$json = {
   '1': 'AccountLookupResponse',
   '2': [
-    {'1': 'account', '3': 1, '4': 1, '5': 11, '6': '.meta.Account', '10': 'account'},
+    {
+      '1': 'account',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.Account',
+      '10': 'account'
+    },
   ],
 };
 
@@ -61,7 +68,14 @@ final $typed_data.Uint8List accountLookupResponseDescriptor = $convert.base64Dec
 const AccountUpdateRequest$json = {
   '1': 'AccountUpdateRequest',
   '2': [
-    {'1': 'account', '3': 1, '4': 1, '5': 11, '6': '.meta.Account', '10': 'account'},
+    {
+      '1': 'account',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.Account',
+      '10': 'account'
+    },
   ],
 };
 
@@ -74,7 +88,14 @@ final $typed_data.Uint8List accountUpdateRequestDescriptor = $convert.base64Deco
 const AccountUpdateResponse$json = {
   '1': 'AccountUpdateResponse',
   '2': [
-    {'1': 'account', '3': 1, '4': 1, '5': 11, '6': '.meta.Account', '10': 'account'},
+    {
+      '1': 'account',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.Account',
+      '10': 'account'
+    },
   ],
 };
 
@@ -82,4 +103,3 @@ const AccountUpdateResponse$json = {
 final $typed_data.Uint8List accountUpdateResponseDescriptor = $convert.base64Decode(
     'ChVBY2NvdW50VXBkYXRlUmVzcG9uc2USJwoHYWNjb3VudBgBIAEoCzINLm1ldGEuQWNjb3VudF'
     'IHYWNjb3VudA==');
-

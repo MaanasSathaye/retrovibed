@@ -63,7 +63,14 @@ final $typed_data.Uint8List mediaSearchRequestDescriptor = $convert.base64Decode
 const MediaSearchResponse$json = {
   '1': 'MediaSearchResponse',
   '2': [
-    {'1': 'next', '3': 1, '4': 1, '5': 11, '6': '.media.MediaSearchRequest', '10': 'next'},
+    {
+      '1': 'next',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.media.MediaSearchRequest',
+      '10': 'next'
+    },
     {'1': 'items', '3': 2, '4': 3, '5': 11, '6': '.media.Media', '10': 'items'},
   ],
 };
@@ -105,8 +112,8 @@ const MediaDeleteRequest$json = {
 };
 
 /// Descriptor for `MediaDeleteRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List mediaDeleteRequestDescriptor = $convert.base64Decode(
-    'ChJNZWRpYURlbGV0ZVJlcXVlc3Q=');
+final $typed_data.Uint8List mediaDeleteRequestDescriptor =
+    $convert.base64Decode('ChJNZWRpYURlbGV0ZVJlcXVlc3Q=');
 
 @$core.Deprecated('Use mediaDeleteResponseDescriptor instead')
 const MediaDeleteResponse$json = {
@@ -163,14 +170,21 @@ const MagnetCreateRequest$json = {
 };
 
 /// Descriptor for `MagnetCreateRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List magnetCreateRequestDescriptor = $convert.base64Decode(
-    'ChNNYWduZXRDcmVhdGVSZXF1ZXN0EhAKA3VyaRgBIAEoCVIDdXJp');
+final $typed_data.Uint8List magnetCreateRequestDescriptor = $convert
+    .base64Decode('ChNNYWduZXRDcmVhdGVSZXF1ZXN0EhAKA3VyaRgBIAEoCVIDdXJp');
 
 @$core.Deprecated('Use magnetCreateResponseDescriptor instead')
 const MagnetCreateResponse$json = {
   '1': 'MagnetCreateResponse',
   '2': [
-    {'1': 'download', '3': 1, '4': 1, '5': 11, '6': '.media.Download', '10': 'download'},
+    {
+      '1': 'download',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.media.Download',
+      '10': 'download'
+    },
   ],
 };
 
@@ -206,8 +220,22 @@ final $typed_data.Uint8List downloadSearchRequestDescriptor = $convert.base64Dec
 const DownloadSearchResponse$json = {
   '1': 'DownloadSearchResponse',
   '2': [
-    {'1': 'next', '3': 1, '4': 1, '5': 11, '6': '.media.DownloadSearchRequest', '10': 'next'},
-    {'1': 'items', '3': 2, '4': 3, '5': 11, '6': '.media.Download', '10': 'items'},
+    {
+      '1': 'next',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.media.DownloadSearchRequest',
+      '10': 'next'
+    },
+    {
+      '1': 'items',
+      '3': 2,
+      '4': 3,
+      '5': 11,
+      '6': '.media.Download',
+      '10': 'items'
+    },
   ],
 };
 
@@ -223,21 +251,29 @@ const DownloadMetadataRequest$json = {
 };
 
 /// Descriptor for `DownloadMetadataRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List downloadMetadataRequestDescriptor = $convert.base64Decode(
-    'ChdEb3dubG9hZE1ldGFkYXRhUmVxdWVzdA==');
+final $typed_data.Uint8List downloadMetadataRequestDescriptor =
+    $convert.base64Decode('ChdEb3dubG9hZE1ldGFkYXRhUmVxdWVzdA==');
 
 @$core.Deprecated('Use downloadMetadataResponseDescriptor instead')
 const DownloadMetadataResponse$json = {
   '1': 'DownloadMetadataResponse',
   '2': [
-    {'1': 'download', '3': 1, '4': 1, '5': 11, '6': '.media.Download', '10': 'download'},
+    {
+      '1': 'download',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.media.Download',
+      '10': 'download'
+    },
   ],
 };
 
 /// Descriptor for `DownloadMetadataResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List downloadMetadataResponseDescriptor = $convert.base64Decode(
-    'ChhEb3dubG9hZE1ldGFkYXRhUmVzcG9uc2USKwoIZG93bmxvYWQYASABKAsyDy5tZWRpYS5Eb3'
-    'dubG9hZFIIZG93bmxvYWQ=');
+final $typed_data.Uint8List downloadMetadataResponseDescriptor =
+    $convert.base64Decode(
+        'ChhEb3dubG9hZE1ldGFkYXRhUmVzcG9uc2USKwoIZG93bmxvYWQYASABKAsyDy5tZWRpYS5Eb3'
+        'dubG9hZFIIZG93bmxvYWQ=');
 
 @$core.Deprecated('Use downloadBeginRequestDescriptor instead')
 const DownloadBeginRequest$json = {
@@ -245,14 +281,21 @@ const DownloadBeginRequest$json = {
 };
 
 /// Descriptor for `DownloadBeginRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List downloadBeginRequestDescriptor = $convert.base64Decode(
-    'ChREb3dubG9hZEJlZ2luUmVxdWVzdA==');
+final $typed_data.Uint8List downloadBeginRequestDescriptor =
+    $convert.base64Decode('ChREb3dubG9hZEJlZ2luUmVxdWVzdA==');
 
 @$core.Deprecated('Use downloadBeginResponseDescriptor instead')
 const DownloadBeginResponse$json = {
   '1': 'DownloadBeginResponse',
   '2': [
-    {'1': 'download', '3': 1, '4': 1, '5': 11, '6': '.media.Download', '10': 'download'},
+    {
+      '1': 'download',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.media.Download',
+      '10': 'download'
+    },
   ],
 };
 
@@ -267,14 +310,21 @@ const DownloadPauseRequest$json = {
 };
 
 /// Descriptor for `DownloadPauseRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List downloadPauseRequestDescriptor = $convert.base64Decode(
-    'ChREb3dubG9hZFBhdXNlUmVxdWVzdA==');
+final $typed_data.Uint8List downloadPauseRequestDescriptor =
+    $convert.base64Decode('ChREb3dubG9hZFBhdXNlUmVxdWVzdA==');
 
 @$core.Deprecated('Use downloadPauseResponseDescriptor instead')
 const DownloadPauseResponse$json = {
   '1': 'DownloadPauseResponse',
   '2': [
-    {'1': 'download', '3': 1, '4': 1, '5': 11, '6': '.media.Download', '10': 'download'},
+    {
+      '1': 'download',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.media.Download',
+      '10': 'download'
+    },
   ],
 };
 
@@ -282,4 +332,3 @@ const DownloadPauseResponse$json = {
 final $typed_data.Uint8List downloadPauseResponseDescriptor = $convert.base64Decode(
     'ChVEb3dubG9hZFBhdXNlUmVzcG9uc2USKwoIZG93bmxvYWQYASABKAsyDy5tZWRpYS5Eb3dubG'
     '9hZFIIZG93bmxvYWQ=');
-

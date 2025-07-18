@@ -50,10 +50,17 @@ class Feed extends $pb.GeneratedMessage {
 
   Feed._();
 
-  factory Feed.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
-  factory Feed.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
+  factory Feed.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory Feed.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'Feed', package: const $pb.PackageName(_omitMessageNames ? '' : 'rss'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'Feed',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'rss'),
+      createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..aOS(2, _omitFieldNames ? '' : 'created_at')
     ..aOS(3, _omitFieldNames ? '' : 'updated_at')
@@ -64,15 +71,17 @@ class Feed extends $pb.GeneratedMessage {
     ..aOB(8, _omitFieldNames ? '' : 'autoarchive')
     ..aOB(9, _omitFieldNames ? '' : 'contributing')
     ..aOS(10, _omitFieldNames ? '' : 'disabled_at')
-    ..a<$fixnum.Int64>(11, _omitFieldNames ? '' : 'ttl_minimum', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(
+        11, _omitFieldNames ? '' : 'ttl_minimum', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
     ..aOS(12, _omitFieldNames ? '' : 'encryption_seed')
-    ..hasRequiredFields = false
-  ;
+    ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   Feed clone() => Feed()..mergeFromMessage(this);
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  Feed copyWith(void Function(Feed) updates) => super.copyWith((message) => updates(message as Feed)) as Feed;
+  Feed copyWith(void Function(Feed) updates) =>
+      super.copyWith((message) => updates(message as Feed)) as Feed;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -83,7 +92,8 @@ class Feed extends $pb.GeneratedMessage {
   Feed createEmptyInstance() => create();
   static $pb.PbList<Feed> createRepeated() => $pb.PbList<Feed>();
   @$core.pragma('dart2js:noInline')
-  static Feed getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Feed>(create);
+  static Feed getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Feed>(create);
   static Feed? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -210,20 +220,31 @@ class FeedSearchRequest extends $pb.GeneratedMessage {
 
   FeedSearchRequest._();
 
-  factory FeedSearchRequest.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
-  factory FeedSearchRequest.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
+  factory FeedSearchRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory FeedSearchRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'FeedSearchRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'rss'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'FeedSearchRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'rss'),
+      createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'query')
-    ..a<$fixnum.Int64>(900, _omitFieldNames ? '' : 'offset', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
-    ..a<$fixnum.Int64>(901, _omitFieldNames ? '' : 'limit', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
-    ..hasRequiredFields = false
-  ;
+    ..a<$fixnum.Int64>(
+        900, _omitFieldNames ? '' : 'offset', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(901, _omitFieldNames ? '' : 'limit', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   FeedSearchRequest clone() => FeedSearchRequest()..mergeFromMessage(this);
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  FeedSearchRequest copyWith(void Function(FeedSearchRequest) updates) => super.copyWith((message) => updates(message as FeedSearchRequest)) as FeedSearchRequest;
+  FeedSearchRequest copyWith(void Function(FeedSearchRequest) updates) =>
+      super.copyWith((message) => updates(message as FeedSearchRequest))
+          as FeedSearchRequest;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -232,9 +253,11 @@ class FeedSearchRequest extends $pb.GeneratedMessage {
   static FeedSearchRequest create() => FeedSearchRequest._();
   @$core.override
   FeedSearchRequest createEmptyInstance() => create();
-  static $pb.PbList<FeedSearchRequest> createRepeated() => $pb.PbList<FeedSearchRequest>();
+  static $pb.PbList<FeedSearchRequest> createRepeated() =>
+      $pb.PbList<FeedSearchRequest>();
   @$core.pragma('dart2js:noInline')
-  static FeedSearchRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<FeedSearchRequest>(create);
+  static FeedSearchRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<FeedSearchRequest>(create);
   static FeedSearchRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -278,19 +301,29 @@ class FeedSearchResponse extends $pb.GeneratedMessage {
 
   FeedSearchResponse._();
 
-  factory FeedSearchResponse.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
-  factory FeedSearchResponse.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
+  factory FeedSearchResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory FeedSearchResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'FeedSearchResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'rss'), createEmptyInstance: create)
-    ..aOM<FeedSearchRequest>(1, _omitFieldNames ? '' : 'next', subBuilder: FeedSearchRequest.create)
-    ..pc<Feed>(2, _omitFieldNames ? '' : 'items', $pb.PbFieldType.PM, subBuilder: Feed.create)
-    ..hasRequiredFields = false
-  ;
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'FeedSearchResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'rss'),
+      createEmptyInstance: create)
+    ..aOM<FeedSearchRequest>(1, _omitFieldNames ? '' : 'next',
+        subBuilder: FeedSearchRequest.create)
+    ..pc<Feed>(2, _omitFieldNames ? '' : 'items', $pb.PbFieldType.PM,
+        subBuilder: Feed.create)
+    ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   FeedSearchResponse clone() => FeedSearchResponse()..mergeFromMessage(this);
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  FeedSearchResponse copyWith(void Function(FeedSearchResponse) updates) => super.copyWith((message) => updates(message as FeedSearchResponse)) as FeedSearchResponse;
+  FeedSearchResponse copyWith(void Function(FeedSearchResponse) updates) =>
+      super.copyWith((message) => updates(message as FeedSearchResponse))
+          as FeedSearchResponse;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -299,9 +332,11 @@ class FeedSearchResponse extends $pb.GeneratedMessage {
   static FeedSearchResponse create() => FeedSearchResponse._();
   @$core.override
   FeedSearchResponse createEmptyInstance() => create();
-  static $pb.PbList<FeedSearchResponse> createRepeated() => $pb.PbList<FeedSearchResponse>();
+  static $pb.PbList<FeedSearchResponse> createRepeated() =>
+      $pb.PbList<FeedSearchResponse>();
   @$core.pragma('dart2js:noInline')
-  static FeedSearchResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<FeedSearchResponse>(create);
+  static FeedSearchResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<FeedSearchResponse>(create);
   static FeedSearchResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -330,18 +365,26 @@ class FeedCreateRequest extends $pb.GeneratedMessage {
 
   FeedCreateRequest._();
 
-  factory FeedCreateRequest.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
-  factory FeedCreateRequest.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
+  factory FeedCreateRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory FeedCreateRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'FeedCreateRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'rss'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'FeedCreateRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'rss'),
+      createEmptyInstance: create)
     ..aOM<Feed>(1, _omitFieldNames ? '' : 'feed', subBuilder: Feed.create)
-    ..hasRequiredFields = false
-  ;
+    ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   FeedCreateRequest clone() => FeedCreateRequest()..mergeFromMessage(this);
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  FeedCreateRequest copyWith(void Function(FeedCreateRequest) updates) => super.copyWith((message) => updates(message as FeedCreateRequest)) as FeedCreateRequest;
+  FeedCreateRequest copyWith(void Function(FeedCreateRequest) updates) =>
+      super.copyWith((message) => updates(message as FeedCreateRequest))
+          as FeedCreateRequest;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -350,9 +393,11 @@ class FeedCreateRequest extends $pb.GeneratedMessage {
   static FeedCreateRequest create() => FeedCreateRequest._();
   @$core.override
   FeedCreateRequest createEmptyInstance() => create();
-  static $pb.PbList<FeedCreateRequest> createRepeated() => $pb.PbList<FeedCreateRequest>();
+  static $pb.PbList<FeedCreateRequest> createRepeated() =>
+      $pb.PbList<FeedCreateRequest>();
   @$core.pragma('dart2js:noInline')
-  static FeedCreateRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<FeedCreateRequest>(create);
+  static FeedCreateRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<FeedCreateRequest>(create);
   static FeedCreateRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -378,18 +423,26 @@ class FeedCreateResponse extends $pb.GeneratedMessage {
 
   FeedCreateResponse._();
 
-  factory FeedCreateResponse.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
-  factory FeedCreateResponse.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
+  factory FeedCreateResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory FeedCreateResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'FeedCreateResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'rss'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'FeedCreateResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'rss'),
+      createEmptyInstance: create)
     ..aOM<Feed>(1, _omitFieldNames ? '' : 'feed', subBuilder: Feed.create)
-    ..hasRequiredFields = false
-  ;
+    ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   FeedCreateResponse clone() => FeedCreateResponse()..mergeFromMessage(this);
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  FeedCreateResponse copyWith(void Function(FeedCreateResponse) updates) => super.copyWith((message) => updates(message as FeedCreateResponse)) as FeedCreateResponse;
+  FeedCreateResponse copyWith(void Function(FeedCreateResponse) updates) =>
+      super.copyWith((message) => updates(message as FeedCreateResponse))
+          as FeedCreateResponse;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -398,9 +451,11 @@ class FeedCreateResponse extends $pb.GeneratedMessage {
   static FeedCreateResponse create() => FeedCreateResponse._();
   @$core.override
   FeedCreateResponse createEmptyInstance() => create();
-  static $pb.PbList<FeedCreateResponse> createRepeated() => $pb.PbList<FeedCreateResponse>();
+  static $pb.PbList<FeedCreateResponse> createRepeated() =>
+      $pb.PbList<FeedCreateResponse>();
   @$core.pragma('dart2js:noInline')
-  static FeedCreateResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<FeedCreateResponse>(create);
+  static FeedCreateResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<FeedCreateResponse>(create);
   static FeedCreateResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -426,18 +481,26 @@ class FeedUpdateRequest extends $pb.GeneratedMessage {
 
   FeedUpdateRequest._();
 
-  factory FeedUpdateRequest.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
-  factory FeedUpdateRequest.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
+  factory FeedUpdateRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory FeedUpdateRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'FeedUpdateRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'rss'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'FeedUpdateRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'rss'),
+      createEmptyInstance: create)
     ..aOM<Feed>(1, _omitFieldNames ? '' : 'feed', subBuilder: Feed.create)
-    ..hasRequiredFields = false
-  ;
+    ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   FeedUpdateRequest clone() => FeedUpdateRequest()..mergeFromMessage(this);
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  FeedUpdateRequest copyWith(void Function(FeedUpdateRequest) updates) => super.copyWith((message) => updates(message as FeedUpdateRequest)) as FeedUpdateRequest;
+  FeedUpdateRequest copyWith(void Function(FeedUpdateRequest) updates) =>
+      super.copyWith((message) => updates(message as FeedUpdateRequest))
+          as FeedUpdateRequest;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -446,9 +509,11 @@ class FeedUpdateRequest extends $pb.GeneratedMessage {
   static FeedUpdateRequest create() => FeedUpdateRequest._();
   @$core.override
   FeedUpdateRequest createEmptyInstance() => create();
-  static $pb.PbList<FeedUpdateRequest> createRepeated() => $pb.PbList<FeedUpdateRequest>();
+  static $pb.PbList<FeedUpdateRequest> createRepeated() =>
+      $pb.PbList<FeedUpdateRequest>();
   @$core.pragma('dart2js:noInline')
-  static FeedUpdateRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<FeedUpdateRequest>(create);
+  static FeedUpdateRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<FeedUpdateRequest>(create);
   static FeedUpdateRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -474,18 +539,26 @@ class FeedUpdateResponse extends $pb.GeneratedMessage {
 
   FeedUpdateResponse._();
 
-  factory FeedUpdateResponse.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
-  factory FeedUpdateResponse.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
+  factory FeedUpdateResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory FeedUpdateResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'FeedUpdateResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'rss'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'FeedUpdateResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'rss'),
+      createEmptyInstance: create)
     ..aOM<Feed>(1, _omitFieldNames ? '' : 'feed', subBuilder: Feed.create)
-    ..hasRequiredFields = false
-  ;
+    ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   FeedUpdateResponse clone() => FeedUpdateResponse()..mergeFromMessage(this);
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  FeedUpdateResponse copyWith(void Function(FeedUpdateResponse) updates) => super.copyWith((message) => updates(message as FeedUpdateResponse)) as FeedUpdateResponse;
+  FeedUpdateResponse copyWith(void Function(FeedUpdateResponse) updates) =>
+      super.copyWith((message) => updates(message as FeedUpdateResponse))
+          as FeedUpdateResponse;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -494,9 +567,11 @@ class FeedUpdateResponse extends $pb.GeneratedMessage {
   static FeedUpdateResponse create() => FeedUpdateResponse._();
   @$core.override
   FeedUpdateResponse createEmptyInstance() => create();
-  static $pb.PbList<FeedUpdateResponse> createRepeated() => $pb.PbList<FeedUpdateResponse>();
+  static $pb.PbList<FeedUpdateResponse> createRepeated() =>
+      $pb.PbList<FeedUpdateResponse>();
   @$core.pragma('dart2js:noInline')
-  static FeedUpdateResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<FeedUpdateResponse>(create);
+  static FeedUpdateResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<FeedUpdateResponse>(create);
   static FeedUpdateResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -516,17 +591,25 @@ class FeedDeleteRequest extends $pb.GeneratedMessage {
 
   FeedDeleteRequest._();
 
-  factory FeedDeleteRequest.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
-  factory FeedDeleteRequest.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
+  factory FeedDeleteRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory FeedDeleteRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'FeedDeleteRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'rss'), createEmptyInstance: create)
-    ..hasRequiredFields = false
-  ;
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'FeedDeleteRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'rss'),
+      createEmptyInstance: create)
+    ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   FeedDeleteRequest clone() => FeedDeleteRequest()..mergeFromMessage(this);
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  FeedDeleteRequest copyWith(void Function(FeedDeleteRequest) updates) => super.copyWith((message) => updates(message as FeedDeleteRequest)) as FeedDeleteRequest;
+  FeedDeleteRequest copyWith(void Function(FeedDeleteRequest) updates) =>
+      super.copyWith((message) => updates(message as FeedDeleteRequest))
+          as FeedDeleteRequest;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -535,9 +618,11 @@ class FeedDeleteRequest extends $pb.GeneratedMessage {
   static FeedDeleteRequest create() => FeedDeleteRequest._();
   @$core.override
   FeedDeleteRequest createEmptyInstance() => create();
-  static $pb.PbList<FeedDeleteRequest> createRepeated() => $pb.PbList<FeedDeleteRequest>();
+  static $pb.PbList<FeedDeleteRequest> createRepeated() =>
+      $pb.PbList<FeedDeleteRequest>();
   @$core.pragma('dart2js:noInline')
-  static FeedDeleteRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<FeedDeleteRequest>(create);
+  static FeedDeleteRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<FeedDeleteRequest>(create);
   static FeedDeleteRequest? _defaultInstance;
 }
 
@@ -552,18 +637,26 @@ class FeedDeleteResponse extends $pb.GeneratedMessage {
 
   FeedDeleteResponse._();
 
-  factory FeedDeleteResponse.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
-  factory FeedDeleteResponse.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
+  factory FeedDeleteResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory FeedDeleteResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'FeedDeleteResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'rss'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'FeedDeleteResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'rss'),
+      createEmptyInstance: create)
     ..aOM<Feed>(1, _omitFieldNames ? '' : 'feed', subBuilder: Feed.create)
-    ..hasRequiredFields = false
-  ;
+    ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   FeedDeleteResponse clone() => FeedDeleteResponse()..mergeFromMessage(this);
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  FeedDeleteResponse copyWith(void Function(FeedDeleteResponse) updates) => super.copyWith((message) => updates(message as FeedDeleteResponse)) as FeedDeleteResponse;
+  FeedDeleteResponse copyWith(void Function(FeedDeleteResponse) updates) =>
+      super.copyWith((message) => updates(message as FeedDeleteResponse))
+          as FeedDeleteResponse;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -572,9 +665,11 @@ class FeedDeleteResponse extends $pb.GeneratedMessage {
   static FeedDeleteResponse create() => FeedDeleteResponse._();
   @$core.override
   FeedDeleteResponse createEmptyInstance() => create();
-  static $pb.PbList<FeedDeleteResponse> createRepeated() => $pb.PbList<FeedDeleteResponse>();
+  static $pb.PbList<FeedDeleteResponse> createRepeated() =>
+      $pb.PbList<FeedDeleteResponse>();
   @$core.pragma('dart2js:noInline')
-  static FeedDeleteResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<FeedDeleteResponse>(create);
+  static FeedDeleteResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<FeedDeleteResponse>(create);
   static FeedDeleteResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -589,6 +684,7 @@ class FeedDeleteResponse extends $pb.GeneratedMessage {
   Feed ensureFeed() => $_ensure(0);
 }
 
-
-const $core.bool _omitFieldNames = $core.bool.fromEnvironment('protobuf.omit_field_names');
-const $core.bool _omitMessageNames = $core.bool.fromEnvironment('protobuf.omit_message_names');
+const $core.bool _omitFieldNames =
+    $core.bool.fromEnvironment('protobuf.omit_field_names');
+const $core.bool _omitMessageNames =
+    $core.bool.fromEnvironment('protobuf.omit_message_names');

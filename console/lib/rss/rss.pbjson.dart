@@ -66,7 +66,14 @@ final $typed_data.Uint8List feedSearchRequestDescriptor = $convert.base64Decode(
 const FeedSearchResponse$json = {
   '1': 'FeedSearchResponse',
   '2': [
-    {'1': 'next', '3': 1, '4': 1, '5': 11, '6': '.rss.FeedSearchRequest', '10': 'next'},
+    {
+      '1': 'next',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.rss.FeedSearchRequest',
+      '10': 'next'
+    },
     {'1': 'items', '3': 2, '4': 3, '5': 11, '6': '.rss.Feed', '10': 'items'},
   ],
 };
@@ -97,8 +104,9 @@ const FeedCreateResponse$json = {
 };
 
 /// Descriptor for `FeedCreateResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List feedCreateResponseDescriptor = $convert.base64Decode(
-    'ChJGZWVkQ3JlYXRlUmVzcG9uc2USHQoEZmVlZBgBIAEoCzIJLnJzcy5GZWVkUgRmZWVk');
+final $typed_data.Uint8List feedCreateResponseDescriptor =
+    $convert.base64Decode(
+        'ChJGZWVkQ3JlYXRlUmVzcG9uc2USHQoEZmVlZBgBIAEoCzIJLnJzcy5GZWVkUgRmZWVk');
 
 @$core.Deprecated('Use feedUpdateRequestDescriptor instead')
 const FeedUpdateRequest$json = {
@@ -121,8 +129,9 @@ const FeedUpdateResponse$json = {
 };
 
 /// Descriptor for `FeedUpdateResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List feedUpdateResponseDescriptor = $convert.base64Decode(
-    'ChJGZWVkVXBkYXRlUmVzcG9uc2USHQoEZmVlZBgBIAEoCzIJLnJzcy5GZWVkUgRmZWVk');
+final $typed_data.Uint8List feedUpdateResponseDescriptor =
+    $convert.base64Decode(
+        'ChJGZWVkVXBkYXRlUmVzcG9uc2USHQoEZmVlZBgBIAEoCzIJLnJzcy5GZWVkUgRmZWVk');
 
 @$core.Deprecated('Use feedDeleteRequestDescriptor instead')
 const FeedDeleteRequest$json = {
@@ -130,8 +139,8 @@ const FeedDeleteRequest$json = {
 };
 
 /// Descriptor for `FeedDeleteRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List feedDeleteRequestDescriptor = $convert.base64Decode(
-    'ChFGZWVkRGVsZXRlUmVxdWVzdA==');
+final $typed_data.Uint8List feedDeleteRequestDescriptor =
+    $convert.base64Decode('ChFGZWVkRGVsZXRlUmVxdWVzdA==');
 
 @$core.Deprecated('Use feedDeleteResponseDescriptor instead')
 const FeedDeleteResponse$json = {
@@ -142,6 +151,6 @@ const FeedDeleteResponse$json = {
 };
 
 /// Descriptor for `FeedDeleteResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List feedDeleteResponseDescriptor = $convert.base64Decode(
-    'ChJGZWVkRGVsZXRlUmVzcG9uc2USHQoEZmVlZBgBIAEoCzIJLnJzcy5GZWVkUgRmZWVk');
-
+final $typed_data.Uint8List feedDeleteResponseDescriptor =
+    $convert.base64Decode(
+        'ChJGZWVkRGVsZXRlUmVzcG9uc2USHQoEZmVlZBgBIAEoCzIJLnJzcy5GZWVkUgRmZWVk');

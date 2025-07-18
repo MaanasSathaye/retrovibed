@@ -58,7 +58,14 @@ final $typed_data.Uint8List knownSearchRequestDescriptor = $convert.base64Decode
 const KnownSearchResponse$json = {
   '1': 'KnownSearchResponse',
   '2': [
-    {'1': 'next', '3': 1, '4': 1, '5': 11, '6': '.media.KnownSearchRequest', '10': 'next'},
+    {
+      '1': 'next',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.media.KnownSearchRequest',
+      '10': 'next'
+    },
     {'1': 'items', '3': 2, '4': 3, '5': 11, '6': '.media.Known', '10': 'items'},
   ],
 };
@@ -77,8 +84,8 @@ const KnownMatchRequest$json = {
 };
 
 /// Descriptor for `KnownMatchRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List knownMatchRequestDescriptor = $convert.base64Decode(
-    'ChFLbm93bk1hdGNoUmVxdWVzdBIUCgVxdWVyeRgBIAEoCVIFcXVlcnk=');
+final $typed_data.Uint8List knownMatchRequestDescriptor = $convert
+    .base64Decode('ChFLbm93bk1hdGNoUmVxdWVzdBIUCgVxdWVyeRgBIAEoCVIFcXVlcnk=');
 
 @$core.Deprecated('Use knownLookupRequestDescriptor instead')
 const KnownLookupRequest$json = {
@@ -86,8 +93,8 @@ const KnownLookupRequest$json = {
 };
 
 /// Descriptor for `KnownLookupRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List knownLookupRequestDescriptor = $convert.base64Decode(
-    'ChJLbm93bkxvb2t1cFJlcXVlc3Q=');
+final $typed_data.Uint8List knownLookupRequestDescriptor =
+    $convert.base64Decode('ChJLbm93bkxvb2t1cFJlcXVlc3Q=');
 
 @$core.Deprecated('Use knownLookupResponseDescriptor instead')
 const KnownLookupResponse$json = {
@@ -101,4 +108,3 @@ const KnownLookupResponse$json = {
 final $typed_data.Uint8List knownLookupResponseDescriptor = $convert.base64Decode(
     'ChNLbm93bkxvb2t1cFJlc3BvbnNlEiIKBWtub3duGAEgASgLMgwubWVkaWEuS25vd25SBWtub3'
     'du');
-

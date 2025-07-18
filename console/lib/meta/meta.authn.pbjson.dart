@@ -41,8 +41,9 @@ const LoginOptionsResponse$json = {
 };
 
 /// Descriptor for `LoginOptionsResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List loginOptionsResponseDescriptor = $convert.base64Decode(
-    'ChRMb2dpbk9wdGlvbnNSZXNwb25zZRIUCgV0b2tlbhgBIAEoCVIFdG9rZW4=');
+final $typed_data.Uint8List loginOptionsResponseDescriptor =
+    $convert.base64Decode(
+        'ChRMb2dpbk9wdGlvbnNSZXNwb25zZRIUCgV0b2tlbhgBIAEoCVIFdG9rZW4=');
 
 @$core.Deprecated('Use identityDescriptor instead')
 const Identity$json = {
@@ -67,8 +68,22 @@ const Authn$json = {
   '1': 'Authn',
   '2': [
     {'1': 'token', '3': 1, '4': 1, '5': 9, '10': 'token'},
-    {'1': 'profile', '3': 2, '4': 1, '5': 11, '6': '.meta.Profile', '10': 'profile'},
-    {'1': 'account', '3': 3, '4': 1, '5': 11, '6': '.meta.Account', '10': 'account'},
+    {
+      '1': 'profile',
+      '3': 2,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.Profile',
+      '10': 'profile'
+    },
+    {
+      '1': 'account',
+      '3': 3,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.Account',
+      '10': 'account'
+    },
   ],
 };
 
@@ -82,9 +97,30 @@ const Authed$json = {
   '1': 'Authed',
   '2': [
     {'1': 'signup_token', '3': 1, '4': 1, '5': 9, '10': 'signup_token'},
-    {'1': 'identity', '3': 3, '4': 1, '5': 11, '6': '.meta.Identity', '10': 'identity'},
-    {'1': 'profiles', '3': 4, '4': 3, '5': 11, '6': '.meta.Authn', '10': 'profiles'},
-    {'1': 'options', '3': 5, '4': 1, '5': 11, '6': '.meta.LoginOptions', '10': 'opts'},
+    {
+      '1': 'identity',
+      '3': 3,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.Identity',
+      '10': 'identity'
+    },
+    {
+      '1': 'profiles',
+      '3': 4,
+      '4': 3,
+      '5': 11,
+      '6': '.meta.Authn',
+      '10': 'profiles'
+    },
+    {
+      '1': 'options',
+      '3': 5,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.LoginOptions',
+      '10': 'opts'
+    },
   ],
 };
 
@@ -100,8 +136,22 @@ const Session$json = {
   '1': 'Session',
   '2': [
     {'1': 'token', '3': 1, '4': 1, '5': 9, '10': 'token'},
-    {'1': 'profile', '3': 2, '4': 1, '5': 11, '6': '.meta.Profile', '10': 'profile'},
-    {'1': 'account', '3': 3, '4': 1, '5': 11, '6': '.meta.Account', '10': 'account'},
+    {
+      '1': 'profile',
+      '3': 2,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.Profile',
+      '10': 'profile'
+    },
+    {
+      '1': 'account',
+      '3': 3,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.Account',
+      '10': 'account'
+    },
     {'1': 'expires', '3': 4, '4': 1, '5': 3, '10': 'expires'},
     {'1': 'redirect', '3': 5, '4': 1, '5': 9, '10': 'redirect'},
   ],
@@ -113,4 +163,3 @@ final $typed_data.Uint8List sessionDescriptor = $convert.base64Decode(
     '5Qcm9maWxlUgdwcm9maWxlEicKB2FjY291bnQYAyABKAsyDS5tZXRhLkFjY291bnRSB2FjY291'
     'bnQSGAoHZXhwaXJlcxgEIAEoA1IHZXhwaXJlcxIaCghyZWRpcmVjdBgFIAEoCVIIcmVkaXJlY3'
     'Q=');
-

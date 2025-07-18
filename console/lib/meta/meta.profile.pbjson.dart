@@ -20,12 +20,30 @@ const Profile$json = {
   '2': [
     {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
     {'1': 'account_id', '3': 2, '4': 1, '5': 9, '10': 'account_id'},
-    {'1': 'session_watermark', '3': 3, '4': 1, '5': 9, '10': 'session_watermark'},
+    {
+      '1': 'session_watermark',
+      '3': 3,
+      '4': 1,
+      '5': 9,
+      '10': 'session_watermark'
+    },
     {'1': 'created_at', '3': 4, '4': 1, '5': 9, '10': 'created_at'},
     {'1': 'updated_at', '3': 5, '4': 1, '5': 9, '10': 'updated_at'},
     {'1': 'disabled_at', '3': 6, '4': 1, '5': 9, '10': 'disabled_at'},
-    {'1': 'disabled_manually_at', '3': 7, '4': 1, '5': 9, '10': 'disabled_manually_at'},
-    {'1': 'disabled_pending_approval_at', '3': 8, '4': 1, '5': 9, '10': 'disabled_pending_approval_at'},
+    {
+      '1': 'disabled_manually_at',
+      '3': 7,
+      '4': 1,
+      '5': 9,
+      '10': 'disabled_manually_at'
+    },
+    {
+      '1': 'disabled_pending_approval_at',
+      '3': 8,
+      '4': 1,
+      '5': 9,
+      '10': 'disabled_pending_approval_at'
+    },
     {'1': 'display', '3': 9, '4': 1, '5': 9, '10': 'display'},
     {'1': 'email', '3': 10, '4': 1, '5': 9, '10': 'email'},
   ],
@@ -62,8 +80,22 @@ final $typed_data.Uint8List profileSearchRequestDescriptor = $convert.base64Deco
 const ProfileSearchResponse$json = {
   '1': 'ProfileSearchResponse',
   '2': [
-    {'1': 'next', '3': 1, '4': 1, '5': 11, '6': '.meta.ProfileSearchRequest', '10': 'next'},
-    {'1': 'items', '3': 2, '4': 3, '5': 11, '6': '.meta.Profile', '10': 'items'},
+    {
+      '1': 'next',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.ProfileSearchRequest',
+      '10': 'next'
+    },
+    {
+      '1': 'items',
+      '3': 2,
+      '4': 3,
+      '5': 11,
+      '6': '.meta.Profile',
+      '10': 'items'
+    },
   ],
 };
 
@@ -76,7 +108,14 @@ final $typed_data.Uint8List profileSearchResponseDescriptor = $convert.base64Dec
 const ProfileCreateRequest$json = {
   '1': 'ProfileCreateRequest',
   '2': [
-    {'1': 'profile', '3': 1, '4': 1, '5': 11, '6': '.meta.Profile', '10': 'profile'},
+    {
+      '1': 'profile',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.Profile',
+      '10': 'profile'
+    },
   ],
 };
 
@@ -89,7 +128,14 @@ final $typed_data.Uint8List profileCreateRequestDescriptor = $convert.base64Deco
 const ProfileCreateResponse$json = {
   '1': 'ProfileCreateResponse',
   '2': [
-    {'1': 'profile', '3': 1, '4': 1, '5': 11, '6': '.meta.Profile', '10': 'profile'},
+    {
+      '1': 'profile',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.Profile',
+      '10': 'profile'
+    },
   ],
 };
 
@@ -104,14 +150,21 @@ const ProfileLookupRequest$json = {
 };
 
 /// Descriptor for `ProfileLookupRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List profileLookupRequestDescriptor = $convert.base64Decode(
-    'ChRQcm9maWxlTG9va3VwUmVxdWVzdA==');
+final $typed_data.Uint8List profileLookupRequestDescriptor =
+    $convert.base64Decode('ChRQcm9maWxlTG9va3VwUmVxdWVzdA==');
 
 @$core.Deprecated('Use profileLookupResponseDescriptor instead')
 const ProfileLookupResponse$json = {
   '1': 'ProfileLookupResponse',
   '2': [
-    {'1': 'profile', '3': 1, '4': 1, '5': 11, '6': '.meta.Profile', '10': 'profile'},
+    {
+      '1': 'profile',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.Profile',
+      '10': 'profile'
+    },
   ],
 };
 
@@ -124,7 +177,14 @@ final $typed_data.Uint8List profileLookupResponseDescriptor = $convert.base64Dec
 const ProfileUpdateRequest$json = {
   '1': 'ProfileUpdateRequest',
   '2': [
-    {'1': 'profile', '3': 1, '4': 1, '5': 11, '6': '.meta.Profile', '10': 'profile'},
+    {
+      '1': 'profile',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.Profile',
+      '10': 'profile'
+    },
   ],
 };
 
@@ -137,7 +197,14 @@ final $typed_data.Uint8List profileUpdateRequestDescriptor = $convert.base64Deco
 const ProfileUpdateResponse$json = {
   '1': 'ProfileUpdateResponse',
   '2': [
-    {'1': 'profile', '3': 1, '4': 1, '5': 11, '6': '.meta.Profile', '10': 'profile'},
+    {
+      '1': 'profile',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.Profile',
+      '10': 'profile'
+    },
   ],
 };
 
@@ -150,7 +217,14 @@ final $typed_data.Uint8List profileUpdateResponseDescriptor = $convert.base64Dec
 const ProfileDisableRequest$json = {
   '1': 'ProfileDisableRequest',
   '2': [
-    {'1': 'profile', '3': 1, '4': 1, '5': 11, '6': '.meta.Profile', '10': 'profile'},
+    {
+      '1': 'profile',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.Profile',
+      '10': 'profile'
+    },
   ],
 };
 
@@ -163,12 +237,19 @@ final $typed_data.Uint8List profileDisableRequestDescriptor = $convert.base64Dec
 const ProfileDisableResponse$json = {
   '1': 'ProfileDisableResponse',
   '2': [
-    {'1': 'profile', '3': 1, '4': 1, '5': 11, '6': '.meta.Profile', '10': 'profile'},
+    {
+      '1': 'profile',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.Profile',
+      '10': 'profile'
+    },
   ],
 };
 
 /// Descriptor for `ProfileDisableResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List profileDisableResponseDescriptor = $convert.base64Decode(
-    'ChZQcm9maWxlRGlzYWJsZVJlc3BvbnNlEicKB3Byb2ZpbGUYASABKAsyDS5tZXRhLlByb2ZpbG'
-    'VSB3Byb2ZpbGU=');
-
+final $typed_data.Uint8List profileDisableResponseDescriptor =
+    $convert.base64Decode(
+        'ChZQcm9maWxlRGlzYWJsZVJlc3BvbnNlEicKB3Byb2ZpbGUYASABKAsyDS5tZXRhLlByb2ZpbG'
+        'VSB3Byb2ZpbGU=');

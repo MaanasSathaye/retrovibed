@@ -38,23 +38,30 @@ class Known extends $pb.GeneratedMessage {
 
   Known._();
 
-  factory Known.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
-  factory Known.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
+  factory Known.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory Known.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'Known', package: const $pb.PackageName(_omitMessageNames ? '' : 'media'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'Known',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
+      createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..a<$core.double>(2, _omitFieldNames ? '' : 'rating', $pb.PbFieldType.OF)
     ..aOB(3, _omitFieldNames ? '' : 'adult')
     ..aOS(4, _omitFieldNames ? '' : 'description')
     ..aOS(5, _omitFieldNames ? '' : 'summary')
     ..aOS(6, _omitFieldNames ? '' : 'image')
-    ..hasRequiredFields = false
-  ;
+    ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   Known clone() => Known()..mergeFromMessage(this);
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  Known copyWith(void Function(Known) updates) => super.copyWith((message) => updates(message as Known)) as Known;
+  Known copyWith(void Function(Known) updates) =>
+      super.copyWith((message) => updates(message as Known)) as Known;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -65,7 +72,8 @@ class Known extends $pb.GeneratedMessage {
   Known createEmptyInstance() => create();
   static $pb.PbList<Known> createRepeated() => $pb.PbList<Known>();
   @$core.pragma('dart2js:noInline')
-  static Known getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Known>(create);
+  static Known getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Known>(create);
   static Known? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -140,21 +148,32 @@ class KnownSearchRequest extends $pb.GeneratedMessage {
 
   KnownSearchRequest._();
 
-  factory KnownSearchRequest.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
-  factory KnownSearchRequest.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
+  factory KnownSearchRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory KnownSearchRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'KnownSearchRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'media'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'KnownSearchRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
+      createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'query')
     ..aOB(2, _omitFieldNames ? '' : 'adult')
-    ..a<$fixnum.Int64>(900, _omitFieldNames ? '' : 'offset', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
-    ..a<$fixnum.Int64>(901, _omitFieldNames ? '' : 'limit', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
-    ..hasRequiredFields = false
-  ;
+    ..a<$fixnum.Int64>(
+        900, _omitFieldNames ? '' : 'offset', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(901, _omitFieldNames ? '' : 'limit', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   KnownSearchRequest clone() => KnownSearchRequest()..mergeFromMessage(this);
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  KnownSearchRequest copyWith(void Function(KnownSearchRequest) updates) => super.copyWith((message) => updates(message as KnownSearchRequest)) as KnownSearchRequest;
+  KnownSearchRequest copyWith(void Function(KnownSearchRequest) updates) =>
+      super.copyWith((message) => updates(message as KnownSearchRequest))
+          as KnownSearchRequest;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -163,9 +182,11 @@ class KnownSearchRequest extends $pb.GeneratedMessage {
   static KnownSearchRequest create() => KnownSearchRequest._();
   @$core.override
   KnownSearchRequest createEmptyInstance() => create();
-  static $pb.PbList<KnownSearchRequest> createRepeated() => $pb.PbList<KnownSearchRequest>();
+  static $pb.PbList<KnownSearchRequest> createRepeated() =>
+      $pb.PbList<KnownSearchRequest>();
   @$core.pragma('dart2js:noInline')
-  static KnownSearchRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<KnownSearchRequest>(create);
+  static KnownSearchRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<KnownSearchRequest>(create);
   static KnownSearchRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -218,19 +239,29 @@ class KnownSearchResponse extends $pb.GeneratedMessage {
 
   KnownSearchResponse._();
 
-  factory KnownSearchResponse.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
-  factory KnownSearchResponse.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
+  factory KnownSearchResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory KnownSearchResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'KnownSearchResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'media'), createEmptyInstance: create)
-    ..aOM<KnownSearchRequest>(1, _omitFieldNames ? '' : 'next', subBuilder: KnownSearchRequest.create)
-    ..pc<Known>(2, _omitFieldNames ? '' : 'items', $pb.PbFieldType.PM, subBuilder: Known.create)
-    ..hasRequiredFields = false
-  ;
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'KnownSearchResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
+      createEmptyInstance: create)
+    ..aOM<KnownSearchRequest>(1, _omitFieldNames ? '' : 'next',
+        subBuilder: KnownSearchRequest.create)
+    ..pc<Known>(2, _omitFieldNames ? '' : 'items', $pb.PbFieldType.PM,
+        subBuilder: Known.create)
+    ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   KnownSearchResponse clone() => KnownSearchResponse()..mergeFromMessage(this);
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  KnownSearchResponse copyWith(void Function(KnownSearchResponse) updates) => super.copyWith((message) => updates(message as KnownSearchResponse)) as KnownSearchResponse;
+  KnownSearchResponse copyWith(void Function(KnownSearchResponse) updates) =>
+      super.copyWith((message) => updates(message as KnownSearchResponse))
+          as KnownSearchResponse;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -239,9 +270,11 @@ class KnownSearchResponse extends $pb.GeneratedMessage {
   static KnownSearchResponse create() => KnownSearchResponse._();
   @$core.override
   KnownSearchResponse createEmptyInstance() => create();
-  static $pb.PbList<KnownSearchResponse> createRepeated() => $pb.PbList<KnownSearchResponse>();
+  static $pb.PbList<KnownSearchResponse> createRepeated() =>
+      $pb.PbList<KnownSearchResponse>();
   @$core.pragma('dart2js:noInline')
-  static KnownSearchResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<KnownSearchResponse>(create);
+  static KnownSearchResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<KnownSearchResponse>(create);
   static KnownSearchResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -270,18 +303,26 @@ class KnownMatchRequest extends $pb.GeneratedMessage {
 
   KnownMatchRequest._();
 
-  factory KnownMatchRequest.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
-  factory KnownMatchRequest.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
+  factory KnownMatchRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory KnownMatchRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'KnownMatchRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'media'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'KnownMatchRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
+      createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'query')
-    ..hasRequiredFields = false
-  ;
+    ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   KnownMatchRequest clone() => KnownMatchRequest()..mergeFromMessage(this);
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  KnownMatchRequest copyWith(void Function(KnownMatchRequest) updates) => super.copyWith((message) => updates(message as KnownMatchRequest)) as KnownMatchRequest;
+  KnownMatchRequest copyWith(void Function(KnownMatchRequest) updates) =>
+      super.copyWith((message) => updates(message as KnownMatchRequest))
+          as KnownMatchRequest;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -290,9 +331,11 @@ class KnownMatchRequest extends $pb.GeneratedMessage {
   static KnownMatchRequest create() => KnownMatchRequest._();
   @$core.override
   KnownMatchRequest createEmptyInstance() => create();
-  static $pb.PbList<KnownMatchRequest> createRepeated() => $pb.PbList<KnownMatchRequest>();
+  static $pb.PbList<KnownMatchRequest> createRepeated() =>
+      $pb.PbList<KnownMatchRequest>();
   @$core.pragma('dart2js:noInline')
-  static KnownMatchRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<KnownMatchRequest>(create);
+  static KnownMatchRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<KnownMatchRequest>(create);
   static KnownMatchRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -310,17 +353,25 @@ class KnownLookupRequest extends $pb.GeneratedMessage {
 
   KnownLookupRequest._();
 
-  factory KnownLookupRequest.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
-  factory KnownLookupRequest.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
+  factory KnownLookupRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory KnownLookupRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'KnownLookupRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'media'), createEmptyInstance: create)
-    ..hasRequiredFields = false
-  ;
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'KnownLookupRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
+      createEmptyInstance: create)
+    ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   KnownLookupRequest clone() => KnownLookupRequest()..mergeFromMessage(this);
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  KnownLookupRequest copyWith(void Function(KnownLookupRequest) updates) => super.copyWith((message) => updates(message as KnownLookupRequest)) as KnownLookupRequest;
+  KnownLookupRequest copyWith(void Function(KnownLookupRequest) updates) =>
+      super.copyWith((message) => updates(message as KnownLookupRequest))
+          as KnownLookupRequest;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -329,9 +380,11 @@ class KnownLookupRequest extends $pb.GeneratedMessage {
   static KnownLookupRequest create() => KnownLookupRequest._();
   @$core.override
   KnownLookupRequest createEmptyInstance() => create();
-  static $pb.PbList<KnownLookupRequest> createRepeated() => $pb.PbList<KnownLookupRequest>();
+  static $pb.PbList<KnownLookupRequest> createRepeated() =>
+      $pb.PbList<KnownLookupRequest>();
   @$core.pragma('dart2js:noInline')
-  static KnownLookupRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<KnownLookupRequest>(create);
+  static KnownLookupRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<KnownLookupRequest>(create);
   static KnownLookupRequest? _defaultInstance;
 }
 
@@ -346,18 +399,26 @@ class KnownLookupResponse extends $pb.GeneratedMessage {
 
   KnownLookupResponse._();
 
-  factory KnownLookupResponse.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
-  factory KnownLookupResponse.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
+  factory KnownLookupResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory KnownLookupResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'KnownLookupResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'media'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'KnownLookupResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
+      createEmptyInstance: create)
     ..aOM<Known>(1, _omitFieldNames ? '' : 'known', subBuilder: Known.create)
-    ..hasRequiredFields = false
-  ;
+    ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   KnownLookupResponse clone() => KnownLookupResponse()..mergeFromMessage(this);
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  KnownLookupResponse copyWith(void Function(KnownLookupResponse) updates) => super.copyWith((message) => updates(message as KnownLookupResponse)) as KnownLookupResponse;
+  KnownLookupResponse copyWith(void Function(KnownLookupResponse) updates) =>
+      super.copyWith((message) => updates(message as KnownLookupResponse))
+          as KnownLookupResponse;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -366,9 +427,11 @@ class KnownLookupResponse extends $pb.GeneratedMessage {
   static KnownLookupResponse create() => KnownLookupResponse._();
   @$core.override
   KnownLookupResponse createEmptyInstance() => create();
-  static $pb.PbList<KnownLookupResponse> createRepeated() => $pb.PbList<KnownLookupResponse>();
+  static $pb.PbList<KnownLookupResponse> createRepeated() =>
+      $pb.PbList<KnownLookupResponse>();
   @$core.pragma('dart2js:noInline')
-  static KnownLookupResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<KnownLookupResponse>(create);
+  static KnownLookupResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<KnownLookupResponse>(create);
   static KnownLookupResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -383,6 +446,7 @@ class KnownLookupResponse extends $pb.GeneratedMessage {
   Known ensureKnown() => $_ensure(0);
 }
 
-
-const $core.bool _omitFieldNames = $core.bool.fromEnvironment('protobuf.omit_field_names');
-const $core.bool _omitMessageNames = $core.bool.fromEnvironment('protobuf.omit_message_names');
+const $core.bool _omitFieldNames =
+    $core.bool.fromEnvironment('protobuf.omit_field_names');
+const $core.bool _omitMessageNames =
+    $core.bool.fromEnvironment('protobuf.omit_message_names');

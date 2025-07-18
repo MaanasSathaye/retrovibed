@@ -40,22 +40,30 @@ class LoginOptions extends $pb.GeneratedMessage {
 
   LoginOptions._();
 
-  factory LoginOptions.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
-  factory LoginOptions.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
+  factory LoginOptions.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory LoginOptions.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'LoginOptions', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'LoginOptions',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
+      createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..aOS(2, _omitFieldNames ? '' : 'account_id')
     ..aOS(3, _omitFieldNames ? '' : 'profile_id')
     ..aOS(4, _omitFieldNames ? '' : 'redirect')
     ..aOB(5, _omitFieldNames ? '' : 'autologin')
-    ..hasRequiredFields = false
-  ;
+    ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   LoginOptions clone() => LoginOptions()..mergeFromMessage(this);
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  LoginOptions copyWith(void Function(LoginOptions) updates) => super.copyWith((message) => updates(message as LoginOptions)) as LoginOptions;
+  LoginOptions copyWith(void Function(LoginOptions) updates) =>
+      super.copyWith((message) => updates(message as LoginOptions))
+          as LoginOptions;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -64,9 +72,11 @@ class LoginOptions extends $pb.GeneratedMessage {
   static LoginOptions create() => LoginOptions._();
   @$core.override
   LoginOptions createEmptyInstance() => create();
-  static $pb.PbList<LoginOptions> createRepeated() => $pb.PbList<LoginOptions>();
+  static $pb.PbList<LoginOptions> createRepeated() =>
+      $pb.PbList<LoginOptions>();
   @$core.pragma('dart2js:noInline')
-  static LoginOptions getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<LoginOptions>(create);
+  static LoginOptions getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<LoginOptions>(create);
   static LoginOptions? _defaultInstance;
 
   /// lock in the id of the login options.
@@ -133,18 +143,27 @@ class LoginOptionsResponse extends $pb.GeneratedMessage {
 
   LoginOptionsResponse._();
 
-  factory LoginOptionsResponse.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
-  factory LoginOptionsResponse.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
+  factory LoginOptionsResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory LoginOptionsResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'LoginOptionsResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'LoginOptionsResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
+      createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'token')
-    ..hasRequiredFields = false
-  ;
+    ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  LoginOptionsResponse clone() => LoginOptionsResponse()..mergeFromMessage(this);
+  LoginOptionsResponse clone() =>
+      LoginOptionsResponse()..mergeFromMessage(this);
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  LoginOptionsResponse copyWith(void Function(LoginOptionsResponse) updates) => super.copyWith((message) => updates(message as LoginOptionsResponse)) as LoginOptionsResponse;
+  LoginOptionsResponse copyWith(void Function(LoginOptionsResponse) updates) =>
+      super.copyWith((message) => updates(message as LoginOptionsResponse))
+          as LoginOptionsResponse;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -153,9 +172,11 @@ class LoginOptionsResponse extends $pb.GeneratedMessage {
   static LoginOptionsResponse create() => LoginOptionsResponse._();
   @$core.override
   LoginOptionsResponse createEmptyInstance() => create();
-  static $pb.PbList<LoginOptionsResponse> createRepeated() => $pb.PbList<LoginOptionsResponse>();
+  static $pb.PbList<LoginOptionsResponse> createRepeated() =>
+      $pb.PbList<LoginOptionsResponse>();
   @$core.pragma('dart2js:noInline')
-  static LoginOptionsResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<LoginOptionsResponse>(create);
+  static LoginOptionsResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<LoginOptionsResponse>(create);
   static LoginOptionsResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -187,22 +208,29 @@ class Identity extends $pb.GeneratedMessage {
 
   Identity._();
 
-  factory Identity.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
-  factory Identity.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
+  factory Identity.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory Identity.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'Identity', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'Identity',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
+      createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..aOS(2, _omitFieldNames ? '' : 'display')
     ..aOS(4, _omitFieldNames ? '' : 'email')
     ..aOS(7, _omitFieldNames ? '' : 'uid')
     ..aOS(8, _omitFieldNames ? '' : 'uidraw')
-    ..hasRequiredFields = false
-  ;
+    ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   Identity clone() => Identity()..mergeFromMessage(this);
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  Identity copyWith(void Function(Identity) updates) => super.copyWith((message) => updates(message as Identity)) as Identity;
+  Identity copyWith(void Function(Identity) updates) =>
+      super.copyWith((message) => updates(message as Identity)) as Identity;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -213,7 +241,8 @@ class Identity extends $pb.GeneratedMessage {
   Identity createEmptyInstance() => create();
   static $pb.PbList<Identity> createRepeated() => $pb.PbList<Identity>();
   @$core.pragma('dart2js:noInline')
-  static Identity getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Identity>(create);
+  static Identity getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Identity>(create);
   static Identity? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -277,20 +306,29 @@ class Authn extends $pb.GeneratedMessage {
 
   Authn._();
 
-  factory Authn.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
-  factory Authn.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
+  factory Authn.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory Authn.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'Authn', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'Authn',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
+      createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'token')
-    ..aOM<$0.Profile>(2, _omitFieldNames ? '' : 'profile', subBuilder: $0.Profile.create)
-    ..aOM<$1.Account>(3, _omitFieldNames ? '' : 'account', subBuilder: $1.Account.create)
-    ..hasRequiredFields = false
-  ;
+    ..aOM<$0.Profile>(2, _omitFieldNames ? '' : 'profile',
+        subBuilder: $0.Profile.create)
+    ..aOM<$1.Account>(3, _omitFieldNames ? '' : 'account',
+        subBuilder: $1.Account.create)
+    ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   Authn clone() => Authn()..mergeFromMessage(this);
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  Authn copyWith(void Function(Authn) updates) => super.copyWith((message) => updates(message as Authn)) as Authn;
+  Authn copyWith(void Function(Authn) updates) =>
+      super.copyWith((message) => updates(message as Authn)) as Authn;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -301,7 +339,8 @@ class Authn extends $pb.GeneratedMessage {
   Authn createEmptyInstance() => create();
   static $pb.PbList<Authn> createRepeated() => $pb.PbList<Authn>();
   @$core.pragma('dart2js:noInline')
-  static Authn getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Authn>(create);
+  static Authn getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Authn>(create);
   static Authn? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -353,21 +392,31 @@ class Authed extends $pb.GeneratedMessage {
 
   Authed._();
 
-  factory Authed.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
-  factory Authed.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
+  factory Authed.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory Authed.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'Authed', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'Authed',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
+      createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'signup_token')
-    ..aOM<Identity>(3, _omitFieldNames ? '' : 'identity', subBuilder: Identity.create)
-    ..pc<Authn>(4, _omitFieldNames ? '' : 'profiles', $pb.PbFieldType.PM, subBuilder: Authn.create)
-    ..aOM<LoginOptions>(5, _omitFieldNames ? '' : 'opts', protoName: 'options', subBuilder: LoginOptions.create)
-    ..hasRequiredFields = false
-  ;
+    ..aOM<Identity>(3, _omitFieldNames ? '' : 'identity',
+        subBuilder: Identity.create)
+    ..pc<Authn>(4, _omitFieldNames ? '' : 'profiles', $pb.PbFieldType.PM,
+        subBuilder: Authn.create)
+    ..aOM<LoginOptions>(5, _omitFieldNames ? '' : 'opts',
+        protoName: 'options', subBuilder: LoginOptions.create)
+    ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   Authed clone() => Authed()..mergeFromMessage(this);
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  Authed copyWith(void Function(Authed) updates) => super.copyWith((message) => updates(message as Authed)) as Authed;
+  Authed copyWith(void Function(Authed) updates) =>
+      super.copyWith((message) => updates(message as Authed)) as Authed;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -378,7 +427,8 @@ class Authed extends $pb.GeneratedMessage {
   Authed createEmptyInstance() => create();
   static $pb.PbList<Authed> createRepeated() => $pb.PbList<Authed>();
   @$core.pragma('dart2js:noInline')
-  static Authed getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Authed>(create);
+  static Authed getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Authed>(create);
   static Authed? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -435,22 +485,31 @@ class Session extends $pb.GeneratedMessage {
 
   Session._();
 
-  factory Session.fromBuffer($core.List<$core.int> data, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(data, registry);
-  factory Session.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(json, registry);
+  factory Session.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory Session.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'Session', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'Session',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
+      createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'token')
-    ..aOM<$0.Profile>(2, _omitFieldNames ? '' : 'profile', subBuilder: $0.Profile.create)
-    ..aOM<$1.Account>(3, _omitFieldNames ? '' : 'account', subBuilder: $1.Account.create)
+    ..aOM<$0.Profile>(2, _omitFieldNames ? '' : 'profile',
+        subBuilder: $0.Profile.create)
+    ..aOM<$1.Account>(3, _omitFieldNames ? '' : 'account',
+        subBuilder: $1.Account.create)
     ..aInt64(4, _omitFieldNames ? '' : 'expires')
     ..aOS(5, _omitFieldNames ? '' : 'redirect')
-    ..hasRequiredFields = false
-  ;
+    ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   Session clone() => Session()..mergeFromMessage(this);
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  Session copyWith(void Function(Session) updates) => super.copyWith((message) => updates(message as Session)) as Session;
+  Session copyWith(void Function(Session) updates) =>
+      super.copyWith((message) => updates(message as Session)) as Session;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -461,7 +520,8 @@ class Session extends $pb.GeneratedMessage {
   Session createEmptyInstance() => create();
   static $pb.PbList<Session> createRepeated() => $pb.PbList<Session>();
   @$core.pragma('dart2js:noInline')
-  static Session getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Session>(create);
+  static Session getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Session>(create);
   static Session? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -514,6 +574,7 @@ class Session extends $pb.GeneratedMessage {
   void clearRedirect() => $_clearField(5);
 }
 
-
-const $core.bool _omitFieldNames = $core.bool.fromEnvironment('protobuf.omit_field_names');
-const $core.bool _omitMessageNames = $core.bool.fromEnvironment('protobuf.omit_message_names');
+const $core.bool _omitFieldNames =
+    $core.bool.fromEnvironment('protobuf.omit_field_names');
+const $core.bool _omitMessageNames =
+    $core.bool.fromEnvironment('protobuf.omit_message_names');

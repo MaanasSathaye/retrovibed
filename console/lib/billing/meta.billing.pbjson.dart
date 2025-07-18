@@ -21,7 +21,13 @@ const Billing$json = {
     {'1': 'customer_id', '3': 1, '4': 1, '5': 9, '10': 'customer_id'},
     {'1': 'plan_id', '3': 2, '4': 1, '5': 9, '10': 'plan_id'},
     {'1': 'subscription_id', '3': 3, '4': 1, '5': 9, '10': 'subscription_id'},
-    {'1': 'subscription_ended_at', '3': 4, '4': 1, '5': 9, '10': 'subscription_ended_at'},
+    {
+      '1': 'subscription_ended_at',
+      '3': 4,
+      '4': 1,
+      '5': 9,
+      '10': 'subscription_ended_at'
+    },
   ],
 };
 
@@ -37,14 +43,21 @@ const BillingCreateRequest$json = {
 };
 
 /// Descriptor for `BillingCreateRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List billingCreateRequestDescriptor = $convert.base64Decode(
-    'ChRCaWxsaW5nQ3JlYXRlUmVxdWVzdA==');
+final $typed_data.Uint8List billingCreateRequestDescriptor =
+    $convert.base64Decode('ChRCaWxsaW5nQ3JlYXRlUmVxdWVzdA==');
 
 @$core.Deprecated('Use billingCreateResponseDescriptor instead')
 const BillingCreateResponse$json = {
   '1': 'BillingCreateResponse',
   '2': [
-    {'1': 'billing', '3': 1, '4': 1, '5': 11, '6': '.meta.Billing', '10': 'billing'},
+    {
+      '1': 'billing',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.Billing',
+      '10': 'billing'
+    },
   ],
 };
 
@@ -59,14 +72,21 @@ const BillingLookupRequest$json = {
 };
 
 /// Descriptor for `BillingLookupRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List billingLookupRequestDescriptor = $convert.base64Decode(
-    'ChRCaWxsaW5nTG9va3VwUmVxdWVzdA==');
+final $typed_data.Uint8List billingLookupRequestDescriptor =
+    $convert.base64Decode('ChRCaWxsaW5nTG9va3VwUmVxdWVzdA==');
 
 @$core.Deprecated('Use billingLookupResponseDescriptor instead')
 const BillingLookupResponse$json = {
   '1': 'BillingLookupResponse',
   '2': [
-    {'1': 'billing', '3': 1, '4': 1, '5': 11, '6': '.meta.Billing', '10': 'billing'},
+    {
+      '1': 'billing',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.Billing',
+      '10': 'billing'
+    },
   ],
 };
 
@@ -84,21 +104,30 @@ const BillingSubscribeRequest$json = {
 };
 
 /// Descriptor for `BillingSubscribeRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List billingSubscribeRequestDescriptor = $convert.base64Decode(
-    'ChdCaWxsaW5nU3Vic2NyaWJlUmVxdWVzdBISCgRwbGFuGAEgASgJUgRwbGFu');
+final $typed_data.Uint8List billingSubscribeRequestDescriptor =
+    $convert.base64Decode(
+        'ChdCaWxsaW5nU3Vic2NyaWJlUmVxdWVzdBISCgRwbGFuGAEgASgJUgRwbGFu');
 
 @$core.Deprecated('Use billingSubscribeResponseDescriptor instead')
 const BillingSubscribeResponse$json = {
   '1': 'BillingSubscribeResponse',
   '2': [
-    {'1': 'billing', '3': 1, '4': 1, '5': 11, '6': '.meta.Billing', '10': 'billing'},
+    {
+      '1': 'billing',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.Billing',
+      '10': 'billing'
+    },
   ],
 };
 
 /// Descriptor for `BillingSubscribeResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List billingSubscribeResponseDescriptor = $convert.base64Decode(
-    'ChhCaWxsaW5nU3Vic2NyaWJlUmVzcG9uc2USJwoHYmlsbGluZxgBIAEoCzINLm1ldGEuQmlsbG'
-    'luZ1IHYmlsbGluZw==');
+final $typed_data.Uint8List billingSubscribeResponseDescriptor =
+    $convert.base64Decode(
+        'ChhCaWxsaW5nU3Vic2NyaWJlUmVzcG9uc2USJwoHYmlsbGluZxgBIAEoCzINLm1ldGEuQmlsbG'
+        'luZ1IHYmlsbGluZw==');
 
 @$core.Deprecated('Use billingSessionRequestDescriptor instead')
 const BillingSessionRequest$json = {
@@ -109,8 +138,9 @@ const BillingSessionRequest$json = {
 };
 
 /// Descriptor for `BillingSessionRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List billingSessionRequestDescriptor = $convert.base64Decode(
-    'ChVCaWxsaW5nU2Vzc2lvblJlcXVlc3QSEgoEcGxhbhgBIAEoCVIEcGxhbg==');
+final $typed_data.Uint8List billingSessionRequestDescriptor =
+    $convert.base64Decode(
+        'ChVCaWxsaW5nU2Vzc2lvblJlcXVlc3QSEgoEcGxhbhgBIAEoCVIEcGxhbg==');
 
 @$core.Deprecated('Use billingSessionResponseDescriptor instead')
 const BillingSessionResponse$json = {
@@ -121,6 +151,6 @@ const BillingSessionResponse$json = {
 };
 
 /// Descriptor for `BillingSessionResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List billingSessionResponseDescriptor = $convert.base64Decode(
-    'ChZCaWxsaW5nU2Vzc2lvblJlc3BvbnNlEhoKCHJlZGlyZWN0GAEgASgJUghyZWRpcmVjdA==');
-
+final $typed_data.Uint8List billingSessionResponseDescriptor =
+    $convert.base64Decode(
+        'ChZCaWxsaW5nU2Vzc2lvblJlc3BvbnNlEhoKCHJlZGlyZWN0GAEgASgJUghyZWRpcmVjdA==');

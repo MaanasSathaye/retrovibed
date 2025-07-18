@@ -69,8 +69,8 @@ const AuthzRequest$json = {
 };
 
 /// Descriptor for `AuthzRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List authzRequestDescriptor = $convert.base64Decode(
-    'CgxBdXRoelJlcXVlc3Q=');
+final $typed_data.Uint8List authzRequestDescriptor =
+    $convert.base64Decode('CgxBdXRoelJlcXVlc3Q=');
 
 @$core.Deprecated('Use authzResponseDescriptor instead')
 const AuthzResponse$json = {
@@ -161,4 +161,3 @@ const AuthzProfileResponse$json = {
 final $typed_data.Uint8List authzProfileResponseDescriptor = $convert.base64Decode(
     'ChRBdXRoelByb2ZpbGVSZXNwb25zZRIhCgV0b2tlbhgBIAEoCzILLm1ldGEuVG9rZW5SBXRva2'
     'Vu');
-

@@ -23,8 +23,8 @@ const Wireguard$json = {
 };
 
 /// Descriptor for `Wireguard`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List wireguardDescriptor = $convert.base64Decode(
-    'CglXaXJlZ3VhcmQSDgoCaWQYASABKAlSAmlk');
+final $typed_data.Uint8List wireguardDescriptor =
+    $convert.base64Decode('CglXaXJlZ3VhcmQSDgoCaWQYASABKAlSAmlk');
 
 @$core.Deprecated('Use wireguardSearchRequestDescriptor instead')
 const WireguardSearchRequest$json = {
@@ -47,8 +47,22 @@ final $typed_data.Uint8List wireguardSearchRequestDescriptor = $convert.base64De
 const WireguardSearchResponse$json = {
   '1': 'WireguardSearchResponse',
   '2': [
-    {'1': 'next', '3': 1, '4': 1, '5': 11, '6': '.meta.WireguardSearchRequest', '10': 'next'},
-    {'1': 'items', '3': 2, '4': 3, '5': 11, '6': '.meta.Wireguard', '10': 'items'},
+    {
+      '1': 'next',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.WireguardSearchRequest',
+      '10': 'next'
+    },
+    {
+      '1': 'items',
+      '3': 2,
+      '4': 3,
+      '5': 11,
+      '6': '.meta.Wireguard',
+      '10': 'items'
+    },
   ],
 };
 
@@ -64,8 +78,8 @@ const WireguardTouchRequest$json = {
 };
 
 /// Descriptor for `WireguardTouchRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List wireguardTouchRequestDescriptor = $convert.base64Decode(
-    'ChVXaXJlZ3VhcmRUb3VjaFJlcXVlc3Q=');
+final $typed_data.Uint8List wireguardTouchRequestDescriptor =
+    $convert.base64Decode('ChVXaXJlZ3VhcmRUb3VjaFJlcXVlc3Q=');
 
 @$core.Deprecated('Use wireguardTouchResponseDescriptor instead')
 const WireguardTouchResponse$json = {
@@ -73,8 +87,8 @@ const WireguardTouchResponse$json = {
 };
 
 /// Descriptor for `WireguardTouchResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List wireguardTouchResponseDescriptor = $convert.base64Decode(
-    'ChZXaXJlZ3VhcmRUb3VjaFJlc3BvbnNl');
+final $typed_data.Uint8List wireguardTouchResponseDescriptor =
+    $convert.base64Decode('ChZXaXJlZ3VhcmRUb3VjaFJlc3BvbnNl');
 
 @$core.Deprecated('Use wireguardUploadRequestDescriptor instead')
 const WireguardUploadRequest$json = {
@@ -82,21 +96,29 @@ const WireguardUploadRequest$json = {
 };
 
 /// Descriptor for `WireguardUploadRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List wireguardUploadRequestDescriptor = $convert.base64Decode(
-    'ChZXaXJlZ3VhcmRVcGxvYWRSZXF1ZXN0');
+final $typed_data.Uint8List wireguardUploadRequestDescriptor =
+    $convert.base64Decode('ChZXaXJlZ3VhcmRVcGxvYWRSZXF1ZXN0');
 
 @$core.Deprecated('Use wireguardUploadResponseDescriptor instead')
 const WireguardUploadResponse$json = {
   '1': 'WireguardUploadResponse',
   '2': [
-    {'1': 'Wireguard', '3': 1, '4': 1, '5': 11, '6': '.meta.Wireguard', '10': 'wireguard'},
+    {
+      '1': 'Wireguard',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.Wireguard',
+      '10': 'wireguard'
+    },
   ],
 };
 
 /// Descriptor for `WireguardUploadResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List wireguardUploadResponseDescriptor = $convert.base64Decode(
-    'ChdXaXJlZ3VhcmRVcGxvYWRSZXNwb25zZRItCglXaXJlZ3VhcmQYASABKAsyDy5tZXRhLldpcm'
-    'VndWFyZFIJd2lyZWd1YXJk');
+final $typed_data.Uint8List wireguardUploadResponseDescriptor =
+    $convert.base64Decode(
+        'ChdXaXJlZ3VhcmRVcGxvYWRSZXNwb25zZRItCglXaXJlZ3VhcmQYASABKAsyDy5tZXRhLldpcm'
+        'VndWFyZFIJd2lyZWd1YXJk');
 
 @$core.Deprecated('Use wireguardCurrentRequestDescriptor instead')
 const WireguardCurrentRequest$json = {
@@ -104,21 +126,29 @@ const WireguardCurrentRequest$json = {
 };
 
 /// Descriptor for `WireguardCurrentRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List wireguardCurrentRequestDescriptor = $convert.base64Decode(
-    'ChdXaXJlZ3VhcmRDdXJyZW50UmVxdWVzdA==');
+final $typed_data.Uint8List wireguardCurrentRequestDescriptor =
+    $convert.base64Decode('ChdXaXJlZ3VhcmRDdXJyZW50UmVxdWVzdA==');
 
 @$core.Deprecated('Use wireguardCurrentResponseDescriptor instead')
 const WireguardCurrentResponse$json = {
   '1': 'WireguardCurrentResponse',
   '2': [
-    {'1': 'Wireguard', '3': 1, '4': 1, '5': 11, '6': '.meta.Wireguard', '10': 'wireguard'},
+    {
+      '1': 'Wireguard',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.Wireguard',
+      '10': 'wireguard'
+    },
   ],
 };
 
 /// Descriptor for `WireguardCurrentResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List wireguardCurrentResponseDescriptor = $convert.base64Decode(
-    'ChhXaXJlZ3VhcmRDdXJyZW50UmVzcG9uc2USLQoJV2lyZWd1YXJkGAEgASgLMg8ubWV0YS5XaX'
-    'JlZ3VhcmRSCXdpcmVndWFyZA==');
+final $typed_data.Uint8List wireguardCurrentResponseDescriptor =
+    $convert.base64Decode(
+        'ChhXaXJlZ3VhcmRDdXJyZW50UmVzcG9uc2USLQoJV2lyZWd1YXJkGAEgASgLMg8ubWV0YS5XaX'
+        'JlZ3VhcmRSCXdpcmVndWFyZA==');
 
 @$core.Deprecated('Use wireguardDeleteRequestDescriptor instead')
 const WireguardDeleteRequest$json = {
@@ -126,19 +156,26 @@ const WireguardDeleteRequest$json = {
 };
 
 /// Descriptor for `WireguardDeleteRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List wireguardDeleteRequestDescriptor = $convert.base64Decode(
-    'ChZXaXJlZ3VhcmREZWxldGVSZXF1ZXN0');
+final $typed_data.Uint8List wireguardDeleteRequestDescriptor =
+    $convert.base64Decode('ChZXaXJlZ3VhcmREZWxldGVSZXF1ZXN0');
 
 @$core.Deprecated('Use wireguardDeleteResponseDescriptor instead')
 const WireguardDeleteResponse$json = {
   '1': 'WireguardDeleteResponse',
   '2': [
-    {'1': 'Wireguard', '3': 1, '4': 1, '5': 11, '6': '.meta.Wireguard', '10': 'wireguard'},
+    {
+      '1': 'Wireguard',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.Wireguard',
+      '10': 'wireguard'
+    },
   ],
 };
 
 /// Descriptor for `WireguardDeleteResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List wireguardDeleteResponseDescriptor = $convert.base64Decode(
-    'ChdXaXJlZ3VhcmREZWxldGVSZXNwb25zZRItCglXaXJlZ3VhcmQYASABKAsyDy5tZXRhLldpcm'
-    'VndWFyZFIJd2lyZWd1YXJk');
-
+final $typed_data.Uint8List wireguardDeleteResponseDescriptor =
+    $convert.base64Decode(
+        'ChdXaXJlZ3VhcmREZWxldGVSZXNwb25zZRItCglXaXJlZ3VhcmQYASABKAsyDy5tZXRhLldpcm'
+        'VndWFyZFIJd2lyZWd1YXJk');
