@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'feed.edit.dart';
 import 'feed.row.dart';
 import './api.dart' as api;
@@ -19,13 +20,26 @@ class Item extends StatelessWidget {
   Widget build(BuildContext context) {
     return ds.Accordion(
       description: FeedRow(current: this.current),
-      content: Edit(
-        current: this.current,
-        onChange: (u) {
-          api.create(api.FeedCreateRequest(feed: u)).then((resp) {
-            onChange(resp.feed);
-          });
-        },
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+           forms.Field(
+            label: Text("id"),
+            input: Text(current.id),
+          ),
+          forms.Field(
+            label: Text("next check"),
+            input: ds.DurationWidget.untilISO8601(current.nextCheck),
+          ),
+          Edit(
+            current: this.current,
+            onChange: (u) {
+              api.create(api.FeedCreateRequest(feed: u)).then((resp) {
+                onChange(resp.feed);
+              });
+            },
+          ),
+        ],
       ),
     );
   }
