@@ -11,10 +11,7 @@ class MagnetDownloads extends StatelessWidget {
   MagnetDownloads({super.key, controller, required this.onSubmitted})
     : this.controller =
           controller ??
-          TextEditingController(
-            text:
-                "magnet:?xt=urn:btih:f42f4f3181996ff4954dd5d7f166bc146810f8e3&dn=archlinux-2025.07.01-x86_64.iso",
-          );
+          TextEditingController();
 
   @override
   Widget build(BuildContext context) {
