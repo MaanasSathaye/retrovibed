@@ -530,7 +530,9 @@ type torrent struct {
 	pex *pex
 
 	// signal events on this torrent.
-	event *sync.Cond
+	event  *sync.Cond
+	lcount uint64
+	ucount uint64
 }
 
 // Returns a Reader bound to the torrent's data. All read calls block until
@@ -559,31 +561,31 @@ func (t *torrent) locker() sync.Locker {
 }
 
 func (t *torrent) _lock(depth int) {
-	// updated := atomic.AddUint64(&t.lcount, 1)
-	// log.Output(depth, fmt.Sprintf("t(%p) lock initiated - %d", t, updated))
+	updated := atomic.AddUint64(&t.lcount, 1)
+	log.Output(depth, fmt.Sprintf("t(%p) lock initiated - %d", t, updated))
 	t._mu.Lock()
-	// log.Output(depth, fmt.Sprintf("t(%p) lock completed - %d", t, updated))
+	log.Output(depth, fmt.Sprintf("t(%p) lock completed - %d", t, updated))
 }
 
 func (t *torrent) _unlock(depth int) {
-	// updated := atomic.AddUint64(&t.ucount, 1)
-	// log.Output(depth, fmt.Sprintf("t(%p) unlock initiated - %d", t, updated))
+	updated := atomic.AddUint64(&t.ucount, 1)
+	log.Output(depth, fmt.Sprintf("t(%p) unlock initiated - %d", t, updated))
 	t._mu.Unlock()
-	// log.Output(depth, fmt.Sprintf("t(%p) unlock completed - %d", t, updated))
+	log.Output(depth, fmt.Sprintf("t(%p) unlock completed - %d", t, updated))
 }
 
 func (t *torrent) _rlock(depth int) {
-	// updated := atomic.AddUint64(&t.lcount, 1)
-	// l2.Output(depth, fmt.Sprintf("t(%p) rlock initiated - %d", t, updated))
+	updated := atomic.AddUint64(&t.lcount, 1)
+	log.Output(depth, fmt.Sprintf("t(%p) rlock initiated - %d", t, updated))
 	t._mu.RLock()
-	// l2.Output(depth, fmt.Sprintf("t(%p) rlock completed - %d", t, updated))
+	log.Output(depth, fmt.Sprintf("t(%p) rlock completed - %d", t, updated))
 }
 
 func (t *torrent) _runlock(depth int) {
-	// updated := atomic.AddUint64(&t.ucount, 1)
-	// l2.Output(depth, fmt.Sprintf("t(%p) unlock initiated - %d", t, updated))
+	updated := atomic.AddUint64(&t.ucount, 1)
+	log.Output(depth, fmt.Sprintf("t(%p) unlock initiated - %d", t, updated))
 	t._mu.RUnlock()
-	// l2.Output(depth, fmt.Sprintf("t(%p) unlock completed - %d", t, updated))
+	log.Output(depth, fmt.Sprintf("t(%p) unlock completed - %d", t, updated))
 }
 
 func (t *torrent) lock() {
@@ -927,7 +929,6 @@ func (t *torrent) writeChunk(piece int, begin int64, data []byte) (err error) {
 	offset := (t.info.PieceLength * int64(piece)) + begin
 
 	n, err := t.storage.WriteAt(data, offset)
-	// n, err := t.pieces[piece].Storage().WriteAt(data, begin)
 	if err == nil && n != len(data) {
 		return io.ErrShortWrite
 	}
@@ -1429,10 +1430,7 @@ func (t *torrent) initiateConn(ctx context.Context, peer Peer) {
 }
 
 func (t *torrent) noLongerHalfOpen(addr string) {
-	t.lock()
 	t.dropHalfOpen(addr)
-	t.unlock()
-
 	t.openNewConns()
 }
 
