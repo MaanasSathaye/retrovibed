@@ -279,7 +279,14 @@ func (t *HTTPDiscovered) upload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	metadata, err := torrent.New(metainfo.Hash(lmd.Infohash), torrent.OptionStorage(t.c), torrent.OptionNodes(meta.NodeList()...), torrentx.OptionTracker(lmd.Tracker), torrent.OptionWebseeds(meta.UrlList), torrent.OptionPublicTrackers(lmd.Private, tracking.PublicTrackers()...))
+	metadata, err := torrent.New(
+		metainfo.Hash(lmd.Infohash),
+		torrent.OptionStorage(t.c),
+		torrent.OptionNodes(meta.NodeList()...),
+		torrentx.OptionTracker(lmd.Tracker),
+		torrent.OptionWebseeds(meta.UrlList),
+		torrent.OptionPublicTrackers(lmd.Private, tracking.PublicTrackers()...),
+	)
 	if err != nil {
 		log.Println(errorsx.Wrapf(err, "unable to create torrent from metadata %s", lmd.ID))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
@@ -374,7 +381,12 @@ func (t *HTTPDiscovered) download(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	metadata, err := torrent.New(metainfo.Hash(meta.Infohash), torrent.OptionStorage(t.c), torrent.OptionTrackers(meta.Tracker), torrent.OptionPublicTrackers(meta.Private, tracking.PublicTrackers()...))
+	metadata, err := torrent.New(
+		metainfo.Hash(meta.Infohash),
+		torrent.OptionStorage(t.c),
+		torrent.OptionTrackers(meta.Tracker),
+		torrent.OptionPublicTrackers(meta.Private, tracking.PublicTrackers()...),
+	)
 	if err != nil {
 		log.Println(errorsx.Wrapf(err, "unable to create metadata from metadata %s", meta.ID))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
