@@ -2,10 +2,12 @@ package tracking
 
 import (
 	"context"
+	"net/url"
 	"time"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/langx"
 	"github.com/retrovibed/retrovibed/internal/md5x"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
@@ -18,11 +20,23 @@ type RSSOption func(*RSS)
 
 func NewFeedRSS(id string, options ...func(*RSS)) (m RSS) {
 	r := langx.Clone(RSS{
-		ID:             id,
-		LastBuiltAt:    time.UnixMicro(0), //timex.NegInf(), should be neg inf but duckdb driver data types still need work.
-		EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
-	}, options...)
+		ID:          id,
+		LastBuiltAt: time.UnixMicro(0), //timex.NegInf(), should be neg inf but duckdb driver data types still need work.
+	}, langx.Compose(options...), RSSOptionDefaultEncryptionSeed)
+
 	return r
+}
+
+// populates the encryption seed based on the url host if it hasnt already been set.
+func RSSOptionDefaultEncryptionSeed(r *RSS) {
+	r.EncryptionSeed = stringsx.FirstNonBlank(
+		r.EncryptionSeed, md5x.FormatUUID(
+			md5x.Digest(stringsx.DefaultIfBlank(
+				errorsx.Zero(url.Parse(r.URL)).Host,
+				uuid.Must(uuid.NewV4()).String(),
+			)),
+		),
+	)
 }
 
 func RSSOptionDefaultFeeds(m RSS) RSSOption {
@@ -30,7 +44,6 @@ func RSSOptionDefaultFeeds(m RSS) RSSOption {
 	return func(r *RSS) {
 		*r = m
 		r.ID = md5x.FormatUUID(md5x.Digest(m.URL))
-		r.EncryptionSeed = stringsx.FirstNonBlank(m.EncryptionSeed, md5x.FormatUUID(md5x.Digest(m.URL)))
 	}
 }
 

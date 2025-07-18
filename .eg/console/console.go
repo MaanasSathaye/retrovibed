@@ -129,18 +129,26 @@ func flatpak(final egflatpak.Module) *egflatpak.Builder {
 			AllowDownload().
 			AllowMusic().
 			AllowVideos().Allow(
+			// we specify environment variables here so they show up in flatseal for easy adjustments.
 			"--filesystem=host:ro",                 // for mpv
 			"--socket=pulseaudio",                  // for mpv
-			"--env=LC_NUMERIC=C",                   // for mpv
 			"--filesystem=xdg-run/pipewire-0:ro",   // for mpv
 			"--filesystem=~/.duckdb:create",        // for duckdb
-			"--env=TMPDIR=/var/tmp/",               // enaure golang sets its os.TempDir() to a working value.
 			"--talk-name=org.freedesktop.portal.*", // enable standard desktop functionality.
 			"--share=ipc",                          // enable standard desktop functionality.
 			"--filesystem=xdg-run/gvfsd",           // enable standard desktop functionality. (probably unnnecessary)
 			// "--filesystem=xdg-run/gvfs",            // enable standard desktop functionality. (probably unnnecessary)
 			// "--talk-name=org.gtk.vfs",              // enable standard desktop functionality. (probably unnnecessary)
 			// "--talk-name=org.gtk.vfs.*",            // enable standard desktop functionality. (probably unnnecessary)
+			"--env=LC_NUMERIC=C",                            // for mpv
+			"--env=TMPDIR=/var/tmp/",                        // enaure golang sets its os.TempDir() to a working value.
+			"--env=RETROVIBED_MDNS_DISABLED=true",           // disable MDNS when running in flatpak since it doesn't work.
+			"--env=RETROVIBED_TORRENT_AUTO_DISCOVERY=false", // peer scanning is an experimental feature.
+			"--env=RETROVIBED_TORRENT_AUTO_BOOTSTRAP=true",  // auto bootstrap the dht from a global endpoint.
+			"--env=RETROVIBED_TORRENT_PORT=",                // manually set the public torrent port.
+			"--env=RETROVIBED_TORRENT_PUBLIC_IP4=",          // manually set the public ipv4 address
+			"--env=RETROVIBED_TORRENT_PUBLIC_IP6=",          // manually set the public ipv6 address
+			"--env=RETROVIBED_SELF_SIGNED_HOSTS=127.0.0.1",  // TLS hosts to include in the self signed certificate.
 		)...)
 }
 

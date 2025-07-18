@@ -213,3 +213,10 @@ func RSSDeleteByID(
 ) {
 	gql = gql.Query(`DELETE FROM torrents_feed_rss WHERE "id" = {id} RETURNING ` + RSSScannerStaticColumns)
 }
+
+func RSSFindByID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewRSSScannerStaticRow,
+) {
+	gql = gql.Query(`SELECT ` + RSSScannerStaticColumns + ` FROM torrents_feed_rss WHERE "id" = {id}`)
+}
