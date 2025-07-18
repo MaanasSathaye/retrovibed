@@ -19,6 +19,10 @@ func (p Piece) Offset() int64 {
 }
 
 func (p Piece) Hash() (ret Hash) {
+	if len(p.Info.Pieces) == 0 {
+		return ret
+	}
+
 	copy(ret[:], p.Info.Pieces[p.i*HashSize:(p.i+1)*HashSize])
 	return
 }

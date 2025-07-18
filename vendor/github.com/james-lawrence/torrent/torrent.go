@@ -255,7 +255,7 @@ func TuneVerifySample(n uint64) Tuner {
 	return func(t *torrent) {
 		t.digests.EnqueueBitmap(bitmapx.Random(t.chunks.pieces, min(n, t.chunks.pieces)))
 		t.digests.Enqueue(0)
-		t.digests.Enqueue(t.chunks.pieces)
+		t.digests.Enqueue(min(t.chunks.pieces-1, t.chunks.pieces)) // min to handle 0 case which causes a uint wrap around.
 		t.digests.Wait()
 
 		if t.chunks.failed.IsEmpty() {
@@ -528,9 +528,7 @@ type torrent struct {
 	pex *pex
 
 	// signal events on this torrent.
-	event  *sync.Cond
-	lcount uint64
-	ucount uint64
+	event *sync.Cond
 }
 
 // Returns a Reader bound to the torrent's data. All read calls block until
@@ -555,31 +553,31 @@ func (t *torrent) Tune(tuning ...Tuner) error {
 }
 
 func (t *torrent) _lock(depth int) {
-	updated := atomic.AddUint64(&t.lcount, 1)
-	log.Output(depth, fmt.Sprintf("t(%p) lock initiated - %d", t, updated))
+	// updated := atomic.AddUint64(&t.lcount, 1)
+	// log.Output(depth, fmt.Sprintf("t(%p) lock initiated - %d", t, updated))
 	t._mu.Lock()
-	log.Output(depth, fmt.Sprintf("t(%p) lock completed - %d", t, updated))
+	// log.Output(depth, fmt.Sprintf("t(%p) lock completed - %d", t, updated))
 }
 
 func (t *torrent) _unlock(depth int) {
-	updated := atomic.AddUint64(&t.ucount, 1)
-	log.Output(depth, fmt.Sprintf("t(%p) unlock initiated - %d", t, updated))
+	// updated := atomic.AddUint64(&t.ucount, 1)
+	// log.Output(depth, fmt.Sprintf("t(%p) unlock initiated - %d", t, updated))
 	t._mu.Unlock()
-	log.Output(depth, fmt.Sprintf("t(%p) unlock completed - %d", t, updated))
+	// log.Output(depth, fmt.Sprintf("t(%p) unlock completed - %d", t, updated))
 }
 
 func (t *torrent) _rlock(depth int) {
-	updated := atomic.AddUint64(&t.lcount, 1)
-	log.Output(depth, fmt.Sprintf("t(%p) rlock initiated - %d", t, updated))
+	// updated := atomic.AddUint64(&t.lcount, 1)
+	// l2.Output(depth, fmt.Sprintf("t(%p) rlock initiated - %d", t, updated))
 	t._mu.RLock()
-	log.Output(depth, fmt.Sprintf("t(%p) rlock completed - %d", t, updated))
+	// l2.Output(depth, fmt.Sprintf("t(%p) rlock completed - %d", t, updated))
 }
 
 func (t *torrent) _runlock(depth int) {
-	updated := atomic.AddUint64(&t.ucount, 1)
-	log.Output(depth, fmt.Sprintf("t(%p) unlock initiated - %d", t, updated))
+	// updated := atomic.AddUint64(&t.ucount, 1)
+	// l2.Output(depth, fmt.Sprintf("t(%p) unlock initiated - %d", t, updated))
 	t._mu.RUnlock()
-	log.Output(depth, fmt.Sprintf("t(%p) unlock completed - %d", t, updated))
+	// l2.Output(depth, fmt.Sprintf("t(%p) unlock completed - %d", t, updated))
 }
 
 func (t *torrent) lock() {
@@ -911,16 +909,6 @@ func (t *torrent) close() (err error) {
 }
 
 func (t *torrent) writeChunk(piece int, begin int64, data []byte) (err error) {
-	defer func() {
-		if err == nil {
-			return
-		}
-		log.Println("DERP DERP", err)
-	}()
-
-	// t.lock()
-	// defer t.unlock()
-
 	if len(data) > int(t.info.PieceLength) {
 		return fmt.Errorf("long write")
 	}
