@@ -43,6 +43,9 @@ class EndpointAuto extends StatefulWidget {
 }
 
 class _DaemonAuto extends State<EndpointAuto> {
+  final ValueNotifier<api.Daemon> changed = ValueNotifier<api.Daemon>(
+    api.Daemon(),
+  );
   bool _loading = true;
   Widget _cause = const SizedBox();
   api.Daemon? _res;
@@ -76,6 +79,7 @@ class _DaemonAuto extends State<EndpointAuto> {
           setState(() {
             httpx.set(v.hostname);
             _res = v;
+            changed.value = v;
           });
         })
         .catchError((e) {

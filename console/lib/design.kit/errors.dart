@@ -80,7 +80,13 @@ class Error extends StatelessWidget {
   final void Function()? onTap;
   final Color? color;
 
-  const Error({super.key, required this.child, this.cause, this.onTap, this.color});
+  const Error({
+    super.key,
+    required this.child,
+    this.cause,
+    this.onTap,
+    this.color,
+  });
 
   @override
   StatelessElement createElement() {
@@ -101,7 +107,12 @@ class Error extends StatelessWidget {
     );
   }
 
-  static Error unauthorized(Object obj, {void Function()? onTap, Widget? message, Color? color }) {
+  static Error unauthorized(
+    Object obj, {
+    void Function()? onTap,
+    Widget? message,
+    Color? color,
+  }) {
     return Error(
       child: message ?? Text("you lack sufficient permissions"),
       cause: obj,
@@ -160,7 +171,6 @@ class Error extends StatelessWidget {
     };
   }
 
-
   @override
   Widget build(BuildContext context) {
     final defaults = theming.Defaults.of(context);
@@ -172,11 +182,7 @@ class Error extends StatelessWidget {
           color: color ?? defaults.danger,
           borderRadius: BorderRadius.circular(20.0),
         ),
-        child: Center(
-          child: SelectionArea(
-            child: child,
-          ),
-        ),
+        child: Flex(children: [Center(child: SelectionArea(child: child))], direction: Axis.vertical,),
       ),
     );
   }

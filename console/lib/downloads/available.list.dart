@@ -153,8 +153,11 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                             widthFactor: 0.75,
                             child: MagnetDownloads(
                               onSubmitted: (derps) {
-                                print("derps ${derps}");
-                                ds.modals.of(context)?.reset();
+                                final pending = derps.map((v) => media.discovered.magnet(media.MagnetCreateRequest(uri: v), options: [authn.AuthzCache.bearer(context)]));
+                                return Future.wait(pending, eagerError: true).then((_) {
+                                  widget.events?.value += 1;
+                                  ds.modals.of(context)?.reset();
+                              });
                               },
                             ),
                           ),

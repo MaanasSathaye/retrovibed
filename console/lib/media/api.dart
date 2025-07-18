@@ -164,15 +164,15 @@ abstract class discovered {
         });
   }
 
-  static Future<DownloadSearchResponse> magnet(
-    DownloadSearchRequest req,
+  static Future<MagnetCreateResponse> magnet(
+    MagnetCreateRequest req,
     {List<httpx.Option> options = const []}
   ) async {
       return httpx
-      .get(Uri.https(httpx.host(), "/d/downloading"), options: options)
+      .post(Uri.https(httpx.host(), "/d/magnet"), body: jsonEncode(req.toProto3Json()), options: options)
       .then((v) {
           return Future.value(
-            DownloadSearchResponse.create()
+            MagnetCreateResponse.create()
               ..mergeFromProto3Json(jsonDecode(v.body)),
           );
         });

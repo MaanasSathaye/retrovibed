@@ -202,8 +202,8 @@ Future<http.Response> get(
   });
 }
 
-Future<http.Response> post(Uri path, {List<Option> options = const []}) {
+Future<http.Response> post(Uri path, {List<Option> options = const [], Object? body}) {
   return request(options).then((r) {
-    return http.Client().post(path, headers: r.headers).then(auto_error);
+    return http.Client().post(path, headers: r.headers, body: body).then(auto_error);
   });
 }

@@ -7,6 +7,9 @@ class Bearer<T> {
 }
 
 class Cached<T> {
+  static Future<Bearer<T>> noprefresh<T>(Cached<T> old) {
+    return Future.value(old.current);
+  }
   sync.Lock _m = sync.Lock();
 
   Bearer<T> current;

@@ -25,23 +25,43 @@ class AuthzCache extends StatefulWidget {
 class _AuthzCache extends State<AuthzCache> {
   authz.Cached<_meta.Token> meta = authz.Cached(
     authz.Bearer(_meta.Token(), ""),
-    authz.refresh(
-      (c) => _meta.authz().then((v) {
-        return authz.Bearer(v.token, v.bearer);
-      }).catchError((e) {
-        print("failed to refresh token cache ${e}");
-        return authz.Bearer(c, "");
-      }),
-      (c, ts) {
-        return DateTime.fromMillisecondsSinceEpoch(c.expires.toInt() * 1000, isUtc: true).isBefore(ts);
-      },
-    ),
+    authz.Cached.noprefresh,
   );
+
+  void refresh() {
+    meta = authz.Cached(
+      authz.Bearer(_meta.Token(), ""),
+      authz.refresh(
+        (c) => _meta
+            .authz()
+            .then((v) {
+              return authz.Bearer(v.token, v.bearer);
+            })
+            .catchError((e) {
+              print("failed to refresh token cache ${e}");
+              return authz.Bearer(c, "");
+            }),
+        (c, ts) {
+          return DateTime.fromMillisecondsSinceEpoch(
+            c.expires.toInt() * 1000,
+            isUtc: true,
+          ).isBefore(ts);
+        },
+      ),
+    );
+  }
 
   @override
   void initState() {
     super.initState();
-    Future.wait([meta.token()]).whenComplete(() {});
+    _meta.EndpointAuto.of(context)?.changed.addListener(refresh);
+    refresh();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _meta.EndpointAuto.of(context)?.changed.removeListener(refresh);
   }
 
   @override
