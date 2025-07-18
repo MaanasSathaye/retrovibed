@@ -14,6 +14,7 @@ message Feed {
   bool contributing = 9 [ json_name = "contributing" ];
   string disabled_at = 10 [ json_name = "disabled_at" ];
   uint64 ttl_minimum = 11 [ json_name = "ttl_minimum" ];
+  string encryption_seed = 12 [ json_name = "encryption_seed" ];
 }
 
 message FeedSearchRequest {
@@ -29,7 +30,10 @@ message FeedSearchResponse {
   repeated Feed items = 2 [ json_name = "items" ];
 }
 
-message FeedCreateRequest { Feed feed = 1 [ json_name = "feed" ]; }
+message FeedCreateRequest {
+  Feed feed = 1 [ json_name = "feed" ];
+}
+
 message FeedCreateResponse { Feed feed = 1 [ json_name = "feed" ]; }
 
 message FeedUpdateRequest { Feed feed = 1 [ json_name = "feed" ]; }

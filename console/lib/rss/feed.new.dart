@@ -27,6 +27,28 @@ class FeedNew extends StatelessWidget {
             ),
           ),
           forms.Field(
+            label: Text("encryption seed"),
+            input: Tooltip(
+              message:
+                  "seed used to generate consistent encryption across users for a given torrent",
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      decoration: InputDecoration(
+                        hintText: "if no seed is provided it'll generate one using the url's host",
+                      ),
+                      initialValue: current.encryptionSeed,
+                      onChanged:
+                          (v) => onChange?.call(current..encryptionSeed = v),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          forms.Field(
             label: SelectableText("autodownload"),
             input: Row(
               children: [

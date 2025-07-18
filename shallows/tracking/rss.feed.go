@@ -27,6 +27,11 @@ func NewFeedRSS(id string, options ...func(*RSS)) (m RSS) {
 	return r
 }
 
+func RSSOptionTestDefaults(p *RSS) {
+	p.ID = stringsx.DefaultIfBlank(md5x.FormatUUID(md5x.Digest(p.URL)), errorsx.Must(uuid.NewV4()).String())
+	p.EncryptionSeed = ""
+}
+
 // populates the encryption seed based on the url host if it hasnt already been set.
 func RSSOptionDefaultEncryptionSeed(r *RSS) {
 	r.EncryptionSeed = stringsx.FirstNonBlank(

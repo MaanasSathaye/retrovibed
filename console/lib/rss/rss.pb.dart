@@ -30,6 +30,7 @@ class Feed extends $pb.GeneratedMessage {
     $core.bool? contributing,
     $core.String? disabledAt,
     $fixnum.Int64? ttlMinimum,
+    $core.String? encryptionSeed,
   }) {
     final result = create();
     if (id != null) result.id = id;
@@ -43,6 +44,7 @@ class Feed extends $pb.GeneratedMessage {
     if (contributing != null) result.contributing = contributing;
     if (disabledAt != null) result.disabledAt = disabledAt;
     if (ttlMinimum != null) result.ttlMinimum = ttlMinimum;
+    if (encryptionSeed != null) result.encryptionSeed = encryptionSeed;
     return result;
   }
 
@@ -63,6 +65,7 @@ class Feed extends $pb.GeneratedMessage {
     ..aOB(9, _omitFieldNames ? '' : 'contributing')
     ..aOS(10, _omitFieldNames ? '' : 'disabled_at')
     ..a<$fixnum.Int64>(11, _omitFieldNames ? '' : 'ttl_minimum', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..aOS(12, _omitFieldNames ? '' : 'encryption_seed')
     ..hasRequiredFields = false
   ;
 
@@ -181,6 +184,15 @@ class Feed extends $pb.GeneratedMessage {
   $core.bool hasTtlMinimum() => $_has(10);
   @$pb.TagNumber(11)
   void clearTtlMinimum() => $_clearField(11);
+
+  @$pb.TagNumber(12)
+  $core.String get encryptionSeed => $_getSZ(11);
+  @$pb.TagNumber(12)
+  set encryptionSeed($core.String value) => $_setString(11, value);
+  @$pb.TagNumber(12)
+  $core.bool hasEncryptionSeed() => $_has(11);
+  @$pb.TagNumber(12)
+  void clearEncryptionSeed() => $_clearField(12);
 }
 
 class FeedSearchRequest extends $pb.GeneratedMessage {

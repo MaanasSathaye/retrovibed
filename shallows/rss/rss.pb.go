@@ -22,20 +22,21 @@ const (
 )
 
 type Feed struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,2,opt,name=created_at,proto3" json:"created_at,omitempty"`
-	UpdatedAt     string                 `protobuf:"bytes,3,opt,name=updated_at,proto3" json:"updated_at,omitempty"`
-	NextCheck     string                 `protobuf:"bytes,4,opt,name=next_check,proto3" json:"next_check,omitempty"`
-	Description   string                 `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
-	Url           string                 `protobuf:"bytes,6,opt,name=url,proto3" json:"url,omitempty"`
-	Autodownload  bool                   `protobuf:"varint,7,opt,name=autodownload,proto3" json:"autodownload,omitempty"`
-	Autoarchive   bool                   `protobuf:"varint,8,opt,name=autoarchive,proto3" json:"autoarchive,omitempty"`
-	Contributing  bool                   `protobuf:"varint,9,opt,name=contributing,proto3" json:"contributing,omitempty"`
-	DisabledAt    string                 `protobuf:"bytes,10,opt,name=disabled_at,proto3" json:"disabled_at,omitempty"`
-	TtlMinimum    uint64                 `protobuf:"varint,11,opt,name=ttl_minimum,proto3" json:"ttl_minimum,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Id             string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	CreatedAt      string                 `protobuf:"bytes,2,opt,name=created_at,proto3" json:"created_at,omitempty"`
+	UpdatedAt      string                 `protobuf:"bytes,3,opt,name=updated_at,proto3" json:"updated_at,omitempty"`
+	NextCheck      string                 `protobuf:"bytes,4,opt,name=next_check,proto3" json:"next_check,omitempty"`
+	Description    string                 `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
+	Url            string                 `protobuf:"bytes,6,opt,name=url,proto3" json:"url,omitempty"`
+	Autodownload   bool                   `protobuf:"varint,7,opt,name=autodownload,proto3" json:"autodownload,omitempty"`
+	Autoarchive    bool                   `protobuf:"varint,8,opt,name=autoarchive,proto3" json:"autoarchive,omitempty"`
+	Contributing   bool                   `protobuf:"varint,9,opt,name=contributing,proto3" json:"contributing,omitempty"`
+	DisabledAt     string                 `protobuf:"bytes,10,opt,name=disabled_at,proto3" json:"disabled_at,omitempty"`
+	TtlMinimum     uint64                 `protobuf:"varint,11,opt,name=ttl_minimum,proto3" json:"ttl_minimum,omitempty"`
+	EncryptionSeed string                 `protobuf:"bytes,12,opt,name=encryption_seed,proto3" json:"encryption_seed,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *Feed) Reset() {
@@ -143,6 +144,13 @@ func (x *Feed) GetTtlMinimum() uint64 {
 		return x.TtlMinimum
 	}
 	return 0
+}
+
+func (x *Feed) GetEncryptionSeed() string {
+	if x != nil {
+		return x.EncryptionSeed
+	}
+	return ""
 }
 
 type FeedSearchRequest struct {
@@ -517,7 +525,7 @@ var File_rss_proto protoreflect.FileDescriptor
 
 const file_rss_proto_rawDesc = "" +
 	"\n" +
-	"\trss.proto\x12\x03rss\"\xd8\x02\n" +
+	"\trss.proto\x12\x03rss\"\x82\x03\n" +
 	"\x04Feed\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1e\n" +
 	"\n" +
@@ -536,7 +544,8 @@ const file_rss_proto_rawDesc = "" +
 	"\fcontributing\x18\t \x01(\bR\fcontributing\x12 \n" +
 	"\vdisabled_at\x18\n" +
 	" \x01(\tR\vdisabled_at\x12 \n" +
-	"\vttl_minimum\x18\v \x01(\x04R\vttl_minimum\"h\n" +
+	"\vttl_minimum\x18\v \x01(\x04R\vttl_minimum\x12(\n" +
+	"\x0fencryption_seed\x18\f \x01(\tR\x0fencryption_seed\"h\n" +
 	"\x11FeedSearchRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12\x17\n" +
 	"\x06offset\x18\x84\a \x01(\x04R\x06offset\x12\x15\n" +

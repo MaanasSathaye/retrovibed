@@ -18,7 +18,6 @@ import (
 	"github.com/retrovibed/retrovibed/internal/md5x"
 	"github.com/retrovibed/retrovibed/internal/numericx"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
-	"github.com/retrovibed/retrovibed/internal/sqlxx"
 	"github.com/retrovibed/retrovibed/internal/stringsx"
 	"github.com/retrovibed/retrovibed/rss"
 	"github.com/retrovibed/retrovibed/tracking"
@@ -98,13 +97,13 @@ func (t *HTTPRSSFeed) search(w http.ResponseWriter, r *http.Request) {
 		squirrel.Expr("1=1"),
 	}).OrderBy("created_at DESC").Offset(msg.Next.Offset * msg.Next.Limit).Limit(msg.Next.Limit)
 
-	err = sqlxx.ScanEach(tracking.RSSSearch(r.Context(), t.q, q), func(p *tracking.RSS) error {
-		tmp := langx.Clone(rss.Feed{}, rss.FeedOptionFromTorrentRSS(langx.Clone(*p, tracking.RSSOptionJSONSafeEncode)))
+	qs := sqlx.Scan(tracking.RSSSearch(r.Context(), t.q, q))
+	for p := range qs.Iter() {
+		tmp := langx.Clone(rss.Feed{}, rss.FeedOptionFromTorrentRSS(langx.Clone(p, tracking.RSSOptionJSONSafeEncode)))
 		msg.Items = append(msg.Items, &tmp)
-		return nil
-	})
+	}
 
-	if err != nil {
+	if err = qs.Err(); err != nil {
 		log.Println(errorsx.Wrap(err, "encoding failed"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
@@ -119,7 +118,7 @@ func (t *HTTPRSSFeed) search(w http.ResponseWriter, r *http.Request) {
 func (t *HTTPRSSFeed) create(w http.ResponseWriter, r *http.Request) {
 	var (
 		err error
-		req rss.FeedUpdateRequest = rss.FeedUpdateRequest{}
+		req rss.FeedCreateRequest = rss.FeedCreateRequest{}
 	)
 
 	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {

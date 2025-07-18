@@ -15,6 +15,7 @@ func FeedOptionFromTorrentRSS(cc tracking.RSS) FeedOption {
 		c.Autodownload = cc.Autodownload
 		c.Autoarchive = cc.Autoarchive
 		c.Contributing = cc.Contributing
+		c.EncryptionSeed = cc.EncryptionSeed
 		c.CreatedAt = grpcx.EncodeTime(cc.CreatedAt)
 		c.UpdatedAt = grpcx.EncodeTime(cc.UpdatedAt)
 		c.NextCheck = grpcx.EncodeTime(cc.NextCheck)
