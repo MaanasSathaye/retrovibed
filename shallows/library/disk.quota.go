@@ -104,8 +104,8 @@ func NewAutoArchive(ctx context.Context, c *http.Client, dir fsx.Virtual, q sqlx
 	}
 
 	archive := func() error {
-		log.Println("disk quota initiated")
-		defer log.Println("disk quota completed")
+		log.Println("archival initiated")
+		defer log.Println("archival completed")
 
 		a := deeppool.NewArchiver(c)
 
@@ -160,7 +160,7 @@ func NewAutoArchive(ctx context.Context, c *http.Client, dir fsx.Virtual, q sqlx
 }
 
 // Clears archived data from disk.
-func NewDiskReclaim(ctx context.Context, c *http.Client, dir fsx.Virtual, q sqlx.Queryer, async *AsyncWakeup) error {
+func NewDiskReclaim(ctx context.Context, dir fsx.Virtual, q sqlx.Queryer, async *AsyncWakeup) error {
 	query := MetadataSearchBuilder().Where(squirrel.And{
 		MetadataQueryArchived(),
 	}).OrderBy("library_metadata.bytes DESC")
@@ -177,7 +177,8 @@ func NewDiskReclaim(ctx context.Context, c *http.Client, dir fsx.Virtual, q sqlx
 
 			if usage, err := disk.UsageWithContext(ctx, dir.Path()); err != nil {
 				log.Println(errorsx.Wrap(err, "unable to retrieve disk"))
-			} else if usage.UsedPercent <= 0.8 {
+				continue
+			} else if usage.UsedPercent <= 80 {
 				// dont continue if disk space remains below 80%
 				return v.Err()
 			} else {
@@ -185,10 +186,10 @@ func NewDiskReclaim(ctx context.Context, c *http.Client, dir fsx.Virtual, q sqlx
 			}
 
 			log.Println("------------------------- reclaim initiated", md.ID, md.ArchiveID)
-			if err := Reclaim(ctx, md, dir); err != nil {
-				errorsx.Log(errorsx.Wrapf(err, "disk reclaimation failed: %s", md.ID))
-				continue
-			}
+			// if err := Reclaim(ctx, md, dir); err != nil {
+			// 	errorsx.Log(errorsx.Wrapf(err, "disk reclaimation failed: %s", md.ID))
+			// 	continue
+			// }
 			log.Println("------------------------- reclaim completed", md.ID)
 		}
 

@@ -129,7 +129,7 @@ func DiscoverFromRSSFeedsOnce(ctx context.Context, q sqlx.Queryer, rootstore fsx
 			continue
 		}
 
-		if v := channel.LastBuildDate.Timestamp(time.Now()); v.Before(feed.LastBuiltAt) {
+		if v := channel.LastBuildDate.Timestamp(time.Now()); v.Before(feed.LastBuiltAt) || v.Equal(feed.LastBuiltAt) {
 			log.Println("torrent rss feed has not updated since last check", feed.ID, channel.TTL, v, "<", feed.LastBuiltAt)
 			if err = tracking.RSSCooldownByID(fctx, q, feed.ID, langx.DefaultIfZero(defaultttl, channel.TTL), v).Scan(&feed); err != nil {
 				log.Println("unable to mark rss feed for cooldown", err)

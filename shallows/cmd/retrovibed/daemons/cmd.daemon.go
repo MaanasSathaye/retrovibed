@@ -63,22 +63,27 @@ type logging interface {
 }
 
 type Command struct {
-	DisableMDNS          bool             `flag:"" name:"no-mdns" help:"disable the multicast dns service" default:"false" env:"${env_mdns_disabled}"`
-	AutoBootstrap        bool             `flag:"" name:"auto-bootstrap" help:"bootstrap from a predefined set of peers" default:"true" env:"${env_auto_bootstrap}"`
-	AutoDiscovery        bool             `flag:"" name:"auto-discovery" help:"EXPERIMENTAL: enable automatic discovery of content from peers" default:"false" env:"${env_auto_discovery}"`
-	AutoDownload         bool             `flag:"" name:"auto-download" help:"EXPERIMENTAL: enable automatically downloading torrent from the downloads folder" default:"false"`
-	AutoIdentifyMedia    bool             `flag:"" name:"auto-identify-media" help:"EXPERIMENTAL: enable automatically identifying media" default:"false" env:"${env_auto_identify_media}"`
-	AutoArchive          bool             `flag:"" name:"auto-archive" help:"enable automatic archiving of eligible media" default:"true" env:"${env_auto_archive}"`
-	AutoReclaim          bool             `flag:"" name:"auto-reclaim" help:"EXPERIMENTAL: enable automatic reclaiming of disk space of archived media" default:"false" env:"${env_auto_reclaim}"`
-	HTTP                 cmdopts.Listener `flag:"" name:"http-address" help:"address to serve daemon api from" default:"tcp://:9998" env:"${env_daemon_socket}"`
-	SelfSignedHosts      []string         `flag:"" name:"self-signed-hosts" help:"comma seperated list of hosts to add to the sign signed certificate" env:"${env_self_signed_hosts}"`
-	TorrentPort          uint16           `flag:"" name:"torrent-port" help:"port to use for torrenting" env:"${env_torrent_port}" default:"10000"`
-	TorrentPrivate       bool             `flag:"" name:"torrent-private" help:"restrict torrent connections to private networks" env:"${env_torrent_private}" default:"false"`
-	TorrentPublicIP4     string           `flag:"" name:"torrent-ipv4" help:"public ipv4 address of the torrent" env:"${env_torrent_ipv4}"`
-	TorrentPublicIP6     string           `flag:"" name:"torrent-ipv6" help:"public ipv6 address of the torrent" env:"${env_torrent_ipv6}"`
-	TorrentMaxRequests   uint32           `flag:"" name:"torrent-max-outstanding" help:"maximum piece requests to allow" default:"1024"`
-	TorrentNoResume      bool             `flag:"" name:"torrent-no-resume" help:"disable announcing and resuming torrents" default:"false"`
-	TorrentLegacyStorage bool             `flag:"" name:"torrent-legacy-storage" help:"enable legacy storage structure for migration" default:"false" hidden:"true"`
+	DisableMDNS        bool             `flag:"" name:"no-mdns" help:"disable the multicast dns service" env:"${env_mdns_disabled}"`
+	AutoBootstrap      bool             `flag:"" name:"auto-bootstrap" help:"bootstrap from a predefined set of peers" env:"${env_auto_bootstrap}"`
+	AutoDiscovery      bool             `flag:"" name:"auto-discovery" help:"EXPERIMENTAL: enable automatic discovery of content from peers" env:"${env_auto_discovery}"`
+	AutoDownload       bool             `flag:"" name:"auto-download" help:"EXPERIMENTAL: enable automatically downloading torrent from the downloads folder"`
+	AutoIdentifyMedia  bool             `flag:"" name:"auto-identify-media" help:"EXPERIMENTAL: enable automatically identifying media" env:"${env_auto_identify_media}"`
+	AutoArchive        bool             `flag:"" name:"auto-archive" help:"enable automatic archiving of eligible media" negatable:"" env:"${env_auto_archive}"`
+	AutoReclaim        bool             `flag:"" name:"auto-reclaim" help:"EXPERIMENTAL: enable automatic reclaiming of disk space of archived media" negatable:"" env:"${env_auto_reclaim}"`
+	TorrentResume      bool             `flag:"" name:"torrent-resume" help:"enable announcing and resuming torrents" negatable:"" default:"true"`
+	TorrentPrivate     bool             `flag:"" name:"torrent-private" help:"restrict torrent connections to private networks" env:"${env_torrent_private}"`
+	TorrentPort        uint16           `flag:"" name:"torrent-port" help:"port to use for torrenting" env:"${env_torrent_port}" default:"10000"`
+	TorrentPublicIP4   string           `flag:"" name:"torrent-ipv4" help:"public ipv4 address of the torrent" env:"${env_torrent_ipv4}"`
+	TorrentPublicIP6   string           `flag:"" name:"torrent-ipv6" help:"public ipv6 address of the torrent" env:"${env_torrent_ipv6}"`
+	TorrentMaxRequests uint32           `flag:"" name:"torrent-max-outstanding" help:"maximum piece requests to allow" default:"1024"`
+	HTTP               cmdopts.Listener `flag:"" name:"http-address" help:"address to serve daemon api from" default:"tcp://:9998" env:"${env_daemon_socket}"`
+	SelfSignedHosts    []string         `flag:"" name:"self-signed-hosts" help:"comma seperated list of hosts to add to the sign signed certificate" env:"${env_self_signed_hosts}"`
+}
+
+func (t *Command) BeforeApply() error {
+	t.AutoReclaim = true
+	t.TorrentResume = true
+	return nil
 }
 
 func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) {
@@ -165,11 +170,6 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) {
 	}
 
 	var tstore storage.ClientImpl = blockcache.NewTorrentFromVirtualFS(torrentstore)
-
-	if t.TorrentLegacyStorage {
-		log.Println("--------------------------------------- LEGACY STORAGE IN USE - NOT A SUPPORTED CONFIGURATION ---------------------------------------")
-		tstore = storage.NewFile(torrentstore.Path(), storage.FileOptionPathMakerInfohash)
-	}
 
 	if t.AutoReclaim {
 		errorsx.Log(AutoReclaim(gctx.Context, db, mediastore, library.NewAsyncWakeup(gctx.Context)))
@@ -317,7 +317,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) {
 			}
 		}()
 	} else {
-		log.Println("autodiscovery is disabled, to enable add --auto-discovery flag, this is an alpha feature.")
+		log.Println("autodiscovery is disabled, to enable add --auto-discovery flag, this is an experimental feature.")
 	}
 
 	go func() {
@@ -329,7 +329,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) {
 
 	go VerifyTorrents(dctx, db, rootstore, tclient, tstore)
 
-	if !t.TorrentNoResume {
+	if t.TorrentResume {
 		go AnnounceSeeded(dctx, db, rootstore, tclient, tstore)
 		go ResumeDownloads(dctx, db, rootstore, tclient, tstore)
 	} else {
@@ -342,7 +342,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) {
 			return nil
 		})
 	} else {
-		log.Println("auto identify media is disabled, to enable add --auto-identify-media. highly experimental.")
+		log.Println("auto identify media is disabled, to enable add --auto-identify-media flag, this is an experimental feature.")
 	}
 
 	if err = PublicIP(dctx, DefaultDialer(wgnet)); err != nil {
@@ -384,7 +384,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) {
 	metaapi.NewHTTPUsermanagement(db).Bind(metamux.PathPrefix("/u12t").Subrouter())
 	metaapi.NewHTTPDaemons(db).Bind(metamux.PathPrefix("/d").Subrouter())
 	metaapi.NewHTTPAuthz(db).Bind(metamux.PathPrefix("/authz").Subrouter())
-	media.NewHTTPLibrary(db, mediastore, deepjwt, media.HTTPLibraryOptionLegacy(t.TorrentLegacyStorage)).Bind(httpmux.PathPrefix("/m").Subrouter())
+	media.NewHTTPLibrary(db, mediastore, deepjwt).Bind(httpmux.PathPrefix("/m").Subrouter())
 	media.NewHTTPDiscovered(db, tclient, tstore, media.HTTPDiscoveredOptionRootStorage(rootstore)).Bind(httpmux.PathPrefix("/d").Subrouter())
 	media.NewHTTPRSSFeed(db).Bind(httpmux.PathPrefix("/rss").Subrouter())
 	media.NewHTTPKnown(db).Bind(httpmux.PathPrefix("/k").Subrouter())

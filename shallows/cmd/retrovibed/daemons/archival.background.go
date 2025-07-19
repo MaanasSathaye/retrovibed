@@ -34,11 +34,6 @@ func AutoArchival(ctx context.Context, q sqlx.Queryer, mediastore fsx.Virtual, a
 }
 
 func AutoReclaim(ctx context.Context, q sqlx.Queryer, mediastore fsx.Virtual, async *library.AsyncWakeup) error {
-	c, err := authn.Oauth2HTTPClient(ctx)
-	if err != nil {
-		return errorsx.Wrap(err, "failed to create oauth2 bearer token")
-	}
-
 	s := backoffx.New(
 		backoffx.Constant(time.Hour),
 		backoffx.Jitter(0.1),
@@ -46,7 +41,7 @@ func AutoReclaim(ctx context.Context, q sqlx.Queryer, mediastore fsx.Virtual, as
 
 	go library.PeriodicWakeup(ctx, async, s)
 	contextx.Run(ctx, func() {
-		errorsx.Log(library.NewDiskReclaim(ctx, metaapi.JWTClient(c), mediastore, q, async))
+		errorsx.Log(library.NewDiskReclaim(ctx, mediastore, q, async))
 	})
 	return nil
 }

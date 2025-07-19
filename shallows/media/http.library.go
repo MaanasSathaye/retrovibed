@@ -44,12 +44,6 @@ func HTTPLibraryOptionJWTSecret(j jwtx.SecretSource) HTTPLibraryOption {
 	}
 }
 
-func HTTPLibraryOptionLegacy(b bool) HTTPLibraryOption {
-	return func(t *HTTPLibrary) {
-		t.legacy = b
-	}
-}
-
 func NewHTTPLibrary(q sqlx.Queryer, media fsx.Virtual, deeppool *http.Client, options ...HTTPLibraryOption) *HTTPLibrary {
 	svc := langx.Clone(HTTPLibrary{
 		q:            q,
@@ -70,7 +64,6 @@ type HTTPLibrary struct {
 	deeppool     *http.Client
 	mediastorage fsx.Virtual
 	fts          lucenex.Driver
-	legacy       bool
 }
 
 func (t *HTTPLibrary) Bind(r *mux.Router) {
@@ -108,26 +101,17 @@ func (t *HTTPLibrary) Bind(r *mux.Router) {
 		httpx.Timeout2s(),
 	).ThenFunc(t.delete))
 
-	if !t.legacy {
-		r.Path("/{id}").Methods(http.MethodGet).Handler(alice.New(
-			httpauth.AuthenticateWithToken(t.jwtsecret),
-			// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
-			httpx.Timeout10s(),
-		).Then(http.FileServerFS(library.New(t.deeppool, t.mediastorage, func(ctx context.Context, s string) (*library.Metadata, error) {
-			var (
-				md library.Metadata
-			)
-			return &md, library.MetadataFindByID(ctx, t.q, strings.TrimPrefix(s, "m/")).Scan(&md)
-		}))))
-	} else {
-		r.Path("/{id}").Methods(http.MethodGet).Handler(alice.New(
-			httpauth.AuthenticateWithToken(t.jwtsecret),
-			// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
-			httpx.Timeout10s(),
-		).Then(http.FileServerFS(fsx.VirtualAsFSWithRewrite(t.mediastorage, func(s string) string {
-			return strings.TrimPrefix(s, "m/")
-		}))))
-	}
+	r.Path("/{id}").Methods(http.MethodGet).Handler(alice.New(
+		httpauth.AuthenticateWithToken(t.jwtsecret),
+		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
+		httpx.Timeout10s(),
+	).Then(http.FileServerFS(library.New(t.deeppool, t.mediastorage, func(ctx context.Context, s string) (*library.Metadata, error) {
+		var (
+			md library.Metadata
+		)
+		return &md, library.MetadataFindByID(ctx, t.q, strings.TrimPrefix(s, "m/")).Scan(&md)
+	}))))
+
 }
 
 func (t *HTTPLibrary) delete(w http.ResponseWriter, r *http.Request) {
