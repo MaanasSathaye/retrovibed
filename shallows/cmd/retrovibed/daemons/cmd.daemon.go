@@ -171,6 +171,12 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) {
 		tstore = storage.NewFile(torrentstore.Path(), storage.FileOptionPathMakerInfohash)
 	}
 
+	if t.AutoReclaim {
+		errorsx.Log(AutoReclaim(gctx.Context, db, mediastore, library.NewAsyncWakeup(gctx.Context)))
+	} else {
+		log.Println("automatic disk reclaim is disabled", envx.Boolean(t.AutoReclaim, env.AutoReclaim))
+	}
+
 	if t.AutoArchive {
 		if err := metaapi.Register(gctx.Context); err != nil {
 			return errorsx.Wrap(err, "unable to register with archival service")

@@ -82,19 +82,28 @@ func PeriodicWakeup(ctx context.Context, async *AsyncWakeup, b backoffx.Strategy
 	}
 }
 
-// Moves archivable data from disk to storage.
-func NewDiskQuota(ctx context.Context, c *http.Client, dir fsx.Virtual, q sqlx.Queryer, async *AsyncWakeup, reclaimdisk bool) error {
+// Moves archivable data from disk to cloud storage.
+func NewAutoArchive(ctx context.Context, c *http.Client, dir fsx.Virtual, q sqlx.Queryer, async *AsyncWakeup, reclaimdisk bool) error {
 	query := MetadataSearchBuilder().Where(squirrel.And{
 		MetadataQueryArchivable(),
 	})
 
-	archive := func() error {
-		if usage, err := disk.UsageWithContext(ctx, dir.Path()); err != nil {
-			log.Println(errorsx.Wrap(err, "unable to retrieve disk"))
-		} else {
-			log.Println("usage", dir.Path(), usage.UsedPercent, usage.Fstype)
-		}
+	if usage, err := disk.UsageWithContext(ctx, dir.Path()); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to retrieve disk"))
+	} else if usage.UsedPercent < 0.8 {
+		reclaimdisk = false
+		log.Println("usage", dir.Path(), usage.UsedPercent, usage.Fstype)
+	} else {
+		log.Println("usage", dir.Path(), usage.UsedPercent, usage.Fstype)
+	}
 
+	if reclaimdisk {
+		log.Println("archive will reclaim disk space")
+	} else {
+		log.Println("archive will not reclaim disk space")
+	}
+
+	archive := func() error {
 		log.Println("disk quota initiated")
 		defer log.Println("disk quota completed")
 
@@ -147,5 +156,70 @@ func NewDiskQuota(ctx context.Context, c *http.Client, dir fsx.Virtual, q sqlx.Q
 		return errorsx.Ignore(archive(), context.Canceled, context.DeadlineExceeded)
 	} else {
 		return errorsx.Wrap(err, "archival failed")
+	}
+}
+
+// Clears archived data from disk.
+func NewDiskReclaim(ctx context.Context, c *http.Client, dir fsx.Virtual, q sqlx.Queryer, async *AsyncWakeup) error {
+	query := MetadataSearchBuilder().Where(squirrel.And{
+		MetadataQueryArchived(),
+	}).OrderBy("library_metadata.bytes DESC")
+
+	reclaim := func() error {
+		log.Println("disk reclaim initiated")
+		defer log.Println("disk reclaim completed")
+
+		v := sqlx.Scan(MetadataSearch(ctx, q, query))
+		for md := range v.Iter() {
+			if !fsx.Exists(dir.Path(md.ID)) {
+				continue
+			}
+
+			if usage, err := disk.UsageWithContext(ctx, dir.Path()); err != nil {
+				log.Println(errorsx.Wrap(err, "unable to retrieve disk"))
+			} else if usage.UsedPercent <= 0.8 {
+				// dont continue if disk space remains below 80%
+				return v.Err()
+			} else {
+				log.Println("usage reclaiming", dir.Path(), usage.UsedPercent, usage.Fstype, md.ID, md.ArchiveID)
+			}
+
+			log.Println("------------------------- reclaim initiated", md.ID, md.ArchiveID)
+			if err := Reclaim(ctx, md, dir); err != nil {
+				errorsx.Log(errorsx.Wrapf(err, "disk reclaimation failed: %s", md.ID))
+				continue
+			}
+			log.Println("------------------------- reclaim completed", md.ID)
+		}
+
+		return v.Err()
+	}
+
+	untilClosed := func() error {
+		for {
+			if err := reclaim(); err != nil {
+				return err
+			}
+
+			select {
+			case err := <-async.C:
+				if err != nil {
+					return err
+				}
+			case <-ctx.Done():
+				return context.Cause(ctx)
+			}
+		}
+	}
+
+	// signal everything is done so the close function returns
+	defer async.doneCond.Broadcast()
+	if err := untilClosed(); errorsx.Is(err, context.Canceled, context.DeadlineExceeded) {
+		return nil
+	} else if errorsx.Is(err, errAsyncClosed) {
+		// run a final time to ensure everything is archived.
+		return errorsx.Ignore(reclaim(), context.Canceled, context.DeadlineExceeded)
+	} else {
+		return errorsx.Wrap(err, "reclaim failed")
 	}
 }
