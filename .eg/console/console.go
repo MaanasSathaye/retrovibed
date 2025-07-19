@@ -143,11 +143,13 @@ func flatpak(final egflatpak.Module) *egflatpak.Builder {
 			"--env=LC_NUMERIC=C",                            // for mpv
 			"--env=TMPDIR=/var/tmp/",                        // enaure golang sets its os.TempDir() to a working value.
 			"--env=RETROVIBED_MDNS_DISABLED=true",           // disable MDNS when running in flatpak since it doesn't work.
+			"--env=RETROVIBED_AUTO_IDENTIFY_MEDIA=false",    // automatically identify metadata for content. experimental.
 			"--env=RETROVIBED_TORRENT_AUTO_DISCOVERY=false", // peer scanning is an experimental feature.
 			"--env=RETROVIBED_TORRENT_AUTO_BOOTSTRAP=true",  // auto bootstrap the dht from a global endpoint.
 			"--env=RETROVIBED_TORRENT_PORT=",                // manually set the public torrent port.
-			"--env=RETROVIBED_TORRENT_PUBLIC_IP4=",          // manually set the public ipv4 address
-			"--env=RETROVIBED_TORRENT_PUBLIC_IP6=",          // manually set the public ipv6 address
+			"--env=RETROVIBED_TORRENT_PUBLIC_IP4=",          // manually set the public ipv4 address.
+			"--env=RETROVIBED_TORRENT_PUBLIC_IP6=",          // manually set the public ipv6 address.
+			"--env=RETROVIBED_JWT_SECRET=",                  // specify the jwt secret to use for signing tokens. generally this should not be necessary.
 			"--env=RETROVIBED_SELF_SIGNED_HOSTS=127.0.0.1",  // TLS hosts to include in the self signed certificate.
 		)...)
 }

@@ -45,7 +45,10 @@ const (
 )
 
 var v = sync.OnceValue(func() []byte {
-	return []byte(envx.String(uuid.Must(uuid.NewV4()).String(), JWTSharedSecret))
+	return []byte(envx.String(
+		uuid.Must(uuid.NewV4()).String(),
+		JWTSharedSecret,
+	))
 })
 
 func JWTSecret() []byte {
