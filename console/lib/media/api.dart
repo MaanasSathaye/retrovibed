@@ -155,7 +155,10 @@ abstract class discovered {
     {List<httpx.Option> options = const []}
   ) async {
       return httpx
-      .get(Uri.https(httpx.host(), "/d/downloading"), options: options)
+      .get(
+        Uri.https(httpx.host(), "/d/downloading", httpx.params(req.toProto3Json())),
+        options: options,
+      )
       .then((v) {
           return Future.value(
             DownloadSearchResponse.create()
