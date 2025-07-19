@@ -193,7 +193,7 @@ func Verify(ctx context.Context, t torrent.Torrent) error {
 	return torrent.Verify(ctx, t)
 }
 
-func DownloadInto(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata, t torrent.Torrent, dst io.Writer) (err error) {
+func DownloadInto(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata, t torrent.Torrent, dst io.Writer, options ...torrent.Tuner) (err error) {
 	var (
 		downloaded int64
 	)
@@ -212,7 +212,7 @@ func DownloadInto(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Meta
 	}
 
 	// just copying as we receive data to block until done.
-	if downloaded, err = torrent.DownloadInto(ctx, dst, t, torrent.TuneAnnounceUntilComplete, torrent.TuneNewConns); err != nil {
+	if downloaded, err = torrent.DownloadInto(ctx, dst, t, torrent.TuneAnnounceUntilComplete, torrent.TuneNewConns, langx.Compose(options...)); err != nil {
 		return errorsx.Wrap(err, "download failed")
 	}
 
@@ -223,11 +223,6 @@ func DownloadInto(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Meta
 		if cause != nil {
 			log.Println("import failed", cause)
 			err = errorsx.Compact(err, cause)
-			continue
-		}
-
-		if uint64(downloaded) != tx.Bytes {
-			err = errorsx.Compact(err, errorsx.Errorf("import failed did not read all data %d != %d", tx.Bytes, downloaded))
 			continue
 		}
 
@@ -366,14 +361,14 @@ func ImportSymlink(id int160.T, srcvfs, vfs fsx.Virtual) library.ImportOp {
 		}
 		defer src.Close()
 
+		if n, ok := src.(*blockcache.File); ok {
+			tx.Offset = n.Offset
+		}
+
 		if n, err := io.Copy(tx.MD5, src); err != nil {
 			return nil, err
 		} else {
 			tx.Bytes = uint64(n)
-		}
-
-		if n, ok := src.(*blockcache.File); ok {
-			tx.Offset = n.Offset
 		}
 
 		uid := md5x.FormatUUID(tx.MD5)

@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/md5"
 	"io"
+	"iter"
 	"os"
 	"path/filepath"
 	"testing"
@@ -69,4 +70,18 @@ func IOBytes(in io.Reader) []byte {
 
 func Context(t testing.TB) (context.Context, context.CancelFunc) {
 	return context.WithCancel(t.Context())
+}
+
+func SeqCount[T any](s iter.Seq[T]) (i uint64) {
+	for range s {
+		i++
+	}
+	return i
+}
+
+func Seq2Count[K any, T any](s iter.Seq2[K, T]) (i uint64) {
+	for range s {
+		i++
+	}
+	return i
 }

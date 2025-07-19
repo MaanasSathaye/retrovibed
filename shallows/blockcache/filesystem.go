@@ -66,11 +66,11 @@ func WithReset(val uint64) FileOption {
 }
 
 // NewFile function updated to use the option pattern.
-func NewFile(dca cache, ts time.Time, path string, len uint64, mod fs.FileMode, opts ...FileOption) *File {
+func NewFile(dca cache, ts time.Time, path string, _len uint64, mod fs.FileMode, opts ...FileOption) (f *File) {
 	return langx.Autoptr(langx.Clone(File{
 		cache:  dca,
 		Path:   path,
-		Length: len,
+		Length: _len,
 		ts:     ts,
 		m:      mod,
 		index:  new(atomic.Uint64),
@@ -122,7 +122,7 @@ func (t *File) Read(p []byte) (int, error) {
 }
 
 func (t *File) ReadAt(p []byte, offset int64) (int, error) {
-	return t.cache.ReadAt(p, offset)
+	return t.cache.ReadAt(p, int64(t.Offset)+offset)
 }
 
 func (t *File) Write(p []byte) (int, error) {

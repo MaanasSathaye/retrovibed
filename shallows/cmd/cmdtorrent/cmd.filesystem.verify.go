@@ -20,9 +20,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/langx"
 )
 
-type filesystemVerify struct {
-	Legacy bool `flag:"" name:"legacy" help:"enable legacy storage structure for migration" default:"false" hidden:"true"`
-}
+type filesystemVerify struct{}
 
 func (t filesystemVerify) Run(gctx *cmdopts.Global) (err error) {
 	type workload struct {
@@ -41,10 +39,6 @@ func (t filesystemVerify) Run(gctx *cmdopts.Global) (err error) {
 	bmcache := torrent.NewBitmapCache(tvfs.Path())
 
 	var tstore storage.ClientImpl = blockcache.NewTorrentFromVirtualFS(torrentstore)
-	if t.Legacy {
-		log.Println("--------------------------------------- LEGACY STORAGE IN USE - NOT A SUPPORTED CONFIGURATION ---------------------------------------")
-		tstore = storage.NewFile(torrentstore.Path(), storage.FileOptionPathMakerInfohash)
-	}
 
 	root, err := os.OpenRoot(tvfs.Path())
 	if err != nil {
