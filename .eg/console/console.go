@@ -130,16 +130,13 @@ func flatpak(final egflatpak.Module) *egflatpak.Builder {
 			AllowMusic().
 			AllowVideos().Allow(
 			// we specify environment variables here so they show up in flatseal for easy adjustments.
-			"--filesystem=host:ro",                 // for mpv
-			"--socket=pulseaudio",                  // for mpv
-			"--filesystem=xdg-run/pipewire-0:ro",   // for mpv
-			"--filesystem=~/.duckdb:create",        // for duckdb
-			"--talk-name=org.freedesktop.portal.*", // enable standard desktop functionality.
-			"--share=ipc",                          // enable standard desktop functionality.
-			"--filesystem=xdg-run/gvfsd",           // enable standard desktop functionality. (probably unnnecessary)
-			// "--filesystem=xdg-run/gvfs",            // enable standard desktop functionality. (probably unnnecessary)
-			// "--talk-name=org.gtk.vfs",              // enable standard desktop functionality. (probably unnnecessary)
-			// "--talk-name=org.gtk.vfs.*",            // enable standard desktop functionality. (probably unnnecessary)
+			"--filesystem=host:ro",                          // for mpv
+			"--socket=pulseaudio",                           // for mpv
+			"--filesystem=xdg-run/pipewire-0:ro",            // for mpv
+			"--filesystem=~/.duckdb:create",                 // for duckdb
+			"--talk-name=org.freedesktop.portal.*",          // enable standard desktop functionality.
+			"--share=ipc",                                   // enable standard desktop functionality.
+			"--filesystem=xdg-run/gvfsd",                    // enable standard desktop functionality. (probably unnnecessary)
 			"--env=LC_NUMERIC=C",                            // for mpv
 			"--env=TMPDIR=/var/tmp/",                        // enaure golang sets its os.TempDir() to a working value.
 			"--env=RETROVIBED_MDNS_DISABLED=true",           // disable MDNS when running in flatpak since it doesn't work.
