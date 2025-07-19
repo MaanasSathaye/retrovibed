@@ -26,6 +26,7 @@ func QuickClient(t testing.TB, options ...torrent.ClientConfigOption) *torrent.C
 				torrent.ClientConfigMuxer(dht.DefaultMuxer()),
 				torrent.ClientConfigBucketLimit(32),
 				torrent.ClientConfigCompose(options...),
+				torrent.ClientConfigDialPoolSize(1),
 			),
 		),
 	))(t)

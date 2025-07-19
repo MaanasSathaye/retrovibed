@@ -20,12 +20,12 @@ import (
 
 // Queryer interface for executing queries.
 type Queryer interface {
-	Query(string, ...interface{}) (*sql.Rows, error)
-	QueryRow(string, ...interface{}) *sql.Row
-	Exec(string, ...interface{}) (sql.Result, error)
-	QueryContext(context.Context, string, ...interface{}) (*sql.Rows, error)
-	QueryRowContext(context.Context, string, ...interface{}) *sql.Row
-	ExecContext(context.Context, string, ...interface{}) (sql.Result, error)
+	Query(string, ...any) (*sql.Rows, error)
+	QueryRow(string, ...any) *sql.Row
+	Exec(string, ...any) (sql.Result, error)
+	QueryContext(context.Context, string, ...any) (*sql.Rows, error)
+	QueryRowContext(context.Context, string, ...any) *sql.Row
+	ExecContext(context.Context, string, ...any) (sql.Result, error)
 }
 
 type Transactioner interface {
@@ -35,7 +35,7 @@ type Transactioner interface {
 
 // Row interface or scanning a single row.
 type Row interface {
-	Scan(dest ...interface{}) error
+	Scan(dest ...any) error
 }
 
 // Debug creates a DebuggingQueryer
@@ -51,34 +51,34 @@ type DebuggingQueryer struct {
 }
 
 // Query execute a query
-func (t DebuggingQueryer) Query(q string, args ...interface{}) (*sql.Rows, error) {
+func (t DebuggingQueryer) Query(q string, args ...any) (*sql.Rows, error) {
 	return t.QueryContext(context.Background(), q, args...)
 }
 
 // QueryRow executes a query that returns a single row.
-func (t DebuggingQueryer) QueryRow(q string, args ...interface{}) *sql.Row {
+func (t DebuggingQueryer) QueryRow(q string, args ...any) *sql.Row {
 	return t.QueryRowContext(context.Background(), q, args...)
 }
 
 // Exec executes a statement.
-func (t DebuggingQueryer) Exec(q string, args ...interface{}) (sql.Result, error) {
+func (t DebuggingQueryer) Exec(q string, args ...any) (sql.Result, error) {
 	return t.ExecContext(context.Background(), q, args...)
 }
 
 // QueryContext ...
-func (t DebuggingQueryer) QueryContext(ctx context.Context, q string, args ...interface{}) (*sql.Rows, error) {
+func (t DebuggingQueryer) QueryContext(ctx context.Context, q string, args ...any) (*sql.Rows, error) {
 	log.Printf("%s:\n%#v\n", q, args)
 	return t.Delegate.QueryContext(ctx, q, args...)
 }
 
 // QueryRowContext ...
-func (t DebuggingQueryer) QueryRowContext(ctx context.Context, q string, args ...interface{}) *sql.Row {
+func (t DebuggingQueryer) QueryRowContext(ctx context.Context, q string, args ...any) *sql.Row {
 	log.Printf("%s:\n%#v\n", q, args)
 	return t.Delegate.QueryRowContext(ctx, q, args...)
 }
 
 // ExecContext ...
-func (t DebuggingQueryer) ExecContext(ctx context.Context, q string, args ...interface{}) (sql.Result, error) {
+func (t DebuggingQueryer) ExecContext(ctx context.Context, q string, args ...any) (sql.Result, error) {
 	log.Printf("%s:\n%#v\n", q, args)
 	return t.Delegate.ExecContext(ctx, q, args...)
 }
@@ -164,7 +164,7 @@ func WriteCSV(rows *sql.Rows, dst io.Writer) error {
 		return errorsx.Wrap(err, "failed to write csv headers")
 	}
 
-	results := make([]interface{}, len(columns))
+	results := make([]any, len(columns))
 	resultStrings := make([]sql.NullString, len(columns))
 	for i := range resultStrings {
 		results[i] = &resultStrings[i]
@@ -280,7 +280,7 @@ func Columns(reference string) []string {
 }
 
 // ExpandStrings into an array of interfaces to pass to squirrel.
-func ExpandStrings(in []string) (results []interface{}) {
+func ExpandStrings(in []string) (results []any) {
 	for _, i := range in {
 		results = append(results, i)
 	}

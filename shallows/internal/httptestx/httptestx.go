@@ -4,11 +4,14 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"os"
 	"strings"
+
+	"github.com/retrovibed/retrovibed/internal/errorsx"
 )
 
 func BuildURL(path string, v url.Values) *url.URL {
@@ -101,5 +104,12 @@ func (f RoundTripFunc) RoundTrip(req *http.Request) (*http.Response, error) {
 func NewTestClient(fn RoundTripFunc) *http.Client {
 	return &http.Client{
 		Transport: RoundTripFunc(fn),
+	}
+}
+
+func HandleIO(in io.Reader) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		errorsx.Must(io.Copy(w, in))
 	}
 }
