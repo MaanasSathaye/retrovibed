@@ -22,7 +22,7 @@ require (
 	github.com/grindlemire/go-lucene v0.0.21
 	github.com/hashicorp/mdns v1.0.6
 	github.com/james-lawrence/genieql v0.0.0-20250605152251-dee4282e5e2a
-	github.com/james-lawrence/torrent v0.0.0-20250718143813-8bf0e7a97801
+	github.com/james-lawrence/torrent v0.0.0-20250720212857-eba9e8a4f849
 	github.com/justinas/alice v1.2.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/marcboeker/go-duckdb/v2 v2.3.2
@@ -36,7 +36,7 @@ require (
 	github.com/stretchr/testify v1.10.0
 	github.com/willabides/kongplete v0.4.0
 	golang.org/x/crypto v0.40.0
-	golang.org/x/exp v0.0.0-20250717185816-542afb5b7346
+	golang.org/x/exp v0.0.0-20250718183923-645b1fa84792
 	golang.org/x/oauth2 v0.30.0
 	golang.org/x/text v0.27.0
 	golang.org/x/time v0.12.0
