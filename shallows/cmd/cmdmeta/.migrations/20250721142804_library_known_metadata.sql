@@ -4,7 +4,7 @@ DROP TABLE IF EXISTS library_known_media;
 CREATE TABLE library_known_media (
     uid UUID PRIMARY KEY NOT NULL,
     md5 UUID UNIQUE NOT NULL,
-    md5_lower UBIGINT NOT NULL,
+    md5_lower UBIGINT NOT NULL GENERATED ALWAYS AS (md5_number_lower(md5::text)) VIRTUAL);,
     duplicates BIGINT NOT NULL DEFAULT 0,
     source VARCHAR NOT NULL DEFAULT '',
     id VARCHAR NOT NULL DEFAULT 0,

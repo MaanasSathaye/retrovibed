@@ -16,8 +16,9 @@ type knownimport struct{}
 
 func (t knownimport) Run(gctx *cmdopts.Global) (err error) {
 	var (
-		db *sql.DB
-		v  library.Known
+		db   *sql.DB
+		v    library.Known
+		derr error
 	)
 
 	if db, err = cmdmeta.Database(gctx.Context); err != nil {
@@ -27,12 +28,11 @@ func (t knownimport) Run(gctx *cmdopts.Global) (err error) {
 
 	d := jsonl.NewDecoder(os.Stdin)
 
-	for err = d.Decode(&v); err != nil; err = d.Decode(&v) {
+	for derr = d.Decode(&v); derr == nil; derr = d.Decode(&v) {
 		log.Println("DERP DERP", spew.Sdump(v))
 		if err = library.KnownInsertWithDefaults(gctx.Context, db, v).Scan(&v); err != nil {
 			return err
 		}
 	}
-
-	return nil
+	return derr
 }

@@ -28,8 +28,9 @@ type tmdbimport struct {
 
 func (t tmdbimport) Run(gctx *cmdopts.Global) (err error) {
 	var (
-		resp *tmdb.DiscoverMovie
+		resp *tmdb.DiscoverMovie = &tmdb.DiscoverMovie{}
 	)
+	defer log.Println("DONE")
 	c, err := tmdb.Init(t.APIKey)
 	if err != nil {
 		return errorsx.Wrap(err, "unable to initialize tmdb client")
@@ -47,7 +48,7 @@ func (t tmdbimport) Run(gctx *cmdopts.Global) (err error) {
 	year := time.Date(1900, time.January, 1, 0, 0, 0, 0, time.UTC)
 	cyear := time.Now().Year()
 	encoder := jsonl.NewEncoder(os.Stdout)
-	for page := int64(1); ; {
+	for page := int64(1); !(page == resp.TotalPages && cyear != year.Year()); {
 		resp, err = c.GetDiscoverMovie(map[string]string{
 			"include_adult":        "true",
 			"page":                 strconv.FormatInt(page, 10),
@@ -59,6 +60,7 @@ func (t tmdbimport) Run(gctx *cmdopts.Global) (err error) {
 			return errorsx.Wrap(err, "unable to initialize tmdb client")
 		}
 
+		// log.Println("SIGH", spew.Sdump(resp))
 		for _, mr := range resp.Results {
 			_md5 := md5x.JSON(mr)
 			uidmd5 := uuid.FromBytesOrNil(_md5.Sum(nil))
@@ -83,13 +85,10 @@ func (t tmdbimport) Run(gctx *cmdopts.Global) (err error) {
 		}
 
 		year = slicesx.LastOrDefault(year, slicesx.MapTransform(func(mr tmdb.MovieResult) time.Time { return errorsx.Must(time.Parse(time.DateOnly, mr.ReleaseDate)) }, resp.Results...)...)
-		page = resp.Page
-		if page == resp.TotalPages && cyear == year.Year() {
-			log.Println("DERP DERP", page, resp.TotalPages, cyear, year.Year())
-			break
-		}
-
+		log.Println("DERP DERP", page, resp.TotalPages, cyear, year.Year(), !(page == resp.TotalPages && cyear != year.Year()))
+		page = resp.Page + 1
 	}
 
+	log.Println("DERP DERP", resp.TotalPages, cyear, year.Year())
 	return nil
 }
