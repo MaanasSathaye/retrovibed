@@ -3,6 +3,7 @@ package cmdmedia
 import (
 	"encoding/binary"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"time"
@@ -65,7 +66,7 @@ func (t tmdbimport) Run(gctx *cmdopts.Global) (err error) {
 				UID:              library.KnownImportedUintID("tmdb", uint64(mr.ID)),
 				Md5:              uidmd5.String(),
 				Md5Lower:         binary.LittleEndian.Uint64(uuidx.LowN(uidmd5, 64)),
-				ID:               mr.ID,
+				ID:               strconv.FormatInt(mr.ID, 10),
 				Adult:            mr.Adult,
 				BackdropPath:     imgpath(mr.BackdropPath),
 				OriginalLanguage: mr.OriginalLanguage,
@@ -84,6 +85,7 @@ func (t tmdbimport) Run(gctx *cmdopts.Global) (err error) {
 		year = slicesx.LastOrDefault(year, slicesx.MapTransform(func(mr tmdb.MovieResult) time.Time { return errorsx.Must(time.Parse(time.DateOnly, mr.ReleaseDate)) }, resp.Results...)...)
 		page = resp.Page
 		if page == resp.TotalPages && cyear == year.Year() {
+			log.Println("DERP DERP", page, resp.TotalPages, cyear, year.Year())
 			break
 		}
 
