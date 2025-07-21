@@ -109,3 +109,89 @@ func TestFirstNonZero(t *testing.T) {
 		require.Equal(t, expected, actual, "Expected FirstNonZero to return uuid.Nil for single nil, got %v", actual)
 	})
 }
+
+func TestHighN(t *testing.T) {
+	runHighNTest := func(t *testing.T, id uuid.UUID, n int, expected []byte) {
+		actual := HighN(id, n)
+		require.Equal(t, expected, actual, "HighN(%v, %d) mismatch", id, n)
+	}
+
+	t.Run("n equals 0", func(t *testing.T) {
+		runHighNTest(t, uuid.Must(uuid.FromString("11223344-5566-7788-99AA-BBCCDDEEFF00")), 0, []byte(nil))
+	})
+
+	t.Run("n less than 0", func(t *testing.T) {
+		runHighNTest(t, uuid.Must(uuid.FromString("11223344-5566-7788-99AA-BBCCDDEEFF00")), -5, []byte(nil))
+	})
+
+	t.Run("n equals 1", func(t *testing.T) {
+		runHighNTest(t, uuid.Must(uuid.FromString("11223344-5566-7788-99AA-BBCCDDEEFF00")), 1, []byte{0x11})
+	})
+
+	t.Run("n equals 8 (half UUID)", func(t *testing.T) {
+		runHighNTest(t, uuid.Must(uuid.FromString("11223344-5566-7788-99AA-BBCCDDEEFF00")), 8, []byte{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88})
+	})
+
+	t.Run("n equals 16 (full UUID length)", func(t *testing.T) {
+		runHighNTest(t, uuid.Must(uuid.FromString("11223344-5566-7788-99AA-BBCCDDEEFF00")), 16, []byte{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00})
+	})
+
+	t.Run("n greater than 16", func(t *testing.T) {
+		runHighNTest(t, uuid.Must(uuid.FromString("11223344-5566-7788-99AA-BBCCDDEEFF00")), 20, []byte{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00})
+	})
+
+	t.Run("with uuid.Nil, n equals 0", func(t *testing.T) {
+		runHighNTest(t, uuid.Nil, 0, []byte(nil))
+	})
+
+	t.Run("with uuid.Nil, n equals 8", func(t *testing.T) {
+		runHighNTest(t, uuid.Nil, 8, []byte{0, 0, 0, 0, 0, 0, 0, 0})
+	})
+
+	t.Run("with uuid.Nil, n equals 16", func(t *testing.T) {
+		runHighNTest(t, uuid.Nil, 16, []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
+	})
+}
+
+func TestLowN(t *testing.T) {
+	runLowNTest := func(t *testing.T, id uuid.UUID, n int, expected []byte) {
+		actual := LowN(id, n)
+		require.Equal(t, expected, actual, "LowN(%v, %d) mismatch", id, n)
+	}
+
+	t.Run("n equals 0", func(t *testing.T) {
+		runLowNTest(t, uuid.Must(uuid.FromString("11223344-5566-7788-99AA-BBCCDDEEFF00")), 0, []byte(nil))
+	})
+
+	t.Run("n less than 0", func(t *testing.T) {
+		runLowNTest(t, uuid.Must(uuid.FromString("11223344-5566-7788-99AA-BBCCDDEEFF00")), -5, []byte(nil))
+	})
+
+	t.Run("n equals 1", func(t *testing.T) {
+		runLowNTest(t, uuid.Must(uuid.FromString("11223344-5566-7788-99AA-BBCCDDEEFF00")), 1, []byte{0x11})
+	})
+
+	t.Run("n equals 8 (half UUID)", func(t *testing.T) {
+		runLowNTest(t, uuid.Must(uuid.FromString("11223344-5566-7788-99AA-BBCCDDEEFF00")), 8, []byte{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88})
+	})
+
+	t.Run("n equals 16 (full UUID length)", func(t *testing.T) {
+		runLowNTest(t, uuid.Must(uuid.FromString("11223344-5566-7788-99AA-BBCCDDEEFF00")), 16, []byte{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00})
+	})
+
+	t.Run("n greater than 16", func(t *testing.T) {
+		runLowNTest(t, uuid.Must(uuid.FromString("11223344-5566-7788-99AA-BBCCDDEEFF00")), 20, []byte{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00})
+	})
+
+	t.Run("with uuid.Nil, n equals 0", func(t *testing.T) {
+		runLowNTest(t, uuid.Nil, 0, []byte(nil))
+	})
+
+	t.Run("with uuid.Nil, n equals 8", func(t *testing.T) {
+		runLowNTest(t, uuid.Nil, 8, []byte{0, 0, 0, 0, 0, 0, 0, 0})
+	})
+
+	t.Run("with uuid.Nil, n equals 16", func(t *testing.T) {
+		runLowNTest(t, uuid.Nil, 16, []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
+	})
+}

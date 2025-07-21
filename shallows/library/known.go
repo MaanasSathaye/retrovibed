@@ -2,6 +2,8 @@ package library
 
 import (
 	"context"
+	"fmt"
+	"hash/fnv"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/gofrs/uuid/v5"
@@ -18,6 +20,13 @@ func KnownOptionTestDefaults(t *Known) {
 	t.UID = errorsx.Must(uuid.NewV4()).String()
 	t.Md5 = errorsx.Must(uuid.NewV4()).String()
 	t.Adult = false
+}
+
+// create a unique import id from a uint sequence.
+func KnownImportedUintID(prefix string, id uint64) string {
+	l := id & 0x0000FFFFFFFFFFFF
+	h := id & 0xFFFF000000000000 >> 56
+	return fmt.Sprintf("%x-0000-0000-%04x-%012x", fnv.New32().Sum([]byte(prefix))[:4], h, l)
 }
 
 func Unknown() Known {

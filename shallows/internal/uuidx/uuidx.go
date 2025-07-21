@@ -45,14 +45,28 @@ func FirstNonZero(uids ...uuid.UUID) uuid.UUID {
 }
 
 func HighN(id uuid.UUID, n int) []byte {
-	uuidBytes := id.Bytes()
+	ubytes := id.Bytes()
 
 	if n <= 0 {
-		return []byte{}
-	}
-	if n >= len(uuidBytes) {
-		return append([]byte(nil), uuidBytes...)
+		return []byte(nil)
 	}
 
-	return append([]byte(nil), uuidBytes[:n]...)
+	if n >= len(ubytes) {
+		return ubytes
+	}
+
+	return ubytes[:n]
+}
+
+func LowN(id uuid.UUID, n int) []byte {
+	ubytes := id.Bytes()
+
+	if n <= 0 {
+		return []byte(nil)
+	}
+	if n >= len(ubytes) {
+		return append([]byte(nil), ubytes...)
+	}
+
+	return ubytes[:n]
 }

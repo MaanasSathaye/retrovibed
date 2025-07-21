@@ -11,6 +11,7 @@ require (
 	github.com/anacrolix/utp v0.2.0
 	github.com/benbjohnson/immutable v0.4.3
 	github.com/charmbracelet/huh v0.7.0
+	github.com/cyruzin/golang-tmdb v1.8.1
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/gabriel-vasile/mimetype v1.4.9
 	github.com/go-playground/form/v4 v4.2.2

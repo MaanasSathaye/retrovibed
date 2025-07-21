@@ -4,9 +4,11 @@ import (
 	"crypto/md5"
 	"encoding/base64"
 	"encoding/hex"
+	"encoding/json"
 	"hash"
 
 	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/internal/errorsx"
 )
 
 // digest the provided contents and return the resulting hash.
@@ -22,6 +24,10 @@ func Digest[T string | ~[]byte](bs ...T) hash.Hash {
 	}
 
 	return v
+}
+
+func JSON(v any) hash.Hash {
+	return Digest(errorsx.Must(json.Marshal(v)))
 }
 
 // String to md5 uuid encoded string
