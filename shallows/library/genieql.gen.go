@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/internal/ducktype"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
 )
 
@@ -112,18 +113,18 @@ func (t metadataScannerStatic) Scan(i *Metadata) error {
 	var (
 		c0  sql.NullString
 		c1  sql.NullString
-		c2  sql.Null[uint64]
+		c2  ducktype.NullUint64
 		c3  sql.NullTime
 		c4  sql.NullString
-		c5  sql.Null[uint64]
-		c6  sql.Null[uint64]
+		c5  ducktype.NullUint64
+		c6  ducktype.NullUint64
 		c7  sql.NullString
 		c8  sql.NullTime
 		c9  sql.NullString
 		c10 sql.NullString
 		c11 sql.NullString
 		c12 sql.NullString
-		c13 sql.Null[uint64]
+		c13 ducktype.NullUint64
 		c14 sql.NullTime
 		c15 sql.NullString
 		c16 sql.NullTime
@@ -147,8 +148,7 @@ func (t metadataScannerStatic) Scan(i *Metadata) error {
 	}
 
 	if c2.Valid {
-		tmp := c2.V
-		i.Bytes = tmp
+		i.Bytes = c2.V
 	}
 
 	if c3.Valid {
@@ -162,13 +162,11 @@ func (t metadataScannerStatic) Scan(i *Metadata) error {
 	}
 
 	if c5.Valid {
-		tmp := c5.V
-		i.DiskOffset = tmp
+		i.DiskOffset = c5.V
 	}
 
 	if c6.Valid {
-		tmp := c6.V
-		i.DiskUsage = tmp
+		i.DiskUsage = c6.V
 	}
 
 	if c7.Valid {
@@ -211,8 +209,7 @@ func (t metadataScannerStatic) Scan(i *Metadata) error {
 	}
 
 	if c13.Valid {
-		tmp := c13.V
-		i.QuotaUsage = tmp
+		i.QuotaUsage = c13.V
 	}
 
 	if c14.Valid {
@@ -273,18 +270,18 @@ func (t MetadataScannerStaticRow) Scan(i *Metadata) error {
 	var (
 		c0  sql.NullString
 		c1  sql.NullString
-		c2  sql.Null[uint64]
+		c2  ducktype.NullUint64
 		c3  sql.NullTime
 		c4  sql.NullString
-		c5  sql.Null[uint64]
-		c6  sql.Null[uint64]
+		c5  ducktype.NullUint64
+		c6  ducktype.NullUint64
 		c7  sql.NullString
 		c8  sql.NullTime
 		c9  sql.NullString
 		c10 sql.NullString
 		c11 sql.NullString
 		c12 sql.NullString
-		c13 sql.Null[uint64]
+		c13 ducktype.NullUint64
 		c14 sql.NullTime
 		c15 sql.NullString
 		c16 sql.NullTime
@@ -312,8 +309,7 @@ func (t MetadataScannerStaticRow) Scan(i *Metadata) error {
 	}
 
 	if c2.Valid {
-		tmp := c2.V
-		i.Bytes = tmp
+		i.Bytes = c2.V
 	}
 
 	if c3.Valid {
@@ -327,13 +323,11 @@ func (t MetadataScannerStaticRow) Scan(i *Metadata) error {
 	}
 
 	if c5.Valid {
-		tmp := c5.V
-		i.DiskOffset = tmp
+		i.DiskOffset = c5.V
 	}
 
 	if c6.Valid {
-		tmp := c6.V
-		i.DiskUsage = tmp
+		i.DiskUsage = c6.V
 	}
 
 	if c7.Valid {
@@ -376,8 +370,7 @@ func (t MetadataScannerStaticRow) Scan(i *Metadata) error {
 	}
 
 	if c13.Valid {
-		tmp := c13.V
-		i.QuotaUsage = tmp
+		i.QuotaUsage = c13.V
 	}
 
 	if c14.Valid {
@@ -452,18 +445,18 @@ func (t metadataScannerDynamic) Scan(i *Metadata) error {
 		dst     []interface{}
 		c0      sql.NullString
 		c1      sql.NullString
-		c2      sql.Null[uint64]
+		c2      ducktype.NullUint64
 		c3      sql.NullTime
 		c4      sql.NullString
-		c5      sql.Null[uint64]
-		c6      sql.Null[uint64]
+		c5      ducktype.NullUint64
+		c6      ducktype.NullUint64
 		c7      sql.NullString
 		c8      sql.NullTime
 		c9      sql.NullString
 		c10     sql.NullString
 		c11     sql.NullString
 		c12     sql.NullString
-		c13     sql.Null[uint64]
+		c13     ducktype.NullUint64
 		c14     sql.NullTime
 		c15     sql.NullString
 		c16     sql.NullTime
@@ -539,8 +532,7 @@ func (t metadataScannerDynamic) Scan(i *Metadata) error {
 
 		case cn2:
 			if c2.Valid {
-				tmp := c2.V
-				i.Bytes = tmp
+				i.Bytes = c2.V
 			}
 
 		case cn3:
@@ -557,14 +549,12 @@ func (t metadataScannerDynamic) Scan(i *Metadata) error {
 
 		case cn5:
 			if c5.Valid {
-				tmp := c5.V
-				i.DiskOffset = tmp
+				i.DiskOffset = c5.V
 			}
 
 		case cn6:
 			if c6.Valid {
-				tmp := c6.V
-				i.DiskUsage = tmp
+				i.DiskUsage = c6.V
 			}
 
 		case cn7:
@@ -614,8 +604,7 @@ func (t metadataScannerDynamic) Scan(i *Metadata) error {
 
 		case cn13:
 			if c13.Valid {
-				tmp := c13.V
-				i.QuotaUsage = tmp
+				i.QuotaUsage = c13.V
 			}
 
 		case cn14:
@@ -720,7 +709,7 @@ func (t knownScannerStatic) Scan(i *Known) error {
 		c3  sql.NullInt64
 		c4  sql.NullString
 		c5  sql.NullString
-		c6  sql.Null[uint64]
+		c6  ducktype.NullUint64
 		c7  sql.NullString
 		c8  sql.NullString
 		c9  sql.NullString
@@ -772,8 +761,7 @@ func (t knownScannerStatic) Scan(i *Known) error {
 	}
 
 	if c6.Valid {
-		tmp := c6.V
-		i.Md5Lower = tmp
+		i.Md5Lower = c6.V
 	}
 
 	if c7.Valid {
@@ -878,7 +866,7 @@ func (t KnownScannerStaticRow) Scan(i *Known) error {
 		c3  sql.NullInt64
 		c4  sql.NullString
 		c5  sql.NullString
-		c6  sql.Null[uint64]
+		c6  ducktype.NullUint64
 		c7  sql.NullString
 		c8  sql.NullString
 		c9  sql.NullString
@@ -934,8 +922,7 @@ func (t KnownScannerStaticRow) Scan(i *Known) error {
 	}
 
 	if c6.Valid {
-		tmp := c6.V
-		i.Md5Lower = tmp
+		i.Md5Lower = c6.V
 	}
 
 	if c7.Valid {
@@ -1055,7 +1042,7 @@ func (t knownScannerDynamic) Scan(i *Known) error {
 		c3      sql.NullInt64
 		c4      sql.NullString
 		c5      sql.NullString
-		c6      sql.Null[uint64]
+		c6      ducktype.NullUint64
 		c7      sql.NullString
 		c8      sql.NullString
 		c9      sql.NullString
@@ -1165,8 +1152,7 @@ func (t knownScannerDynamic) Scan(i *Known) error {
 
 		case cn6:
 			if c6.Valid {
-				tmp := c6.V
-				i.Md5Lower = tmp
+				i.Md5Lower = c6.V
 			}
 
 		case cn7:
@@ -1608,19 +1594,19 @@ const MetadataInsertWithDefaultsStaticColumns = `$1,$2,$3,DEFAULT,$4,$5,$6,$7,DE
 // MetadataInsertWithDefaultsExplode generated by genieql
 func MetadataInsertWithDefaultsExplode(a *Metadata) ([]interface{}, error) {
 	var (
-		c0  sql.NullString   // archive_id
-		c1  sql.NullString   // auto_description
-		c2  sql.Null[uint64] // bytes
-		c3  sql.NullString   // description
-		c4  sql.Null[uint64] // disk_offset
-		c5  sql.Null[uint64] // disk_usage
-		c6  sql.NullString   // encryption_seed
-		c7  sql.NullString   // id
-		c8  sql.NullString   // image
-		c9  sql.NullString   // known_media_id
-		c10 sql.NullString   // mimetype
-		c11 sql.Null[uint64] // quota_usage
-		c12 sql.NullString   // torrent_id
+		c0  sql.NullString      // archive_id
+		c1  sql.NullString      // auto_description
+		c2  ducktype.NullUint64 // bytes
+		c3  sql.NullString      // description
+		c4  ducktype.NullUint64 // disk_offset
+		c5  ducktype.NullUint64 // disk_usage
+		c6  sql.NullString      // encryption_seed
+		c7  sql.NullString      // id
+		c8  sql.NullString      // image
+		c9  sql.NullString      // known_media_id
+		c10 sql.NullString      // mimetype
+		c11 ducktype.NullUint64 // quota_usage
+		c12 sql.NullString      // torrent_id
 	)
 
 	c0.Valid = true
@@ -1669,18 +1655,18 @@ func MetadataInsertWithDefaultsExplode(a *Metadata) ([]interface{}, error) {
 func MetadataInsertWithDefaults(ctx context.Context, q sqlx.Queryer, a Metadata) MetadataScannerStaticRow {
 	const query = `INSERT INTO "library_metadata" ("archive_id","auto_description","bytes","created_at","description","disk_offset","disk_usage","encryption_seed","hidden_at","id","image","known_media_id","mimetype","quota_usage","tombstoned_at","torrent_id","updated_at") VALUES ($1,$2,$3,DEFAULT,$4,$5,$6,$7,DEFAULT,$8,$9,$10,$11,$12,DEFAULT,$13,DEFAULT) ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, archive_id = CASE WHEN archive_id IN ('ffffffff-ffff-ffff-ffff-ffffffffffff', '00000000-0000-0000-0000-000000000000') THEN EXCLUDED.archive_id ELSE archive_id END RETURNING "archive_id","auto_description","bytes","created_at","description","disk_offset","disk_usage","encryption_seed","hidden_at","id","image","known_media_id","mimetype","quota_usage","tombstoned_at","torrent_id","updated_at"`
 	var (
-		c0  sql.NullString   // archive_id
-		c1  sql.NullString   // auto_description
-		c2  sql.Null[uint64] // bytes
-		c3  sql.NullString   // description
-		c4  sql.Null[uint64] // disk_offset
-		c5  sql.Null[uint64] // disk_usage
-		c6  sql.NullString   // encryption_seed
-		c7  sql.NullString   // id
-		c8  sql.NullString   // image
-		c9  sql.NullString   // known_media_id
-		c10 sql.NullString   // mimetype
-		c11 sql.Null[uint64] // quota_usage
+		c0  sql.NullString      // archive_id
+		c1  sql.NullString      // auto_description
+		c2  ducktype.NullUint64 // bytes
+		c3  sql.NullString      // description
+		c4  ducktype.NullUint64 // disk_offset
+		c5  ducktype.NullUint64 // disk_usage
+		c6  sql.NullString      // encryption_seed
+		c7  sql.NullString      // id
+		c8  sql.NullString      // image
+		c9  sql.NullString      // known_media_id
+		c10 sql.NullString      // mimetype
+		c11 ducktype.NullUint64 // quota_usage
 		c12 sql.NullString
 	)
 	c0.Valid = true
@@ -1718,24 +1704,24 @@ const KnownInsertWithDefaultsStaticColumns = `$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11
 // KnownInsertWithDefaultsExplode generated by genieql
 func KnownInsertWithDefaultsExplode(a *Known) ([]interface{}, error) {
 	var (
-		c0  sql.NullBool     // adult
-		c1  sql.NullString   // auto_description
-		c2  sql.NullString   // backdrop_path
-		c3  sql.NullInt64    // duplicates
-		c4  sql.NullString   // id
-		c5  sql.NullString   // md5
-		c6  sql.Null[uint64] // md5_lower
-		c7  sql.NullString   // original_language
-		c8  sql.NullString   // original_title
-		c9  sql.NullString   // overview
-		c10 sql.NullFloat64  // popularity
-		c11 sql.NullString   // poster_path
-		c12 sql.NullTime     // released
-		c13 sql.NullString   // source
-		c14 sql.NullString   // title
-		c15 sql.NullString   // uid
-		c16 sql.NullFloat64  // vote_average
-		c17 sql.NullInt64    // vote_count
+		c0  sql.NullBool        // adult
+		c1  sql.NullString      // auto_description
+		c2  sql.NullString      // backdrop_path
+		c3  sql.NullInt64       // duplicates
+		c4  sql.NullString      // id
+		c5  sql.NullString      // md5
+		c6  ducktype.NullUint64 // md5_lower
+		c7  sql.NullString      // original_language
+		c8  sql.NullString      // original_title
+		c9  sql.NullString      // overview
+		c10 sql.NullFloat64     // popularity
+		c11 sql.NullString      // poster_path
+		c12 sql.NullTime        // released
+		c13 sql.NullString      // source
+		c14 sql.NullString      // title
+		c15 sql.NullString      // uid
+		c16 sql.NullFloat64     // vote_average
+		c17 sql.NullInt64       // vote_count
 	)
 
 	c0.Valid = true
@@ -1797,25 +1783,25 @@ func KnownInsertWithDefaultsExplode(a *Known) ([]interface{}, error) {
 
 // KnownInsertWithDefaults generated by genieql
 func KnownInsertWithDefaults(ctx context.Context, q sqlx.Queryer, a Known) KnownScannerStaticRow {
-	const query = `INSERT INTO "library_known_media" ("adult","auto_description","backdrop_path","duplicates","id","md5","md5_lower","original_language","original_title","overview","popularity","poster_path","released","source","title","uid","vote_average","vote_count") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18) RETURNING "adult","auto_description","backdrop_path","duplicates","id","md5","md5_lower","original_language","original_title","overview","popularity","poster_path","released","source","title","uid","vote_average","vote_count"`
+	const query = `INSERT INTO "library_known_media" ("adult","auto_description","backdrop_path","duplicates","id","md5","md5_lower","original_language","original_title","overview","popularity","poster_path","released","source","title","uid","vote_average","vote_count") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18) ON CONFLICT (uid) DO UPDATE SET title = EXCLUDED.title, original_language = EXCLUDED.original_language, original_title = EXCLUDED.original_title, popularity = EXCLUDED.popularity, overview = EXCLUDED.overview, source = EXCLUDED.source, poster_path = EXCLUDED.poster_path, backdrop_path = EXCLUDED.backdrop_path, duplicates = duplicates + 1 RETURNING "adult","auto_description","backdrop_path","duplicates","id","md5","md5_lower","original_language","original_title","overview","popularity","poster_path","released","source","title","uid","vote_average","vote_count"`
 	var (
-		c0  sql.NullBool     // adult
-		c1  sql.NullString   // auto_description
-		c2  sql.NullString   // backdrop_path
-		c3  sql.NullInt64    // duplicates
-		c4  sql.NullString   // id
-		c5  sql.NullString   // md5
-		c6  sql.Null[uint64] // md5_lower
-		c7  sql.NullString   // original_language
-		c8  sql.NullString   // original_title
-		c9  sql.NullString   // overview
-		c10 sql.NullFloat64  // popularity
-		c11 sql.NullString   // poster_path
-		c12 sql.NullTime     // released
-		c13 sql.NullString   // source
-		c14 sql.NullString   // title
-		c15 sql.NullString   // uid
-		c16 sql.NullFloat64  // vote_average
+		c0  sql.NullBool        // adult
+		c1  sql.NullString      // auto_description
+		c2  sql.NullString      // backdrop_path
+		c3  sql.NullInt64       // duplicates
+		c4  sql.NullString      // id
+		c5  sql.NullString      // md5
+		c6  ducktype.NullUint64 // md5_lower
+		c7  sql.NullString      // original_language
+		c8  sql.NullString      // original_title
+		c9  sql.NullString      // overview
+		c10 sql.NullFloat64     // popularity
+		c11 sql.NullString      // poster_path
+		c12 sql.NullTime        // released
+		c13 sql.NullString      // source
+		c14 sql.NullString      // title
+		c15 sql.NullString      // uid
+		c16 sql.NullFloat64     // vote_average
 		c17 sql.NullInt64
 	)
 	c0.Valid = true

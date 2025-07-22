@@ -129,12 +129,14 @@ func Main(args ...string) {
 		}
 	}, syscall.SIGUSR1)
 
+	tsstarted := time.Now().UTC()
 	parser := kong.Must(
 		&shellCli,
 		kong.Name(userx.DefaultRelRoot()),
 		kong.Description("daemon"),
 		kong.Vars{
-			"vars_timestamp_started":  time.Now().UTC().Format(time.RFC3339),
+			"vars_date_started":       tsstarted.UTC().Format(time.DateOnly),
+			"vars_timestamp_started":  tsstarted.UTC().Format(time.RFC3339),
 			"vars_random_seed":        uuid.Must(uuid.NewV4()).String(),
 			"vars_cores":              strconv.Itoa(runtime.NumCPU()),
 			"env_mdns_disabled":       env.MDNSDisabled,

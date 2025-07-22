@@ -2,13 +2,14 @@ package cmdmedia
 
 import (
 	"database/sql"
-	"log"
+	"io"
 	"os"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/jsonl"
+	"github.com/retrovibed/retrovibed/internal/stringsx"
 	"github.com/retrovibed/retrovibed/library"
 )
 
@@ -29,10 +30,11 @@ func (t knownimport) Run(gctx *cmdopts.Global) (err error) {
 	d := jsonl.NewDecoder(os.Stdin)
 
 	for derr = d.Decode(&v); derr == nil; derr = d.Decode(&v) {
-		log.Println("DERP DERP", spew.Sdump(v))
+		v.AutoDescription = stringsx.Join("\n", v.Title, v.OriginalTitle, v.Overview)
 		if err = library.KnownInsertWithDefaults(gctx.Context, db, v).Scan(&v); err != nil {
 			return err
 		}
 	}
-	return derr
+
+	return errorsx.Ignore(derr, io.EOF)
 }

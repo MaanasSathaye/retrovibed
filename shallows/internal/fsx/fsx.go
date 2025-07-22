@@ -208,3 +208,14 @@ func (t *Walker) Walk() iter.Seq2[string, fs.DirEntry] {
 func (t *Walker) Err() error {
 	return t.failed
 }
+
+func AppendTo(path string, encoded []byte, perm os.FileMode) error {
+	d, err := os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, perm)
+	if err != nil {
+		return err
+	}
+	defer d.Close()
+
+	_, err = d.Write(encoded)
+	return err
+}

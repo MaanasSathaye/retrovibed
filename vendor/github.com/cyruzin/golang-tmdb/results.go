@@ -61,6 +61,7 @@ type AccountFavoriteMoviesResults struct {
 // and average, associated genre IDs, and the countries of origin.
 type TVShowResult struct {
 	ID               int64    `json:"id"`
+	Adult            bool     `json:"adult"`
 	Name             string   `json:"name"`
 	OriginalName     string   `json:"original_name"`
 	OriginalLanguage string   `json:"original_language"`

@@ -1,7 +1,22 @@
-- type: VARCHAR
+- type: UBIGINT
   native: uint64
-  database_type_name: VARCHAR
+  database_type_name: UBIGINT
   column_type: ducktype.NullUint64
+  decode: |-
+    func() {
+      if {{ .From | expr }}.Valid {
+        {{ .To | autodereference | expr }} = {{ .From | expr }}.V
+      }
+    }
+  encode: |-
+    func() {
+      {{ .To | expr }}.Valid = true
+      {{ .To | expr }}.V = {{ .From | expr }}
+    }
+- type: INTERVAL
+  native: time.Duration
+  database_type_name: INTERVAL
+  column_type: ducktype.NullDuration
   decode: |-
     func() {
       if {{ .From | expr }}.Valid {
