@@ -28,8 +28,8 @@ class _DaemonList extends State<DaemonList> {
   Widget? _optional = null;
   api.DaemonSearchResponse _res = api.daemons.response();
 
-  void refresh(api.DaemonSearchRequest req) {
-    widget
+  Future<void> refresh(api.DaemonSearchRequest req) {
+    return widget
         .search(req)
         .then((v) {
           setState(() {
@@ -62,68 +62,43 @@ class _DaemonList extends State<DaemonList> {
       leading: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    _optional =
-                        _optional != null
-                            ? null
-                            : ManualConfiguration(
-                              connect: (daemon) {
-                                setState(() {
-                                  _optional = null;
-                                  _res.next.offset = fixnum.Int64(0);
-                                });
-                                refresh(_res.next);
-                              },
-                            );
-                  });
-                },
-                icon: Icon(_optional == null ? Icons.add : Icons.remove),
-              ),
-              Expanded(
-                child: TextField(
-                  decoration: InputDecoration(hintText: "search servers"),
-                  onChanged:
-                      (v) => setState(() {
-                        _res.next.query = v;
-                      }),
-                  onSubmitted: (v) {
-                    setState(() {
-                      _res.next.offset = fixnum.Int64(0);
-                    });
-                    refresh(_res.next);
-                  },
-                ),
-              ),
-              IconButton(
-                onPressed:
-                    _res.next.offset > 0
-                        ? () {
-                          setState(() {
-                            _res.next.offset -= 1;
-                          });
-                          refresh(_res.next);
-                        }
-                        : null,
-                icon: Icon(Icons.arrow_left),
-              ),
-              IconButton(
-                onPressed:
-                    _res.items.isNotEmpty
-                        ? () {
-                          setState(() {
-                            _res.next.offset += 1;
-                          });
-                          refresh(_res.next);
-                        }
-                        : null,
-                icon: Icon(Icons.arrow_right),
-              ),
-            ],
+          ds.SearchTray(
+            autofocus: true,
+            inputDecoration: InputDecoration(hintText: "search servers"),
+            onSubmitted: (v) {
+              setState(() {
+                _res.next.query = v;
+                _res.next.offset = fixnum.Int64(0);
+              });
+              return refresh(_res.next);
+            },
+            next: (i) {
+              setState(() {
+                _res.next.offset = i;
+              });
+              refresh(_res.next);
+            },
+            current: _res.next.offset,
+            empty: fixnum.Int64(_res.items.length) < _res.next.limit,
+            leading: IconButton(
+              onPressed: () {
+                setState(() {
+                  _optional =
+                      _optional != null
+                          ? null
+                          : ManualConfiguration(
+                            connect: (daemon) {
+                              setState(() {
+                                _optional = null;
+                                _res.next.offset = fixnum.Int64(0);
+                              });
+                              refresh(_res.next);
+                            },
+                          );
+                });
+              },
+              icon: Icon(_optional == null ? Icons.add : Icons.remove),
+            ),
           ),
           if (_optional != null) _optional!,
         ],

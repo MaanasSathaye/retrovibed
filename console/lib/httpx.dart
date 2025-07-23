@@ -23,11 +23,13 @@ String localhost() {
 }
 
 String metaendpoint() {
+  // return "localhost:8081";
   return normalizeuri(Platform.environment["RETROVIBED_META_ENDPOINT"]) ??
       "api.retrovibe.space";
 }
 
 String consoleendpoint() {
+  // return "localhost:8080";
   return "console.retrovibe.space";
 }
 

@@ -34,7 +34,7 @@ func (n *NullNetAddr) Scan(src any) error {
 	case string:
 		addr, err := netip.ParseAddr(v)
 		if err != nil {
-			return fmt.Errorf("nullnetip: failed to parse string %q as netip.Addr: %w", err, v)
+			return fmt.Errorf("nullnetip: failed to parse string %q as netip.Addr: %s", err, v)
 		}
 		n.V = addr
 		return nil
