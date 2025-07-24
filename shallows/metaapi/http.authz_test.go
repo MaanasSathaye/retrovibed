@@ -45,7 +45,7 @@ func TestHTTPAuthz(t *testing.T) {
 	).Bind(routes.PathPrefix("/").Subrouter())
 
 	claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
-	resp, req, err := httptestx.BuildRequest(http.MethodGet, "/", nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)))
+	resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, "/", nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)))
 	require.NoError(t, err)
 
 	routes.ServeHTTP(resp, req)
@@ -80,7 +80,7 @@ func TestHTTPProfileUnauthorized(t *testing.T) {
 	).Bind(routes.PathPrefix("/").Subrouter())
 
 	claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p1.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
-	resp, req, err := httptestx.BuildRequest(http.MethodGet, fmt.Sprintf("/%s", p1.ID), nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)))
+	resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, fmt.Sprintf("/%s", p1.ID), nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)))
 	require.NoError(t, err)
 
 	routes.ServeHTTP(resp, req)
@@ -119,7 +119,7 @@ func TestHTTPProfile(t *testing.T) {
 	).Bind(routes.PathPrefix("/").Subrouter())
 
 	claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p1.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
-	resp, req, err := httptestx.BuildRequest(http.MethodGet, fmt.Sprintf("/%s", p1.ID), nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)))
+	resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, fmt.Sprintf("/%s", p1.ID), nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)))
 	require.NoError(t, err)
 
 	routes.ServeHTTP(resp, req)
@@ -129,7 +129,7 @@ func TestHTTPProfile(t *testing.T) {
 
 	require.True(t, result.Token.Usermanagement)
 
-	resp, req, err = httptestx.BuildRequest(http.MethodGet, fmt.Sprintf("/%s", p2.ID), nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)))
+	resp, req, err = httptestx.BuildRequestBytes(http.MethodGet, fmt.Sprintf("/%s", p2.ID), nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)))
 	require.NoError(t, err)
 
 	routes.ServeHTTP(resp, req)
@@ -165,7 +165,7 @@ func TestHTTPGrantUnauthorized(t *testing.T) {
 
 	claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p1.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
 
-	resp, req, err := httptestx.BuildRequest(http.MethodPost, fmt.Sprintf("/%s", p1.ID), nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)))
+	resp, req, err := httptestx.BuildRequestBytes(http.MethodPost, fmt.Sprintf("/%s", p1.ID), nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)))
 	require.NoError(t, err)
 
 	routes.ServeHTTP(resp, req)
@@ -210,7 +210,7 @@ func TestHTTPGrant(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	resp, req, err := httptestx.BuildRequest(http.MethodGet, fmt.Sprintf("/%s", p2.ID), encoded, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)))
+	resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, fmt.Sprintf("/%s", p2.ID), encoded, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)))
 	require.NoError(t, err)
 
 	routes.ServeHTTP(resp, req)
@@ -219,7 +219,7 @@ func TestHTTPGrant(t *testing.T) {
 	require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 	require.False(t, result.Token.Usermanagement)
 
-	resp, req, err = httptestx.BuildRequest(http.MethodPost, fmt.Sprintf("/%s", p2.ID), encoded, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)))
+	resp, req, err = httptestx.BuildRequestBytes(http.MethodPost, fmt.Sprintf("/%s", p2.ID), encoded, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)))
 	require.NoError(t, err)
 
 	routes.ServeHTTP(resp, req)
@@ -254,7 +254,7 @@ func TestHTTPRevokeUnauthorized(t *testing.T) {
 
 	claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p1.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
 
-	resp, req, err := httptestx.BuildRequest(http.MethodDelete, fmt.Sprintf("/%s", p1.ID), nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)))
+	resp, req, err := httptestx.BuildRequestBytes(http.MethodDelete, fmt.Sprintf("/%s", p1.ID), nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)))
 	require.NoError(t, err)
 
 	routes.ServeHTTP(resp, req)

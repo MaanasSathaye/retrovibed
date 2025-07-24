@@ -53,7 +53,7 @@ func TestHTTPDaemonSearch(t *testing.T) {
 
 	claims = jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration())
 
-	resp, req, err := httptestx.BuildRequest(http.MethodGet, "/?"+b.Encode(), nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
+	resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, "/?"+b.Encode(), nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 	require.NoError(t, err)
 
 	routes.ServeHTTP(resp, req)
@@ -91,7 +91,7 @@ func TestHTTPDaemonCreateNew(t *testing.T) {
 
 	claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
 
-	resp, req, err := httptestx.BuildRequest(http.MethodPost, "/", b, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
+	resp, req, err := httptestx.BuildRequestBytes(http.MethodPost, "/", b, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 	require.NoError(t, err)
 
 	routes.ServeHTTP(resp, req)
@@ -136,7 +136,7 @@ func TestHTTPDaemonCreateUpdate(t *testing.T) {
 
 	claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
 
-	resp, req, err := httptestx.BuildRequest(http.MethodPost, "/", b, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
+	resp, req, err := httptestx.BuildRequestBytes(http.MethodPost, "/", b, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 	require.NoError(t, err)
 
 	routes.ServeHTTP(resp, req)
@@ -178,7 +178,7 @@ func TestHTTPDaemonTouch(t *testing.T) {
 
 	claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
 
-	resp, req, err := httptestx.BuildRequest(http.MethodPut, fmt.Sprintf("/%s", v.ID), nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
+	resp, req, err := httptestx.BuildRequestBytes(http.MethodPut, fmt.Sprintf("/%s", v.ID), nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 	require.NoError(t, err)
 
 	routes.ServeHTTP(resp, req)
@@ -219,7 +219,7 @@ func TestHTTPDaemonDelete(t *testing.T) {
 
 	claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
 
-	resp, req, err := httptestx.BuildRequest(http.MethodDelete, fmt.Sprintf("/%s", v.ID), b, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
+	resp, req, err := httptestx.BuildRequestBytes(http.MethodDelete, fmt.Sprintf("/%s", v.ID), b, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 	require.NoError(t, err)
 
 	routes.ServeHTTP(resp, req)
@@ -271,7 +271,7 @@ func TestHTTPDaemonLatest(t *testing.T) {
 
 	claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
 
-	resp, req, err := httptestx.BuildRequest(http.MethodGet, "/latest", b, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
+	resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, "/latest", b, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 	require.NoError(t, err)
 
 	routes.ServeHTTP(resp, req)

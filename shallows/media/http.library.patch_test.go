@@ -58,7 +58,7 @@ func TestMediaUpdate(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	resp, req, err := httptestx.BuildRequest(
+	resp, req, err := httptestx.BuildRequestBytes(
 		http.MethodPost,
 		fmt.Sprintf("/%s", v.ID),
 		encoded,

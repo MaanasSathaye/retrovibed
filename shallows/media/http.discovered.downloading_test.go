@@ -133,7 +133,7 @@ func TestDiscoveredDownloading(t *testing.T) {
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
 
-		resp, req, err := httptestx.BuildRequest(
+		resp, req, err := httptestx.BuildRequestBytes(
 			http.MethodGet,
 			fmt.Sprintf("/downloading?%s", query.Encode()),
 			nil,

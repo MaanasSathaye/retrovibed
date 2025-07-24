@@ -55,7 +55,7 @@ func TestHTTPDiscoveredMagnet(t *testing.T) {
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
 
-		resp, req, err := httptestx.BuildRequest(
+		resp, req, err := httptestx.BuildRequestBytes(
 			http.MethodPost,
 			"/magnet",
 			testx.Must(json.Marshal(&media.MagnetCreateRequest{Uri: "magnet:?xt=urn:btih:8665727372B28B0263690B82928399516641A1B4&dn=ubuntu-20.04.1-desktop-amd64.iso&tr=http%3A%2F%2Ftorrent.ubuntu.com%3A6969%2Fannounce"}))(t),
@@ -111,7 +111,7 @@ func TestHTTPDiscoveredMagnet(t *testing.T) {
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
 
-		resp, req, err := httptestx.BuildRequest(
+		resp, req, err := httptestx.BuildRequestBytes(
 			http.MethodPost,
 			"/magnet",
 			testx.Must(json.Marshal(&media.MagnetCreateRequest{Uri: "magnet:?xt=invalid_uri"}))(t),
@@ -155,7 +155,7 @@ func TestHTTPDiscoveredMagnet(t *testing.T) {
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
 
-		resp, req, err := httptestx.BuildRequest(
+		resp, req, err := httptestx.BuildRequestBytes(
 			http.MethodPost,
 			"/magnet",
 			[]byte(`{"uri": "invalid`), // Malformed JSON

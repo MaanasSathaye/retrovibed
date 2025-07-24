@@ -1,10 +1,15 @@
 package cmdmedia
 
 type Commands struct {
-	Import  importFilesystem `cmd:"" help:"import files and directories"`
-	Export  exportFilesystem `cmd:"" help:"export media to a directory"`
-	Reindex reindex          `cmd:"" help:"run the indexing process on media contents, this can take a bit"`
-	Known   Known            `cmd:"" help:"functionality for managing known media"`
+	Import    importFilesystem `cmd:"" help:"import files and directories"`
+	Export    exportFilesystem `cmd:"" help:"export media to a directory"`
+	Reindex   reindex          `cmd:"" help:"run the indexing process on media contents, this can take a bit"`
+	Known     Known            `cmd:"" help:"functionality for managing known media"`
+	Community Community        `cmd:"" help:"functionality for managing a community's media"`
+}
+
+type Community struct {
+	Publish publish `cmd:"" help:"publish a directory of content to a community first creating torrents then "`
 }
 
 type Known struct {

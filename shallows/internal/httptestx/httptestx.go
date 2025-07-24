@@ -39,14 +39,13 @@ func ReadRequest(path string) (resp *httptest.ResponseRecorder, req *http.Reques
 
 type RequestOption func(*http.Request)
 
-func BuildRequest(method string, uri string, body []byte, options ...RequestOption) (recorder *httptest.ResponseRecorder, req *http.Request, err error) {
-	return BuildRequestContext(context.Background(), method, uri, body, options...)
+func BuildRequestBytes(method string, uri string, body []byte, options ...RequestOption) (recorder *httptest.ResponseRecorder, req *http.Request, err error) {
+	return BuildRequestContextBytes(context.Background(), method, uri, body, options...)
 }
 
-// BuildRequest ...
-func BuildRequestContext(ctx context.Context, method string, uri string, body []byte, options ...RequestOption) (recorder *httptest.ResponseRecorder, req *http.Request, err error) {
+func BuildRequestContext(ctx context.Context, method string, uri string, body io.Reader, options ...RequestOption) (recorder *httptest.ResponseRecorder, req *http.Request, err error) {
 	recorder = httptest.NewRecorder()
-	if req, err = http.NewRequestWithContext(ctx, strings.ToUpper(method), uri, bytes.NewBuffer(body)); err != nil {
+	if req, err = http.NewRequestWithContext(ctx, strings.ToUpper(method), uri, body); err != nil {
 		return recorder, req, err
 	}
 
@@ -55,6 +54,10 @@ func BuildRequestContext(ctx context.Context, method string, uri string, body []
 	}
 
 	return recorder, req, nil
+}
+
+func BuildRequestContextBytes(ctx context.Context, method string, uri string, body []byte, options ...RequestOption) (recorder *httptest.ResponseRecorder, req *http.Request, err error) {
+	return BuildRequestContext(ctx, method, uri, bytes.NewBuffer(body), options...)
 }
 
 func RequestOptionURL(uri *url.URL) RequestOption {
@@ -79,17 +82,17 @@ func RequestOptionHeader(key string, value string) RequestOption {
 
 // BuildGetRequest ...
 func BuildGetRequest(body []byte, options ...RequestOption) (*httptest.ResponseRecorder, *http.Request, error) {
-	return BuildRequest(http.MethodGet, "http://example.com/", body, options...)
+	return BuildRequestBytes(http.MethodGet, "http://example.com/", body, options...)
 }
 
 // BuildPostRequest ...
 func BuildPostRequest(body []byte, options ...RequestOption) (*httptest.ResponseRecorder, *http.Request, error) {
-	return BuildRequest(http.MethodPost, "http://example.com/", body, options...)
+	return BuildRequestBytes(http.MethodPost, "http://example.com/", body, options...)
 }
 
 // BuildDeleteRequest ...
 func BuildDeleteRequest(body []byte, options ...RequestOption) (*httptest.ResponseRecorder, *http.Request, error) {
-	return BuildRequest(http.MethodDelete, "http://example.com/", body, options...)
+	return BuildRequestBytes(http.MethodDelete, "http://example.com/", body, options...)
 }
 
 // RoundTripFunc ...

@@ -49,7 +49,7 @@ func TestKnownSearch(t *testing.T) {
 
 	claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
-	resp, req, err := httptestx.BuildRequest(
+	resp, req, err := httptestx.BuildRequestBytes(
 		http.MethodGet,
 		"/",
 		nil,

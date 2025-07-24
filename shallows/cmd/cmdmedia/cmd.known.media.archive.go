@@ -8,7 +8,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
@@ -80,7 +79,7 @@ func (t knownarchive) Run(gctx *cmdopts.Global) (err error) {
 			return err
 		}
 		return errorsx.Compact(gzout.Flush(), gzout.Close(), os.RemoveAll(path))
-	}, asynccompute.Workers[string](uint16(runtime.NumCPU())))
+	})
 
 	w := fsx.Walk(os.DirFS(dir))
 

@@ -1,6 +1,7 @@
 package media
 
 import (
+	"bytes"
 	"context"
 	"crypto/md5"
 	"encoding/json"
@@ -93,6 +94,12 @@ func (t *HTTPDiscovered) Bind(r *mux.Router) {
 		httpx.TimeoutRollingWrite(3*time.Second),
 	).ThenFunc(t.upload))
 
+	r.Path("/publish").Methods(http.MethodPost).Handler(alice.New(
+		httpx.ContextBufferPool512(),
+		httpauth.AuthenticateWithToken(t.jwtsecret),
+		httpx.TimeoutRollingWrite(3*time.Second),
+	).ThenFunc(t.publish))
+
 	r.Path("/magnet").Methods(http.MethodPost).Handler(alice.New(
 		httpx.ContextBufferPool512(),
 		httpx.Timeout2s(),
@@ -110,7 +117,6 @@ func (t *HTTPDiscovered) Bind(r *mux.Router) {
 		httpx.ContextBufferPool512(),
 		httpx.ParseForm,
 		httpauth.AuthenticateWithToken(t.jwtsecret),
-		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
 		httpx.Timeout2s(),
 	).ThenFunc(t.downloading))
 
@@ -193,6 +199,99 @@ func (t *HTTPDiscovered) magnet(w http.ResponseWriter, r *http.Request) {
 			langx.Clone(
 				Download{},
 				DownloadOptionFromTorrentMetadata(lmd),
+			),
+		),
+	}); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to write response"))
+		return
+	}
+}
+
+func (t *HTTPDiscovered) publish(w http.ResponseWriter, r *http.Request) {
+	var (
+		err    error
+		copied = &iox.Copied{Result: new(uint64)}
+		mhash  = md5.New()
+		buf    bytes.Buffer
+	)
+
+	reader, err := r.MultipartReader()
+	if err != nil {
+		log.Println(errorsx.Wrap(err, "failed creating a multipart form"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
+
+	torfile, err := reader.NextPart()
+	if err != nil {
+		log.Println(errorsx.Wrap(err, "missing torrent file"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
+	defer torfile.Close()
+
+	// we limit torrent files to 128 MB for sanity sake.
+	meta, err := metainfo.Load(io.TeeReader(io.LimitReader(torfile, 128*bytesx.MiB), io.MultiWriter(&buf, mhash, copied)))
+	if err != nil {
+		log.Println(errorsx.Wrap(err, "unable to read torrent file"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	info, err := meta.UnmarshalInfo()
+	if err != nil {
+		log.Println(errorsx.Wrap(err, "unable to read torrent info"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
+
+	torimp, err := t.c.OpenTorrent(&info, meta.ID().AsByteArray())
+	if err != nil {
+		log.Println(errorsx.Wrap(err, "unable to open torrent storage"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	contents, err := reader.NextPart()
+	if err != nil {
+		log.Println(errorsx.Wrap(err, "missing torrent contents"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
+	defer contents.Close()
+
+	log.Println("copying", contents.FormName(), "|", contents.FileName())
+	n, err := io.Copy(io.NewOffsetWriter(torimp, 0), contents)
+	if err != nil {
+		log.Println(errorsx.Wrap(err, "unable to copy torrent to storage"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
+
+	if n != info.TotalLength() {
+		log.Println(errorsx.Errorf("failed to upload all content %d != %d", n, info.TotalLength()))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
+
+	lmd := tracking.NewMetadata(
+		langx.Autoptr(meta.HashInfoBytes()),
+		tracking.MetadataOptionFromInfo(&info),
+		tracking.MetadataOptionTrackers(slicesx.Flatten(meta.UpvertedAnnounceList()...)...),
+		tracking.MetadataOptionAutoDescription,
+	)
+
+	if err = tracking.MetadataInsertWithDefaults(r.Context(), t.q, lmd).Scan(&lmd); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to record metadata record"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &MediaUploadResponse{
+		Media: langx.Autoptr(
+			langx.Clone(
+				Media{},
+				MediaOptionFromTorrentMetadata(lmd),
 			),
 		),
 	}); err != nil {

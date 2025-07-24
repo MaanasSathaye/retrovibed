@@ -128,6 +128,40 @@ func Oauth2Bearer(ctx context.Context, signer ssh.Signer, c *http.Client, email,
 	return oauth2Bearer(ctx, signer, c, oauth2SSHConfig(signer, "", DeeppoolEndpoint()), email, displayname)
 }
 
+type FnTokenSource func() (*oauth2.Token, error)
+
+func (t FnTokenSource) Token() (*oauth2.Token, error) {
+	return t()
+}
+
+func AutomaticTokenSource() (*oauth2.Token, error) {
+	signer, err := sshx.AutoCached(sshx.NewKeyGen(), env.PrivateKeyPath())
+	if err != nil {
+		return nil, errorsx.Wrap(err, "unable to read identity")
+	}
+
+	id := ssh.FingerprintSHA256(signer.PublicKey())
+
+	claims := jwtx.NewJWTClaims(
+		id,
+		jwtx.ClaimsOptionAuthnExpiration(),
+		jwtx.ClaimsOptionIssuer(id),
+	)
+
+	debugx.Println("claims", spew.Sdump(claims))
+
+	bearer, err := jwtx.Signed(JWTSecretFromEnv(), claims)
+	if err != nil {
+		return nil, errorsx.Wrap(err, "unable to create bearer")
+	}
+
+	return &oauth2.Token{
+		TokenType:   "bearer",
+		AccessToken: bearer,
+		Expiry:      claims.ExpiresAt.Time,
+	}, nil
+}
+
 func NewBearer() (string, error) {
 	signer, err := sshx.AutoCached(sshx.NewKeyGen(), env.PrivateKeyPath())
 	if err != nil {
@@ -256,6 +290,10 @@ func AutoTokenState(signer ssh.Signer) (encoded string, err error) {
 	}
 
 	return encoded, nil
+}
+
+func AutoLocalOauth2Client(ctx context.Context) (c *http.Client) {
+	return oauth2.NewClient(context.WithValue(ctx, oauth2.HTTPClient, HTTPClientDefaults()), FnTokenSource(AutomaticTokenSource))
 }
 
 type AuthResponse struct {

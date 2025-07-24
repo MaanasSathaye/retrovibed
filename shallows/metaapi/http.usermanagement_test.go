@@ -48,7 +48,7 @@ func TestHTTPUserManagementSearch(t *testing.T) {
 
 	claims = jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration())
 
-	resp, req, err := httptestx.BuildRequest(http.MethodGet, "/?"+b.Encode(), nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
+	resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, "/?"+b.Encode(), nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 	require.NoError(t, err)
 
 	routes.ServeHTTP(resp, req)
@@ -85,7 +85,7 @@ func TestHTTPUserManagementFind(t *testing.T) {
 	mut := p
 
 	token := httpauthtest.UnsafeClaimsToken(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), httpauthtest.UnsafeJWTSecretSource)
-	resp, req, err := httptestx.BuildRequest(http.MethodGet, fmt.Sprintf("/%s", mut.ID), nil, httptestx.RequestOptionAuthorization(token))
+	resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, fmt.Sprintf("/%s", mut.ID), nil, httptestx.RequestOptionAuthorization(token))
 	require.NoError(t, err)
 	routes.ServeHTTP(resp, req)
 

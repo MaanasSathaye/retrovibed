@@ -191,6 +191,7 @@ func (t tmdbimport) Run(gctx *cmdopts.Global) (err error) {
 	c.SetClientAutoRetry()
 
 	encoder := jsonl.NewEncoder(os.Stdout)
+
 	for v := range t.movies(c) {
 		if err := encoder.Encode(v); err != nil {
 			return errorsx.Wrap(err, "unable to encode media")

@@ -60,7 +60,7 @@ func TestHTTPWireguardCreateUnparsable(t *testing.T) {
 
 	claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
 
-	resp, req, err := httptestx.BuildRequestContext(
+	resp, req, err := httptestx.BuildRequestContextBytes(
 		ctx,
 		http.MethodPost,
 		"/",
@@ -111,7 +111,7 @@ func TestHTTPWireguardCreate(t *testing.T) {
 
 	claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
 
-	resp, req, err := httptestx.BuildRequestContext(
+	resp, req, err := httptestx.BuildRequestContextBytes(
 		ctx,
 		http.MethodPost,
 		"/",

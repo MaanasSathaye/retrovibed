@@ -44,7 +44,7 @@ func TestHTTPWireguardSearchZeroState(t *testing.T) {
 
 	claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
 
-	resp, req, err := httptestx.BuildRequestContext(ctx, http.MethodGet, "/?"+b.Encode(), nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
+	resp, req, err := httptestx.BuildRequestContextBytes(ctx, http.MethodGet, "/?"+b.Encode(), nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 	require.NoError(t, err)
 
 	routes.ServeHTTP(resp, req)
@@ -83,7 +83,7 @@ func TestHTTPWireguardSearch(t *testing.T) {
 
 	claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
 
-	resp, req, err := httptestx.BuildRequestContext(ctx, http.MethodGet, "/?"+b.Encode(), nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
+	resp, req, err := httptestx.BuildRequestContextBytes(ctx, http.MethodGet, "/?"+b.Encode(), nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 	require.NoError(t, err)
 
 	routes.ServeHTTP(resp, req)
