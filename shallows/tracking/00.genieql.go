@@ -26,7 +26,7 @@ func MetadataInsertWithDefaults(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a Metadata) NewMetadataScannerStaticRow,
 ) {
-	gql.Into("torrents_metadata").Default("created_at", "updated_at", "hidden_at", "initiated_at", "paused_at", "downloaded", "next_announce_at", "verify_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, tracker = EXCLUDED.tracker")
+	gql.Into("torrents_metadata").Default("created_at", "updated_at", "hidden_at", "initiated_at", "paused_at", "next_announce_at", "verify_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, tracker = EXCLUDED.tracker")
 }
 
 func MetadataBatchInsertWithDefaults(

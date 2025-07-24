@@ -1,26 +1,24 @@
-package tracking
+package media
 
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"io"
-	"log"
 	"mime/multipart"
-	"os"
 
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/metainfo"
-	"github.com/james-lawrence/torrent/storage"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/httpx"
 	"github.com/retrovibed/retrovibed/internal/mimex"
 )
 
 // PublishRequest a torrent to an http endpoint in its entirety
-func PublishRequest(ctx context.Context, path string) (boundary string, _ io.ReadCloser, err error) {
-	md, err := torrent.NewFromFile(path, torrent.OptionStorage(storage.NewFile(os.TempDir())))
+func PublishRequest(ctx context.Context, md torrent.Metadata, req *PublishedUploadRequest) (boundary string, _ io.ReadCloser, err error) {
+	encodedreq, err := json.Marshal(req)
 	if err != nil {
-		return "", nil, errorsx.Wrapf(err, "unable to create torrent from: %s", path)
+		return "", nil, errorsx.Wrap(err, "unable to encode publish metadata")
 	}
 
 	encoded, err := metainfo.Encode(md.Metainfo())
@@ -39,11 +37,6 @@ func PublishRequest(ctx context.Context, path string) (boundary string, _ io.Rea
 	}
 
 	return httpx.Multipart(func(w *multipart.Writer) (merr error) {
-		defer log.Println("MULTIPART CREATE DONE")
-		defer func() {
-			log.Println("DERP DERP", merr)
-		}()
-
 		part, lerr := w.CreatePart(httpx.NewMultipartHeader(mimex.Bittorrent, "torrentfile", md.DisplayName))
 		if lerr != nil {
 			return errorsx.Wrap(lerr, "unable to create torrent file part")
@@ -60,10 +53,18 @@ func PublishRequest(ctx context.Context, path string) (boundary string, _ io.Rea
 
 		if n, lerr := io.Copy(content, io.NewSectionReader(disk, 0, info.TotalLength())); lerr != nil {
 			return errorsx.Wrap(lerr, "unable to copy torrent")
-		} else {
-			log.Println("copied", n)
+		} else if n < info.TotalLength() {
+			return errorsx.Errorf("failed to copy entire torrent %d < %d", n, info.TotalLength())
 		}
 
+		metadata, lerr := w.CreatePart(httpx.NewMultipartHeader(mimex.JSON, "metadata", "metadata.json"))
+		if lerr != nil {
+			return errorsx.Wrap(lerr, "unable to create torrent file part")
+		}
+
+		if _, lerr = io.Copy(metadata, bytes.NewBuffer(encodedreq)); lerr != nil {
+			return errorsx.Wrap(lerr, "unable to copy metadata")
+		}
 		return nil
 	})
 }

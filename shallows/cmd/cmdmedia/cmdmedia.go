@@ -1,5 +1,7 @@
 package cmdmedia
 
+import "github.com/retrovibed/retrovibed/cmd/cmdopts"
+
 type Commands struct {
 	Import    importFilesystem `cmd:"" help:"import files and directories"`
 	Export    exportFilesystem `cmd:"" help:"export media to a directory"`
@@ -9,7 +11,9 @@ type Commands struct {
 }
 
 type Community struct {
-	Publish publish `cmd:"" help:"publish a directory of content to a community first creating torrents then "`
+	Create  cmdopts.CmdNotImplemented `cmd:"" help:"unimplemented: create a new community"`
+	Info    cmdopts.CmdNotImplemented `cmd:"" help:"unimplemented: display the community details"`
+	Publish cmdopts.CmdNotImplemented `cmd:"" help:"unimplemented: create and publish a rss feed from a list of torrents"`
 }
 
 type Known struct {

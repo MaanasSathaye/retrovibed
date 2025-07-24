@@ -81,3 +81,16 @@ message DownloadPauseRequest {}
 message DownloadPauseResponse {
   Download download = 1 [ json_name = "download" ];
 }
+
+message Published {
+  string id = 1 [ json_name = "id" ];
+  string mimetype = 2 [ json_name = "mimetype" ];
+  string description = 3 [ json_name = "description" ];
+  uint64 bytes = 4 [ json_name = "bytes" ];
+  string entropy = 5 [ json_name = "entropy" ];
+}
+
+message PublishedUploadRequest {
+  string entropy = 1 [ json_name = "entropy" ];
+}
+message PublishedUploadResponse { Published published = 1 [ json_name = "published" ]; }

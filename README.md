@@ -65,9 +65,19 @@ retrovibed identity generate {secret}
 
 on the device you're exporting from:
 ```bash
-retrovibed torrent export | ssh user@newdevicehost "retrovibed torrent import --peer='olddevicehost:port'"
+retrovibed torrent export | ssh user@newdevicehost "retrovibed torrent import peer --peer='olddevicehost:port'"
 ```
 
+#### publishing torrents to an rss feed
+```bash
+# community names are globally unique. we reserve the right for change owners if someone is found squatting on a well known entity.
+# we wont do it without informing the current owner 3 months in advance.
+retrovibed community create --name="foo" --description="my special feed"
+
+retrovibed torrent import --peer="localhost:9998" {directory} | retrovibed community publish --dry-run foo
+# future work will allow using the exporting functionality to publish. either torrents or media.
+# retrovibed torrent export "query" | retrovibed community publish --dry-run foo
+```
 
 #### install flatpak gui
 

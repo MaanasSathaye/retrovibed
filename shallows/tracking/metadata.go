@@ -101,6 +101,11 @@ func MetadataOptionDownloaded[T constraints.Integer](b T) func(*Metadata) {
 	}
 }
 
+// mark the torrent as seeding if the downloaded field is == to the bytes.
+func MetadataOptionAutoSeeding(m *Metadata) {
+	m.Seeding = m.Downloaded == m.Bytes
+}
+
 func MetadataOptionTestDefaults(m *Metadata) {
 	*m = NewMetadata(
 		langx.Autoptr(metainfo.NewHashFromBytes(int160.Random().Bytes())),

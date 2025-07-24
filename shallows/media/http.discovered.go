@@ -15,6 +15,7 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/go-playground/form/v4"
+	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/metainfo"
@@ -209,10 +210,11 @@ func (t *HTTPDiscovered) magnet(w http.ResponseWriter, r *http.Request) {
 
 func (t *HTTPDiscovered) publish(w http.ResponseWriter, r *http.Request) {
 	var (
-		err    error
-		copied = &iox.Copied{Result: new(uint64)}
-		mhash  = md5.New()
-		buf    bytes.Buffer
+		err     error
+		decoded PublishedUploadRequest
+		copied  = &iox.Copied{Result: new(uint64)}
+		mhash   = md5.New()
+		buf     bytes.Buffer
 	)
 
 	reader, err := r.MultipartReader()
@@ -234,7 +236,7 @@ func (t *HTTPDiscovered) publish(w http.ResponseWriter, r *http.Request) {
 	meta, err := metainfo.Load(io.TeeReader(io.LimitReader(torfile, 128*bytesx.MiB), io.MultiWriter(&buf, mhash, copied)))
 	if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to read torrent file"))
-		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusRequestEntityTooLarge))
 		return
 	}
 
@@ -260,7 +262,6 @@ func (t *HTTPDiscovered) publish(w http.ResponseWriter, r *http.Request) {
 	}
 	defer contents.Close()
 
-	log.Println("copying", contents.FormName(), "|", contents.FileName())
 	n, err := io.Copy(io.NewOffsetWriter(torimp, 0), contents)
 	if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to copy torrent to storage"))
@@ -274,10 +275,33 @@ func (t *HTTPDiscovered) publish(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if err := os.WriteFile(t.rootstorage.Path(fmt.Sprintf("%s.torrent", meta.ID().String())), buf.Bytes(), 0600); err != nil {
+		log.Println(errorsx.Errorf("failed to write torrent file %d != %d", n, info.TotalLength()))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
+
+	metadata, err := reader.NextPart()
+	if err != nil {
+		log.Println(errorsx.Wrap(err, "missing metadata"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
+	defer metadata.Close()
+
+	if err = json.NewDecoder(metadata).Decode(&decoded); err != nil {
+		log.Println(errorsx.Wrap(err, "invalid metadata"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
+
 	lmd := tracking.NewMetadata(
 		langx.Autoptr(meta.HashInfoBytes()),
 		tracking.MetadataOptionFromInfo(&info),
+		tracking.MetadataOptionDownloaded(n),
 		tracking.MetadataOptionTrackers(slicesx.Flatten(meta.UpvertedAnnounceList()...)...),
+		tracking.MetadataOptionEntropySeed(meta.ID().Bytes(), uuid.FromStringOrNil(decoded.Entropy).Bytes()),
+		tracking.MetadataOptionAutoSeeding,
 		tracking.MetadataOptionAutoDescription,
 	)
 
@@ -287,11 +311,11 @@ func (t *HTTPDiscovered) publish(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &MediaUploadResponse{
-		Media: langx.Autoptr(
+	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &PublishedUploadResponse{
+		Published: langx.Autoptr(
 			langx.Clone(
-				Media{},
-				MediaOptionFromTorrentMetadata(lmd),
+				Published{},
+				PublishedOptionFromTorrentMetadata(lmd),
 			),
 		),
 	}); err != nil {

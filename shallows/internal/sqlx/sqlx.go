@@ -93,6 +93,11 @@ func String(ctx context.Context, q Queryer, query string) (s string, err error) 
 	return s, err
 }
 
+func Value[T any](ctx context.Context, q Queryer, query string) (s T, err error) {
+	err = NewValueRowScanner[T](q.QueryRowContext(ctx, query)).Scan(&s)
+	return s, err
+}
+
 func Timestamp(ctx context.Context, q Queryer, query string, args ...any) (s time.Time, err error) {
 	err = NewValueRowScanner[time.Time](q.QueryRowContext(ctx, query, args...)).Scan(&s)
 	return s, err

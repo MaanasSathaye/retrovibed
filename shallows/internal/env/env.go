@@ -4,7 +4,6 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/internal/envx"
 	"github.com/retrovibed/retrovibed/internal/userx"
 )
@@ -46,7 +45,8 @@ const (
 
 var v = sync.OnceValue(func() []byte {
 	return []byte(envx.String(
-		uuid.Must(uuid.NewV4()).String(),
+		// uuid.Must(uuid.NewV4()).String(),
+		"429d78f2-ad8d-47d8-ad03-a809968b4a19",
 		JWTSharedSecret,
 	))
 })

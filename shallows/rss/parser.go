@@ -40,12 +40,16 @@ func parseData(data io.Reader, originURL string) (*channel, []Item, error) {
 		}
 
 		if item.Source != nil {
-			rssItem.Source = item.Source.Value
-			rssItem.SourceURL = item.Source.URL
+			rssItem.Source = &Source{
+				Description: item.Source.Value,
+				URL:         item.Source.URL,
+			}
 		} else {
 			host := extractSource(originURL)
-			rssItem.Source = host
-			rssItem.SourceURL = originURL
+			rssItem.Source = &Source{
+				Description: host,
+				URL:         originURL,
+			}
 		}
 
 		rssItems = append(rssItems, rssItem)

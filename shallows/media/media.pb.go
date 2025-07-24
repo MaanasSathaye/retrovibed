@@ -1001,6 +1001,170 @@ func (x *DownloadPauseResponse) GetDownload() *Download {
 	return nil
 }
 
+type Published struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Mimetype      string                 `protobuf:"bytes,2,opt,name=mimetype,proto3" json:"mimetype,omitempty"`
+	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Bytes         uint64                 `protobuf:"varint,4,opt,name=bytes,proto3" json:"bytes,omitempty"`
+	Entropy       string                 `protobuf:"bytes,5,opt,name=entropy,proto3" json:"entropy,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Published) Reset() {
+	*x = Published{}
+	mi := &file_media_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Published) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Published) ProtoMessage() {}
+
+func (x *Published) ProtoReflect() protoreflect.Message {
+	mi := &file_media_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Published.ProtoReflect.Descriptor instead.
+func (*Published) Descriptor() ([]byte, []int) {
+	return file_media_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *Published) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *Published) GetMimetype() string {
+	if x != nil {
+		return x.Mimetype
+	}
+	return ""
+}
+
+func (x *Published) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *Published) GetBytes() uint64 {
+	if x != nil {
+		return x.Bytes
+	}
+	return 0
+}
+
+func (x *Published) GetEntropy() string {
+	if x != nil {
+		return x.Entropy
+	}
+	return ""
+}
+
+type PublishedUploadRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Entropy       string                 `protobuf:"bytes,1,opt,name=entropy,proto3" json:"entropy,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PublishedUploadRequest) Reset() {
+	*x = PublishedUploadRequest{}
+	mi := &file_media_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PublishedUploadRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PublishedUploadRequest) ProtoMessage() {}
+
+func (x *PublishedUploadRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_media_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PublishedUploadRequest.ProtoReflect.Descriptor instead.
+func (*PublishedUploadRequest) Descriptor() ([]byte, []int) {
+	return file_media_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *PublishedUploadRequest) GetEntropy() string {
+	if x != nil {
+		return x.Entropy
+	}
+	return ""
+}
+
+type PublishedUploadResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Published     *Published             `protobuf:"bytes,1,opt,name=published,proto3" json:"published,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PublishedUploadResponse) Reset() {
+	*x = PublishedUploadResponse{}
+	mi := &file_media_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PublishedUploadResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PublishedUploadResponse) ProtoMessage() {}
+
+func (x *PublishedUploadResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_media_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PublishedUploadResponse.ProtoReflect.Descriptor instead.
+func (*PublishedUploadResponse) Descriptor() ([]byte, []int) {
+	return file_media_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *PublishedUploadResponse) GetPublished() *Published {
+	if x != nil {
+		return x.Published
+	}
+	return nil
+}
+
 var File_media_proto protoreflect.FileDescriptor
 
 const file_media_proto_rawDesc = "" +
@@ -1071,7 +1235,17 @@ const file_media_proto_rawDesc = "" +
 	"\bdownload\x18\x01 \x01(\v2\x0f.media.DownloadR\bdownload\"\x16\n" +
 	"\x14DownloadPauseRequest\"D\n" +
 	"\x15DownloadPauseResponse\x12+\n" +
-	"\bdownload\x18\x01 \x01(\v2\x0f.media.DownloadR\bdownloadb\x06proto3"
+	"\bdownload\x18\x01 \x01(\v2\x0f.media.DownloadR\bdownload\"\x89\x01\n" +
+	"\tPublished\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
+	"\bmimetype\x18\x02 \x01(\tR\bmimetype\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x14\n" +
+	"\x05bytes\x18\x04 \x01(\x04R\x05bytes\x12\x18\n" +
+	"\aentropy\x18\x05 \x01(\tR\aentropy\"2\n" +
+	"\x16PublishedUploadRequest\x12\x18\n" +
+	"\aentropy\x18\x01 \x01(\tR\aentropy\"I\n" +
+	"\x17PublishedUploadResponse\x12.\n" +
+	"\tpublished\x18\x01 \x01(\v2\x10.media.PublishedR\tpublishedb\x06proto3"
 
 var (
 	file_media_proto_rawDescOnce sync.Once
@@ -1085,7 +1259,7 @@ func file_media_proto_rawDescGZIP() []byte {
 	return file_media_proto_rawDescData
 }
 
-var file_media_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
+var file_media_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
 var file_media_proto_goTypes = []any{
 	(*Media)(nil),                    // 0: media.Media
 	(*MediaSearchRequest)(nil),       // 1: media.MediaSearchRequest
@@ -1106,6 +1280,9 @@ var file_media_proto_goTypes = []any{
 	(*DownloadBeginResponse)(nil),    // 16: media.DownloadBeginResponse
 	(*DownloadPauseRequest)(nil),     // 17: media.DownloadPauseRequest
 	(*DownloadPauseResponse)(nil),    // 18: media.DownloadPauseResponse
+	(*Published)(nil),                // 19: media.Published
+	(*PublishedUploadRequest)(nil),   // 20: media.PublishedUploadRequest
+	(*PublishedUploadResponse)(nil),  // 21: media.PublishedUploadResponse
 }
 var file_media_proto_depIdxs = []int32{
 	1,  // 0: media.MediaSearchResponse.next:type_name -> media.MediaSearchRequest
@@ -1121,11 +1298,12 @@ var file_media_proto_depIdxs = []int32{
 	8,  // 10: media.DownloadMetadataResponse.download:type_name -> media.Download
 	8,  // 11: media.DownloadBeginResponse.download:type_name -> media.Download
 	8,  // 12: media.DownloadPauseResponse.download:type_name -> media.Download
-	13, // [13:13] is the sub-list for method output_type
-	13, // [13:13] is the sub-list for method input_type
-	13, // [13:13] is the sub-list for extension type_name
-	13, // [13:13] is the sub-list for extension extendee
-	0,  // [0:13] is the sub-list for field type_name
+	19, // 13: media.PublishedUploadResponse.published:type_name -> media.Published
+	14, // [14:14] is the sub-list for method output_type
+	14, // [14:14] is the sub-list for method input_type
+	14, // [14:14] is the sub-list for extension type_name
+	14, // [14:14] is the sub-list for extension extendee
+	0,  // [0:14] is the sub-list for field type_name
 }
 
 func init() { file_media_proto_init() }
@@ -1139,7 +1317,7 @@ func file_media_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_media_proto_rawDesc), len(file_media_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   19,
+			NumMessages:   22,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -332,3 +332,55 @@ const DownloadPauseResponse$json = {
 final $typed_data.Uint8List downloadPauseResponseDescriptor = $convert.base64Decode(
     'ChVEb3dubG9hZFBhdXNlUmVzcG9uc2USKwoIZG93bmxvYWQYASABKAsyDy5tZWRpYS5Eb3dubG'
     '9hZFIIZG93bmxvYWQ=');
+
+@$core.Deprecated('Use publishedDescriptor instead')
+const Published$json = {
+  '1': 'Published',
+  '2': [
+    {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
+    {'1': 'mimetype', '3': 2, '4': 1, '5': 9, '10': 'mimetype'},
+    {'1': 'description', '3': 3, '4': 1, '5': 9, '10': 'description'},
+    {'1': 'bytes', '3': 4, '4': 1, '5': 4, '10': 'bytes'},
+    {'1': 'entropy', '3': 5, '4': 1, '5': 9, '10': 'entropy'},
+  ],
+};
+
+/// Descriptor for `Published`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List publishedDescriptor = $convert.base64Decode(
+    'CglQdWJsaXNoZWQSDgoCaWQYASABKAlSAmlkEhoKCG1pbWV0eXBlGAIgASgJUghtaW1ldHlwZR'
+    'IgCgtkZXNjcmlwdGlvbhgDIAEoCVILZGVzY3JpcHRpb24SFAoFYnl0ZXMYBCABKARSBWJ5dGVz'
+    'EhgKB2VudHJvcHkYBSABKAlSB2VudHJvcHk=');
+
+@$core.Deprecated('Use publishedUploadRequestDescriptor instead')
+const PublishedUploadRequest$json = {
+  '1': 'PublishedUploadRequest',
+  '2': [
+    {'1': 'entropy', '3': 1, '4': 1, '5': 9, '10': 'entropy'},
+  ],
+};
+
+/// Descriptor for `PublishedUploadRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List publishedUploadRequestDescriptor =
+    $convert.base64Decode(
+        'ChZQdWJsaXNoZWRVcGxvYWRSZXF1ZXN0EhgKB2VudHJvcHkYASABKAlSB2VudHJvcHk=');
+
+@$core.Deprecated('Use publishedUploadResponseDescriptor instead')
+const PublishedUploadResponse$json = {
+  '1': 'PublishedUploadResponse',
+  '2': [
+    {
+      '1': 'published',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.media.Published',
+      '10': 'published'
+    },
+  ],
+};
+
+/// Descriptor for `PublishedUploadResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List publishedUploadResponseDescriptor =
+    $convert.base64Decode(
+        'ChdQdWJsaXNoZWRVcGxvYWRSZXNwb25zZRIuCglwdWJsaXNoZWQYASABKAsyEC5tZWRpYS5QdW'
+        'JsaXNoZWRSCXB1Ymxpc2hlZA==');

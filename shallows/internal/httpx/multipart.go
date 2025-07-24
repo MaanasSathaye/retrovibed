@@ -33,12 +33,12 @@ func Multipart(do func(*multipart.Writer) error) (contentType string, _ io.ReadC
 
 	ctx, done := context.WithCancelCause(context.Background())
 	go func() {
-		err := do(mw)
-		done(errorsx.Compact(err, mw.Close(), w.CloseWithError(err)))
+		if err = errorsx.Compact(do(mw), mw.Close(), w.CloseWithError(err)); err != nil {
+			done(err)
+		}
 	}()
 
 	return mw.FormDataContentType(), iox.ReaderCompositeCloser(r, func() error {
-		done(nil)
 		return context.Cause(ctx)
 	}, r.Close), nil
 }

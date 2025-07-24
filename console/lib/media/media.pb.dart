@@ -1307,6 +1307,228 @@ class DownloadPauseResponse extends $pb.GeneratedMessage {
   Download ensureDownload() => $_ensure(0);
 }
 
+class Published extends $pb.GeneratedMessage {
+  factory Published({
+    $core.String? id,
+    $core.String? mimetype,
+    $core.String? description,
+    $fixnum.Int64? bytes,
+    $core.String? entropy,
+  }) {
+    final result = create();
+    if (id != null) result.id = id;
+    if (mimetype != null) result.mimetype = mimetype;
+    if (description != null) result.description = description;
+    if (bytes != null) result.bytes = bytes;
+    if (entropy != null) result.entropy = entropy;
+    return result;
+  }
+
+  Published._();
+
+  factory Published.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory Published.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'Published',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
+      createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'id')
+    ..aOS(2, _omitFieldNames ? '' : 'mimetype')
+    ..aOS(3, _omitFieldNames ? '' : 'description')
+    ..a<$fixnum.Int64>(4, _omitFieldNames ? '' : 'bytes', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..aOS(5, _omitFieldNames ? '' : 'entropy')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  Published clone() => Published()..mergeFromMessage(this);
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  Published copyWith(void Function(Published) updates) =>
+      super.copyWith((message) => updates(message as Published)) as Published;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static Published create() => Published._();
+  @$core.override
+  Published createEmptyInstance() => create();
+  static $pb.PbList<Published> createRepeated() => $pb.PbList<Published>();
+  @$core.pragma('dart2js:noInline')
+  static Published getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Published>(create);
+  static Published? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get id => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set id($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get mimetype => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set mimetype($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasMimetype() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearMimetype() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get description => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set description($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasDescription() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearDescription() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $fixnum.Int64 get bytes => $_getI64(3);
+  @$pb.TagNumber(4)
+  set bytes($fixnum.Int64 value) => $_setInt64(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasBytes() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearBytes() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.String get entropy => $_getSZ(4);
+  @$pb.TagNumber(5)
+  set entropy($core.String value) => $_setString(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasEntropy() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearEntropy() => $_clearField(5);
+}
+
+class PublishedUploadRequest extends $pb.GeneratedMessage {
+  factory PublishedUploadRequest({
+    $core.String? entropy,
+  }) {
+    final result = create();
+    if (entropy != null) result.entropy = entropy;
+    return result;
+  }
+
+  PublishedUploadRequest._();
+
+  factory PublishedUploadRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory PublishedUploadRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'PublishedUploadRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
+      createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'entropy')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  PublishedUploadRequest clone() =>
+      PublishedUploadRequest()..mergeFromMessage(this);
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  PublishedUploadRequest copyWith(
+          void Function(PublishedUploadRequest) updates) =>
+      super.copyWith((message) => updates(message as PublishedUploadRequest))
+          as PublishedUploadRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static PublishedUploadRequest create() => PublishedUploadRequest._();
+  @$core.override
+  PublishedUploadRequest createEmptyInstance() => create();
+  static $pb.PbList<PublishedUploadRequest> createRepeated() =>
+      $pb.PbList<PublishedUploadRequest>();
+  @$core.pragma('dart2js:noInline')
+  static PublishedUploadRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<PublishedUploadRequest>(create);
+  static PublishedUploadRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get entropy => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set entropy($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasEntropy() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearEntropy() => $_clearField(1);
+}
+
+class PublishedUploadResponse extends $pb.GeneratedMessage {
+  factory PublishedUploadResponse({
+    Published? published,
+  }) {
+    final result = create();
+    if (published != null) result.published = published;
+    return result;
+  }
+
+  PublishedUploadResponse._();
+
+  factory PublishedUploadResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory PublishedUploadResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'PublishedUploadResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
+      createEmptyInstance: create)
+    ..aOM<Published>(1, _omitFieldNames ? '' : 'published',
+        subBuilder: Published.create)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  PublishedUploadResponse clone() =>
+      PublishedUploadResponse()..mergeFromMessage(this);
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  PublishedUploadResponse copyWith(
+          void Function(PublishedUploadResponse) updates) =>
+      super.copyWith((message) => updates(message as PublishedUploadResponse))
+          as PublishedUploadResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static PublishedUploadResponse create() => PublishedUploadResponse._();
+  @$core.override
+  PublishedUploadResponse createEmptyInstance() => create();
+  static $pb.PbList<PublishedUploadResponse> createRepeated() =>
+      $pb.PbList<PublishedUploadResponse>();
+  @$core.pragma('dart2js:noInline')
+  static PublishedUploadResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<PublishedUploadResponse>(create);
+  static PublishedUploadResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Published get published => $_getN(0);
+  @$pb.TagNumber(1)
+  set published(Published value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasPublished() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearPublished() => $_clearField(1);
+  @$pb.TagNumber(1)
+  Published ensurePublished() => $_ensure(0);
+}
+
 const $core.bool _omitFieldNames =
     $core.bool.fromEnvironment('protobuf.omit_field_names');
 const $core.bool _omitMessageNames =

@@ -22,17 +22,22 @@ type channel struct {
 	Items         []item   `xml:"item"`
 	TTL           int      `xml:"ttl"`
 	LastBuildDate xmlTime  `xml:"lastBuildDate"`
+	Language      string   `xml:"language"`
+	Mimetype      string   `xml:"mimetype"`
+	Encryption    Encryption
 }
 
 // item represent the actual feed for each news
 type item struct {
 	XMLName     xml.Name    `xml:"item"`
+	GUID        string      `xml:"guid"`
 	Title       string      `xml:"title"`
 	Link        string      `xml:"link"`
 	Description string      `xml:"description"`
 	PubDate     xmlTime     `xml:"pubDate"`
 	Source      *source     `xml:"source"`
 	Enclosures  []Enclosure `xml:"enclosure"`
+	Mimetype    string      `xml:"retrovibed:mimetype"`
 }
 
 func parseTimestamp(encoded string) (_ time.Time, err error) {
@@ -98,18 +103,40 @@ type source struct {
 	Value   string   `xml:",chardata"`
 }
 
+type Channel struct {
+	Title         string
+	Link          string
+	TTL           int
+	LastBuildDate time.Time
+	Language      string
+	Description   string
+	Copyright     string
+	Mimetype      string      // specify the mimetype for this channel.
+	Encryption    *Encryption // specify the encryption details for this channel.
+}
+
 // Item is the representation of an item
 // retrieved from an RSS feed
 type Item struct {
+	Guid        string      // global id
 	Title       string      // Defines the title of the item
-	Source      string      // Specifies a third-party source for the item
-	SourceURL   string      // Specifies the link to the source
+	Source      *Source     // Specifies a third-party source for the item
 	Link        string      // Defines the hyperlink to the item
 	PublishDate time.Time   // Defines the last-publication date for the item
 	Description string      // Describes the item
 	Enclosures  []Enclosure // attached media objects
 }
 
+type Source struct {
+	XMLName     xml.Name `xml:"source"`
+	Description string
+	URL         string
+}
+
+type Encryption struct {
+	XMLName xml.Name `xml:"encryption"`
+	Seed    string   `xml:"entropy,attr"`
+}
 type Enclosure struct {
 	URL      string `xml:"url,attr"`
 	Mimetype string `xml:"type,attr"`
