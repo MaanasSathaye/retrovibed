@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package retrovibed.community;
+
+message Community {
+  string id = 1 [ json_name = "id" ];
+  string account_id = 2 [ json_name = "account_id" ];
+  string created_at = 4 [ json_name = "created_at" ];
+  string updated_at = 5 [ json_name = "updated_at" ];
+  string mimetype = 6 [ json_name = "mimetype" ];
+  string domain = 7 [ json_name = "domain" ];
+  string description = 8 [ json_name = "description" ];
+  string entropy = 9 [json_name = "entropy"];
+  uint64 bytes = 10 [ json_name = "bytes" ];
+  reserved 20 to 999;
+}
+
+message CommunitySearchRequest {
+  string query = 1 [ json_name = "query" ];
+  uint64 offset = 2 [ json_name = "offset" ];
+  uint64 limit = 3 [ json_name = "limit" ];
+  reserved 4 to 999;
+}
+
+message CommunitySearchResponse {
+  CommunitySearchRequest next = 1 [ json_name = "next" ];
+  repeated Community items = 2 [ json_name = "items" ];
+}
+
+message CommunityCreateRequest {
+  Community community = 1 [ json_name = "community" ];
+}
+message CommunityCreateResponse {
+  Community community = 1 [ json_name = "community" ];
+}
+
+message CommunityFindRequest {}
+message CommunityFindResponse {
+  Community community = 1 [ json_name = "community" ];
+}
+
+message CommunityUploadRequest {
+  Community community = 1 [ json_name = "community" ];
+}
+message CommunityUploadResponse {
+  Community community = 1 [ json_name = "community" ];
+}
+

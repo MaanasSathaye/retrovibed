@@ -81,14 +81,8 @@ func (t gen) Generate(w io.Writer, c Channel, items iter.Seq[Item]) error {
 		return errorsx.Wrap(err, "failed to encode channel ttl")
 	}
 
-	if stringsx.Present(c.Mimetype) {
-		if err := encoder.EncodeElement(c.Mimetype, xml.StartElement{Name: xml.Name{Local: "retrovibed:mimetype"}}); err != nil {
-			return errorsx.Wrap(err, "failed to encode channel ttl")
-		}
-	}
-
-	if c.Encryption != nil {
-		if err := encoder.EncodeElement(c.Encryption, xml.StartElement{Name: xml.Name{Local: "retrovibed:encryption"}}); err != nil {
+	if c.Retrovibed != nil {
+		if err := encoder.EncodeElement(c.Retrovibed, xml.StartElement{Name: xml.Name{Local: "retrovibed:metadata"}}); err != nil {
 			return errorsx.Wrap(err, "failed to encode channel ttl")
 		}
 	}

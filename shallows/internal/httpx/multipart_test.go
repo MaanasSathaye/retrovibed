@@ -82,7 +82,7 @@ func TestMultipart(t *testing.T) {
 
 		_, err = io.ReadAll(content)
 		require.ErrorIs(t, err, expectedErr)
-		require.ErrorIs(t, content.Close(), expectedErr)
+		require.NoError(t, content.Close())
 	})
 
 	t.Run("handle empty multipart body", func(t *testing.T) {

@@ -17,14 +17,13 @@ type rss struct {
 // in the oficial shcema channel contains more than just `item`
 // but there is no need to use those fields
 type channel struct {
-	XMLName       xml.Name `xml:"channel"`
-	Title         string   `xml:"title"`
-	Items         []item   `xml:"item"`
-	TTL           int      `xml:"ttl"`
-	LastBuildDate xmlTime  `xml:"lastBuildDate"`
-	Language      string   `xml:"language"`
-	Mimetype      string   `xml:"mimetype"`
-	Encryption    Encryption
+	XMLName       xml.Name   `xml:"channel"`
+	Title         string     `xml:"title"`
+	Items         []item     `xml:"item"`
+	TTL           int        `xml:"ttl"`
+	LastBuildDate xmlTime    `xml:"lastBuildDate"`
+	Language      string     `xml:"language"`
+	Retrovibed    Retrovibed `xml:"metadata"`
 }
 
 // item represent the actual feed for each news
@@ -37,7 +36,6 @@ type item struct {
 	PubDate     xmlTime     `xml:"pubDate"`
 	Source      *source     `xml:"source"`
 	Enclosures  []Enclosure `xml:"enclosure"`
-	Mimetype    string      `xml:"retrovibed:mimetype"`
 }
 
 func parseTimestamp(encoded string) (_ time.Time, err error) {
@@ -104,6 +102,7 @@ type source struct {
 }
 
 type Channel struct {
+	Retrovibed    *Retrovibed
 	Title         string
 	Link          string
 	TTL           int
@@ -111,8 +110,6 @@ type Channel struct {
 	Language      string
 	Description   string
 	Copyright     string
-	Mimetype      string      // specify the mimetype for this channel.
-	Encryption    *Encryption // specify the encryption details for this channel.
 }
 
 // Item is the representation of an item
@@ -133,10 +130,11 @@ type Source struct {
 	URL         string
 }
 
-type Encryption struct {
-	XMLName xml.Name `xml:"encryption"`
-	Seed    string   `xml:"entropy,attr"`
+type Retrovibed struct {
+	Entropy  string `xml:"entropy,attr,omitempty"`
+	Mimetype string `xml:"mimetype,attr,omitempty"`
 }
+
 type Enclosure struct {
 	URL      string `xml:"url,attr"`
 	Mimetype string `xml:"type,attr"`

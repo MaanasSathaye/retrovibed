@@ -80,7 +80,7 @@ func authn_bearer_host(hostname *C.char) *C.char {
 		log.Println(err)
 	}
 
-	return C.CString(bearer)
+	return C.CString(bearer.AccessToken)
 }
 
 //export public_key

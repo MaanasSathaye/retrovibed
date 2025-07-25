@@ -9,9 +9,19 @@ import (
 
 	"github.com/retrovibed/retrovibed/authn"
 	"github.com/retrovibed/retrovibed/deeppool"
+	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/httpx"
 	"golang.org/x/oauth2"
 )
+
+func AutoJWTClient(ctx context.Context) (c *http.Client, err error) {
+	c, err = authn.Oauth2HTTPClient(ctx)
+	if err != nil {
+		return nil, errorsx.Wrap(err, "failed to create oauth2 http client")
+	}
+
+	return JWTClient(c), nil
+}
 
 func JWTClient(oauth2c *http.Client) *http.Client {
 	return oauth2.NewClient(

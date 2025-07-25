@@ -183,15 +183,15 @@ func NewBearer() (string, error) {
 	return bearer, errorsx.Wrap(err, "token signature failure")
 }
 
-func BearerForHost(ctx context.Context, c *http.Client, host string) (string, error) {
+func BearerForHost(ctx context.Context, c *http.Client, host string) (*oauth2.Token, error) {
 	signer, err := sshx.AutoCached(sshx.NewKeyGen(), env.PrivateKeyPath())
 	if err != nil {
-		return "", errorsx.Wrap(err, "unable to read identity")
+		return nil, errorsx.Wrap(err, "unable to read identity")
 	}
 
 	state, err := AutoTokenState(signer)
 	if err != nil {
-		return "", errorsx.Wrap(err, "unable to generate authentication state")
+		return nil, errorsx.Wrap(err, "unable to generate authentication state")
 	}
 
 	ctx = context.WithValue(ctx, oauth2.HTTPClient, c)
@@ -207,18 +207,18 @@ func BearerForHost(ctx context.Context, c *http.Client, host string) (string, er
 
 	r, err := RetrieveAuthCode(ctx, c, authzuri)
 	if err != nil {
-		return "", errorsx.Wrap(err, "unable to retrieve auth code")
+		return nil, errorsx.Wrap(err, "unable to retrieve auth code")
 	}
 	if r.State != state {
-		return "", errorsx.Wrap(err, "invalid state")
+		return nil, errorsx.Wrap(err, "invalid state")
 	}
 
 	token, err := cfg.Exchange(ctx, r.Code, oauth2.AccessTypeOffline)
 	if err != nil {
-		return "", errorsx.Wrap(err, "unable to exchange auth code")
+		return nil, errorsx.Wrap(err, "unable to exchange auth code")
 	}
 
-	return token.AccessToken, nil
+	return token, nil
 }
 
 func JWTSecretFromEnv() []byte {

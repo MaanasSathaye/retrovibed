@@ -17,6 +17,7 @@ import (
 
 	"github.com/alecthomas/kong"
 	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/cmd/cmdcommunity"
 	"github.com/retrovibed/retrovibed/cmd/cmdmedia"
 	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
@@ -65,11 +66,12 @@ func Main(args ...string) {
 	var shellCli struct {
 		cmdopts.Global
 		cmdopts.PeerID
-		Version  cmdopts.Version     `cmd:"" help:"display versioning information"`
-		Identity cmdmeta.Identity    `cmd:"" help:"identity management commands"`
-		Media    cmdmedia.Commands   `cmd:"" help:"media management (import/export)"`
-		Torrent  cmdtorrent.Commands `cmd:"" help:"torrent related sub commands"`
-		Daemon   daemons.Command     `cmd:"" help:"run the backend daemon" default:"true"`
+		Version   cmdopts.Version       `cmd:"" help:"display versioning information"`
+		Identity  cmdmeta.Identity      `cmd:"" help:"identity management commands"`
+		Media     cmdmedia.Commands     `cmd:"" help:"media management (import/export)"`
+		Torrent   cmdtorrent.Commands   `cmd:"" help:"torrent related sub commands"`
+		Community cmdcommunity.Commands `cmd:"" help:"community related sub commands"`
+		Daemon    daemons.Command       `cmd:"" help:"run the backend daemon" default:"true"`
 	}
 
 	var (

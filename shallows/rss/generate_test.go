@@ -46,8 +46,10 @@ func TestGenerate(t *testing.T) {
 			LastBuildDate: time.Date(2025, time.July, 22, 13, 02, 40, 0, time.UTC),
 			Language:      "en-us",
 			Copyright:     "Retrovibed 2025",
-			Mimetype:      "application/vnd.retrovibed.media.archive",
-			Encryption:    &rss.Encryption{Seed: "57869e82c2684ac4881bd32581f969db"},
+			Retrovibed: &rss.Retrovibed{
+				Mimetype: "application/vnd.retrovibed.media.archive",
+				Entropy:  "57869e82c2684ac4881bd32581f969db",
+			},
 		}, iterx.From(rss.Item{
 			Guid:        "00000000-0000-0000-0000-000000000001",
 			Title:       "Retrovibe Media Archive 00",

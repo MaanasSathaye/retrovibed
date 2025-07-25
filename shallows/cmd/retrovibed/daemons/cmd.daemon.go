@@ -20,7 +20,6 @@ import (
 	"github.com/james-lawrence/torrent/dht/krpc"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
-	"github.com/retrovibed/retrovibed/authn"
 	"github.com/retrovibed/retrovibed/blockcache"
 	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
@@ -183,11 +182,11 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) {
 		}
 
 		errorsx.Log(AutoArchival(gctx.Context, db, mediastore, library.NewAsyncWakeup(gctx.Context), t.AutoReclaim))
-		c, err := authn.Oauth2HTTPClient(gctx.Context)
+		c, err := metaapi.AutoJWTClient(gctx.Context)
 		if err != nil {
 			return errorsx.Wrap(err, "failed to create oauth2 http client for archival")
 		}
-		deepjwt = metaapi.JWTClient(c)
+		deepjwt = c
 		tstore = library.NewTorrentStorage(deepjwt, db, tstore)
 	} else {
 		log.Println("automatic media archival is disabled")
