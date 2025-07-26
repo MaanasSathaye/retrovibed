@@ -356,13 +356,15 @@ const PublishedUploadRequest$json = {
   '1': 'PublishedUploadRequest',
   '2': [
     {'1': 'entropy', '3': 1, '4': 1, '5': 9, '10': 'entropy'},
+    {'1': 'mimetype', '3': 2, '4': 1, '5': 9, '10': 'mimetype'},
   ],
 };
 
 /// Descriptor for `PublishedUploadRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List publishedUploadRequestDescriptor =
     $convert.base64Decode(
-        'ChZQdWJsaXNoZWRVcGxvYWRSZXF1ZXN0EhgKB2VudHJvcHkYASABKAlSB2VudHJvcHk=');
+        'ChZQdWJsaXNoZWRVcGxvYWRSZXF1ZXN0EhgKB2VudHJvcHkYASABKAlSB2VudHJvcHkSGgoIbW'
+        'ltZXR5cGUYAiABKAlSCG1pbWV0eXBl');
 
 @$core.Deprecated('Use publishedUploadResponseDescriptor instead')
 const PublishedUploadResponse$json = {

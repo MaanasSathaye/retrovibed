@@ -301,6 +301,7 @@ func (t *HTTPDiscovered) publish(w http.ResponseWriter, r *http.Request) {
 		tracking.MetadataOptionDownloaded(n),
 		tracking.MetadataOptionTrackers(slicesx.Flatten(meta.UpvertedAnnounceList()...)...),
 		tracking.MetadataOptionEntropySeed(meta.ID().Bytes(), uuid.FromStringOrNil(decoded.Entropy).Bytes()),
+		tracking.MetadataOptionMimetype(decoded.Mimetype),
 		tracking.MetadataOptionAutoSeeding,
 		tracking.MetadataOptionAutoDescription,
 	)

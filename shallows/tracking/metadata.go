@@ -28,6 +28,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/fsx"
 	"github.com/retrovibed/retrovibed/internal/langx"
 	"github.com/retrovibed/retrovibed/internal/md5x"
+	"github.com/retrovibed/retrovibed/internal/mimex"
 	"github.com/retrovibed/retrovibed/internal/slicesx"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
 	"github.com/retrovibed/retrovibed/internal/squirrelx"
@@ -60,7 +61,7 @@ func MetadataOptionFromMagnet(i *metainfo.Magnet) func(*Metadata) {
 
 func MetadataOptionMimetype(d string) func(*Metadata) {
 	return func(m *Metadata) {
-		m.Mimetype = d
+		m.Mimetype = stringsx.FirstNonBlank(d, mimex.Bittorrent)
 	}
 }
 
@@ -135,6 +136,7 @@ func NewMetadata(md *metainfo.Hash, options ...func(*Metadata)) (m Metadata) {
 		NextAnnounceAt: timex.Inf(),
 		KnownMediaID:   uuid.Max.String(),
 		EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+		Mimetype:       mimex.Bittorrent,
 	}, options...)
 	return r
 }

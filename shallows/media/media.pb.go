@@ -1080,6 +1080,7 @@ func (x *Published) GetEntropy() string {
 type PublishedUploadRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Entropy       string                 `protobuf:"bytes,1,opt,name=entropy,proto3" json:"entropy,omitempty"`
+	Mimetype      string                 `protobuf:"bytes,2,opt,name=mimetype,proto3" json:"mimetype,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1117,6 +1118,13 @@ func (*PublishedUploadRequest) Descriptor() ([]byte, []int) {
 func (x *PublishedUploadRequest) GetEntropy() string {
 	if x != nil {
 		return x.Entropy
+	}
+	return ""
+}
+
+func (x *PublishedUploadRequest) GetMimetype() string {
+	if x != nil {
+		return x.Mimetype
 	}
 	return ""
 }
@@ -1241,9 +1249,10 @@ const file_media_proto_rawDesc = "" +
 	"\bmimetype\x18\x02 \x01(\tR\bmimetype\x12 \n" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x14\n" +
 	"\x05bytes\x18\x04 \x01(\x04R\x05bytes\x12\x18\n" +
-	"\aentropy\x18\x05 \x01(\tR\aentropy\"2\n" +
+	"\aentropy\x18\x05 \x01(\tR\aentropy\"N\n" +
 	"\x16PublishedUploadRequest\x12\x18\n" +
-	"\aentropy\x18\x01 \x01(\tR\aentropy\"I\n" +
+	"\aentropy\x18\x01 \x01(\tR\aentropy\x12\x1a\n" +
+	"\bmimetype\x18\x02 \x01(\tR\bmimetype\"I\n" +
 	"\x17PublishedUploadResponse\x12.\n" +
 	"\tpublished\x18\x01 \x01(\v2\x10.media.PublishedR\tpublishedb\x06proto3"
 

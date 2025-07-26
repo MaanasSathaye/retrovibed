@@ -92,5 +92,6 @@ message Published {
 
 message PublishedUploadRequest {
   string entropy = 1 [ json_name = "entropy" ];
+  string mimetype = 2 [ json_name = "mimetype" ];
 }
 message PublishedUploadResponse { Published published = 1 [ json_name = "published" ]; }

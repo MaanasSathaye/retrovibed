@@ -24,6 +24,8 @@ import (
 
 type importDirectory struct {
 	Endpoint  string `flag:"" name:"peer" help:"http address for the daemon you want to import to, usually you do this on device" default:"localhost:9998"`
+	Entropy   string `flag:"" name:"entropy" help:"encryption entropy value to set for uploads" default:""`
+	Mimetype  string `flag:"" name:"mimetype" help:"mimetype of the media if known and consistent"`
 	Directory string `arg:"" name:"directory" help:"directory containing the content to import. each immediate file / directory generates a torrent torrent. subdirectories create multi file torrents"`
 }
 
@@ -54,7 +56,7 @@ func (t importDirectory) Run(gctx *cmdopts.Global) error {
 			return err
 		}
 
-		mimetype, data, err := media.PublishRequest(ctx, md, &media.PublishedUploadRequest{})
+		mimetype, data, err := media.PublishRequest(ctx, md, &media.PublishedUploadRequest{Entropy: t.Entropy, Mimetype: t.Mimetype})
 		if err != nil {
 			return err
 		}

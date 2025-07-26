@@ -71,7 +71,8 @@ func TestDiscoveredPublishTorrent(t *testing.T) {
 		require.NoError(t, err)
 
 		mimetype, buf, err := media.PublishRequest(ctx, md, &media.PublishedUploadRequest{
-			Entropy: uuidx.WithSuffix(16),
+			Entropy:  uuidx.WithSuffix(16),
+			Mimetype: mimex.RetrovibedMediaArchive,
 		})
 		require.NoError(t, err)
 
@@ -96,10 +97,11 @@ func TestDiscoveredPublishTorrent(t *testing.T) {
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&r))
 		require.Equal(t, info.Name, r.Published.Description)
 		require.Equal(t, md.ID.String(), r.Published.Id)
-		require.Equal(t, mimex.Bittorrent, r.Published.Mimetype)
+		require.Equal(t, mimex.RetrovibedMediaArchive, r.Published.Mimetype)
 		require.Equal(t, 1, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM torrents_metadata"))(t))
 		require.Equal(t, md5x.FormatUUID(md5x.Digest(md.ID.Bytes(), uuid.FromStringOrNil(uuidx.WithSuffix(16)).Bytes())), testx.Must(sqlx.String(ctx, q, "SELECT encryption_seed::text FROM torrents_metadata"))(t))
 		require.Equal(t, "", testx.Must(sqlx.String(ctx, q, "SELECT tracker FROM torrents_metadata"))(t))
+		require.Equal(t, mimex.RetrovibedMediaArchive, testx.Must(sqlx.String(ctx, q, "SELECT mimetype FROM torrents_metadata"))(t))
 		require.EqualValues(t, info.TotalLength(), testx.Must(sqlx.Value[int](ctx, q, "SELECT bytes FROM torrents_metadata"))(t))
 		require.EqualValues(t, info.TotalLength(), testx.Must(sqlx.Value[int](ctx, q, "SELECT downloaded FROM torrents_metadata"))(t))
 		require.True(t, testx.Must(sqlx.Value[bool](ctx, q, "SELECT seeding FROM torrents_metadata"))(t))

@@ -1413,9 +1413,11 @@ class Published extends $pb.GeneratedMessage {
 class PublishedUploadRequest extends $pb.GeneratedMessage {
   factory PublishedUploadRequest({
     $core.String? entropy,
+    $core.String? mimetype,
   }) {
     final result = create();
     if (entropy != null) result.entropy = entropy;
+    if (mimetype != null) result.mimetype = mimetype;
     return result;
   }
 
@@ -1433,6 +1435,7 @@ class PublishedUploadRequest extends $pb.GeneratedMessage {
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
       createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'entropy')
+    ..aOS(2, _omitFieldNames ? '' : 'mimetype')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1466,6 +1469,15 @@ class PublishedUploadRequest extends $pb.GeneratedMessage {
   $core.bool hasEntropy() => $_has(0);
   @$pb.TagNumber(1)
   void clearEntropy() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get mimetype => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set mimetype($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasMimetype() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearMimetype() => $_clearField(2);
 }
 
 class PublishedUploadResponse extends $pb.GeneratedMessage {
