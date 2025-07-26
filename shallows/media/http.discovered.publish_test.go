@@ -59,7 +59,7 @@ func TestDiscoveredPublishTorrent(t *testing.T) {
 		media.NewHTTPDiscovered(
 			q,
 			tclient,
-			storage.NewFile(dvfs.Path(), storage.FileOptionPathMakerInfohash),
+			storage.NewFile(dvfs.Path("torrent"), storage.FileOptionPathMakerInfohash),
 			media.HTTPDiscoveredOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 			media.HTTPDiscoveredOptionRootStorage(dvfs),
 		).Bind(routes.PathPrefix("/").Subrouter())
@@ -105,8 +105,10 @@ func TestDiscoveredPublishTorrent(t *testing.T) {
 		require.EqualValues(t, info.TotalLength(), testx.Must(sqlx.Value[int](ctx, q, "SELECT bytes FROM torrents_metadata"))(t))
 		require.EqualValues(t, info.TotalLength(), testx.Must(sqlx.Value[int](ctx, q, "SELECT downloaded FROM torrents_metadata"))(t))
 		require.True(t, testx.Must(sqlx.Value[bool](ctx, q, "SELECT seeding FROM torrents_metadata"))(t))
-		require.DirExists(t, dvfs.Path(md.ID.String()))
-		require.FileExists(t, dvfs.Path(fmt.Sprintf("%s.torrent", md.ID.String())))
-		require.Equal(t, testx.IOMD5(bytes.NewReader(errorsx.Must(metainfo.Encode(md.Metainfo())))), testx.ReadMD5(dvfs.Path(fmt.Sprintf("%s.torrent", md.ID.String()))))
+
+		path := dvfs.Path("torrent", md.ID.String())
+		require.DirExists(t, path)
+		require.FileExists(t, fmt.Sprintf("%s.torrent", path))
+		require.Equal(t, testx.IOMD5(bytes.NewReader(errorsx.Must(metainfo.Encode(md.Metainfo())))), testx.ReadMD5(fmt.Sprintf("%s.torrent", path)))
 	})
 }

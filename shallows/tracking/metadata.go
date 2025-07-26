@@ -188,6 +188,14 @@ func MetadataQueryNeedsKnownMediaID() squirrel.Sqlizer {
 	return squirrel.Expr("torrents_metadata.known_media_id = 'FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF'")
 }
 
+func MetadataQueryMetadataArchive() squirrel.Sqlizer {
+	return squirrel.Expr("torrents_metadata.mimetype = ?", mimex.RetrovibedMediaArchive)
+}
+
+func MetadataQueryCreatedAfter(ts time.Time) squirrel.Sqlizer {
+	return squirrel.Expr("torrents_metadata.created_at BETWEEN ? AND NOW()", ts)
+}
+
 func MetadataSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) MetadataScanner {
 	return NewMetadataScannerStatic(b.RunWith(q).QueryContext(ctx))
 }

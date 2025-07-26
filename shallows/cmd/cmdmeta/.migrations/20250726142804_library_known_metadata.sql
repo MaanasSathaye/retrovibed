@@ -8,6 +8,7 @@ CREATE TABLE library_known_media (
     duplicates BIGINT NOT NULL DEFAULT 0,
     source VARCHAR NOT NULL DEFAULT '',
     id VARCHAR NOT NULL DEFAULT 0,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     released TIMESTAMPTZ NOT NULL DEFAULT 'infinity',
     title VARCHAR NOT NULL DEFAULT '',
     popularity DOUBLE NOT NULL DEFAULT 0.0,

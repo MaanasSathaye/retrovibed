@@ -246,13 +246,13 @@ func DiscoverFromRSSFeedsOnce(ctx context.Context, q sqlx.Queryer, rootstore fsx
 		}
 
 		for _, item := range items {
-			if err = l.Wait(ctx); err != nil {
-				log.Println("rate limit failure", err)
+			if item.PublishDate.Before(feed.LastBuiltAt) || item.PublishDate.Equal(feed.LastBuiltAt) {
+				log.Println("item before last built date", item.PublishDate, "<=", feed.LastBuiltAt)
 				continue
 			}
 
-			if item.PublishDate.Before(feed.LastBuiltAt) || item.PublishDate.Equal(feed.LastBuiltAt) {
-				log.Println("item before last built date", item.PublishDate, "<=", feed.LastBuiltAt)
+			if err = l.Wait(ctx); err != nil {
+				log.Println("rate limit failure", err)
 				continue
 			}
 

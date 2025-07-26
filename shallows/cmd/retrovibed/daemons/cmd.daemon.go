@@ -162,13 +162,13 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) {
 
 	rootstore := fsx.DirVirtual(env.RootStorageDir())
 	mediastore := fsx.DirVirtual(env.MediaDir())
-	torrentstore := fsx.DirVirtual(env.TorrentDir())
+	tvfs := fsx.DirVirtual(env.TorrentDir())
 
-	if err := fsx.MkDirs(0700, rootstore.Path(), mediastore.Path(), torrentstore.Path(), wireguardx.ConfigDirectory()); err != nil {
+	if err := fsx.MkDirs(0700, rootstore.Path(), mediastore.Path(), tvfs.Path(), wireguardx.ConfigDirectory()); err != nil {
 		return err
 	}
 
-	var tstore storage.ClientImpl = blockcache.NewTorrentFromVirtualFS(torrentstore)
+	var tstore storage.ClientImpl = blockcache.NewTorrentFromVirtualFS(tvfs)
 
 	if t.AutoReclaim {
 		errorsx.Log(AutoReclaim(gctx.Context, db, mediastore, library.NewAsyncWakeup(gctx.Context)))
@@ -192,7 +192,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) {
 		log.Println("automatic media archival is disabled")
 	}
 
-	log.Printf("USING STORAGE %T - %s\n", tstore, torrentstore.Path())
+	log.Printf("USING STORAGE %T - %s\n", tstore, tvfs.Path())
 
 	tm := dht.DefaultMuxer().
 		Method(bep0051.Query, bep0051.NewEndpoint(bep0051.EmptySampler{}))
@@ -220,9 +220,9 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) {
 	}
 
 	torconfig := torrent.NewDefaultClientConfig(
-		torrent.NewMetadataCache(torrentstore.Path()),
+		torrent.NewMetadataCache(tvfs.Path()),
 		tstore,
-		torrent.ClientConfigCacheDirectory(torrentstore.Path()),
+		torrent.ClientConfigCacheDirectory(tvfs.Path()),
 		torrent.ClientConfigPeerID(string(peerid[:])),
 		torrent.ClientConfigIPv4(t.TorrentPublicIP4),
 		torrent.ClientConfigIPv6(t.TorrentPublicIP6),
@@ -306,6 +306,10 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) {
 	errorsx.Log(cmdmeta.RefreshFTS(gctx.Context, db))
 	go timex.Every(10*time.Minute, func() {
 		errorsx.Log(cmdmeta.RefreshFTS(gctx.Context, db))
+	})
+
+	go timex.NowAndEveryVoid(gctx.Context, 10*time.Minute, func(ctx context.Context) {
+		errorsx.Log(MediaMetadataImport(gctx.Context, db, tvfs, tstore))
 	})
 
 	if t.AutoDiscovery {

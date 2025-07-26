@@ -80,6 +80,13 @@ func NowAndEvery(ctx context.Context, d time.Duration, do func(context.Context) 
 	}
 }
 
+func NowAndEveryVoid(ctx context.Context, d time.Duration, do func(context.Context)) {
+	NowAndEvery(ctx, d, func(ctx context.Context) error {
+		do(ctx)
+		return nil
+	})
+}
+
 // DurationOrDefault ...
 func DurationOrDefault(a, b time.Duration) time.Duration {
 	if a == 0 {

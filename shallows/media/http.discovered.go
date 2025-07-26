@@ -71,6 +71,8 @@ func NewHTTPDiscovered(q sqlx.Queryer, d download, c storage.ClientImpl, options
 		fts:         duckdbx.NewLucene(),
 	}, options...)
 
+	errorsx.Log(errorsx.Wrap(fsx.MkDirs(0700, svc.rootstorage.Path("torrent"), svc.rootstorage.Path("media")), "failed to prepare directories"))
+
 	return &svc
 }
 
@@ -275,8 +277,8 @@ func (t *HTTPDiscovered) publish(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := os.WriteFile(t.rootstorage.Path(fmt.Sprintf("%s.torrent", meta.ID().String())), buf.Bytes(), 0600); err != nil {
-		log.Println(errorsx.Errorf("failed to write torrent file %d != %d", n, info.TotalLength()))
+	if err := os.WriteFile(t.rootstorage.Path("torrent", fmt.Sprintf("%s.torrent", meta.ID().String())), buf.Bytes(), 0600); err != nil {
+		log.Println(errorsx.Errorf("failed to write torrent file: %s", t.rootstorage.Path("torrent", fmt.Sprintf("%s.torrent", meta.ID().String()))))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}
@@ -397,7 +399,7 @@ func (t *HTTPDiscovered) upload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = os.Rename(tmp.Name(), t.rootstorage.Path(fmt.Sprintf("%s.torrent", metainfo.Hash(lmd.Infohash).String()))); err != nil {
+	if err = os.Rename(tmp.Name(), t.rootstorage.Path("torrent", fmt.Sprintf("%s.torrent", metainfo.Hash(lmd.Infohash).String()))); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to failed to record torrent file"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return

@@ -52,6 +52,7 @@ func TestDiscoveredUploadTorrent(t *testing.T) {
 		tclient,
 		storage.NewFile(vfs.Path(), storage.FileOptionPathMakerInfohash),
 		media.HTTPDiscoveredOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+		media.HTTPDiscoveredOptionRootStorage(vfs),
 	).Bind(routes.PathPrefix("/").Subrouter())
 
 	mimetype, buf, err := httpx.Multipart(func(w *multipart.Writer) error {

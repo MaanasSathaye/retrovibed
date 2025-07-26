@@ -129,7 +129,7 @@ func KnownInsertWithDefaults(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a Known) NewKnownScannerStaticRow,
 ) {
-	gql.Into("library_known_media").Conflict("ON CONFLICT (uid) DO UPDATE SET title = EXCLUDED.title, original_language = EXCLUDED.original_language, original_title = EXCLUDED.original_title, popularity = EXCLUDED.popularity, overview = EXCLUDED.overview, source = EXCLUDED.source, poster_path = EXCLUDED.poster_path, backdrop_path = EXCLUDED.backdrop_path, duplicates = duplicates + 1")
+	gql.Into("library_known_media").Default("created_at").Conflict("ON CONFLICT (uid) DO UPDATE SET title = EXCLUDED.title, original_language = EXCLUDED.original_language, original_title = EXCLUDED.original_title, popularity = EXCLUDED.popularity, overview = EXCLUDED.overview, source = EXCLUDED.source, poster_path = EXCLUDED.poster_path, backdrop_path = EXCLUDED.backdrop_path, duplicates = duplicates + 1")
 }
 
 func KnownFindByID(
@@ -137,6 +137,13 @@ func KnownFindByID(
 	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewKnownScannerStaticRow,
 ) {
 	gql = gql.Query(`SELECT ` + KnownScannerStaticColumns + ` FROM library_known_media WHERE "uid" = {id}`)
+}
+
+func KnownFindByLastCreated(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer) NewKnownScannerStaticRow,
+) {
+	gql = gql.Query(`SELECT ` + KnownScannerStaticColumns + ` FROM library_known_media ORDER BY created_at DESC LIMIT 1`)
 }
 
 func KnownScoreByID(

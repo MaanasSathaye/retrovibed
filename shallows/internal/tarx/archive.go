@@ -4,6 +4,7 @@ import (
 	"archive/tar"
 	"compress/gzip"
 	"io"
+	"iter"
 	"os"
 	"path/filepath"
 
@@ -45,6 +46,46 @@ func Pack(dst io.Writer, paths ...string) (err error) {
 	}
 
 	return errors.Wrap(tw.Flush(), "failed to flush archive")
+}
+
+func UnpackSeq(r io.Reader) (_ iter.Seq2[*tar.Header, *tar.Reader], err error) {
+	var (
+		gzr *gzip.Reader
+		tr  *tar.Reader
+	)
+	if gzr, err = gzip.NewReader(r); err != nil {
+		return nil, errors.Wrap(err, "failed to create gzip reader")
+	}
+
+	tr = tar.NewReader(gzr)
+
+	return func(yield func(*tar.Header, *tar.Reader) bool) {
+		defer gzr.Close()
+		for {
+			header, err := tr.Next()
+			switch {
+			// if no more files are found return
+			case err == io.EOF:
+				return
+			// return any other error
+			case err != nil:
+				return
+			// if the header is nil, just skip it (not sure how this happens)
+			case header == nil:
+				continue
+			}
+
+			// check the file type
+			switch header.Typeflag {
+			case tar.TypeDir:
+			// if it's a file create it
+			case tar.TypeReg:
+				if !yield(header, tr) {
+					return
+				}
+			}
+		}
+	}, nil
 }
 
 // Unpack unpacks the archive from the reader into the root directory.
