@@ -41,7 +41,7 @@ func MediaMetadataImport(ctx context.Context, db sqlx.Queryer, tvfs fsx.Virtual,
 	).OrderBy("created_at ASC")
 
 	mdcache := torrent.NewMetadataCache(tvfs.Path())
-	iter := sqlx.Scan(tracking.MetadataSearch(ctx, sqlx.Debug(db), q))
+	iter := sqlx.Scan(tracking.MetadataSearch(ctx, db, q))
 
 	ts := time.Now()
 

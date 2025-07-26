@@ -20,7 +20,7 @@ func IdentifyTorrentyMedia(ctx context.Context, db sqlx.Queryer) error {
 		},
 	)
 
-	iter := sqlx.Scan(tracking.MetadataSearch(ctx, sqlx.Debug(db), q))
+	iter := sqlx.Scan(tracking.MetadataSearch(ctx, db, q))
 
 	log.Println("attempting to locate unidentified media initiated")
 	defer log.Println("attempting to locate unidentified media completed")
