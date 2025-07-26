@@ -21,8 +21,7 @@ const (
 	DaemonTLSPEM = "RETROVIBED_TLS_PEM"
 	DaemonSocket = "RETROVIBED_DAEMON_SOCKET" // specify the socket/port to listen on in the form: tcp://:9998
 
-	// JWTSharedSecret shared secret between the applications, used to encrypt data.
-	// and sign messages.
+	// JWTSharedSecret used to create jwt tokens
 	JWTSharedSecret = "RETROVIBED_JWT_SECRET"
 
 	// enable multicast service discovery
