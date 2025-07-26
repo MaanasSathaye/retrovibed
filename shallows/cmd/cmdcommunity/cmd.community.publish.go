@@ -49,7 +49,6 @@ func (t cmdCommunityPublish) items(r io.Reader) iter.Seq[rss.Item] {
 				Guid:        v.Id,
 				Title:       v.Description,
 				PublishDate: ts,
-				Link:        fmt.Sprintf("https://%s.community.retrovibe.space/%s", t.Name, v.Id),
 				Enclosures: []rss.Enclosure{
 					{URL: uri.String(), Mimetype: mimex.Bittorrent, Length: v.Bytes},
 				},

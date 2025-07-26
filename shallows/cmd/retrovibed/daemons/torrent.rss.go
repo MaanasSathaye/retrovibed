@@ -150,6 +150,11 @@ func DiscoverFromRSSFeedsOnce(ctx context.Context, q sqlx.Queryer, rootstore fsx
 				continue
 			}
 
+			if item.PublishDate.Before(feed.LastBuiltAt) || item.PublishDate.Equal(feed.LastBuiltAt) {
+				log.Println("item before last built date")
+				continue
+			}
+
 			uri := slicesx.FirstOrDefault(item.Link, rss.FindEnclosureURLByMimetype(mimex.Bittorrent, item)...)
 
 			req, err := http.NewRequestWithContext(ctx, http.MethodGet, uri, nil)

@@ -28,6 +28,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/envx"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/fsx"
+	"github.com/retrovibed/retrovibed/internal/md5x"
 	"github.com/retrovibed/retrovibed/internal/sshx"
 	"github.com/retrovibed/retrovibed/internal/stringsx"
 	"github.com/retrovibed/retrovibed/internal/userx"
@@ -86,6 +87,7 @@ func Main(args ...string) {
 	log.SetPrefix(fmt.Sprintf("%d ", os.Getpid()))
 
 	log.Println("wireguard preallocated buffers per pool", device.PreallocatedBuffersPerPool)
+	log.Println("jwt checksum", md5x.FormatUUID(md5x.Digest(env.JWTSecret())))
 
 	go debugx.DumpOnSignal(shellCli.Context, syscall.SIGUSR2)
 	go cmdopts.Cleanup(shellCli.Context, shellCli.Shutdown, shellCli.Cleanup, os.Kill, os.Interrupt, syscall.SIGTERM)(func() {
