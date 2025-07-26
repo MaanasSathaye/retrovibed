@@ -15,7 +15,7 @@ func Parse(ctx context.Context, r io.Reader) (*channel, []Item, error) {
 }
 
 func parseData(data io.Reader, originURL string) (*channel, []Item, error) {
-	var r rss
+	var r Root
 
 	if err := xml.NewDecoder(data).Decode(&r); err != nil {
 		return nil, nil, err

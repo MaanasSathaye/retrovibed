@@ -209,13 +209,21 @@ func (t *Walker) Err() error {
 	return t.failed
 }
 
-func AppendTo(path string, encoded []byte, perm os.FileMode) error {
+func AppendTo(path string, perm os.FileMode, block []byte, blocks ...[]byte) error {
 	d, err := os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, perm)
 	if err != nil {
 		return err
 	}
 	defer d.Close()
 
-	_, err = d.Write(encoded)
-	return err
+	for _, encoded := range blocks {
+		block = append(block, encoded...)
+
+	}
+
+	if _, err = d.Write(block); err != nil {
+		return err
+	}
+
+	return nil
 }

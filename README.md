@@ -68,17 +68,6 @@ on the device you're exporting from:
 retrovibed torrent export | ssh user@newdevicehost "retrovibed torrent import peer --peer='olddevicehost:port'"
 ```
 
-#### publishing torrents to an rss feed
-```bash
-# community names are globally unique. we reserve the right for change owners if someone is found squatting on a well known entity.
-# we wont do it without informing the current owner 3 months in advance.
-retrovibed community create --name="foo" --description="my special feed"
-
-retrovibed torrent import --peer="localhost:9998" {directory} | retrovibed community publish --dry-run foo
-# future work will allow using the exporting functionality to publish. either torrents or media.
-# retrovibed torrent export "query" | retrovibed community publish --dry-run foo
-```
-
 #### install flatpak gui
 
 requires flatpak-builder 1.4.2 or later to be installed.
@@ -102,4 +91,20 @@ retrovibed identity show
 
 ```bash
 go install github.com/retrovibed/retrovibed/shallows/cmd/retrovibed/...
+```
+
+### generating media metadata archive
+```bash
+retrovibed media known tmdb --apikey="..." --start=1800-01-01 --end=2000-12-31 | retrovibed media known archive --directory="." --pattern="retrovibed.media.archive.d"
+```
+
+#### publishing torrents to an rss feed
+```bash
+# community names are globally unique. we reserve the right for change owners if someone is found squatting on a well known entity.
+# we wont do it without informing the current owner 3 months in advance.
+retrovibed community create --name="foo" --description="my special feed"
+
+retrovibed torrent import --peer="localhost:9998" {directory} | retrovibed community publish --dry-run foo
+# future work will allow using the exporting functionality to publish. either torrents or media.
+# retrovibed torrent export "query" | retrovibed community publish --dry-run foo
 ```

@@ -1,7 +1,6 @@
 package cmdmedia
 
 import (
-	"compress/gzip"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -17,12 +16,13 @@ import (
 	"github.com/retrovibed/retrovibed/internal/fsx"
 	"github.com/retrovibed/retrovibed/internal/jsonl"
 	"github.com/retrovibed/retrovibed/internal/stringsx"
+	"github.com/retrovibed/retrovibed/internal/tarx"
 	"github.com/retrovibed/retrovibed/library"
 )
 
 type knownarchive struct {
 	Directory string `flag:"" name:"directory" help:"work directory for the command"`
-	Pattern   string `flag:"" name:"pattern" help:"name of the archive directory to create" default:"retrovibed.known.media.archive.*.d"`
+	Pattern   string `flag:"" name:"pattern" help:"name of the archive directory to create" default:"retrovibed.media.archive.*.d"`
 }
 
 func (t knownarchive) Run(gctx *cmdopts.Global) (err error) {
@@ -51,8 +51,13 @@ func (t knownarchive) Run(gctx *cmdopts.Global) (err error) {
 			return errorsx.Wrapf(err, "unable to encode record %s", v.UID)
 		}
 
-		path := filepath.Join(dir, fmt.Sprintf("%x%x", backoffx.DynamicHashWindow(v.Released.String(), 16), backoffx.DynamicHashWindow(v.UID, 48)))
-		if err := fsx.AppendTo(path, []byte(fmt.Sprintf("%s\n", encoded)), 0600); err != nil {
+		adir := filepath.Join(dir, fmt.Sprintf("%02x", backoffx.DynamicHashWindow(v.Released.String(), 32)))
+		if err := fsx.MkDirs(0700, adir); err != nil {
+			return errorsx.Wrapf(err, "unable to make directory: %s %s", v.UID, adir)
+		}
+
+		path := filepath.Join(adir, fmt.Sprintf("%x", backoffx.DynamicHashWindow(v.UID, 16)))
+		if err := fsx.AppendTo(path, 0600, encoded, []byte("\n")); err != nil {
 			return errorsx.Wrapf(err, "unable to append record %s %s", v.UID, path)
 		}
 	}
@@ -68,17 +73,12 @@ func (t knownarchive) Run(gctx *cmdopts.Global) (err error) {
 		}
 		defer in.Close()
 
-		out, err := os.Create(fmt.Sprintf("%s.gz", path))
+		out, err := os.Create(filepath.Join(dir, fmt.Sprintf("retrovibed.media.metadata.archive.%s.tar.gz", filepath.Base(path))))
 		if err != nil {
 			return err
 		}
-		defer out.Close()
-		gzout := gzip.NewWriter(out)
 
-		if _, err := io.Copy(gzout, in); err != nil {
-			return err
-		}
-		return errorsx.Compact(gzout.Flush(), gzout.Close(), os.RemoveAll(path))
+		return errorsx.Compact(tarx.Pack(out, path), out.Close(), os.RemoveAll(path))
 	})
 
 	w := fsx.Walk(os.DirFS(dir))

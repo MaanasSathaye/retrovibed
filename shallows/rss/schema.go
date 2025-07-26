@@ -7,14 +7,14 @@ import (
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 )
 
-// rss represents the shcema of an RSS feed
-type rss struct {
+// Root represents the schema of an RSS feed
+type Root struct {
 	XMLName xml.Name `xml:"rss"`
 	Version string   `xml:"version,attr"`
 	Channel channel  `xml:"channel"`
 }
 
-// in the oficial shcema channel contains more than just `item`
+// in the oficial schema channel contains more than just `item`
 // but there is no need to use those fields
 type channel struct {
 	XMLName       xml.Name   `xml:"channel"`

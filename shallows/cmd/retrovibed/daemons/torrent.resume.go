@@ -8,6 +8,7 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/james-lawrence/torrent"
+	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
@@ -16,7 +17,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/fsx"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
-	"github.com/retrovibed/retrovibed/internal/sqlxx"
+	"github.com/retrovibed/retrovibed/internal/stringsx"
 	"github.com/retrovibed/retrovibed/internal/timex"
 	"github.com/retrovibed/retrovibed/internal/torrentx"
 	"github.com/retrovibed/retrovibed/tracking"
@@ -124,13 +125,77 @@ func VerifyTorrents(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual,
 }
 
 func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, tclient *torrent.Client, tstore storage.ClientImpl) {
-	const limit = 128
+	const defaultDelay = 40 * time.Minute
 
 	defer log.Println("announce seeded completed")
 
 	announcer := torrentx.AnnouncerFromClient(tclient)
 	nport := tclient.LocalPort()
 	pid := tclient.PeerID()
+
+	announceDHT := func(cctx context.Context, md tracking.Metadata) time.Duration {
+		if md.Private {
+			return 0
+		}
+
+		log.Println("announcing dht", md.ID, int160.FromBytes(md.Infohash).String())
+
+		announceonce := func(cctx context.Context, d *dht.Server) error {
+			actx, done := context.WithTimeout(cctx, time.Minute)
+			defer done()
+
+			announced, err := d.AnnounceTraversal(actx, [20]byte(md.Infohash))
+			if err != nil {
+				return errorsx.Wrapf(err, "failed to announce to dht: %s", int160.FromBytes(md.Infohash))
+			}
+
+			for {
+				select {
+				case <-actx.Done():
+					return actx.Err()
+				case <-announced.Peers:
+				case <-announced.Finished():
+					return nil
+				}
+			}
+		}
+
+		for _, dht := range tclient.DhtServers() {
+			go func() {
+				errorsx.Log(announceonce(cctx, dht))
+			}()
+		}
+
+		return defaultDelay
+	}
+
+	announceTracker := func(cctx context.Context, md tracking.Metadata) time.Duration {
+		if stringsx.Blank(md.Tracker) {
+			return 0
+		}
+
+		req := tracker.NewAccounceRequest(
+			pid,
+			nport,
+			int160.FromBytes(md.Infohash),
+			tracker.AnnounceOptionKey,
+			tracker.AnnounceOptionDownloaded(int64(md.Downloaded)),
+			tracker.AnnounceOptionUploaded(int64(md.Uploaded)),
+			tracker.AnnounceOptionSeeding,
+		)
+
+		log.Println("announcing tracker", md.ID, int160.FromBytes(md.Infohash).String())
+		announced, err := announcer.ForTracker(md.Tracker).Do(cctx, req)
+		if err == tracker.ErrMissingInfoHash {
+			errorsx.Log(errorsx.Wrapf(tracking.MetadataDisableAnnounced(cctx, q, md.ID).Scan(&md), "unable to disable announcements for torrent: %s", md.ID))
+			return defaultDelay
+		} else if err != nil {
+			log.Println("failed to announce seeded torrent", md.ID, int160.FromBytes(md.Infohash).String(), err)
+			return defaultDelay
+		}
+
+		return timex.DurationMax(time.Duration(announced.Interval)*time.Second, 10*time.Minute)
+	}
 
 	for {
 		select {
@@ -140,52 +205,26 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, 
 			log.Println("running announcements")
 		}
 
-		var seeded []tracking.Metadata
-
 		query := tracking.MetadataSearchBuilder().Where(
 			squirrel.And{
 				tracking.MetadataQuerySeeding(),
-				tracking.MetadataQueryHasTracker(),
 				tracking.MetadataQueryNeedsAnnounce(),
 			},
-		).Limit(limit)
+		)
 
-		if err := sqlxx.ScanInto(tracking.MetadataSearch(ctx, q, query), &seeded); err != nil {
-			errorsx.Log(errorsx.Wrap(err, "failed to retrieve torrents to announce"))
-			continue
-		}
-
-		for _, i := range seeded {
-			req := tracker.NewAccounceRequest(
-				pid,
-				nport,
-				int160.FromBytes(i.Infohash),
-				tracker.AnnounceOptionKey,
-				tracker.AnnounceOptionDownloaded(int64(i.Downloaded)),
-				tracker.AnnounceOptionUploaded(int64(i.Uploaded)),
-				tracker.AnnounceOptionSeeding,
-			)
-
-			log.Println("announcing", i.ID, int160.FromBytes(i.Infohash).String())
-			announced, err := announcer.ForTracker(i.Tracker).Do(ctx, req)
-			if err == tracker.ErrMissingInfoHash {
-				errorsx.Log(errorsx.Wrapf(tracking.MetadataDisableAnnounced(ctx, q, i.ID).Scan(&i), "unable to disable announcements for torrent: %s", i.ID))
-				continue
-			} else if err != nil {
-				log.Println("failed to announce seeded torrent", i.ID, int160.FromBytes(i.Infohash).String(), err)
-			}
-
-			nextts := time.Now().Add(timex.DurationMax(time.Duration(announced.Interval)*time.Second, 10*time.Minute)).Add(backoffx.Random(5 * time.Minute))
-
+		s := sqlx.Scan(tracking.MetadataSearch(ctx, q, query))
+		for i := range s.Iter() {
+			nextts := time.Now().Add(timex.DurationMax(announceDHT(ctx, i), announceTracker(ctx, i))).Add(backoffx.Random(5 * time.Minute))
 			if err := tracking.MetadataAnnounced(ctx, q, i.ID, nextts).Scan(&i); err != nil {
 				log.Println("failed to record announcement", err)
 				continue
 			}
 
-			log.Println("announced", i.ID, "next", i.NextAnnounceAt, announced.Interval, time.Duration(announced.Interval)*time.Second)
+			log.Println("announced", i.ID, "next", i.NextAnnounceAt)
 		}
 
-		if len(seeded) >= limit {
+		if err := s.Err(); err != nil {
+			errorsx.Log(errorsx.Wrap(err, "failed to retrieve torrents to announce"))
 			continue
 		}
 
@@ -200,10 +239,9 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, 
 			query, args, err := tracking.MetadataSearchBuilder().RemoveColumns().Columns("next_announce_at").Where(
 				squirrel.And{
 					tracking.MetadataQuerySeeding(),
-					tracking.MetadataQueryHasTracker(),
 					tracking.MetadataQueryAnnounceable(),
 				},
-			).OrderBy("next_announce_at ASC").Limit(limit).ToSql()
+			).OrderBy("next_announce_at ASC").Limit(1).ToSql()
 			if err != nil {
 				panic(errorsx.Wrap(err, "failed to generate announce query"))
 			}
