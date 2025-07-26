@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/fs"
 	"log"
+	"net"
 	"os"
 	"path/filepath"
 	"strings"
@@ -305,8 +306,12 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 
 	log.Println("monitoring download progress initiated", md.ID, md.Description, md.Tracker, statsfreq)
 	defer log.Println("monitoring download progress completed", md.ID, md.Description, md.Tracker)
+	peer := torrent.TunePeers(torrent.Peer{
+		IP:   net.ParseIP("79.127.160.151"),
+		Port: 49364,
+	})
 	// Revisit once resume is working.
-	if err := dl.Tune(torrent.TuneSubscribe(&sub)); err != nil {
+	if err := dl.Tune(peer, torrent.TuneSubscribe(&sub)); err != nil {
 		log.Println("unable to subscribe", err)
 		return
 	}
@@ -314,6 +319,7 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 
 	statst := time.NewTicker(statsfreq)
 	l := rate.NewLimiter(rate.Every(time.Second), 1)
+
 	for {
 		select {
 		case <-statst.C:
@@ -325,7 +331,7 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 				stats.Missing, stats.Outstanding, stats.Unverified, stats.Completed, stats.Failed,
 			)
 
-			if err := dl.Tune(torrent.TuneNewConns); err != nil {
+			if err := dl.Tune(peer, torrent.TuneNewConns); err != nil {
 				log.Println("unable to request new connections", err)
 				continue
 			}

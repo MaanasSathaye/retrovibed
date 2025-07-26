@@ -8,11 +8,11 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/james-lawrence/torrent"
-	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/james-lawrence/torrent/tracker"
+	"github.com/retrovibed/retrovibed/internal/asynccompute"
 	"github.com/retrovibed/retrovibed/internal/backoffx"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/fsx"
@@ -138,35 +138,14 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, 
 			return 0
 		}
 
-		log.Println("announcing dht", md.ID, int160.FromBytes(md.Infohash).String())
+		id := int160.FromBytes(md.Infohash)
+		log.Println("announcing dht", md.ID, id)
 
-		announceonce := func(cctx context.Context, d *dht.Server) error {
-			actx, done := context.WithTimeout(cctx, time.Minute)
-			defer done()
-
-			announced, err := d.AnnounceTraversal(actx, [20]byte(md.Infohash))
-			if err != nil {
-				return errorsx.Wrapf(err, "failed to announce to dht: %s", int160.FromBytes(md.Infohash))
-			}
-
-			for {
-				select {
-				case <-actx.Done():
-					return actx.Err()
-				case <-announced.Peers:
-				case <-announced.Finished():
-					return nil
-				}
-			}
+		for _, d := range tclient.DhtServers() {
+			errorsx.Wrap(torrent.DHTAnnounceOnce(cctx, tclient, d, id), "announce dht failed")
 		}
 
-		for _, dht := range tclient.DhtServers() {
-			go func() {
-				errorsx.Log(announceonce(cctx, dht))
-			}()
-		}
-
-		return defaultDelay
+		return 0
 	}
 
 	announceTracker := func(cctx context.Context, md tracking.Metadata) time.Duration {
@@ -197,6 +176,19 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, 
 		return timex.DurationMax(time.Duration(announced.Interval)*time.Second, 10*time.Minute)
 	}
 
+	pool := asynccompute.New(func(ctx context.Context, i tracking.Metadata) error {
+		nextts := time.Now().Add(timex.DurationMax(announceDHT(ctx, i), announceTracker(ctx, i))).Add(backoffx.Random(5 * time.Minute))
+		if err := tracking.MetadataAnnounced(ctx, q, i.ID, nextts).Scan(&i); err != nil {
+			return errorsx.Wrap(err, "failed to record announcement")
+		}
+
+		log.Println("announced", i.ID, "next", i.NextAnnounceAt)
+		return nil
+	})
+	defer func() {
+		errorsx.Log(asynccompute.Shutdown(ctx, pool))
+	}()
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -212,15 +204,12 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, 
 			},
 		)
 
-		s := sqlx.Scan(tracking.MetadataSearch(ctx, q, query))
+		s := sqlx.Scan(tracking.MetadataSearch(ctx, sqlx.Debug(q), query))
 		for i := range s.Iter() {
-			nextts := time.Now().Add(timex.DurationMax(announceDHT(ctx, i), announceTracker(ctx, i))).Add(backoffx.Random(5 * time.Minute))
-			if err := tracking.MetadataAnnounced(ctx, q, i.ID, nextts).Scan(&i); err != nil {
-				log.Println("failed to record announcement", err)
+			if err := pool.Run(ctx, i); err != nil {
+				log.Println(err)
 				continue
 			}
-
-			log.Println("announced", i.ID, "next", i.NextAnnounceAt)
 		}
 
 		if err := s.Err(); err != nil {
@@ -245,6 +234,8 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, 
 			if err != nil {
 				panic(errorsx.Wrap(err, "failed to generate announce query"))
 			}
+
+			log.Println("derp", errorsx.Zero(sqlx.Timestamp(ctx, q, "UPDATE torrents_metadata SET next_announce_at = NOW() + INTERVAL '5s' WHERE id = '8ff31fd8-3950-1ee9-0bef-186e20d8e812' RETURNING next_announce_at")))
 
 			if nextts, err = sqlx.Timestamp(ctx, q, query, args...); err != nil {
 				log.Printf("unable to determine next timestamp - %v", err)

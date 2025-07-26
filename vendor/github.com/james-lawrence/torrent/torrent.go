@@ -25,6 +25,7 @@ import (
 	"github.com/james-lawrence/torrent/internal/errorsx"
 	"github.com/james-lawrence/torrent/internal/langx"
 	"github.com/james-lawrence/torrent/internal/netx"
+	"github.com/james-lawrence/torrent/internal/slicesx"
 	"github.com/james-lawrence/torrent/internal/x/bitmapx"
 	"github.com/james-lawrence/torrent/tracker"
 
@@ -204,7 +205,7 @@ func TuneAutoDownload(t *torrent) {
 		return
 	}
 
-	t.chunks.fill(t.chunks.missing)
+	t.chunks.fill(t.chunks.missing, uint64(t.chunks.cmaximum))
 }
 
 // Announce to trackers looking for at least one successful request that returns peers.
@@ -222,6 +223,9 @@ func TuneAnnounceUntilComplete(t *torrent) {
 	})
 }
 
+// laptop: 079.127.160.151:65431
+// eg:     151.243.141.105:40193
+// peers:  151.243.141.105
 // Verify the entirety of the torrent. will block
 func TuneVerifyFull(t *torrent) {
 	t.digests.EnqueueBitmap(bitmapx.Fill(t.chunks.pieces))
@@ -258,10 +262,16 @@ func TuneVerifySample(n uint64) Tuner {
 		t.digests.Enqueue(min(t.chunks.pieces-1, t.chunks.pieces)) // min to handle 0 case which causes a uint wrap around.
 		t.digests.Wait()
 
+		// if everything validated assume the torrent is good and mark it as fully complete.
 		if t.chunks.failed.IsEmpty() {
+			t.chunks.fill(t.chunks.completed, t.chunks.pieces)
+			t.chunks.zero(t.chunks.unverified)
+			t.chunks.zero(t.chunks.missing)
+			log.Println("DEEEEEEEEEEEEEEEEEEEEEEEEEERP", t.chunks.String())
 			return
 		}
 
+		log.Println("VERIFYING FULL")
 		TuneVerifyFull(t)
 	}
 }
@@ -999,16 +1009,16 @@ func (t *torrent) openNewConns() {
 
 	for {
 		if !t.wantConns() {
-			t.cln.config.debug().Println("openNewConns: connections not wanted")
+			log.Println("openNewConns: connections not wanted")
 			return
 		}
 
 		if p, ok = t.peers.PopMax(); !ok {
-			t.cln.config.debug().Println("openNewConns: no peers")
+			// log.Println("openNewConns: no peers")
 			return
 		}
 
-		t.cln.config.debug().Printf("initiating connection to peer %p %s %d\n", t, p.IP, p.Port)
+		log.Printf("initiating connection to peer %p %s %d\n", t, p.IP, p.Port)
 		t.initiateConn(context.Background(), p)
 	}
 }
@@ -1032,7 +1042,7 @@ func (t *torrent) maybeCompleteMetadata(c *connection) error {
 		return fmt.Errorf("error setting info bytes: %s", err)
 	}
 
-	t.chunks.fill(t.chunks.missing)
+	t.chunks.fill(t.chunks.missing, uint64(t.chunks.cmaximum))
 	t.cln.config.debug().Printf("seeding(%t) %s: received metadata from peers\n", t.seeding(), t)
 
 	return nil
@@ -1142,7 +1152,6 @@ func (t *torrent) seeding() bool {
 // Adds peers revealed in an announce until the announce ends, or we have
 // enough peers.
 func (t *torrent) consumeDhtAnnouncePeers(ctx context.Context, pvs <-chan dht.PeersValues) {
-	// l := rate.NewLimiter(rate.Every(time.Minute), 1)
 	for {
 		select {
 		case v, ok := <-pvs:
@@ -1151,19 +1160,17 @@ func (t *torrent) consumeDhtAnnouncePeers(ctx context.Context, pvs <-chan dht.Pe
 				return
 			}
 
-			for _, cp := range v.Peers {
-				if cp.Port() == 0 {
-					// Can't do anything with this.
-					continue
-				}
-
-				t.cln.config.debug().Println("adding peer", cp.AddrPort)
-				t.AddPeer(Peer{
+			peers := slicesx.MapTransform(func(cp dht.Peer) Peer {
+				return Peer{
 					IP:     cp.Addr().AsSlice(),
 					Port:   int(cp.Port()),
 					Source: peerSourceDhtGetPeers,
-				})
-			}
+				}
+			}, slicesx.Filter(func(v dht.Peer) bool { return v.Port() != 0 }, v.Peers...)...)
+
+			// log.Println("LOCATED", t.md.ID, len(peers))
+			t.cln.config.debug().Println("adding peers", len(peers))
+			t.AddPeers(peers)
 		case <-ctx.Done():
 			return
 		}
@@ -1174,6 +1181,7 @@ func (t *torrent) announceToDht(impliedPort bool, s *dht.Server) error {
 	ctx, done := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer done()
 
+	log.Println("WAKA", t.md.ID, impliedPort, t.cln.LocalPort16())
 	ps, err := s.AnnounceTraversal(ctx, t.md.ID, dht.AnnouncePeer(impliedPort, t.cln.LocalPort()))
 	if err != nil {
 		return err
@@ -1192,25 +1200,32 @@ func (t *torrent) announceToDht(impliedPort bool, s *dht.Server) error {
 }
 
 func (t *torrent) dhtAnnouncer(s *dht.Server) {
+	errdelay := time.Duration(0) // for the first run 0 delay to immediately find peers
 	for {
 		t.cln.config.debug().Println("dht ancouncer waiting for peers event", int160.FromByteArray(s.ID()))
 		select {
 		case <-t.closed:
 			return
+		case <-time.After(errdelay):
 		case <-t.wantPeersEvent:
-			t.cln.config.debug().Println("dht ancouncing peers wanted event", int160.FromByteArray(s.ID()))
+			log.Println("dht ancouncing peers wanted event", int160.FromByteArray(s.ID()))
 		}
 
 		t.stats.DHTAnnounce.Add(1)
 
-		if err := t.announceToDht(true, s); errors.Is(err, dht.ErrDHTNoInitialNodes) {
+		if err := t.announceToDht(true, s); err == nil {
+			errdelay = time.Hour // when we succeeded wait an hour unless a wantPeersEvent comes in.
+			t.cln.config.debug().Println("dht ancouncing completed", int160.FromByteArray(s.ID()))
+			continue
+		} else if errors.Is(err, dht.ErrDHTNoInitialNodes) {
 			t.cln.config.errors().Println(t, err)
-			time.Sleep(time.Minute)
-		} else if err != nil {
+			errdelay = time.Minute
+			continue
+		} else {
 			t.cln.config.errors().Println(t, errorsx.Wrap(err, "error announcing to DHT"))
-			time.Sleep(time.Second)
+			errdelay = time.Second
+			continue
 		}
-		t.cln.config.debug().Println("dht ancouncing completed", int160.FromByteArray(s.ID()))
 	}
 }
 
