@@ -67,16 +67,22 @@ func extractSource(urlRaw string) string {
 	return u.Hostname()
 }
 
-func FindEnclosureURLByMimetype(mimetype string, items ...Item) (urls []string) {
+func FindEnclosureURLByMimetype(mimetype string, items ...Item) (enc []Enclosure) {
 	for _, i := range items {
 		for _, i := range i.Enclosures {
 			if i.Mimetype != mimetype {
 				continue
 			}
 
-			urls = append(urls, i.URL)
+			enc = append(enc, i)
 		}
 	}
 
-	return urls
+	return enc
+}
+
+func ItemToEnclosure(i Item) Enclosure {
+	return Enclosure{
+		URL: i.Link,
+	}
 }

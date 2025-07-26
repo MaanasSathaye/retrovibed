@@ -58,6 +58,12 @@ func MetadataOptionFromMagnet(i *metainfo.Magnet) func(*Metadata) {
 	}
 }
 
+func MetadataOptionMimetype(d string) func(*Metadata) {
+	return func(m *Metadata) {
+		m.Mimetype = d
+	}
+}
+
 func MetadataOptionDescription(d string) func(*Metadata) {
 	return func(m *Metadata) {
 		m.Description = d
