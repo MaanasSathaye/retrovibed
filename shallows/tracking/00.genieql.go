@@ -26,7 +26,7 @@ func MetadataInsertWithDefaults(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a Metadata) NewMetadataScannerStaticRow,
 ) {
-	gql.Into("torrents_metadata").Default("created_at", "updated_at", "hidden_at", "initiated_at", "paused_at", "next_announce_at", "verify_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, tracker = EXCLUDED.tracker")
+	gql.Into("torrents_metadata").Default("created_at", "updated_at", "hidden_at", "initiated_at", "paused_at", "next_announce_at", "verify_at", "imported_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, tracker = EXCLUDED.tracker")
 }
 
 func MetadataBatchInsertWithDefaults(
@@ -69,6 +69,13 @@ func MetadataProgressByID(
 	pattern func(ctx context.Context, q sqlx.Queryer, id string, peers uint16, downloaded uint64) NewMetadataScannerStaticRow,
 ) {
 	gql = gql.Query(`UPDATE torrents_metadata SET updated_at = NOW(), downloaded = {downloaded}, peers = {peers}, seeding = (bytes == {downloaded}) WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
+}
+
+func MetadataImportedByID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewMetadataScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE torrents_metadata SET updated_at = NOW(), imported_at = NOW() WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
 }
 
 func MetadataVerifyByID(

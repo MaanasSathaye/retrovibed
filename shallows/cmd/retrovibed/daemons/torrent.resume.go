@@ -65,7 +65,6 @@ func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual
 
 		go func(infopath string, md tracking.Metadata, dl torrent.Torrent) {
 			errorsx.Log(errorsx.Wrap(tracking.Download(ctx, db, rootstore, &md, dl), "resume failed"))
-			torrentx.RecordInfo(infopath, dl.Metadata())
 		}(infopath, md, t)
 
 		log.Println("resumed", md.ID, md.Description)
@@ -101,7 +100,7 @@ func VerifyTorrents(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual,
 			return
 		}
 
-		log.Println("verification initiated", md.ID, md.Description)
+		log.Println("verification initiated", md.ID, int160.FromBytes(md.Infohash), md.Description)
 		t, _, err := tclient.Start(metadata, torrent.TuneVerifySample(32))
 		if err != nil {
 			log.Println(errorsx.Wrapf(err, "unable to start download %s - %s", md.ID, infopath))
@@ -109,7 +108,7 @@ func VerifyTorrents(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual,
 		}
 
 		if t.Info() == nil {
-			log.Println("verification ignored", md.ID, md.Description)
+			log.Println("verification ignored", md.ID, int160.FromBytes(md.Infohash), md.Description)
 			// ignoring for now
 			continue
 		}
@@ -204,7 +203,7 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, 
 			},
 		)
 
-		s := sqlx.Scan(tracking.MetadataSearch(ctx, sqlx.Debug(q), query))
+		s := sqlx.Scan(tracking.MetadataSearch(ctx, q, query))
 		for i := range s.Iter() {
 			if err := pool.Run(ctx, i); err != nil {
 				log.Println(err)
@@ -235,7 +234,7 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, 
 				panic(errorsx.Wrap(err, "failed to generate announce query"))
 			}
 
-			log.Println("derp", errorsx.Zero(sqlx.Timestamp(ctx, q, "UPDATE torrents_metadata SET next_announce_at = NOW() + INTERVAL '5s' WHERE id = '8ff31fd8-3950-1ee9-0bef-186e20d8e812' RETURNING next_announce_at")))
+			// log.Println("derp", errorsx.Zero(sqlx.Timestamp(ctx, q, "UPDATE torrents_metadata SET next_announce_at = NOW() + INTERVAL '5s' WHERE id = '8ff31fd8-3950-1ee9-0bef-186e20d8e812' RETURNING next_announce_at")))
 
 			if nextts, err = sqlx.Timestamp(ctx, q, query, args...); err != nil {
 				log.Printf("unable to determine next timestamp - %v", err)

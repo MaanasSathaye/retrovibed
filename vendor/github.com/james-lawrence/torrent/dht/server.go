@@ -884,13 +884,11 @@ func (s *Server) announcePeer(
 	ret QueryResult,
 ) {
 
-	// log.Println("CHECKPOINT announce peer initiated")
-	// defer log.Println("CHECKPOINT announce peer completed")
 	qi, err := NewAnnouncePeerRequest(s.ID(), infoHash.AsByteArray(), port, token, impliedPort)
 	if err != nil {
 		return NewQueryResultErr(err)
 	}
-	// log.Println("CHECKPOINT announce peer")
+
 	if ret = s.Query(ctx, node, qi); ret.Err != nil {
 		return ret
 	}

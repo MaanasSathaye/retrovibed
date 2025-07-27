@@ -1,95 +1,104 @@
 package daemons
 
 import (
+	"archive/tar"
 	"context"
 	"io"
 	"log"
-	"time"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/storage"
+	"github.com/retrovibed/retrovibed/internal/asynccompute"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/fsx"
 	"github.com/retrovibed/retrovibed/internal/jsonl"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
 	"github.com/retrovibed/retrovibed/internal/stringsx"
 	"github.com/retrovibed/retrovibed/internal/tarx"
-	"github.com/retrovibed/retrovibed/internal/timex"
 	"github.com/retrovibed/retrovibed/library"
 	"github.com/retrovibed/retrovibed/tracking"
 )
 
 func MediaMetadataImport(ctx context.Context, db sqlx.Queryer, tvfs fsx.Virtual, tstore storage.ClientImpl) error {
-	var (
-		latest library.Known
-	)
-
 	log.Println("import latest media metadata initiated")
 	defer log.Println("import latest media metadata completed")
-
-	if err := library.KnownFindByLastCreated(ctx, db).Scan(&latest); sqlx.IgnoreNoRows(err) != nil {
-		return errorsx.Wrap(err, "unable to retrieve latest media metadata")
-	}
 
 	q := tracking.MetadataSearchBuilder().Where(
 		squirrel.And{
 			tracking.MetadataQueryMetadataArchive(),
-			tracking.MetadataQueryCreatedAfter(timex.Max(time.UnixMicro(0), latest.CreatedAt.Add(-1*time.Hour))),
+			tracking.MetadataQueryCompleted(true),
+			tracking.MetadataQueryNotImported(),
 		},
 	).OrderBy("created_at ASC")
 
 	mdcache := torrent.NewMetadataCache(tvfs.Path())
 	iter := sqlx.Scan(tracking.MetadataSearch(ctx, db, q))
 
-	ts := time.Now()
+	insert := asynccompute.New(func(ctx context.Context, v library.Known) error {
+		return library.KnownInsertWithDefaults(ctx, db, v).Scan(&v)
+	}, asynccompute.Workers[library.Known](1))
 
-	for _md := range iter.Iter() {
+	pool := asynccompute.New(func(ctx context.Context, _md tracking.Metadata) error {
 		id := int160.FromBytes(_md.Infohash)
 
 		md, err := mdcache.Read(id)
 		if err != nil {
-			errorsx.Log(errorsx.Wrap(err, "unable to read torrent metadata"))
-			continue
+			return errorsx.Wrap(err, "unable to read torrent metadata")
 		}
 		info, err := md.Metainfo().UnmarshalInfo()
 		if err != nil {
-			errorsx.Log(errorsx.Wrap(err, "unable to decode torrent info"))
-			continue
+			return errorsx.Wrap(err, "unable to decode torrent info")
 		}
 
 		disk, err := tstore.OpenTorrent(&info, md.ID)
 		if err != nil {
-			errorsx.Log(errorsx.Wrap(err, "unable to open torrent reader"))
-			continue
+			return errorsx.Wrap(err, "unable to open torrent reader")
 		}
 
 		iter, err := tarx.UnpackSeq(io.NewSectionReader(disk, 0, int64(_md.Bytes)))
 		if err != nil {
-			errorsx.Log(errorsx.Wrap(err, "unable to open read archive"))
-			continue
+			return errorsx.Wrap(err, "unable to open read archive")
 		}
 
-		for header, content := range iter {
+		importtarfile := func(header *tar.Header, content *tar.Reader) error {
 			var (
 				derr error
+				i    uint64
 				v    library.Known
 			)
 
-			log.Println("importing media metadata", id, _md.Description, header.Name)
+			log.Println("media metadata import initiated", id, _md.Description, header.Name)
+			defer log.Println("media metadata import completed", id, _md.Description, header.Name)
 			d := jsonl.NewDecoder(content)
 
-			for derr = d.Decode(&v); derr == nil; derr = d.Decode(&v) {
+			for i, derr = 0, d.Decode(&v); derr == nil; i, derr = i+1, d.Decode(&v) {
 				v.AutoDescription = stringsx.Join("\n", v.Title, v.OriginalTitle, v.Overview)
-				if err = library.KnownInsertWithDefaults(ctx, db, v).Scan(&v); err != nil {
-					return err
-				}
+				return insert.Run(ctx, v)
 			}
 
 			if err := errorsx.Ignore(derr, io.EOF); err != nil {
 				return err
 			}
+
+			return nil
+		}
+
+		for header, content := range iter {
+			errorsx.Log(importtarfile(header, content))
+		}
+
+		if err = tracking.MetadataImportedByID(ctx, db, _md.ID).Scan(&_md); err != nil {
+			return errorsx.Wrap(err, "unable to mark archive as imported")
+		}
+
+		return nil
+	})
+
+	for _md := range iter.Iter() {
+		if err := pool.Run(ctx, _md); err != nil {
+			return errorsx.Wrap(err, "unable to enqueue for import")
 		}
 	}
 
@@ -97,9 +106,9 @@ func MediaMetadataImport(ctx context.Context, db sqlx.Queryer, tvfs fsx.Virtual,
 		return errorsx.Wrap(iter.Err(), "failed to ingest latest media metadata")
 	}
 
-	if err := sqlx.Discard(sqlx.Scan(library.MetadataTransferKnownMediaIDFromTorrent(ctx, db, ts))); err != nil {
-		return errorsx.Wrap(iter.Err(), "failed to associate known media with upstream library")
+	if err := asynccompute.Shutdown(ctx, pool); err != nil {
+		return err
 	}
 
-	return nil
+	return asynccompute.Shutdown(ctx, insert)
 }

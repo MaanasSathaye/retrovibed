@@ -23,13 +23,14 @@ require (
 	github.com/grindlemire/go-lucene v0.0.21
 	github.com/hashicorp/mdns v1.0.6
 	github.com/james-lawrence/genieql v0.0.0-20250605152251-dee4282e5e2a
-	github.com/james-lawrence/torrent v0.0.0-20250720212857-eba9e8a4f849
+	github.com/james-lawrence/torrent v0.0.0-20250727193552-923d4efbb937
 	github.com/justinas/alice v1.2.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/marcboeker/go-duckdb/v2 v2.3.2
 	github.com/mattn/go-isatty v0.0.20
 	github.com/onsi/ginkgo/v2 v2.23.4
 	github.com/onsi/gomega v1.37.0
+	github.com/pkg/errors v0.9.1
 	github.com/pkg/profile v1.7.0
 	github.com/porfirion/trie v1.0.0
 	github.com/pressly/goose/v3 v3.24.3
@@ -122,7 +123,6 @@ require (
 	github.com/muesli/termenv v0.16.0 // indirect
 	github.com/nxadm/tail v1.4.11 // indirect
 	github.com/pierrec/lz4/v4 v4.1.22 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/rs/dnscache v0.0.0-20230804202142-fc85eb664529 // indirect

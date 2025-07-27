@@ -156,7 +156,7 @@ func MetadataQueryIncomplete() squirrel.Sqlizer {
 
 func MetadataQueryCompleted(b bool) squirrel.Sqlizer {
 	if b {
-		return squirrel.Expr("torrents_metadata.downloaded = torrents_metadata.bytes")
+		return squirrel.Expr("torrents_metadata.downloaded >= torrents_metadata.bytes")
 	}
 	return squirrel.Expr("torrents_metadata.downloaded < torrents_metadata.bytes")
 }
@@ -195,6 +195,10 @@ func MetadataQueryMetadataArchive() squirrel.Sqlizer {
 
 func MetadataQueryCreatedAfter(ts time.Time) squirrel.Sqlizer {
 	return squirrel.Expr("torrents_metadata.created_at BETWEEN ? AND NOW()", ts)
+}
+
+func MetadataQueryNotImported() squirrel.Sqlizer {
+	return squirrel.Expr("torrents_metadata.imported_at = 'infinity'")
 }
 
 func MetadataSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) MetadataScanner {
@@ -308,7 +312,7 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 	defer log.Println("monitoring download progress completed", md.ID, md.Description, md.Tracker)
 	peer := torrent.TunePeers(torrent.Peer{
 		IP:   net.ParseIP("79.127.160.151"),
-		Port: 49364,
+		Port: 39851,
 	})
 	// Revisit once resume is working.
 	if err := dl.Tune(peer, torrent.TuneSubscribe(&sub)); err != nil {

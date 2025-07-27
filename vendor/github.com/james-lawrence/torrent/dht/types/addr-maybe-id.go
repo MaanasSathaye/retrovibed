@@ -13,7 +13,6 @@ func AddrMaybeIdSliceFromNodeInfoSlice(nis []krpc.NodeInfo) (ret []AddrMaybeId) 
 	ret = make([]AddrMaybeId, 0, len(nis))
 	for _, ni := range nis {
 		id := int160.FromByteArray(ni.ID)
-		// log.Println(id, ni.Addr.AddrPort.Port(), ni.Addr.AddrPort)
 		ret = append(ret, AddrMaybeId{
 			Addr: ni.Addr,
 			Id:   generics.Some(id),

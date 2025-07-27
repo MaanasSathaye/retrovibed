@@ -81,8 +81,9 @@ func FindEnclosureURLByMimetype(mimetype string, items ...Item) (enc []Enclosure
 	return enc
 }
 
-func ItemToEnclosure(i Item) Enclosure {
+func ItemToEnclosure(i Item, mimetype string) Enclosure {
 	return Enclosure{
-		URL: i.Link,
+		URL:      i.Link,
+		Mimetype: mimetype,
 	}
 }

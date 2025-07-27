@@ -71,11 +71,9 @@ type AnnouncePeerOpts struct {
 func AnnouncePeer(implied bool, port int) AnnounceOpt {
 	return func(a *Announce) {
 		if port == 0 && !implied {
-			log.Println("DERP DERP")
 			return
 		}
 
-		// log.Println("ZERP ZERP", implied, port)
 		a.announcePeerOpts = &AnnouncePeerOpts{
 			Port:        port,
 			ImpliedPort: implied,
@@ -112,14 +110,13 @@ func (s *Server) AnnounceTraversal(ctx context.Context, infoHash [20]byte, opts 
 	go func() {
 		select {
 		case <-a.traversal.Stalled():
-			log.Println("traversal stalled", a.traversal.Stats())
+			// log.Println("traversal stalled")
 		case <-ctx.Done():
-			log.Println("traversal", ctx.Err())
+			// log.Println("traversal", ctx.Err())
 		}
 
 		a.traversal.Stop()
 		<-a.traversal.Stopped()
-
 		if a.announcePeerOpts != nil {
 			a.announceClosest(ctx)
 		}
@@ -135,7 +132,7 @@ func (a *Announce) announceClosest(ctx context.Context) {
 	a.traversal.Closest().Range(func(elem dhtutil.Elem) {
 		wg.Add(1)
 		go func() {
-			log.Printf("announce_peer to %s - %s: %v\n", elem.ID, elem.Addr.AddrPort, a.announcePeer(ctx, elem))
+			a.logger().Printf("announce_peer to %s - %s: %v\n", elem.ID, elem.Addr.AddrPort, a.announcePeer(ctx, elem))
 			wg.Done()
 		}()
 	})
@@ -181,6 +178,7 @@ func (a *Announce) getPeers(ctx context.Context, addr krpc.NodeAddr) traversal.Q
 	return res.TraversalQueryResult(addr)
 }
 
+// Corresponds to the "values" key in a get_peers KRPC response. A list of
 // peers that a node has reported as being in the swarm for a queried info
 // hash.
 type PeersValues struct {

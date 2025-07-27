@@ -113,7 +113,7 @@ func (t *fallback) ReadAt(p []byte, off int64) (n int, err error) {
 			// non min/max uuid.
 		}
 
-		prng := cryptox.NewChaCha8(uuidx.FirstNonZero(uuid.FromStringOrNil(v.EncryptionSeed), uuid.FromStringOrNil(v.ID)).Bytes())
+		prng := cryptox.NewChaCha8(uuidx.FirstNonNil(uuid.FromStringOrNil(v.EncryptionSeed), uuid.FromStringOrNil(v.ID)).Bytes())
 		if cerr := t.downloadChunk(prng, v.ArchiveID, v.DiskOffset, v.Bytes); cerr != nil {
 			log.Println("failed to download from archive", cerr)
 			return

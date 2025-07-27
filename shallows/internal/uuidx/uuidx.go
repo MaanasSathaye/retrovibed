@@ -34,7 +34,7 @@ func Advance16(u uuid.UUID, by uint16) uuid.UUID {
 }
 
 // returns the first non-zero uuid or zero if all are zero.
-func FirstNonZero(uids ...uuid.UUID) uuid.UUID {
+func FirstNonNil(uids ...uuid.UUID) uuid.UUID {
 	for _, uid := range uids {
 		if !uid.IsNil() {
 			return uid

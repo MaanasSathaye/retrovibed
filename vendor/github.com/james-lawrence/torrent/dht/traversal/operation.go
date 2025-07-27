@@ -261,7 +261,6 @@ func (op *Operation) startQuery() {
 				op.addClosest(*res.ResponseFrom, res.ClosestData)
 			}()
 		}
-
 		op.AddNodes(types.AddrMaybeIdSliceFromNodeInfoSlice(res.Nodes))
 		op.AddNodes(types.AddrMaybeIdSliceFromNodeInfoSlice(res.Nodes6))
 	}()

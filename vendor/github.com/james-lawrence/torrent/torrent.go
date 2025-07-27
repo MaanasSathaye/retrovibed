@@ -223,9 +223,6 @@ func TuneAnnounceUntilComplete(t *torrent) {
 	})
 }
 
-// laptop: 079.127.160.151:65431
-// eg:     151.243.141.105:40193
-// peers:  151.243.141.105
 // Verify the entirety of the torrent. will block
 func TuneVerifyFull(t *torrent) {
 	t.digests.EnqueueBitmap(bitmapx.Fill(t.chunks.pieces))
@@ -267,17 +264,26 @@ func TuneVerifySample(n uint64) Tuner {
 			t.chunks.fill(t.chunks.completed, t.chunks.pieces)
 			t.chunks.zero(t.chunks.unverified)
 			t.chunks.zero(t.chunks.missing)
-			log.Println("DEEEEEEEEEEEEEEEEEEEEEEEEEERP", t.chunks.String())
 			return
 		}
 
-		log.Println("VERIFYING FULL")
 		TuneVerifyFull(t)
 	}
 }
 
 func TuneSeeding(t *torrent) {
 	t.chunks.MergeInto(t.chunks.completed, bitmapx.Fill(t.chunks.pieces))
+}
+
+// used after info has been received to mark all chunks missing.
+// will only happen if missing and completed are zero.
+func TuneRecordMetadata(t *torrent) {
+	if t.Info() == nil {
+		panic("cannot persist torrent metadata when missing info")
+	}
+
+	t.md.InfoBytes = t.metadataBytes
+	errorsx.Log(errorsx.Wrap(t.cln.torrents.Write(t.Metadata()), "failed to perist torrent file"))
 }
 
 func tuneMerge(md Metadata) Tuner {
@@ -313,12 +319,11 @@ func DownloadInto(ctx context.Context, dst io.Writer, m Torrent, options ...Tune
 
 	select {
 	case <-m.GotInfo():
-
 	case <-ctx.Done():
 		return 0, errorsx.Compact(context.Cause(ctx), ctx.Err())
 	}
 
-	if err = m.Tune(TuneAutoDownload, TuneNewConns, TuneAnnounceOnce(tracker.AnnounceOptionEventStarted)); err != nil {
+	if err = m.Tune(TuneRecordMetadata, TuneAutoDownload, TuneNewConns, TuneAnnounceOnce(tracker.AnnounceOptionEventStarted)); err != nil {
 		return 0, err
 	}
 
@@ -760,6 +765,7 @@ func (t *torrent) setInfo(info *metainfo.Info) (err error) {
 	t.nameMu.Lock()
 	t.info = info
 	t.setChunkSize(langx.DefaultIfZero(defaultChunkSize, t.md.ChunkSize))
+	t.md.InfoBytes = t.metadataBytes
 	t.nameMu.Unlock()
 
 	t.initFiles()
@@ -1009,16 +1015,16 @@ func (t *torrent) openNewConns() {
 
 	for {
 		if !t.wantConns() {
-			log.Println("openNewConns: connections not wanted")
+			t.cln.config.debug().Println("openNewConns: connections not wanted")
 			return
 		}
 
 		if p, ok = t.peers.PopMax(); !ok {
-			// log.Println("openNewConns: no peers")
+			t.cln.config.debug().Println("openNewConns: no peers")
 			return
 		}
 
-		log.Printf("initiating connection to peer %p %s %d\n", t, p.IP, p.Port)
+		t.cln.config.debug().Printf("initiating connection to peer %p %s %d\n", t, p.IP, p.Port)
 		t.initiateConn(context.Background(), p)
 	}
 }
@@ -1168,7 +1174,6 @@ func (t *torrent) consumeDhtAnnouncePeers(ctx context.Context, pvs <-chan dht.Pe
 				}
 			}, slicesx.Filter(func(v dht.Peer) bool { return v.Port() != 0 }, v.Peers...)...)
 
-			// log.Println("LOCATED", t.md.ID, len(peers))
 			t.cln.config.debug().Println("adding peers", len(peers))
 			t.AddPeers(peers)
 		case <-ctx.Done():
@@ -1181,7 +1186,6 @@ func (t *torrent) announceToDht(impliedPort bool, s *dht.Server) error {
 	ctx, done := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer done()
 
-	log.Println("WAKA", t.md.ID, impliedPort, t.cln.LocalPort16())
 	ps, err := s.AnnounceTraversal(ctx, t.md.ID, dht.AnnouncePeer(impliedPort, t.cln.LocalPort()))
 	if err != nil {
 		return err

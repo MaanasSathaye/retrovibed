@@ -1,7 +1,6 @@
 package torrent
 
 import (
-	"log"
 	"sync"
 
 	"github.com/james-lawrence/torrent/dht/int160"
@@ -136,7 +135,6 @@ func (t *memoryseeding) Load(cl *Client, id int160.T) (_ *torrent, cached bool, 
 	}
 
 	dlt := newTorrent(cl, md)
-	log.Println("---------------------", unverified.GetCardinality())
 	dlt.chunks.InitFromUnverified(unverified)
 	// lets randomly verify some of the data.
 	// will block until complete.

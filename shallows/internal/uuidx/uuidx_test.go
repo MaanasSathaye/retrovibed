@@ -51,7 +51,7 @@ func TestFirstNonZero(t *testing.T) {
 			uuid.Must(uuid.FromString("00000000-0000-0000-0000-000000000003")),
 		}
 		expected := uuid.Must(uuid.FromString("00000000-0000-0000-0000-000000000001"))
-		actual := FirstNonZero(input...)
+		actual := FirstNonNil(input...)
 		require.Equal(t, expected, actual, "Expected FirstNonZero to return %v, got %v", expected, actual)
 	})
 
@@ -63,7 +63,7 @@ func TestFirstNonZero(t *testing.T) {
 			uuid.Must(uuid.FromString("00000000-0000-0000-0000-000000000003")),
 		}
 		expected := uuid.Must(uuid.FromString("00000000-0000-0000-0000-000000000002"))
-		actual := FirstNonZero(input...)
+		actual := FirstNonNil(input...)
 		require.Equal(t, expected, actual, "Expected FirstNonZero to return %v, got %v", expected, actual)
 	})
 
@@ -75,21 +75,21 @@ func TestFirstNonZero(t *testing.T) {
 			uuid.Must(uuid.FromString("00000000-0000-0000-0000-000000000003")),
 		}
 		expected := uuid.Must(uuid.FromString("00000000-0000-0000-0000-000000000003"))
-		actual := FirstNonZero(input...)
+		actual := FirstNonNil(input...)
 		require.Equal(t, expected, actual, "Expected FirstNonZero to return %v, got %v", expected, actual)
 	})
 
 	t.Run("should return uuid.Nil if all UUIDs are nil", func(t *testing.T) {
 		input := []uuid.UUID{uuid.Nil, uuid.Nil, uuid.Nil}
 		expected := uuid.Nil
-		actual := FirstNonZero(input...)
+		actual := FirstNonNil(input...)
 		require.Equal(t, expected, actual, "Expected FirstNonZero to return uuid.Nil, got %v", actual)
 	})
 
 	t.Run("should return uuid.Nil for an empty slice", func(t *testing.T) {
 		input := []uuid.UUID{}
 		expected := uuid.Nil
-		actual := FirstNonZero(input...)
+		actual := FirstNonNil(input...)
 		require.Equal(t, expected, actual, "Expected FirstNonZero to return uuid.Nil for empty slice, got %v", actual)
 	})
 
@@ -98,14 +98,14 @@ func TestFirstNonZero(t *testing.T) {
 			uuid.Must(uuid.FromString("00000000-0000-0000-0000-000000000001")),
 		}
 		expected := uuid.Must(uuid.FromString("00000000-0000-0000-0000-000000000001"))
-		actual := FirstNonZero(input...)
+		actual := FirstNonNil(input...)
 		require.Equal(t, expected, actual, "Expected FirstNonZero to return %v for single non-nil, got %v", expected, actual)
 	})
 
 	t.Run("should handle a single nil UUID correctly", func(t *testing.T) {
 		input := []uuid.UUID{uuid.Nil}
 		expected := uuid.Nil
-		actual := FirstNonZero(input...)
+		actual := FirstNonNil(input...)
 		require.Equal(t, expected, actual, "Expected FirstNonZero to return uuid.Nil for single nil, got %v", actual)
 	})
 }

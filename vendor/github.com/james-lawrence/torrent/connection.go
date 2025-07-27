@@ -787,7 +787,6 @@ func (cn *connection) ReadOne(ctx context.Context, decoder *pp.Decoder) (msg pp.
 	cn.lastMessageReceived.Store(langx.Autoptr(time.Now()))
 
 	if msg.Keepalive {
-
 		cn.cfg.debug().Printf("(%d) c(%p) id(%s) seed(%t) remote(%s) claimed(%d) - RECEIVED KEEPALIVE - missing(%d) - failed(%d) - outstanding(%d) - unverified(%d) - completed(%d)\n", os.Getpid(), cn, cn.t.md.ID, cn.cfg.Seed, cn.conn.RemoteAddr(), cn.claimed.GetCardinality(), cn.t.chunks.Cardinality(cn.t.chunks.missing), cn.t.chunks.Cardinality(cn.t.chunks.failed), len(cn.t.chunks.outstanding), cn.t.chunks.Cardinality(cn.t.chunks.unverified), cn.t.chunks.Cardinality(cn.t.chunks.completed))
 		return
 	}

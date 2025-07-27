@@ -192,9 +192,3 @@ func OptionTracker(tracker string) torrent.Option {
 
 	return torrent.OptionTrackers(tracker)
 }
-
-func RecordInfo(infopath string, dl torrent.Metadata) {
-	if info := dl.InfoBytes; info != nil {
-		errorsx.Log(errorsx.Wrap(os.WriteFile(infopath, info, 0600), "unable to record info file"))
-	}
-}

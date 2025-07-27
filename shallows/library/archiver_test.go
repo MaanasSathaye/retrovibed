@@ -85,7 +85,7 @@ func TestArchive(t *testing.T) {
 		require.Equal(t, v.Bytes, uint64(n))
 
 		archiver := &md5archive{
-			seed: uuidx.FirstNonZero(uuid.FromStringOrNil(v.EncryptionSeed), uuid.FromStringOrNil(v.ID)).Bytes(),
+			seed: uuidx.FirstNonNil(uuid.FromStringOrNil(v.EncryptionSeed), uuid.FromStringOrNil(v.ID)).Bytes(),
 		}
 
 		require.NoError(t, library.Archive(ctx, q, v, root, archiver))

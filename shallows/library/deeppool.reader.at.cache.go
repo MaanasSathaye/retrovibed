@@ -85,5 +85,5 @@ func (t *DeeppoolReaderAtCache) ReadAt(p []byte, off int64) (n int, err error) {
 }
 
 func MetadataChaCha8(md Metadata) *rand.ChaCha8 {
-	return cryptox.NewChaCha8(uuidx.FirstNonZero(uuid.FromStringOrNil(md.EncryptionSeed), uuid.FromStringOrNil(md.ID)).Bytes())
+	return cryptox.NewChaCha8(uuidx.FirstNonNil(uuid.FromStringOrNil(md.EncryptionSeed), uuid.FromStringOrNil(md.ID)).Bytes())
 }
