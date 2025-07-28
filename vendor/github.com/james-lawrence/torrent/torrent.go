@@ -296,6 +296,7 @@ func tuneMerge(md Metadata) Tuner {
 		t.md.Trackers = append(t.md.Trackers, md.Trackers...)
 
 		if md.ChunkSize != t.md.ChunkSize && md.ChunkSize != 0 {
+			log.Println("merging set chunk size")
 			t.setChunkSize(md.ChunkSize)
 		}
 	}
@@ -382,7 +383,7 @@ func VerifyStored(ctx context.Context, md *metainfo.MetaInfo, t io.ReaderAt) (mi
 	return chunks.Clone(chunks.missing), chunks.ReadableBitmap(), nil
 }
 
-func newTorrent(cl *Client, src Metadata) *torrent {
+func newTorrent(cl *Client, src Metadata, options ...Tuner) *torrent {
 	const (
 		maxEstablishedConns = 200
 	)
@@ -415,6 +416,11 @@ func newTorrent(cl *Client, src Metadata) *torrent {
 	if err := t.setInfoBytes(src.InfoBytes); err != nil {
 		log.Println("encountered an error setting info bytes", len(src.InfoBytes), err)
 	}
+
+	if err := t.Tune(options...); err != nil {
+		log.Println("encountered an error tuning torrent", err)
+	}
+
 	return t
 }
 
@@ -657,9 +663,9 @@ func (t *torrent) KnownSwarm() (ks []Peer) {
 
 func (t *torrent) setChunkSize(size uint64) {
 	t.md.ChunkSize = size
-	// potential bug here us to be '*t.chunks = *newChunks(...)' change to straight assignment to deal with
+	// potential bug here use to be '*t.chunks = *newChunks(...)' change to straight assignment to deal with
 	// Unlock called on a non-locked mutex.
-	t.chunks = newChunks(size, langx.DefaultIfZero(metainfo.NewInfo(), t.info), chunkoptMutex(t.chunks.mu), chunkoptCond(t.chunks.cond), chunkoptCompleted(t.chunks.completed))
+	*t.chunks = *newChunks(size, langx.DefaultIfZero(metainfo.NewInfo(), t.info), chunkoptMutex(t.chunks.mu), chunkoptCond(t.chunks.cond), chunkoptCompleted(t.chunks.completed))
 }
 
 // There's a connection to that address already.
