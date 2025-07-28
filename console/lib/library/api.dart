@@ -1,8 +1,11 @@
 import 'dart:convert';
+import 'dart:typed_data';
+import 'package:lru/lru.dart';
 import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:retrovibed/media/media.known.pb.dart';
 import 'package:http/http.dart' as http;
 import 'package:retrovibed/httpx.dart' as httpx;
+import 'package:retrovibed/design.kit/inputs.dart' as inputs;
 
 export 'package:retrovibed/media/media.known.pb.dart';
 
@@ -10,6 +13,11 @@ typedef FnKnownSearch =
     Future<KnownSearchResponse> Function(KnownSearchRequest req);
 
 abstract class known {
+  static LruTypedDataCache<String, Uint8List> cache =
+      LruTypedDataCache<String, Uint8List>(
+        capacity: 256,
+        capacityInBytes: inputs.bytesx.MiB,
+      );
   static KnownSearchRequest request({int limit = 0, String query = ""}) =>
       KnownSearchRequest(limit: fixnum.Int64(limit));
   static KnownSearchResponse response({KnownSearchRequest? next}) =>
@@ -35,6 +43,19 @@ abstract class known {
         });
   }
 
+  static Future<KnownLookupResponse> cached(
+    String id,
+    Future<KnownLookupResponse> Function() fetch,
+  ) {
+    final c = cache[id];
+    return c == null
+        ? fetch().then((v) {
+          cache[id] = v.known.writeToBuffer();
+          return v;
+        })
+        : Future.value(KnownLookupResponse(known: Known.fromBuffer(c)));
+  }
+
   static Future<KnownLookupResponse> get(
     String id, {
     List<httpx.Option> options = const [],
@@ -49,3 +70,5 @@ abstract class known {
         });
   }
 }
+
+T cached<T>(T? v, T fallback) => v ?? fallback;

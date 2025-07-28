@@ -3,7 +3,6 @@ import 'package:retrovibed/designkit.dart' as ds;
 
 class Card extends material.StatelessWidget {
   final material.Widget leading;
-  final material.Widget image;
   final material.Widget child;
   final material.Widget trailing;
 
@@ -13,9 +12,7 @@ class Card extends material.StatelessWidget {
   final material.GestureTapCallback? onDoubleTap;
   final material.GestureLongPressCallback? onLongPress;
 
-  const Card({
-    required this.image,
-    required this.child,
+  const Card(this.child, {
     this.leading = const material.SizedBox(),
     this.trailing = const material.SizedBox(),
     this.onTap,
@@ -27,6 +24,7 @@ class Card extends material.StatelessWidget {
   @override
   material.Widget build(material.BuildContext context) {
     final defaults = ds.Defaults.of(context);
+
     return material.InkWell(
       onTap: onTap,
       onDoubleTap: onDoubleTap,
@@ -38,20 +36,12 @@ class Card extends material.StatelessWidget {
           padding: defaults.padding ?? material.EdgeInsets.zero,
           child: material.Column(
             children: [
-              material.Padding(
-                padding: material.EdgeInsets.only(top: 0.0, bottom: 10.0),
+              material.Container(
+                margin: material.EdgeInsets.only(bottom: defaults.margin?.vertical ?? 0.0),
                 child: leading,
               ),
               material.Expanded(
-                child: material.Row(
-                  mainAxisSize: material.MainAxisSize.min,
-                  children: [
-                    image,
-                    material.Expanded(
-                      child: material.SelectionArea(child: child),
-                    ),
-                  ],
-                ),
+                child: material.SelectionArea(child: child),
               ),
               trailing,
             ],

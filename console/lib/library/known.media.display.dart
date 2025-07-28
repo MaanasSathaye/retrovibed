@@ -28,7 +28,7 @@ class KnownMediaDisplay extends StatefulWidget {
         api.Known(
           id: "",
           description: m.description,
-          summary: "no metadata known, feel free to assign",
+          summary: "",
           rating: 0.0,
           image: "",
         ),

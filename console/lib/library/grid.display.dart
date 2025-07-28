@@ -140,6 +140,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                   _res.next.query = v;
                   _res.next.offset = fixnum.Int64(0);
                 });
+                ds.textediting.refocus(widget.controller);
                 return refresh(_res.next);
               },
               next: (i) {
@@ -169,13 +170,13 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                 padding: defaults.padding,
                 itemCount: _res.items.length, // Number of items in your grid
                 gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: 633, // Maximum width of each item
+                  maxCrossAxisExtent: 512, // Maximum width of each item
                   crossAxisSpacing:
                       (defaults.spacing ?? 0.0) / 2, // Spacing between columns
                   mainAxisSpacing:
                       (defaults.spacing ?? 0.0) / 2, // Spacing between rows
                   childAspectRatio:
-                      16 / 9, // Aspect ratio of each grid item (width/height)
+                      2 / 3, // Aspect ratio of each grid item (width/height)
                 ),
                 itemBuilder: (context, index) {
                   var _media = _res.items.elementAt(index);
@@ -223,7 +224,15 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                     default:
                       return KnownMediaDisplay(
                         api.known
-                            .get(_media.knownMediaId, options: [authn.Authenticated.devicebearer(context)])
+                            .cached(
+                              _media.knownMediaId,
+                              () => api.known.get(
+                                _media.knownMediaId,
+                                options: [
+                                  authn.Authenticated.devicebearer(context),
+                                ],
+                              ),
+                            )
                             .then(
                               (w) =>
                                   (w.known..description = _media.description),
