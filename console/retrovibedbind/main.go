@@ -73,11 +73,12 @@ func authn_bearer_host(hostname *C.char) *C.char {
 		},
 	}
 	defaultclient := &http.Client{Transport: ctransport, Timeout: 20 * time.Second}
-	// defaultclient = httpx.BindRetryTransport(defaultclient, http.StatusTooManyRequests, http.StatusBadGateway, http.StatusInternalServerError, http.StatusRequestTimeout)
+	defaultclient = authn.RetryClient(defaultclient)
 
 	bearer, err := authn.BearerForHost(ctx, defaultclient, C.GoString(hostname))
 	if err != nil {
 		log.Println(err)
+		return C.CString("")
 	}
 
 	return C.CString(bearer.AccessToken)

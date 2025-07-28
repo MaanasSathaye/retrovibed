@@ -27,6 +27,10 @@ import (
 	"golang.org/x/oauth2"
 )
 
+func RetryClient(c *http.Client) *http.Client {
+	return httpx.BindRetryTransport(c, http.StatusTooManyRequests, http.StatusBadGateway, http.StatusInternalServerError, http.StatusRequestTimeout)
+}
+
 func DeeppoolEndpoint() oauth2.Endpoint {
 	return EndpointSSHAuth(fmt.Sprintf("https://%s", deeppool.Deeppool()))
 }

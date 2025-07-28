@@ -110,10 +110,10 @@ class _PlaylistState extends State<Playlist> {
       player.setAudioTrack(audio);
       player.setSubtitleTrack(subtitles);
 
-      // track.audio.forEach((t) => print("audio: ${t.id} ${t.language} ${t.title} -- ${t}"));
-      // track.subtitle.forEach((t) => print("subtitle: ${t.id} ${t.language} ${t.title} -- ${t}"));
-      // print("audio: ${audio.id} ${audio.language} ${audio.title} -- ${audio}");
-      // print("subtitles: ${subtitles.id} ${subtitles.language} ${subtitles.title} -- ${subtitles}");
+      track.audio.forEach((t) => print("audio: ${t.id} ${t.language} ${t.title} -- ${t}"));
+      track.subtitle.forEach((t) => print("subtitle: ${t.id} ${t.language} ${t.title} -- ${t}"));
+      print("audio: ${audio.id} ${audio.language} ${audio.title} -- ${audio}");
+      print("subtitles: ${subtitles.id} ${subtitles.language} ${subtitles.title} -- ${subtitles}");
     });
     // player.stream.playlist.listen((list) {
     //   print("playlist: ${list.index} - ${list}");
