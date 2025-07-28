@@ -26,6 +26,10 @@ class Authenticated extends StatefulWidget {
     });
   }
 
+  static httpx.Option devicebearer(BuildContext context) {
+    return httpx.Request.bearer(Future.value(httpx.auto_bearer_host()));
+  }
+
   @override
   State<Authenticated> createState() => _AuthenticatedState();
 }

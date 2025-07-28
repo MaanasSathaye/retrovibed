@@ -38,6 +38,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/sqlx"
 	"github.com/retrovibed/retrovibed/internal/sqlxx"
 	"github.com/retrovibed/retrovibed/internal/torrentx"
+	"github.com/retrovibed/retrovibed/library"
 	"github.com/retrovibed/retrovibed/tracking"
 )
 
@@ -122,6 +123,14 @@ func (t *HTTPDiscovered) Bind(r *mux.Router) {
 		httpauth.AuthenticateWithToken(t.jwtsecret),
 		httpx.Timeout2s(),
 	).ThenFunc(t.downloading))
+
+	r.Path("/{id}/metadatasync").Methods(http.MethodPost).Handler(alice.New(
+		httpx.DebugRequest,
+		httpx.ContextBufferPool512(),
+		httpx.ParseForm,
+		httpauth.AuthenticateWithToken(t.jwtsecret),
+		httpx.Timeout2s(),
+	).ThenFunc(t.metadatasync))
 
 	r.Path("/{id}").Methods(http.MethodGet).Handler(alice.New(
 		httpx.ContextBufferPool512(),
@@ -570,6 +579,43 @@ func (t *HTTPDiscovered) metadata(w http.ResponseWriter, r *http.Request) {
 			langx.Clone(
 				Download{},
 				DownloadOptionFromTorrentMetadata(langx.Clone(meta, tracking.MetadataOptionJSONSafeEncode))),
+		),
+	}); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to write response"))
+		return
+	}
+}
+
+func (t *HTTPDiscovered) metadatasync(w http.ResponseWriter, r *http.Request) {
+	var (
+		req Download
+		tmd tracking.Metadata
+		id  = mux.Vars(r)["id"]
+	)
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to decoded update"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
+
+	if err := tracking.MetadataAssignKnownMediaID(r.Context(), t.q, id, req.Media.KnownMediaId).Scan(&tmd); err != nil {
+		log.Println(errorsx.Wrapf(err, "unable to sync media metadata: %s", id))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err := sqlx.Discard(sqlx.Scan(library.MetadataSyncKnownMediaIDFromTorrent(r.Context(), t.q, id))); sqlx.IgnoreNoRows(err) != nil {
+		log.Println(errorsx.Wrap(err, "unable to sync media metadata"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &MetadataSyncResponse{
+		Media: langx.Autoptr(
+			langx.Clone(
+				Media{},
+				MediaOptionFromTorrentMetadata(langx.Clone(tmd, tracking.MetadataOptionJSONSafeEncode))),
 		),
 	}); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))

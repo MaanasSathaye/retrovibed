@@ -96,6 +96,12 @@ func MetadataOptionTestDefaults(p *Metadata) {
 	p.DiskOffset = 0
 }
 
+func MetadataOptionTestID(id string) MetadataOption {
+	return func(p *Metadata) {
+		p.ID = id
+	}
+}
+
 func NewMetadata(id string, options ...func(*Metadata)) (m Metadata) {
 	r := langx.Clone(Metadata{
 		ID:             id,

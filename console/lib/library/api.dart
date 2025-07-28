@@ -35,18 +35,12 @@ abstract class known {
         });
   }
 
-  static Future<KnownLookupResponse> get(String id) async {
-    final client = http.Client();
-    return client
-        .get(
-          Uri.https(
-            httpx.host(),
-            "/k/${id}",
-           {},
-          ),
-          headers: {"Authorization": httpx.auto_bearer_host()},
-        )
-        .then(httpx.auto_error)
+  static Future<KnownLookupResponse> get(
+    String id, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
+        .get(Uri.https(httpx.host(), "/k/${id}", {}), options: options)
         .then((v) {
           return Future.value(
             KnownLookupResponse.create()

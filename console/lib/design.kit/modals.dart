@@ -49,6 +49,7 @@ class NodeState extends State<Node> {
     final theme = Theme.of(context);
     final themex = Defaults.of(context);
     final mq = MediaQuery.of(context);
+
     return screens.Overlay.tappable(
       widget.child,
       overlay: KeyboardListener(
@@ -72,7 +73,9 @@ class NodeState extends State<Node> {
                 alpha: themex.opaque?.a ?? 0.0,
               ),
             ),
-            child: Center(child: SingleChildScrollView(child: current)),
+            child: Center(
+              child: SingleChildScrollView(child: current)
+            ),
           ),
         ),
       ),

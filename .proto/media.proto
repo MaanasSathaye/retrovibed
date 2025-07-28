@@ -95,3 +95,11 @@ message PublishedUploadRequest {
   string mimetype = 2 [ json_name = "mimetype" ];
 }
 message PublishedUploadResponse { Published published = 1 [ json_name = "published" ]; }
+
+
+message MetadataSyncRequest {
+  Media media = 1 [ json_name = "media" ];
+}
+message MetadataSyncResponse {
+  Media media = 1 [ json_name = "media" ];
+}

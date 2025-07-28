@@ -12,8 +12,8 @@ import (
 	"github.com/retrovibed/retrovibed/internal/squirrelx"
 )
 
-func KnownOptionJSONSafeEncode(t *Known) {
-
+func KnownOptionRandomID(t *Known) {
+	t.ID = errorsx.Must(uuid.NewV4()).String()
 }
 
 func KnownOptionTestDefaults(t *Known) {

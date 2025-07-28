@@ -27,6 +27,7 @@ func MediaOptionFromTorrentMetadata(cc tracking.Metadata) MediaOption {
 		c.Id = cc.ID
 		c.TorrentId = cc.ID
 		c.Description = cc.Description
+		c.KnownMediaId = cc.KnownMediaID
 		c.CreatedAt = grpcx.EncodeTime(cc.CreatedAt)
 		c.UpdatedAt = grpcx.EncodeTime(cc.UpdatedAt)
 		c.Mimetype = mimex.Bittorrent

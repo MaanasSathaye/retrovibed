@@ -73,7 +73,6 @@ func (t *HTTPLibrary) Bind(r *mux.Router) {
 		httpx.ContextBufferPool512(),
 		httpx.ParseForm,
 		httpauth.AuthenticateWithToken(t.jwtsecret),
-		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
 		httpx.Timeout2s(),
 	).ThenFunc(t.search))
 
@@ -81,15 +80,20 @@ func (t *HTTPLibrary) Bind(r *mux.Router) {
 		httpx.ContextBufferPool512(),
 		httpx.ParseForm,
 		httpauth.AuthenticateWithToken(t.jwtsecret),
-		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
 		httpx.TimeoutRollingRead(3*time.Second),
 	).ThenFunc(t.upload))
+
+	r.Path("/{id}/metadatasync").Methods(http.MethodPost).Handler(alice.New(
+		httpx.ContextBufferPool512(),
+		httpx.ParseForm,
+		httpauth.AuthenticateWithToken(t.jwtsecret),
+		httpx.Timeout2s(),
+	).ThenFunc(t.patch))
 
 	r.Path("/{id}").Methods(http.MethodPost).Handler(alice.New(
 		httpx.ContextBufferPool512(),
 		httpx.ParseForm,
 		httpauth.AuthenticateWithToken(t.jwtsecret),
-		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
 		httpx.Timeout2s(),
 	).ThenFunc(t.patch))
 

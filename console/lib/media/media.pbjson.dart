@@ -386,3 +386,29 @@ final $typed_data.Uint8List publishedUploadResponseDescriptor =
     $convert.base64Decode(
         'ChdQdWJsaXNoZWRVcGxvYWRSZXNwb25zZRIuCglwdWJsaXNoZWQYASABKAsyEC5tZWRpYS5QdW'
         'JsaXNoZWRSCXB1Ymxpc2hlZA==');
+
+@$core.Deprecated('Use metadataSyncRequestDescriptor instead')
+const MetadataSyncRequest$json = {
+  '1': 'MetadataSyncRequest',
+  '2': [
+    {'1': 'media', '3': 1, '4': 1, '5': 11, '6': '.media.Media', '10': 'media'},
+  ],
+};
+
+/// Descriptor for `MetadataSyncRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List metadataSyncRequestDescriptor = $convert.base64Decode(
+    'ChNNZXRhZGF0YVN5bmNSZXF1ZXN0EiIKBW1lZGlhGAEgASgLMgwubWVkaWEuTWVkaWFSBW1lZG'
+    'lh');
+
+@$core.Deprecated('Use metadataSyncResponseDescriptor instead')
+const MetadataSyncResponse$json = {
+  '1': 'MetadataSyncResponse',
+  '2': [
+    {'1': 'media', '3': 1, '4': 1, '5': 11, '6': '.media.Media', '10': 'media'},
+  ],
+};
+
+/// Descriptor for `MetadataSyncResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List metadataSyncResponseDescriptor = $convert.base64Decode(
+    'ChRNZXRhZGF0YVN5bmNSZXNwb25zZRIiCgVtZWRpYRgBIAEoCzIMLm1lZGlhLk1lZGlhUgVtZW'
+    'RpYQ==');

@@ -3,12 +3,12 @@ import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/library/known.media.display.dart';
-import 'package:retrovibed/library/known.media.dropdown.dart';
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/httpx.dart' as httpx;
 import './api.dart' as api;
 import './search.tuning.dart';
+import './media.settings.dart';
 
 class AvailableGridDisplay extends StatefulWidget {
   final media.FnMediaSearch search;
@@ -174,7 +174,8 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                       (defaults.spacing ?? 0.0) / 2, // Spacing between columns
                   mainAxisSpacing:
                       (defaults.spacing ?? 0.0) / 2, // Spacing between rows
-                  childAspectRatio: 16 / 9, // Aspect ratio of each grid item (width/height)
+                  childAspectRatio:
+                      16 / 9, // Aspect ratio of each grid item (width/height)
                 ),
                 itemBuilder: (context, index) {
                   var _media = _res.items.elementAt(index);
@@ -182,16 +183,13 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                     ds.modals
                         .of(context)
                         ?.push(
-                          KnownMediaDropdown(
-                            current: _media.knownMediaId,
-                            onChange: (known) {
-                              final upd = _media..knownMediaId = known.id;
-                              media.media
-                                  .update(upd.id, upd)
+                          MediaSettings(
+                            current: _media,
+                            onChange: (pending) {
+                              pending
                                   .then((v) {
-                                    // print("selected known media: ${known}");
                                     final replaced = _res.items.map(
-                                      (o) => o.id == v.media.id ? v.media : o,
+                                      (o) => o.id == v.id ? v : o,
                                     );
 
                                     setState(() {
@@ -225,7 +223,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                     default:
                       return KnownMediaDisplay(
                         api.known
-                            .get(_media.knownMediaId)
+                            .get(_media.knownMediaId, options: [authn.Authenticated.devicebearer(context)])
                             .then(
                               (w) =>
                                   (w.known..description = _media.description),

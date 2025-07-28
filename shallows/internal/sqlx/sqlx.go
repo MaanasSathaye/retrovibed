@@ -83,18 +83,18 @@ func (t DebuggingQueryer) ExecContext(ctx context.Context, q string, args ...any
 	return t.Delegate.ExecContext(ctx, q, args...)
 }
 
-func Count(ctx context.Context, q Queryer, query string) (count int, err error) {
-	err = NewIntRowScanner(q.QueryRowContext(ctx, query)).Scan(&count)
+func Count(ctx context.Context, q Queryer, query string, args ...any) (count int, err error) {
+	err = NewIntRowScanner(q.QueryRowContext(ctx, query, args...)).Scan(&count)
 	return count, err
 }
 
-func String(ctx context.Context, q Queryer, query string) (s string, err error) {
-	err = NewValueRowScanner[string](q.QueryRowContext(ctx, query)).Scan(&s)
+func String(ctx context.Context, q Queryer, query string, args ...any) (s string, err error) {
+	err = NewValueRowScanner[string](q.QueryRowContext(ctx, query, args...)).Scan(&s)
 	return s, err
 }
 
-func Value[T any](ctx context.Context, q Queryer, query string) (s T, err error) {
-	err = NewValueRowScanner[T](q.QueryRowContext(ctx, query)).Scan(&s)
+func Value[T any](ctx context.Context, q Queryer, query string, args ...any) (s T, err error) {
+	err = NewValueRowScanner[T](q.QueryRowContext(ctx, query, args...)).Scan(&s)
 	return s, err
 }
 

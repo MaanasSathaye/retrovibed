@@ -1541,6 +1541,123 @@ class PublishedUploadResponse extends $pb.GeneratedMessage {
   Published ensurePublished() => $_ensure(0);
 }
 
+class MetadataSyncRequest extends $pb.GeneratedMessage {
+  factory MetadataSyncRequest({
+    Media? media,
+  }) {
+    final result = create();
+    if (media != null) result.media = media;
+    return result;
+  }
+
+  MetadataSyncRequest._();
+
+  factory MetadataSyncRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory MetadataSyncRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'MetadataSyncRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
+      createEmptyInstance: create)
+    ..aOM<Media>(1, _omitFieldNames ? '' : 'media', subBuilder: Media.create)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  MetadataSyncRequest clone() => MetadataSyncRequest()..mergeFromMessage(this);
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  MetadataSyncRequest copyWith(void Function(MetadataSyncRequest) updates) =>
+      super.copyWith((message) => updates(message as MetadataSyncRequest))
+          as MetadataSyncRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static MetadataSyncRequest create() => MetadataSyncRequest._();
+  @$core.override
+  MetadataSyncRequest createEmptyInstance() => create();
+  static $pb.PbList<MetadataSyncRequest> createRepeated() =>
+      $pb.PbList<MetadataSyncRequest>();
+  @$core.pragma('dart2js:noInline')
+  static MetadataSyncRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<MetadataSyncRequest>(create);
+  static MetadataSyncRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Media get media => $_getN(0);
+  @$pb.TagNumber(1)
+  set media(Media value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasMedia() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearMedia() => $_clearField(1);
+  @$pb.TagNumber(1)
+  Media ensureMedia() => $_ensure(0);
+}
+
+class MetadataSyncResponse extends $pb.GeneratedMessage {
+  factory MetadataSyncResponse({
+    Media? media,
+  }) {
+    final result = create();
+    if (media != null) result.media = media;
+    return result;
+  }
+
+  MetadataSyncResponse._();
+
+  factory MetadataSyncResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory MetadataSyncResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'MetadataSyncResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
+      createEmptyInstance: create)
+    ..aOM<Media>(1, _omitFieldNames ? '' : 'media', subBuilder: Media.create)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  MetadataSyncResponse clone() =>
+      MetadataSyncResponse()..mergeFromMessage(this);
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  MetadataSyncResponse copyWith(void Function(MetadataSyncResponse) updates) =>
+      super.copyWith((message) => updates(message as MetadataSyncResponse))
+          as MetadataSyncResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static MetadataSyncResponse create() => MetadataSyncResponse._();
+  @$core.override
+  MetadataSyncResponse createEmptyInstance() => create();
+  static $pb.PbList<MetadataSyncResponse> createRepeated() =>
+      $pb.PbList<MetadataSyncResponse>();
+  @$core.pragma('dart2js:noInline')
+  static MetadataSyncResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<MetadataSyncResponse>(create);
+  static MetadataSyncResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Media get media => $_getN(0);
+  @$pb.TagNumber(1)
+  set media(Media value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasMedia() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearMedia() => $_clearField(1);
+  @$pb.TagNumber(1)
+  Media ensureMedia() => $_ensure(0);
+}
+
 const $core.bool _omitFieldNames =
     $core.bool.fromEnvironment('protobuf.omit_field_names');
 const $core.bool _omitMessageNames =

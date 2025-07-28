@@ -105,6 +105,14 @@ func MetadataTransferKnownMediaIDFromTorrent(
 	gql = gql.Query(`UPDATE library_metadata SET updated_at = NOW(), known_media_id = t.known_media_id FROM torrents_metadata AS t WHERE t.id = library_metadata.torrent_id AND t."updated_at" >= {ts} AND library_metadata.known_media_id = 'ffffffff-ffff-ffff-ffff-ffffffffffff' AND t.known_media_id NOT IN ('ffffffff-ffff-ffff-ffff-ffffffffffff', '00000000-0000-0000-0000-000000000000') RETURNING ` + MetadataScannerStaticColumns)
 }
 
+// used to sync known media idea from a known torrent.metadata to every media with that torrent.metadata.
+func MetadataSyncKnownMediaIDFromTorrent(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, tid string) NewMetadataScannerStatic,
+) {
+	gql = gql.Query(`UPDATE library_metadata SET updated_at = NOW(), known_media_id = torrents_metadata.known_media_id FROM torrents_metadata WHERE "torrents_metadata.id" = {tid} RETURNING ` + MetadataScannerStaticColumns)
+}
+
 func MetadataForTorrentArchiveRetrieval(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, infohash []byte, offset uint64, length uint64) NewMetadataScannerStatic,

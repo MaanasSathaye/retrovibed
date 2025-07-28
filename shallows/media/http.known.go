@@ -19,6 +19,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/lucenex"
 	"github.com/retrovibed/retrovibed/internal/numericx"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
+	"github.com/retrovibed/retrovibed/internal/timex"
 	"github.com/retrovibed/retrovibed/library"
 )
 
@@ -88,7 +89,7 @@ func (t *HTTPKnown) search(w http.ResponseWriter, r *http.Request) {
 	}).OrderBy("title DESC").Offset(msg.Next.Offset*msg.Next.Limit).Limit(msg.Next.Limit)))
 
 	for v := range q.Iter() {
-		tmp := langx.Clone(Known{}, KnownOptionFromLibraryKnown(langx.Clone(v, library.KnownOptionJSONSafeEncode)))
+		tmp := langx.Clone(Known{}, KnownOptionFromLibraryKnown(langx.Clone(v, timex.JSONSafeEncodeOption)))
 		msg.Items = append(msg.Items, &tmp)
 	}
 
@@ -124,7 +125,7 @@ func (t *HTTPKnown) find(w http.ResponseWriter, r *http.Request) {
 		Known: langx.Autoptr(
 			langx.Clone(
 				Known{},
-				KnownOptionFromLibraryKnown(langx.Clone(meta, library.KnownOptionJSONSafeEncode)),
+				KnownOptionFromLibraryKnown(langx.Clone(meta, timex.JSONSafeEncodeOption)),
 			),
 		),
 	}); err != nil {

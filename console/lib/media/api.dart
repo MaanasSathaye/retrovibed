@@ -7,10 +7,16 @@ import 'package:retrovibed/httpx.dart' as httpx;
 export 'package:retrovibed/media/media.pb.dart';
 
 typedef FnMediaSearch =
-    Future<MediaSearchResponse> Function(MediaSearchRequest req, {List<httpx.Option> options});
+    Future<MediaSearchResponse> Function(
+      MediaSearchRequest req, {
+      List<httpx.Option> options,
+    });
 
 typedef FnDownloadSearch =
-    Future<DownloadSearchResponse> Function(DownloadSearchRequest req, {List<httpx.Option> options});
+    Future<DownloadSearchResponse> Function(
+      DownloadSearchRequest req, {
+      List<httpx.Option> options,
+    });
 
 typedef FnUploadRequest =
     Future<MediaUploadResponse> Function(
@@ -38,9 +44,9 @@ abstract class media {
       MediaSearchResponse(next: next ?? request(limit: 100), items: []);
 
   static Future<MediaSearchResponse> get(
-    MediaSearchRequest req,
-    {List<httpx.Option> options = const []}
-  ) async {
+    MediaSearchRequest req, {
+    List<httpx.Option> options = const [],
+  }) async {
     return httpx
         .get(
           Uri.https(
@@ -78,15 +84,17 @@ abstract class media {
         });
   }
 
-  static Future<MediaUpdateResponse> update(String id, Media upd) async {
-    final client = http.Client();
-    return client
+  static Future<MediaUpdateResponse> update(
+    String id,
+    Media upd, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
         .post(
           Uri.https(httpx.host(), "/m/${id}"),
-          headers: {"Authorization": httpx.auto_bearer_host()},
+          options: options,
           body: jsonEncode(MediaUpdateRequest(media: upd).toProto3Json()),
         )
-        .then(httpx.auto_error)
         .then((v) {
           return Future.value(
             MediaUpdateResponse.create()
@@ -131,10 +139,11 @@ abstract class discoveredsearch {
 
 abstract class discovered {
   static Future<DownloadSearchResponse> available(
-    DownloadSearchRequest req,
-    {List<httpx.Option> options = const []}
-  ) async {
-    return httpx.get(
+    DownloadSearchRequest req, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
+        .get(
           Uri.https(
             httpx.host(),
             "/d/available",
@@ -151,15 +160,19 @@ abstract class discovered {
   }
 
   static Future<DownloadSearchResponse> downloading(
-    DownloadSearchRequest req,
-    {List<httpx.Option> options = const []}
-  ) async {
-      return httpx
-      .get(
-        Uri.https(httpx.host(), "/d/downloading", httpx.params(req.toProto3Json())),
-        options: options,
-      )
-      .then((v) {
+    DownloadSearchRequest req, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
+        .get(
+          Uri.https(
+            httpx.host(),
+            "/d/downloading",
+            httpx.params(req.toProto3Json()),
+          ),
+          options: options,
+        )
+        .then((v) {
           return Future.value(
             DownloadSearchResponse.create()
               ..mergeFromProto3Json(jsonDecode(v.body)),
@@ -168,12 +181,16 @@ abstract class discovered {
   }
 
   static Future<MagnetCreateResponse> magnet(
-    MagnetCreateRequest req,
-    {List<httpx.Option> options = const []}
-  ) async {
-      return httpx
-      .post(Uri.https(httpx.host(), "/d/magnet"), body: jsonEncode(req.toProto3Json()), options: options)
-      .then((v) {
+    MagnetCreateRequest req, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
+        .post(
+          Uri.https(httpx.host(), "/d/magnet"),
+          body: jsonEncode(req.toProto3Json()),
+          options: options,
+        )
+        .then((v) {
           return Future.value(
             MagnetCreateResponse.create()
               ..mergeFromProto3Json(jsonDecode(v.body)),
@@ -214,14 +231,31 @@ abstract class discovered {
         });
   }
 
-  static Future<DownloadMetadataResponse> get(
+  static Future<MetadataSyncResponse> metadatasync(
     String id,
-    {List<httpx.Option> options = const []}
-  ) async {
-    return httpx.get(
-          Uri.https(httpx.host(), "/d/${id}", null),
+    Media upd, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
+        .post(
+          Uri.https(httpx.host(), "/d/${id}/metadatasync"),
+          body: jsonEncode(MetadataSyncRequest(media: upd).toProto3Json()),
           options: options,
         )
+        .then((v) {
+          return Future.value(
+            MetadataSyncResponse.create()
+              ..mergeFromProto3Json(jsonDecode(v.body)),
+          );
+        });
+  }
+
+  static Future<DownloadMetadataResponse> get(
+    String id, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
+        .get(Uri.https(httpx.host(), "/d/${id}", null), options: options)
         .then(httpx.auto_error)
         .then((v) {
           return DownloadMetadataResponse.create()

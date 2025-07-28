@@ -1173,6 +1173,94 @@ func (x *PublishedUploadResponse) GetPublished() *Published {
 	return nil
 }
 
+type MetadataSyncRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Media         *Media                 `protobuf:"bytes,1,opt,name=media,proto3" json:"media,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MetadataSyncRequest) Reset() {
+	*x = MetadataSyncRequest{}
+	mi := &file_media_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MetadataSyncRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MetadataSyncRequest) ProtoMessage() {}
+
+func (x *MetadataSyncRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_media_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MetadataSyncRequest.ProtoReflect.Descriptor instead.
+func (*MetadataSyncRequest) Descriptor() ([]byte, []int) {
+	return file_media_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *MetadataSyncRequest) GetMedia() *Media {
+	if x != nil {
+		return x.Media
+	}
+	return nil
+}
+
+type MetadataSyncResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Media         *Media                 `protobuf:"bytes,1,opt,name=media,proto3" json:"media,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MetadataSyncResponse) Reset() {
+	*x = MetadataSyncResponse{}
+	mi := &file_media_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MetadataSyncResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MetadataSyncResponse) ProtoMessage() {}
+
+func (x *MetadataSyncResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_media_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MetadataSyncResponse.ProtoReflect.Descriptor instead.
+func (*MetadataSyncResponse) Descriptor() ([]byte, []int) {
+	return file_media_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *MetadataSyncResponse) GetMedia() *Media {
+	if x != nil {
+		return x.Media
+	}
+	return nil
+}
+
 var File_media_proto protoreflect.FileDescriptor
 
 const file_media_proto_rawDesc = "" +
@@ -1254,7 +1342,11 @@ const file_media_proto_rawDesc = "" +
 	"\aentropy\x18\x01 \x01(\tR\aentropy\x12\x1a\n" +
 	"\bmimetype\x18\x02 \x01(\tR\bmimetype\"I\n" +
 	"\x17PublishedUploadResponse\x12.\n" +
-	"\tpublished\x18\x01 \x01(\v2\x10.media.PublishedR\tpublishedb\x06proto3"
+	"\tpublished\x18\x01 \x01(\v2\x10.media.PublishedR\tpublished\"9\n" +
+	"\x13MetadataSyncRequest\x12\"\n" +
+	"\x05media\x18\x01 \x01(\v2\f.media.MediaR\x05media\":\n" +
+	"\x14MetadataSyncResponse\x12\"\n" +
+	"\x05media\x18\x01 \x01(\v2\f.media.MediaR\x05mediab\x06proto3"
 
 var (
 	file_media_proto_rawDescOnce sync.Once
@@ -1268,7 +1360,7 @@ func file_media_proto_rawDescGZIP() []byte {
 	return file_media_proto_rawDescData
 }
 
-var file_media_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
+var file_media_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
 var file_media_proto_goTypes = []any{
 	(*Media)(nil),                    // 0: media.Media
 	(*MediaSearchRequest)(nil),       // 1: media.MediaSearchRequest
@@ -1292,6 +1384,8 @@ var file_media_proto_goTypes = []any{
 	(*Published)(nil),                // 19: media.Published
 	(*PublishedUploadRequest)(nil),   // 20: media.PublishedUploadRequest
 	(*PublishedUploadResponse)(nil),  // 21: media.PublishedUploadResponse
+	(*MetadataSyncRequest)(nil),      // 22: media.MetadataSyncRequest
+	(*MetadataSyncResponse)(nil),     // 23: media.MetadataSyncResponse
 }
 var file_media_proto_depIdxs = []int32{
 	1,  // 0: media.MediaSearchResponse.next:type_name -> media.MediaSearchRequest
@@ -1308,11 +1402,13 @@ var file_media_proto_depIdxs = []int32{
 	8,  // 11: media.DownloadBeginResponse.download:type_name -> media.Download
 	8,  // 12: media.DownloadPauseResponse.download:type_name -> media.Download
 	19, // 13: media.PublishedUploadResponse.published:type_name -> media.Published
-	14, // [14:14] is the sub-list for method output_type
-	14, // [14:14] is the sub-list for method input_type
-	14, // [14:14] is the sub-list for extension type_name
-	14, // [14:14] is the sub-list for extension extendee
-	0,  // [0:14] is the sub-list for field type_name
+	0,  // 14: media.MetadataSyncRequest.media:type_name -> media.Media
+	0,  // 15: media.MetadataSyncResponse.media:type_name -> media.Media
+	16, // [16:16] is the sub-list for method output_type
+	16, // [16:16] is the sub-list for method input_type
+	16, // [16:16] is the sub-list for extension type_name
+	16, // [16:16] is the sub-list for extension extendee
+	0,  // [0:16] is the sub-list for field type_name
 }
 
 func init() { file_media_proto_init() }
@@ -1326,7 +1422,7 @@ func file_media_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_media_proto_rawDesc), len(file_media_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   22,
+			NumMessages:   24,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

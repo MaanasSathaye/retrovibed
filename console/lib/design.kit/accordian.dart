@@ -4,21 +4,25 @@ class Accordion extends StatefulWidget {
   final Widget description;
   final Widget content;
   final Widget? disabled;
+  final bool expanded;
 
   const Accordion({
     Key? key,
     required this.description,
     required this.content,
     this.disabled,
+    this.expanded = false,
   }) : super(key: key);
 
   @override
-  State<Accordion> createState() => _AccordionState();
+  State<Accordion> createState() => _AccordionState(!this.expanded);
 }
 
 class _AccordionState extends State<Accordion> {
-  bool hidden = true;
+  bool hidden;
 
+  _AccordionState(this.hidden);
+  
   void toggle() {
     setState(() {
       hidden = !hidden;
