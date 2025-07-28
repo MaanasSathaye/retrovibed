@@ -210,16 +210,21 @@ class _PlaylistState extends State<Playlist> {
 
   @override
   Widget build(BuildContext context) {
-    return KeyboardListener(
+    return Focus(
+      canRequestFocus: true,
+      autofocus: true,
       focusNode: _selffocus,
-      onKeyEvent: (event) {
+      onKeyEvent: (node, event) {
         if (event is KeyDownEvent) {
-          return;
+          return KeyEventResult.ignored;
         }
 
-        if (event.logicalKey == LogicalKeyboardKey.escape) {
-          player.playOrPause();
+        if (event.logicalKey != LogicalKeyboardKey.escape) {
+          return KeyEventResult.ignored;
         }
+
+        player.playOrPause();
+        return KeyEventResult.handled;
       },
       child: widget.child,
     );

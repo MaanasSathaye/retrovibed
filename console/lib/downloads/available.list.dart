@@ -149,17 +149,22 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                     ds.modals
                         .of(context)
                         ?.push(
-                          FractionallySizedBox(
-                            widthFactor: 0.75,
-                            child: MagnetDownloads(
-                              onSubmitted: (derps) {
-                                final pending = derps.map((v) => media.discovered.magnet(media.MagnetCreateRequest(uri: v), options: [authn.AuthzCache.bearer(context)]));
-                                return Future.wait(pending, eagerError: true).then((_) {
-                                  widget.events?.value += 1;
-                                  ds.modals.of(context)?.reset();
+                          MagnetDownloads(
+                            onSubmitted: (derps) {
+                              final pending = derps.map(
+                                (v) => media.discovered.magnet(
+                                  media.MagnetCreateRequest(uri: v),
+                                  options: [authn.AuthzCache.bearer(context)],
+                                ),
+                              );
+                              return Future.wait(
+                                pending,
+                                eagerError: true,
+                              ).then((_) {
+                                widget.events?.value += 1;
+                                ds.modals.of(context)?.reset();
                               });
-                              },
-                            ),
+                            },
                           ),
                         );
                   },

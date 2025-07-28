@@ -79,6 +79,7 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
     return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         ds.SearchTray(
@@ -111,13 +112,12 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
             padding: defaults.padding,
             itemCount: _res.items.length,
             gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: 633, // Maximum width of each item
+              maxCrossAxisExtent: 512, // Maximum width of each item
               crossAxisSpacing:
                   (defaults.spacing ?? 0.0) / 2, // Spacing between columns
               mainAxisSpacing:
                   (defaults.spacing ?? 0.0) / 2, // Spacing between rows
-              childAspectRatio:
-                  16 / 9, // Aspect ratio of each grid item (width/height)
+              childAspectRatio: 2 / 3,
             ),
             itemBuilder: (context, index) {
               var v = _res.items.elementAt(index);

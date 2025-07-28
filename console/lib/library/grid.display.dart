@@ -168,15 +168,14 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
             Expanded(
               child: GridView.builder(
                 padding: defaults.padding,
-                itemCount: _res.items.length, // Number of items in your grid
+                itemCount: _res.items.length,
                 gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: 512, // Maximum width of each item
+                  maxCrossAxisExtent: 512,
                   crossAxisSpacing:
                       (defaults.spacing ?? 0.0) / 2, // Spacing between columns
                   mainAxisSpacing:
                       (defaults.spacing ?? 0.0) / 2, // Spacing between rows
-                  childAspectRatio:
-                      2 / 3, // Aspect ratio of each grid item (width/height)
+                  childAspectRatio: 2 / 3,
                 ),
                 itemBuilder: (context, index) {
                   var _media = _res.items.elementAt(index);
@@ -237,9 +236,9 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                               (w) =>
                                   (w.known..description = _media.description),
                             ),
-                        key: ValueKey(_media.id),
                         onDoubleTap: media.PlayAction(context, _media, _res),
                         onSettings: onSettings,
+                        key: ValueKey(_media.id)
                       );
                   }
                 },

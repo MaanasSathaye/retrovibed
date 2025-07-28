@@ -50,6 +50,12 @@ class _SearchTrayState extends State<SearchTray> {
   );
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.autofocus) _focusNode.requestFocus();
+  }
+
+  @override
   void dispose() {
     _defaultController.dispose();
     _focusNode.dispose();
@@ -72,7 +78,9 @@ class _SearchTrayState extends State<SearchTray> {
               widget.leading,
               Expanded(
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: theming.spacing ?? 0.0),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: theming.spacing ?? 0.0,
+                  ),
                   child: TextField(
                     controller: widget.controller ?? _defaultController,
                     decoration:

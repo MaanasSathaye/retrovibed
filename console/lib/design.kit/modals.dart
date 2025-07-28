@@ -25,6 +25,7 @@ class NodeState extends State<Node> {
   static const zeromodal = const SizedBox();
   final FocusNode _selffocus = FocusNode();
   Widget current = zeromodal;
+  List<Widget> stack = [];
 
   void setState(VoidCallback fn) {
     if (!mounted) return;
@@ -33,9 +34,25 @@ class NodeState extends State<Node> {
 
   void push(Widget? m) {
     setState(() {
-      current = m ?? zeromodal;
+      _selffocus.requestFocus();
+      if (m == null) {
+        setState(() {
+          current = stack.isEmpty ? zeromodal : stack.last;
+          stack.remove(current);
+        });
+        return;
+      }
+
+      setState(() {
+        if (current == NodeState.zeromodal) {
+          current = m;
+          return;
+        }
+
+        stack = stack + [current];
+        current = m;
+      });
     });
-    _selffocus.requestFocus();
   }
 
   void reset() {
@@ -52,16 +69,21 @@ class NodeState extends State<Node> {
 
     return screens.Overlay.tappable(
       widget.child,
-      overlay: KeyboardListener(
+      overlay: Focus(
+        canRequestFocus: true,
+        autofocus: true,
         focusNode: _selffocus,
-        onKeyEvent: (event) {
+        onKeyEvent: (node, event) {
           if (event is KeyDownEvent) {
-            return;
+            return KeyEventResult.ignored;
           }
 
-          if (event.logicalKey == LogicalKeyboardKey.escape) {
-            push(null);
+          if (event.logicalKey != LogicalKeyboardKey.escape || (stack.isEmpty && current == NodeState.zeromodal)) {
+            return KeyEventResult.ignored;
           }
+
+          push(null);
+          return KeyEventResult.handled;
         },
         child: Visibility(
           visible: current != zeromodal,
@@ -73,9 +95,7 @@ class NodeState extends State<Node> {
                 alpha: themex.opaque?.a ?? 0.0,
               ),
             ),
-            child: Center(
-              child: SingleChildScrollView(child: current)
-            ),
+            child: SingleChildScrollView(child: current),
           ),
         ),
       ),

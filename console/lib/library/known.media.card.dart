@@ -34,7 +34,12 @@ class KnownMediaCard extends StatelessWidget {
                 padding: defaults.padding ?? EdgeInsets.zero,
                 child: Column(
                   children: [
-                    Text(current.summary, textAlign: TextAlign.start),
+                    Text(
+                      current.summary,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.start,
+                      maxLines: 10,
+                    ),
                     Spacer(flex: 9),
                     trailing ?? const SizedBox(),
                   ],

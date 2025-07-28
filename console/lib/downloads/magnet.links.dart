@@ -9,55 +9,59 @@ class MagnetDownloads extends StatelessWidget {
   final StreamController<String> stream = StreamController<String>();
 
   MagnetDownloads({super.key, controller, required this.onSubmitted})
-    : this.controller =
-          controller ??
-          TextEditingController();
+    : this.controller = controller ?? TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     final focus = FocusNode();
     final defaults = ds.Defaults.of(context);
-    return Column(
-      spacing: defaults.spacing ?? 0.0,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        TextField(
-          focusNode: focus,
-          controller: controller,
-          decoration: const InputDecoration(
-            labelText: 'Enter an magnet link',
-            border: OutlineInputBorder(),
+    return Container(
+      padding: defaults.padding ?? EdgeInsets.zero,
+      color: defaults.opaque ?? Colors.transparent,
+      child: Column(
+        spacing: defaults.spacing ?? 0.0,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            focusNode: focus,
+            controller: controller,
+            decoration: const InputDecoration(
+              labelText: 'Enter an magnet link(s)',
+              border: OutlineInputBorder(),
+            ),
+            onSubmitted: (v) {
+              stream.add(v);
+              controller.clear();
+              ds.textediting.refocus(controller);
+              focus.requestFocus();
+            },
           ),
-          onSubmitted: (v) {
-            stream.add(v);
-            controller.clear();
-            ds.textediting.refocus(controller);
-            focus.requestFocus();
-          },
-        ),
-        ds.ErrorBoundary(
-          ds.build((context) {
-            return forms.ItemListManager<String>(
-              stream: stream.stream,
-              onSubmitted: (l) {
-                onSubmitted([
-                  if (controller.text.isNotEmpty) controller.text,
-                  ...l,
-                ]).catchError(ds.Error.boundary(context, null, ds.Error.unknown));
-              },
-              builder: (item) {
-                return SelectionArea(
-                  child: Text(
-                    item,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                );
-              },
-            );
-          }),
-        ),
-      ],
+          ds.ErrorBoundary(
+            ds.build((context) {
+              return forms.ItemListManager<String>(
+                stream: stream.stream,
+                onSubmitted: (l) {
+                  onSubmitted([
+                    if (controller.text.isNotEmpty) controller.text,
+                    ...l,
+                  ]).catchError(
+                    ds.Error.boundary(context, null, ds.Error.unknown),
+                  );
+                },
+                builder: (item) {
+                  return SelectionArea(
+                    child: Text(
+                      item,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  );
+                },
+              );
+            }),
+          ),
+        ],
+      ),
     );
   }
 }
