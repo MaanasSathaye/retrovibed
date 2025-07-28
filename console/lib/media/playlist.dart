@@ -95,25 +95,37 @@ class _PlaylistState extends State<Playlist> {
   void initState() {
     super.initState();
     player.stream.tracks.listen((track) {
-      final current = LanguageCode.locale.toLanguageTag();
-      final audio = track.audio.firstWhere(
-        (t) => t.language == current,
-        orElse: () => AudioTrack.auto(),
-      );
+      final current = LanguageCode.code;
+      final matches = track.audio.where((t) {
+        final code = LanguageCodes.fromCode(
+          t.language ?? "",
+          orElse: () => LanguageCodes.aa,
+        );
+        return current.englishName.startsWith(code.englishName);
+      });
+
+      final audio = matches.firstOrNull ?? AudioTrack.auto();
       final subtitles =
-          audio.language == current
+          audio.id != AudioTrack.auto().id
               ? SubtitleTrack.no()
-              : track.subtitle.firstWhere(
-                (t) => t.language == current,
-                orElse: () => SubtitleTrack.no(),
-              );
+              : track.subtitle.where((t) {
+                    final code = LanguageCodes.fromCode(
+                      t.language ?? "",
+                      orElse: () => LanguageCodes.aa,
+                    );
+                    return current.englishName.startsWith(code.englishName);
+                  }).firstOrNull ??
+                  SubtitleTrack.no();
       player.setAudioTrack(audio);
       player.setSubtitleTrack(subtitles);
 
-      track.audio.forEach((t) => print("audio: ${t.id} ${t.language} ${t.title} -- ${t}"));
-      track.subtitle.forEach((t) => print("subtitle: ${t.id} ${t.language} ${t.title} -- ${t}"));
-      print("audio: ${audio.id} ${audio.language} ${audio.title} -- ${audio}");
-      print("subtitles: ${subtitles.id} ${subtitles.language} ${subtitles.title} -- ${subtitles}");
+      // print(
+      //   "current: ${current} ${LanguageCode.locale} ${LanguageCode.code.englishName}",
+      // );
+      // print("audio: ${audio.id} ${audio.language} ${audio.title} -- ${audio}");
+      // print(
+      //   "subtitles: ${subtitles.id} ${subtitles.language} ${subtitles.title} -- ${subtitles}",
+      // );
     });
     // player.stream.playlist.listen((list) {
     //   print("playlist: ${list.index} - ${list}");
