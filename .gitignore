@@ -1,5 +1,6 @@
 .eg.cache
 .eg.runtime
+*.archive.d
 .flatpak-builder
 flatpak.build.*
 .torrent

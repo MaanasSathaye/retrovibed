@@ -44,3 +44,4 @@ app.*.map.json
 
 # ignore platform specific builds
 linux/
+macos/
