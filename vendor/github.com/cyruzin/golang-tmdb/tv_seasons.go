@@ -7,19 +7,18 @@ type TVSeasonDetails struct {
 	IDString string `json:"_id"`
 	AirDate  string `json:"air_date"`
 	Episodes []struct {
-		AirDate        string  `json:"air_date"`
-		EpisodeNumber  int     `json:"episode_number"`
-		ID             int64   `json:"id"`
-		Name           string  `json:"name"`
-		Overview       string  `json:"overview"`
-		ProductionCode string  `json:"production_code"`
-		Runtime        int     `json:"runtime"`
-		SeasonNumber   int     `json:"season_number"`
-		ShowID         int64   `json:"show_id"`
-		StillPath      string  `json:"still_path"`
-		VoteAverage    float32 `json:"vote_average"`
-		VoteCount      int64   `json:"vote_count"`
-		Crew           []struct {
+		AirDate        string `json:"air_date"`
+		EpisodeNumber  int    `json:"episode_number"`
+		ID             int64  `json:"id"`
+		Name           string `json:"name"`
+		Overview       string `json:"overview"`
+		ProductionCode string `json:"production_code"`
+		Runtime        int    `json:"runtime"`
+		SeasonNumber   int    `json:"season_number"`
+		ShowID         int64  `json:"show_id"`
+		StillPath      string `json:"still_path"`
+		VoteMetrics
+		Crew []struct {
 			ID          int64  `json:"id"`
 			CreditID    string `json:"credit_id"`
 			Name        string `json:"name"`
@@ -85,9 +84,7 @@ type TVSeasonTranslations struct {
 // TVSeasonVideosAppend type is a struct
 // for videos in append to response.
 type TVSeasonVideosAppend struct {
-	Videos struct {
-		*TVSeasonVideos
-	} `json:"videos,omitempty"`
+	Videos *VideoResults `json:"videos"`
 }
 
 // GetTVSeasonDetails get the TV season details by id.
@@ -254,13 +251,8 @@ func (c *Client) GetTVSeasonExternalIDs(
 
 // TVSeasonImage type is a struct for a single image.
 type TVSeasonImage struct {
-	AspectRatio float32 `json:"aspect_ratio"`
-	FilePath    string  `json:"file_path"`
-	Height      int     `json:"height"`
-	Iso639_1    string  `json:"iso_639_1"`
-	VoteAverage float32 `json:"vote_average"`
-	VoteCount   int64   `json:"vote_count"`
-	Width       int     `json:"width"`
+	ImageBase
+	Iso639_1 string `json:"iso_639_1"`
 }
 
 // TVSeasonImages type is a struct for images JSON response.
@@ -300,21 +292,6 @@ func (c *Client) GetTVSeasonImages(
 	return &tvSeasonImages, nil
 }
 
-// TVSeasonVideos type is a struct for videos JSON response.
-type TVSeasonVideos struct {
-	ID      int64 `json:"id,omitempty"`
-	Results []struct {
-		ID        string `json:"id"`
-		Iso639_1  string `json:"iso_639_1"`
-		Iso3166_1 string `json:"iso_3166_1"`
-		Key       string `json:"key"`
-		Name      string `json:"name"`
-		Site      string `json:"site"`
-		Size      int    `json:"size"`
-		Type      string `json:"type"`
-	} `json:"results"`
-}
-
 // GetTVSeasonVideos get the videos that have been added to a TV season.
 //
 // https://developers.themoviedb.org/3/tv-seasons/get-tv-season-videos
@@ -322,7 +299,7 @@ func (c *Client) GetTVSeasonVideos(
 	id int,
 	seasonNumber int,
 	urlOptions map[string]string,
-) (*TVSeasonVideos, error) {
+) (*VideoResults, error) {
 	options := c.fmtOptions(urlOptions)
 	tmdbURL := fmt.Sprintf(
 		"%s%s%d%s%d/videos?api_key=%s%s",
@@ -334,7 +311,7 @@ func (c *Client) GetTVSeasonVideos(
 		c.apiKey,
 		options,
 	)
-	tvSeasonVideos := TVSeasonVideos{}
+	tvSeasonVideos := VideoResults{}
 	if err := c.get(tmdbURL, &tvSeasonVideos); err != nil {
 		return nil, err
 	}

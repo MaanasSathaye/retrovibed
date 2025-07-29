@@ -33,8 +33,7 @@ type MovieDetails struct {
 	Tagline             string              `json:"tagline"`
 	Title               string              `json:"title"`
 	Video               bool                `json:"video"`
-	VoteAverage         float32             `json:"vote_average"`
-	VoteCount           int64               `json:"vote_count"`
+	VoteMetrics
 	*MovieAlternativeTitlesAppend
 	*MovieChangesAppend
 	*MovieCreditsAppend
@@ -86,9 +85,7 @@ type MovieReleaseDatesAppend struct {
 
 // MovieVideosAppend type is a struct for videos in append to response.
 type MovieVideosAppend struct {
-	Videos struct {
-		*MovieVideos
-	} `json:"videos,omitempty"`
+	Videos *VideoResults `json:"videos"`
 }
 
 // MovieTranslationsAppend type is a struct for translations in append to response.
@@ -129,7 +126,7 @@ type MovieKeywordsAppend struct {
 // MovieWatchProvidersAppend type is a struct for
 // watch/providers in append to response.
 type MovieWatchProvidersAppend struct {
-	WatchProviders *MovieWatchProviders `json:"watch/providers,omitempty"`
+	WatchProviders *WatchProviderResults `json:"watch/providers"`
 }
 
 // GetMovieDetails get the primary information about a movie.
@@ -194,12 +191,8 @@ func (c *Client) GetMovieAccountStates(
 
 // MovieAlternativeTitles type is a struct for alternative titles JSON response.
 type MovieAlternativeTitles struct {
-	ID     int `json:"id,omitempty"`
-	Titles []struct {
-		Iso3166_1 string `json:"iso_3166_1"`
-		Title     string `json:"title"`
-		Type      string `json:"type"`
-	} `json:"titles"`
+	ID     int                `json:"id"`
+	Titles []AlternativeTitle `json:"titles"`
 }
 
 // GetMovieAlternativeTitles get all of the alternative titles for a movie.
@@ -362,13 +355,8 @@ func (c *Client) GetMovieExternalIDs(
 
 // MovieImage type is a struct for a single image.
 type MovieImage struct {
-	AspectRatio float32 `json:"aspect_ratio"`
-	FilePath    string  `json:"file_path"`
-	Height      int     `json:"height"`
-	Iso639_1    string  `json:"iso_639_1"`
-	VoteAverage float32 `json:"vote_average"`
-	VoteCount   int64   `json:"vote_count"`
-	Width       int     `json:"width"`
+	ImageBase
+	Iso639_1 string `json:"iso_639_1"`
 }
 
 // MovieImages type is a struct for images JSON response.
@@ -460,19 +448,13 @@ func (c *Client) GetMovieReleaseDates(
 	return &movieReleaseDates, nil
 }
 
-// MovieVideos type is a struct for videos JSON response.
-type MovieVideos struct {
-	ID int64 `json:"id,omitempty"`
-	*MovieVideosResults
-}
-
 // GetMovieVideos get the videos that have been added to a movie.
 //
 // https://developers.themoviedb.org/3/movies/get-movie-videos
 func (c *Client) GetMovieVideos(
 	id int,
 	urlOptions map[string]string,
-) (*MovieVideos, error) {
+) (*VideoResults, error) {
 	options := c.fmtOptions(urlOptions)
 	tmdbURL := fmt.Sprintf(
 		"%s%s%d/videos?api_key=%s%s",
@@ -482,17 +464,11 @@ func (c *Client) GetMovieVideos(
 		c.apiKey,
 		options,
 	)
-	movieVideos := MovieVideos{}
+	movieVideos := VideoResults{}
 	if err := c.get(tmdbURL, &movieVideos); err != nil {
 		return nil, err
 	}
 	return &movieVideos, nil
-}
-
-// MovieWatchProviders type is a struct for watch/providers JSON response.
-type MovieWatchProviders struct {
-	ID int64 `json:"id,omitempty"`
-	*MovieWatchProvidersResults
 }
 
 // GetMovieWatchProviders get a list of the availabilities per country by provider for a movie.
@@ -501,7 +477,7 @@ type MovieWatchProviders struct {
 func (c *Client) GetMovieWatchProviders(
 	id int,
 	urlOptions map[string]string,
-) (*MovieWatchProviders, error) {
+) (*WatchProviderResults, error) {
 	options := c.fmtOptions(urlOptions)
 	tmdbURL := fmt.Sprintf(
 		"%s%s%d/watch/providers?api_key=%s%s",
@@ -511,7 +487,7 @@ func (c *Client) GetMovieWatchProviders(
 		c.apiKey,
 		options,
 	)
-	movieWatchProviders := MovieWatchProviders{}
+	movieWatchProviders := WatchProviderResults{}
 	if err := c.get(tmdbURL, &movieWatchProviders); err != nil {
 		return nil, err
 	}

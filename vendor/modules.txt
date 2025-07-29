@@ -150,7 +150,7 @@ github.com/charmbracelet/x/term
 github.com/csnewman/flutter-go-bridge/cmd/flutter-go-bridge
 github.com/csnewman/flutter-go-bridge/generator
 github.com/csnewman/flutter-go-bridge/parser
-# github.com/cyruzin/golang-tmdb v1.8.1
+# github.com/cyruzin/golang-tmdb v1.8.2-0.20250725073205-7f95ce6079f0
 ## explicit; go 1.24
 github.com/cyruzin/golang-tmdb
 # github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc

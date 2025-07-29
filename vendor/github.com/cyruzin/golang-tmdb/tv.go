@@ -37,8 +37,7 @@ type TVDetails struct {
 	Status              string              `json:"status"`
 	Tagline             string              `json:"tagline"`
 	Type                string              `json:"type"`
-	VoteAverage         float32             `json:"vote_average"`
-	VoteCount           int64               `json:"vote_count"`
+	VoteMetrics
 	*TVAggregateCreditsAppend
 	*TVAlternativeTitlesAppend
 	*TVChangesAppend
@@ -144,15 +143,13 @@ type TVTranslationsAppend struct {
 
 // TVVideosAppend type is a struct for videos in append to response.
 type TVVideosAppend struct {
-	Videos struct {
-		*TVVideos
-	} `json:"videos,omitempty"`
+	Videos *VideoResults `json:"videos"`
 }
 
 // TVWatchProvidersAppend type is a struct for
 // watch/providers in append to response.
 type TVWatchProvidersAppend struct {
-	WatchProviders *TVWatchProviders `json:"watch/providers,omitempty"`
+	WatchProviders *WatchProviderResults `json:"watch/providers"`
 }
 
 // GetTVDetails get the primary TV show details by id.
@@ -281,8 +278,8 @@ func (c *Client) GetTVAggregateCredits(
 
 // TVAlternativeTitles type is a struct for alternative titles JSON response.
 type TVAlternativeTitles struct {
-	ID int `json:"id,omitempty"`
-	*TVAlternativeTitlesResults
+	ID      int                `json:"id"`
+	Results []AlternativeTitle `json:"results"`
 }
 
 // GetTVAlternativeTitles get all of the alternative titles for a TV show.
@@ -516,13 +513,8 @@ func (c *Client) GetTVExternalIDs(
 
 // TVImage type is a struct for a single image.
 type TVImage struct {
-	AspectRatio float32 `json:"aspect_ratio"`
-	FilePath    string  `json:"file_path"`
-	Height      int     `json:"height"`
-	Iso639_1    string  `json:"iso_639_1"`
-	VoteAverage float32 `json:"vote_average"`
-	VoteCount   int64   `json:"vote_count"`
-	Width       int     `json:"width"`
+	ImageBase
+	Iso639_1 string `json:"iso_639_1"`
 }
 
 // TVImages type is a struct for images JSON response.
@@ -702,19 +694,13 @@ func (c *Client) GetTVSimilar(
 	return &tVSimilar, nil
 }
 
-// TVWatchProviders type is a struct for watch/providers JSON response.
-type TVWatchProviders struct {
-	ID int64 `json:"id,omitempty"`
-	*TVWatchProvidersResults
-}
-
 // GetTVWatchProviders get a list of the availabilities per country by provider for a TV show.
 //
 // https://developers.themoviedb.org/3/tv/get-tv-watch-providers
 func (c *Client) GetTVWatchProviders(
 	id int,
 	urlOptions map[string]string,
-) (*TVWatchProviders, error) {
+) (*WatchProviderResults, error) {
 	options := c.fmtOptions(urlOptions)
 	tmdbURL := fmt.Sprintf(
 		"%s%s%d/watch/providers?api_key=%s%s",
@@ -724,7 +710,7 @@ func (c *Client) GetTVWatchProviders(
 		c.apiKey,
 		options,
 	)
-	tvWatchProviders := TVWatchProviders{}
+	tvWatchProviders := WatchProviderResults{}
 	if err := c.get(tmdbURL, &tvWatchProviders); err != nil {
 		return nil, err
 	}
@@ -760,19 +746,13 @@ func (c *Client) GetTVTranslations(
 	return &tvTranslations, nil
 }
 
-// TVVideos type is a struct for videos JSON response.
-type TVVideos struct {
-	ID int64 `json:"id,omitempty"`
-	*TVVideosResults
-}
-
 // GetTVVideos get the videos that have been added to a TV show.
 //
 // https://developers.themoviedb.org/3/tv/get-tv-videos
 func (c *Client) GetTVVideos(
 	id int,
 	urlOptions map[string]string,
-) (*TVVideos, error) {
+) (*VideoResults, error) {
 	options := c.fmtOptions(urlOptions)
 	tmdbURL := fmt.Sprintf(
 		"%s%s%d/videos?api_key=%s%s",
@@ -782,7 +762,7 @@ func (c *Client) GetTVVideos(
 		c.apiKey,
 		options,
 	)
-	tvVideos := TVVideos{}
+	tvVideos := VideoResults{}
 	if err := c.get(tmdbURL, &tvVideos); err != nil {
 		return nil, err
 	}

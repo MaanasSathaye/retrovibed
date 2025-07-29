@@ -63,14 +63,9 @@ func (c *Client) GetNetworkAlternativeNames(
 
 // NetworkImage type is a struct for a single image.
 type NetworkImage struct {
-	AspectRatio float64 `json:"aspect_ratio"`
-	FilePath    string  `json:"file_path"`
-	Height      int     `json:"height"`
-	ID          string  `json:"id"`
-	FileType    string  `json:"file_type"`
-	VoteAverage float64 `json:"vote_average"`
-	VoteCount   int64   `json:"vote_count"`
-	Width       int     `json:"width"`
+	ImageBase
+	ID       string `json:"id"`
+	FileType string `json:"file_type"`
 }
 
 // NetworkImages type is a struct for images JSON response.

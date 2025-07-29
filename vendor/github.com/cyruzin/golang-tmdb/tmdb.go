@@ -1,6 +1,6 @@
 // Copyright (c) 2019 Cyro Dubeux. License MIT.
 
-// Package tmdb is a wrapper for working with TMDb API.
+// Package tmdb is a Golang wrapper around the TMDb API
 package tmdb
 
 import (
@@ -179,7 +179,10 @@ func (c *Client) request(
 	ctx, cancel := context.WithTimeout(context.Background(), c.http.Timeout)
 	defer cancel()
 	bodyBytes := new(bytes.Buffer)
-	json.NewEncoder(bodyBytes).Encode(body)
+	err := json.NewEncoder(bodyBytes).Encode(body)
+	if err != nil {
+		return fmt.Errorf("failed to encode request body to JSON: %s", err)
+	}
 	req, err := http.NewRequestWithContext(
 		ctx,
 		method,

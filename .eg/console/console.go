@@ -68,7 +68,7 @@ func GenerateFlutter(ctx context.Context, _ eg.Op) error {
 	return shell.Run(
 		ctx,
 		// runtime.New("flutter clean"),
-		runtime.New("flutter create --platforms=linux ."),
+		runtime.New("flutter create --platforms=linux,macos ."),
 		runtime.New("flutter pub get"),
 	)
 }
