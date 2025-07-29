@@ -197,7 +197,7 @@ func Runtime(cfg Config, opts ...option) shell.Command {
 		Environ("DEB_CHANGELOG_DATE", cfg.ChangeLog.When.Format(time.RFC1123Z)).
 		Environ("DEB_MAINTAINER_EMAIL", cfg.Maintainer.Email).
 		Environ("DEB_MAINTAINER_FULLNAME", cfg.Maintainer.Name).
-		Environ("DEB_DEPENDS_BUILD", strings.Join(append(cfg.Dependency.Build, "dh-make", "debhelper", "software-properties-common"), ", ")).
+		Environ("DEB_DEPENDS_BUILD", strings.Join(append(cfg.Dependency.Build, "dh-make", "debhelper (>= 10)", "software-properties-common"), ", ")).
 		Environ("DEB_DEPENDS_RUNTIME", strings.Join(append(cfg.Dependency.Runtime, "${misc:Depends}", "${shlibs:Depends}"), ", ")).
 		EnvironFrom(cfg.Environ...)
 }
@@ -237,9 +237,9 @@ func Build(cfg Config, opts ...option) eg.OpFn {
 			ctx,
 			runtime.Newf("chown -R egd:egd %s", root).Privileged(),
 			runtime.Newf("rsync --recursive --perms %s/ src/", cfg.SourceDir),
-			runtime.New("cat debian/changelog | envsubst | tee debian/changelog"),
-			runtime.New("cat debian/control | envsubst | tee debian/control"),
-			runtime.New("cat debian/rules | envsubst | tee debian/rules"),
+			runtime.New("cat debian/control | envsubst | tee debian/control.new && mv debian/control.new debian/control"),
+			runtime.New("cat debian/changelog | envsubst | tee debian/changelog.new && mv debian/changelog.new debian/changelog"),
+			runtime.New("cat debian/rules | envsubst | tee debian/rules.new && mv debian/rules.new debian/rules"),
 			cfg.buildCommand(&cfg, runtime),
 		)
 	}

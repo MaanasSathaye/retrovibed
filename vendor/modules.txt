@@ -186,7 +186,7 @@ github.com/ebitengine/purego/internal/strings
 # github.com/edsrzf/mmap-go v1.2.0
 ## explicit; go 1.17
 github.com/edsrzf/mmap-go
-# github.com/egdaemon/eg v0.0.0-20250521211932-c3b4b39ce9ed
+# github.com/egdaemon/eg v0.0.0-20250719135955-4d4c80205a7c
 ## explicit; go 1.24
 github.com/egdaemon/eg
 github.com/egdaemon/eg/backoff
@@ -813,7 +813,7 @@ golang.zx2c4.com/wireguard/rwcancel
 golang.zx2c4.com/wireguard/tai64n
 golang.zx2c4.com/wireguard/tun
 golang.zx2c4.com/wireguard/tun/netstack
-# google.golang.org/genproto/googleapis/rpc v0.0.0-20250425173222-7b384671a197
+# google.golang.org/genproto/googleapis/rpc v0.0.0-20250603155806-513f23925822
 ## explicit; go 1.23.0
 google.golang.org/genproto/googleapis/rpc/status
 # google.golang.org/grpc v1.73.0
