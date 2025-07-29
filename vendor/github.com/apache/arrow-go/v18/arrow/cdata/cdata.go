@@ -194,7 +194,8 @@ func importSchema(schema *CArrowSchema) (ret arrow.Field, err error) {
 			ret.Type = &arrow.DictionaryType{
 				IndexType: ret.Type,
 				ValueType: valueField.Type,
-				Ordered:   schema.dictionary.flags&C.ARROW_FLAG_DICTIONARY_ORDERED != 0}
+				Ordered:   schema.dictionary.flags&C.ARROW_FLAG_DICTIONARY_ORDERED != 0,
+			}
 		}
 
 		return
@@ -280,9 +281,10 @@ func importSchema(schema *CArrowSchema) (ret arrow.Field, err error) {
 		case 'L': // large list
 			dt = arrow.LargeListOfField(childFields[0])
 		case 'v': // list view/large list view
-			if f[2] == 'l' {
+			switch f[2] {
+			case 'l':
 				dt = arrow.ListViewOfField(childFields[0])
-			} else if f[2] == 'L' {
+			case 'L':
 				dt = arrow.LargeListViewOfField(childFields[0])
 			}
 		case 'w': // fixed size list is w:# where # is the list size.
@@ -460,7 +462,7 @@ func (imp *cimporter) doImportArr(src *CArrowArray) error {
 	// struct immediately after import, since we have no imported
 	// memory that we have to track the lifetime of.
 	defer func() {
-		if imp.alloc.bufCount == 0 {
+		if imp.alloc.bufCount.Load() == 0 {
 			C.ArrowArrayRelease(imp.arr)
 			C.free(unsafe.Pointer(imp.arr))
 		}
@@ -662,9 +664,7 @@ func (imp *cimporter) importStringLike(offsetByteWidth int64) (err error) {
 		return
 	}
 
-	var (
-		nulls, offsets, values *memory.Buffer
-	)
+	var nulls, offsets, values *memory.Buffer
 	if nulls, err = imp.importNullBitmap(0); err != nil {
 		return
 	}
@@ -964,10 +964,10 @@ func (n *nativeCRecordBatchReader) Record() arrow.Record { return n.cur }
 
 func (n *nativeCRecordBatchReader) Next() bool {
 	err := n.next()
-	switch {
-	case err == nil:
+	switch err {
+	case nil:
 		return true
-	case err == io.EOF:
+	case io.EOF:
 		return false
 	}
 	n.err = err
@@ -1035,4 +1035,8 @@ func releaseArr(arr *CArrowArray) {
 
 func releaseSchema(schema *CArrowSchema) {
 	C.ArrowSchemaRelease(schema)
+}
+
+func releaseStream(stream *CArrowArrayStream) {
+	C.ArrowArrayStreamRelease(stream)
 }
