@@ -9,7 +9,7 @@ user friendly and easy to manage. It provides the ability to manage and share co
 with the world and allows users to sign up for at cost cloud backup functionality.
 
 It allow supports community rss feeds of content, like linux ISOs, AI models, and public interest archives that you can subscribe
-to and donate your storage towards enabling distribution.
+to and donate your storage towards enabling distribution and resist censorship, all while remaining anonymous (not yet audited, best effort).
 
 #### features
 see the [site](https://retrovibe.space) for more details
