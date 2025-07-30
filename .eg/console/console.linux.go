@@ -22,12 +22,21 @@ func flutterRuntime() shell.Command {
 	return shell.Runtime().Directory(egenv.WorkingDirectory("console")).EnvironFrom(eggolang.Env()...).Environ("PUB_CACHE", egenv.CacheDirectory(".eg", "dart"))
 }
 
-func Build(ctx context.Context, _ eg.Op) error {
+func BuildLinux(ctx context.Context, _ eg.Op) error {
 	runtime := flutterRuntime()
 	return shell.Run(
 		ctx,
 		runtime.New("rm -rf build/linux/x64/debug").Lenient(true),
 		runtime.New("flutter build linux --release lib/main.dart"),
+	)
+}
+
+func BuildDarwin(ctx context.Context, _ eg.Op) error {
+	runtime := flutterRuntime()
+	return shell.Run(
+		ctx,
+		runtime.New("rm -rf build/macos/{x64,arm64}/debug").Lenient(true),
+		runtime.New("flutter build macos --release lib/main.dart"),
 	)
 }
 
