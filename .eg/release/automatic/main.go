@@ -29,18 +29,18 @@ func main() {
 			ctx,
 			deb,
 			eg.Parallel(
-				// shallows.Generate,
+				shallows.Generate,
 				console.Generate,
 			),
 			eg.Parallel(
-				eg.Sequential(console.GenerateBinding, console.Build),
+				eg.Sequential(console.GenerateBinding, console.BuildLinux),
 				shallows.Compile(),
 			),
-			// eg.Parallel(
-			// 	console.Tests,
-			// 	console.Linting,
-			// 	shallows.Test(),
-			// ),
+			eg.Parallel(
+				console.Tests,
+				console.Linting,
+				shallows.Test(),
+			),
 		),
 		egtarball.Clean(
 			eg.Module(

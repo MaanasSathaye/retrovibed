@@ -3,10 +3,12 @@ package release
 import (
 	"context"
 	"eg/compute/tarballs"
+	"os"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
+	"github.com/egdaemon/eg/runtime/x/wasi/egdmg"
 	"github.com/egdaemon/eg/runtime/x/wasi/eggithub"
 	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
 )
@@ -48,4 +50,9 @@ func DistroBuilds(ctx context.Context, op eg.Op) error {
 			shell.Op(podman.New("podman run --privileged --rm --volume .eg.cache/flatpak.client.yml:/retrovibed.client.yml:ro retrovibed.flatpak.distro.check.ubuntu.noble").Privileged()),
 		),
 	)(ctx, op)
+}
+
+func DarwinDmg(ctx context.Context, _ eg.Op) error {
+	b := egdmg.New("retrovibe")
+	return eg.Perform(ctx, egdmg.Build(b, os.DirFS(egtarball.Path(tarballs.Retrovibed()))))
 }

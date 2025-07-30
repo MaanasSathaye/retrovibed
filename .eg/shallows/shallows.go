@@ -70,7 +70,7 @@ func Install(ctx context.Context, _ eg.Op) error {
 	gruntime := shellruntime()
 	return shell.Run(
 		ctx,
-		gruntime.Newf("go install -tags %s ./cmd/...", strings.Join(buildTags, ",")).Environ("GOBIN", dstdir),
+		gruntime.Newf("go install -ldflags=\"-extldflags=-static\" -tags %s ./cmd/...", strings.Join(buildTags, ",")).Environ("GOBIN", dstdir),
 	)
 }
 

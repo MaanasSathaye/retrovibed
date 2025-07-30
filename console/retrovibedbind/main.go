@@ -121,8 +121,8 @@ func ips() *C.char {
 	return C.CString(string(encoded))
 }
 
-//export daemon
-func daemon(jsonargs *C.char) {
+//export egdaemon
+func egdaemon(jsonargs *C.char) {
 	var args []string
 	if err := json.Unmarshal([]byte(C.GoString(jsonargs)), &args); err != nil {
 		log.Fatalln(err)

@@ -57,16 +57,18 @@ jobs:
           ${{ runner.os }}-go-${{ steps.setup-go-macos.outputs.go-version }}-installed- # Fallback keys
     - uses: tecolicom/actions-use-homebrew-tools@v1
       with:
-        tools: 'duckdb gpgme flutter'
-        cache: yes
+        tools: 'duckdb gpgme flutter tree'
+        # cache: yes
         verbose: false
-    - name: eg
-      run: |
-        CGO_ENABLED=1 CGO_LDFLAGS="-L/opt/homebrew/lib" go install -tags duckdb_use_lib github.com/egdaemon/eg/cmd/...@latest
-        # podman machine init --now
+    # - name: eg
+    #   run: |
+    #     CGO_ENABLED=1 CGO_LDFLAGS="-L/opt/homebrew/lib" go install -tags duckdb_use_lib github.com/egdaemon/eg/cmd/...@latest
+    #     # podman machine init --now
 
     - name: Checkout repository
       uses: actions/checkout@v4
-    - name: run tests
+    - name: build
       run: |
-        ~/go/bin/eg compute baremetal
+        CGO_ENABLED=1 CGO_LDFLAGS="-L/opt/homebrew/lib" go -C console/retrovibedbind build -buildmode=c-shared --tags duckdb_use_lib -o ../build/nativelib/retrovibed.so ./...
+        pushd console && flutter build macos --release lib/main.dart && popd
+        tree build

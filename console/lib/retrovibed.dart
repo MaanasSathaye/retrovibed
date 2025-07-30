@@ -46,7 +46,7 @@ List<String> ips() {
 
 void daemon() {
   String args = jsonEncode(["daemon", "--no-mdns"]);
-  bridge.daemon(args.toNativeUtf8().cast<Char>());
+  bridge.egdaemon(args.toNativeUtf8().cast<Char>());
 }
 
 String _convertstring(Pointer<Char> charPointer) {
