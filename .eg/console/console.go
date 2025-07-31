@@ -15,7 +15,16 @@ import (
 )
 
 func flutterRuntime() shell.Command {
-	return shell.Runtime().Directory(egenv.WorkingDirectory("console")).EnvironFrom(eggolang.Env()...).Environ("PUB_CACHE", egenv.CacheDirectory(".eg", "dart"))
+
+	user := egenv.User().Username
+	if user == "" {
+		user = "egd"
+	}
+	return shell.Runtime().
+		Directory(egenv.WorkingDirectory("console")).
+		EnvironFrom(eggolang.Env()...).
+		Environ("PUB_CACHE", egenv.CacheDirectory(".eg", "dart")).
+		As(user)
 }
 
 func Tests(ctx context.Context, _ eg.Op) error {
