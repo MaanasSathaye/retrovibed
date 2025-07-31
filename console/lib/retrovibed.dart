@@ -5,7 +5,7 @@ import 'package:ffi/ffi.dart' as ffi;
 import 'package:retrovibed/retrovibed/gen.dart' as lib;
 
 String _path() {
-  final files = [File("/app/lib/retrovibed.so"), File("/app/bin/lib/retrovibed.so"), File("build/nativelib/retrovibed.so")];
+  final files = [File("/app/lib/retrovibed.so"), File("/app/bin/lib/retrovibed.so"), File("build/nativelib/retrovibed.so"), File("../Frameworks/retrovibed.dylib")];
   final found = files.firstWhere(
     (v) {
       try {

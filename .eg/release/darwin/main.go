@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"eg/compute/release"
 	"eg/compute/tarballs"
 	"log"
 
@@ -49,6 +50,11 @@ func main() {
 		shell.Op(
 			flutter.Newf("rsync build/macos/Build/Products/Release/retrovibed.app/ %s", egtarball.Path(tarballs.Retrovibed())),
 			shell.Newf("tree -L 3 %s", egtarball.Path(tarballs.Retrovibed())),
+		),
+		eg.Module(
+			ctx,
+			eg.DefaultModule(),
+			release.Tarball,
 		),
 		// 	release.Tarball,
 		// 	release.DarwinDmg,
