@@ -10,7 +10,6 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/eggit"
-	"github.com/egdaemon/eg/runtime/x/wasi/egbug"
 	"github.com/egdaemon/eg/runtime/x/wasi/egfs"
 )
 
@@ -20,10 +19,10 @@ func main() {
 	defer done()
 
 	log.Println(egfs.Inspect(ctx, os.DirFS("/eg.mnt/.eg.runtime")))
+	log.Println(egfs.Inspect(ctx, os.DirFS("/workload")))
 	// deb := eg.Container(maintainer.Container)
 	err := eg.Perform(
 		ctx,
-		egbug.FileTree,
 		eggit.AutoClone,
 		eg.Parallel(
 			eg.Sequential(console.GenerateBinding, console.BuildDarwin),

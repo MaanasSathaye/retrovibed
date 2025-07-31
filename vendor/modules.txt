@@ -186,8 +186,8 @@ github.com/ebitengine/purego/internal/strings
 # github.com/edsrzf/mmap-go v1.2.0
 ## explicit; go 1.17
 github.com/edsrzf/mmap-go
-# github.com/egdaemon/eg v0.0.0-20250730153632-6b338941d7b6
-## explicit; go 1.24
+# github.com/egdaemon/eg v0.0.0-20250731143834-2d1bc7519403
+## explicit; go 1.24.0
 github.com/egdaemon/eg
 github.com/egdaemon/eg/backoff
 github.com/egdaemon/eg/internal/bytesx
@@ -212,7 +212,7 @@ github.com/egdaemon/eg/internal/tracex
 github.com/egdaemon/eg/internal/userx
 github.com/egdaemon/eg/interp/c8s
 github.com/egdaemon/eg/interp/events
-github.com/egdaemon/eg/interp/exec
+github.com/egdaemon/eg/interp/execproxy
 github.com/egdaemon/eg/interp/runtime/wasi/ffierrors
 github.com/egdaemon/eg/interp/runtime/wasi/ffiguest
 github.com/egdaemon/eg/runtime/wasi/eg
@@ -227,6 +227,7 @@ github.com/egdaemon/eg/runtime/wasi/egunsafe/ffigraph
 github.com/egdaemon/eg/runtime/wasi/env
 github.com/egdaemon/eg/runtime/wasi/shell
 github.com/egdaemon/eg/runtime/x/wasi/egbug
+github.com/egdaemon/eg/runtime/x/wasi/egcache
 github.com/egdaemon/eg/runtime/x/wasi/egccache
 github.com/egdaemon/eg/runtime/x/wasi/egdebuild
 github.com/egdaemon/eg/runtime/x/wasi/egdmg
@@ -238,7 +239,7 @@ github.com/egdaemon/eg/runtime/x/wasi/egmd5x
 github.com/egdaemon/eg/runtime/x/wasi/egsha256x
 github.com/egdaemon/eg/runtime/x/wasi/egtarball
 github.com/egdaemon/eg/runtime/x/wasi/execx
-# github.com/egdaemon/wasinet/wasinet v0.0.0-20250205011224-d5f0e1da96d7
+# github.com/egdaemon/wasinet/wasinet v0.0.0-20250731121320-3287a738a635
 ## explicit; go 1.23.4
 github.com/egdaemon/wasinet/wasinet
 github.com/egdaemon/wasinet/wasinet/ffi
@@ -670,10 +671,6 @@ github.com/zeebo/xxh3
 # github.com/zieckey/goini v0.0.0-20240615065340-08ee21c836fb
 ## explicit; go 1.22.4
 github.com/zieckey/goini
-# go.opentelemetry.io/otel v1.37.0
-## explicit; go 1.23.0
-# go.opentelemetry.io/otel/sdk/metric v1.37.0
-## explicit; go 1.23.0
 # go.uber.org/automaxprocs v1.6.0
 ## explicit; go 1.20
 go.uber.org/automaxprocs

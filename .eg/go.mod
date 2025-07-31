@@ -2,18 +2,15 @@ module eg/compute
 
 go 1.24.0
 
-require github.com/egdaemon/eg v0.0.0-20250730153632-6b338941d7b6
+require github.com/egdaemon/eg v0.0.0-20250731143834-2d1bc7519403
 
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
-	github.com/egdaemon/wasinet/wasinet v0.0.0-20250205011224-d5f0e1da96d7 // indirect
+	github.com/egdaemon/wasinet/wasinet v0.0.0-20250731121320-3287a738a635 // indirect
 	github.com/gofrs/uuid v4.4.0+incompatible // indirect
-	github.com/google/pprof v0.0.0-20250630185457-6e76a2b096b5 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
-	go.opentelemetry.io/otel v1.37.0 // indirect
-	go.opentelemetry.io/otel/sdk/metric v1.37.0 // indirect
 	golang.org/x/net v0.42.0 // indirect
 	golang.org/x/sys v0.34.0 // indirect
 	golang.org/x/text v0.27.0 // indirect

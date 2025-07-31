@@ -3,10 +3,10 @@ github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc h1:U9qPSI2PIWSS1
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dustin/go-humanize v1.0.1 h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkpeCY=
 github.com/dustin/go-humanize v1.0.1/go.mod h1:Mu1zIs6XwVuF/gI1OepvI0qD18qycQx+mFykh5fBlto=
-github.com/egdaemon/eg v0.0.0-20250730153632-6b338941d7b6 h1:UZR8Q0pocgrOMDMvyje4PCjtzYiTgR4LbKN6L2bCa7M=
-github.com/egdaemon/eg v0.0.0-20250730153632-6b338941d7b6/go.mod h1:lx5cJsiVMh98mxMupEhY8LxP+yrpysAYScYjxEq8dSk=
-github.com/egdaemon/wasinet/wasinet v0.0.0-20250205011224-d5f0e1da96d7 h1:tmVfnQM80Qxn3DgwcRqoq0r54rpL6VhOyGfvcT/B0FU=
-github.com/egdaemon/wasinet/wasinet v0.0.0-20250205011224-d5f0e1da96d7/go.mod h1:vPVQ3HHYTa9Fe7lz+ZBqI49kw76LSTQfvKZlO8QpWsY=
+github.com/egdaemon/eg v0.0.0-20250731143834-2d1bc7519403 h1:3i/mkxvSWKAuR2UwGQHGC3Kpe1dA9YaQDwjAmDJ2Yl4=
+github.com/egdaemon/eg v0.0.0-20250731143834-2d1bc7519403/go.mod h1:rmwvOlThjqxPQ5p95pArv2br3XzXOxQFbdtFx6SxrbQ=
+github.com/egdaemon/wasinet/wasinet v0.0.0-20250731121320-3287a738a635 h1:oUAQyl92oDx09AV5XqOrlDdw/OmsGhxxFfKWspg8+kw=
+github.com/egdaemon/wasinet/wasinet v0.0.0-20250731121320-3287a738a635/go.mod h1:vPVQ3HHYTa9Fe7lz+ZBqI49kw76LSTQfvKZlO8QpWsY=
 github.com/go-logr/logr v1.4.3 h1:CjnDlHq8ikf6E492q6eKboGOC0T8CDaOvkHCIg8idEI=
 github.com/go-logr/logr v1.4.3/go.mod h1:9T104GzyrTigFIr8wt5mBrctHMim0Nb2HLGrmQ40KvY=
 github.com/go-logr/stdr v1.2.2 h1:hSWxHoqTgW2S2qGc0LTAI563KZ5YKYRhT3MFKZMbjag=
