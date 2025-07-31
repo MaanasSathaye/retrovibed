@@ -1,0 +1,72 @@
+name: tests
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  # ubuntu:
+  #   name: test
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #   - name: Checkout repository
+  #     uses: actions/checkout@v4
+  #   - name: Install EG Tool Dependencies and PPAs on Ubuntu
+  #     run: |
+  #       sudo apt-get update
+  #       sudo apt-get install -y software-properties-common build-essential ca-certificates curl sudo gnupg2 lsb-release iproute2 git apt-file uidmap dbus-user-session fuse-overlayfs rsync vim
+
+  #       # Add PPAs for Go, EG, and DuckDB
+  #       sudo add-apt-repository -y ppa:longsleep/golang-backports
+  #       sudo add-apt-repository -y ppa:egdaemon/eg
+  #       sudo add-apt-repository -y ppa:egdaemon/duckdb
+  #       sudo apt-get update
+  #       sudo apt-get install -y --no-install-recommends ssh podman netavark golang-1.23 eg egbootstrap tree nftables iptables
+  #   - name: run tests
+  #     run: |
+  #       eg compute local
+
+  macos:
+    name: test
+    runs-on: macos-latest
+
+    steps:
+    - name: Set up Homebrew
+      id: set-up-homebrew
+      uses: Homebrew/actions/setup-homebrew@main
+
+    - name: Setup Go environment on macOS
+      id: setup-go-macos
+      uses: actions/setup-go@v5 # Using setup-go action for Go installation and caching
+      with:
+        go-version: 'stable' # Use 'stable' to always get the latest stable Go version
+        cache: true # Enable caching for Go modules and build cache
+        check-latest: true # Ensures the latest stable version is always used
+    - name: Cache Go module and build cache
+      id: cache-go-install-deps # Add an ID for this cache step
+      uses: actions/cache@v4
+      with:
+        path: |
+          ${{ steps.setup-go-macos.outputs.go-mod-cache }} # Path to Go module cache
+          ${{ steps.setup-go-macos.outputs.go-build-cache }} # Path to Go build cache
+        key: ${{ runner.os }}-go-${{ steps.setup-go-macos.outputs.go-version }}-installed # Unique key for this cache
+        restore-keys: |
+          ${{ runner.os }}-go-${{ steps.setup-go-macos.outputs.go-version }}-installed- # Fallback keys
+    - uses: tecolicom/actions-use-homebrew-tools@v1
+      with:
+        tools: 'duckdb gpgme flutter'
+        cache: yes
+        verbose: false
+    - name: eg
+      run: |
+        CGO_ENABLED=1 CGO_LDFLAGS="-L/opt/homebrew/lib" go install -tags duckdb_use_lib github.com/egdaemon/eg/cmd/...@latest
+        # podman machine init --now
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    - name: run tests
+      run: |
+        ~/go/bin/eg compute baremetal
