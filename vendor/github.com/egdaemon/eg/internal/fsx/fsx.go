@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/egdaemon/eg/internal/debugx"
 	"github.com/egdaemon/eg/internal/errorsx"
 	"github.com/egdaemon/eg/internal/systemx"
 	"github.com/egdaemon/eg/internal/tracex"
@@ -81,8 +82,8 @@ func LocateFirst(paths ...string) (result string) {
 // FileExists returns true IFF a non-directory file exists at the provided path.
 func FileExists(path string) bool {
 	info, err := os.Stat(path)
-
-	if os.IsNotExist(err) {
+	if err != nil {
+		debugx.Println(errorsx.Wrapf(err, "failed to stat path: %s", path))
 		return false
 	}
 
@@ -112,8 +113,8 @@ func SymlinkExists(path string) error {
 // FileExists returns true IFF a non-directory file exists at the provided path.
 func DirExists(path string) error {
 	info, err := os.Stat(path)
-
 	if err != nil {
+		debugx.Println(errorsx.Wrapf(err, "failed to stat path: %s", path))
 		return err
 	}
 

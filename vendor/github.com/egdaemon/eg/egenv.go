@@ -80,6 +80,7 @@ const (
 	EnvComputeBin                = "EG_COMPUTE_BIN"                             // hotswap the binary, used for development testing
 	EnvComputeContainerImpure    = "EG_COMPUTE_C8S_IMPURE"                      // informs the container runner that the container depends on the repository being present.
 	EnvComputeModuleSocket       = "EG_COMPUTE_MODULE_SOCKET"                   // socket providing functionality that is scoped to an individual module. primarily command execution.
+	EnvComputeDefaultGroup       = "EG_COMPUTE_DEFAULT_GROUP"                   // override the group assigned to the user. mainly used by baremetal.
 )
 
 const (
@@ -94,6 +95,8 @@ const (
 	EnvGitHeadCommitAuthor    = "EG_GIT_HEAD_COMMIT_AUTHOR"
 	EnvGitHeadCommitEmail     = "EG_GIT_HEAD_COMMIT_EMAIL"
 	EnvGitHeadCommitTimestamp = "EG_GIT_HEAD_COMMIT_TIMESTAMP"
+	EnvGitAuthHTTPPassword    = "EG_GIT_AUTH_HTTP_PASSWORD"
+	EnvGitAuthHTTPUsername    = "EG_GIT_AUTH_HTTP_USERNAME"
 )
 
 const (
@@ -141,11 +144,6 @@ func DefaultWorkloadRoot(rel ...string) string {
 func DefaultMountRoot(rel ...string) string {
 	return filepath.Join("/", "eg.mnt", filepath.Join(rel...))
 }
-
-// // isolated module directory, each module will have a private directory.
-// func DefaultMountModule(rel ...string) string {
-// 	return filepath.Join("/", "eg.mod", filepath.Join(rel...))
-// }
 
 //go:embed DefaultContainerfile
 var Embedded embed.FS

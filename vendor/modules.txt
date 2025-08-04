@@ -186,7 +186,7 @@ github.com/ebitengine/purego/internal/strings
 # github.com/edsrzf/mmap-go v1.2.0
 ## explicit; go 1.17
 github.com/edsrzf/mmap-go
-# github.com/egdaemon/eg v0.0.0-20250731143834-2d1bc7519403
+# github.com/egdaemon/eg v0.0.0-20250804175537-c73829198c5d
 ## explicit; go 1.24.0
 github.com/egdaemon/eg
 github.com/egdaemon/eg/backoff
@@ -529,7 +529,7 @@ github.com/mattn/go-runewidth
 # github.com/mfridman/interpolate v0.0.2
 ## explicit; go 1.19
 github.com/mfridman/interpolate
-# github.com/miekg/dns v1.1.67
+# github.com/miekg/dns v1.1.68
 ## explicit; go 1.23.0
 github.com/miekg/dns
 # github.com/mitchellh/hashstructure/v2 v2.0.2

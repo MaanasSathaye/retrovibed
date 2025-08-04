@@ -15,6 +15,7 @@ import (
 	"time"
 
 	_eg "github.com/egdaemon/eg"
+	"github.com/egdaemon/eg/internal/envx"
 	"github.com/egdaemon/eg/internal/errorsx"
 	"github.com/egdaemon/eg/internal/langx"
 	"github.com/egdaemon/eg/runtime/wasi/eg"
@@ -66,16 +67,16 @@ func FileTree(ctx context.Context, op eg.Op) error {
 	privileged := shell.Runtime().Privileged().Lenient(true).Directory("/")
 	return shell.Run(
 		ctx,
-		privileged.Newf("echo 'runtime directory:' && ls -lhan %s", _eg.DefaultMountRoot(_eg.RuntimeDirectory)),
-		privileged.Newf("echo 'mount directory:' && ls -lhan %s", _eg.DefaultMountRoot()),
-		privileged.Newf("echo 'workload directory:' && ls -lhan %s", _eg.DefaultWorkloadRoot()),
-		privileged.Newf("echo 'cache directory:' && ls -lhan %s", egenv.CacheDirectory()),
-		privileged.Newf("echo 'ephemeral directory:' && ls -lhan %s", egenv.EphemeralDirectory()),
-		privileged.Newf("echo 'working directory:' && ls -lhan %s", egenv.WorkingDirectory()),
-		privileged.Newf("tree -a -L 1 %s", egenv.CacheDirectory()),
-		privileged.Newf("tree -a -L 1 %s", egenv.EphemeralDirectory()),
-		privileged.Newf("tree -a -L 1 %s", egenv.WorkingDirectory()),
-		privileged.Newf("tree -a -L 1 %s", _eg.DefaultMountRoot()),
+		privileged.Newf("echo 'runtime directory: %s' && ls -lhan %s", _eg.DefaultMountRoot(_eg.RuntimeDirectory), _eg.DefaultMountRoot(_eg.RuntimeDirectory)),
+		privileged.Newf("echo 'mount directory: %s' && ls -lhan %s", _eg.DefaultMountRoot(), _eg.DefaultMountRoot()),
+		privileged.Newf("echo 'workload directory: %s' && ls -lhan %s", _eg.DefaultWorkloadRoot(), _eg.DefaultWorkloadRoot()),
+		privileged.Newf("echo 'cache directory: %s' && ls -lhan %s", egenv.CacheDirectory(), egenv.CacheDirectory()),
+		privileged.Newf("echo 'ephemeral directory: %s' && ls -lhan %s", egenv.EphemeralDirectory(), egenv.EphemeralDirectory()),
+		privileged.Newf("echo 'working directory: %s' && ls -lhan %s", egenv.WorkingDirectory(), egenv.WorkingDirectory()),
+		// privileged.Newf("tree -a -L 1 %s", egenv.CacheDirectory()),
+		// privileged.Newf("tree -a -L 1 %s", egenv.EphemeralDirectory()),
+		// privileged.Newf("tree -a -L 1 %s", egenv.WorkingDirectory()),
+		// privileged.Newf("tree -a -L 1 %s", _eg.DefaultMountRoot()),
 	)
 }
 
@@ -130,26 +131,73 @@ func Images(ctx context.Context, op eg.Op) error {
 	)
 }
 
-// Ensures the environment is stable between releases.
-func EnsureEnv(ctx context.Context, op eg.Op) error {
+const (
+	EnvUnsafeDigest = "EG_UNSAFE_ENVVARS_DIGEST"
+	defaultDigest   = "3b7a9c279c58032a046aa980dd38cb8b"
+)
+
+func EgEnviron() []string {
+	return []string{
+		_eg.EnvCI,
+		_eg.EnvComputeTLSInsecure,
+		_eg.EnvComputeLoggingVerbosity,
+		_eg.EnvComputeModuleNestedLevel,
+		_eg.EnvComputeRootModule,
+		_eg.EnvComputeRunID,
+		_eg.EnvComputeAccountID,
+		_eg.EnvComputeVCS,
+		_eg.EnvComputeTTL,
+		_eg.EnvComputeWorkingDirectory,
+		_eg.EnvComputeCacheDirectory,
+		// _eg.EnvComputeRuntimeDirectory, // intentionally ignore this because its entirely random.
+		_eg.EnvComputeWorkloadDirectory,
+		_eg.EnvComputeWorkloadCapacity,
+		_eg.EnvComputeWorkloadTargetLoad,
+		_eg.EnvScheduleMaximumDelay,
+		_eg.EnvScheduleSystemLoadFreq,
+		_eg.EnvPingMinimumDelay,
+		_eg.EnvComputeBin,
+		_eg.EnvComputeContainerImpure,
+		_eg.EnvComputeModuleSocket,
+		_eg.EnvComputeDefaultGroup,
+	}
+}
+
+func normalizeEnv(environ *envx.Builder) *envx.Builder {
+	// zero out some dynamic environment variables for consistent results
+	environ.Setenv(_eg.EnvComputeAccountID, uuid.Nil.String())
+	environ.Setenv(_eg.EnvComputeRunID, uuid.Nil.String())
+	environ.Setenv(_eg.EnvGitHeadCommitTimestamp, "0000-00-00T00:00:00-00:00")
+	environ.Setenv(_eg.EnvGitHeadCommit, "0000000000000000000000000000000000000000")
+	environ.Setenv(_eg.EnvGitBaseCommit, "0000000000000000000000000000000000000000")
+	environ.Setenv(_eg.EnvUnsafeCacheID, uuid.Nil.String())
+	environ.Setenv(_eg.EnvComputeLoggingVerbosity, "0")
+	environ.Setenv(_eg.EnvComputeModuleSocket, _eg.DefaultRuntimeDirectory("module.socket"))
+
+	// always ignore compute bin. its development tooling.
+	environ.Unsetenv(_eg.EnvComputeBin)
+	// always ingore unsafe digest, its for testing.
+	environ.Unsetenv(EnvUnsafeDigest)
+	// probably shouldn't ignore this...
+	environ.Unsetenv("DEBIAN_FRONTEND")
+
+	return environ
+}
+
+// Ensures the environment is stable between releases. only usable for standard compute.
+// baremetal is too variable. use EnsureEnvSubset for baremetal.
+func EnsureEnvAuto(ctx context.Context, op eg.Op) error {
+	expected := envx.String(defaultDigest, EnvUnsafeDigest)
 	// expected hash with normalized values.
 	// if this needs to change it means we might be breaking
 	// existing builds.
-	const expected = "166edecb15fd621ae2bc9d11f122f2ed"
-	// zero out some dynamic environment variables for consistent results
-	os.Setenv(_eg.EnvComputeAccountID, uuid.Nil.String())
-	os.Setenv(_eg.EnvComputeRunID, uuid.Nil.String())
-	os.Setenv(_eg.EnvGitHeadCommitTimestamp, "0000-00-00T00:00:00-00:00")
-	os.Setenv(_eg.EnvGitHeadCommit, "0000000000000000000000000000000000000000")
-	os.Setenv(_eg.EnvGitBaseCommit, "0000000000000000000000000000000000000000")
-	os.Setenv(_eg.EnvUnsafeCacheID, uuid.Nil.String())
-	// always ignore compute bin. its development tooling.
-	os.Unsetenv(_eg.EnvComputeBin)
-	os.Unsetenv("DEBIAN_FRONTEND")
-	// we plan to make this value static in the future. so ignore it for now.
-	os.Unsetenv(_eg.EnvComputeModuleSocket)
+	old := os.Environ()
+	sort.Strings(old)
 
-	environ := os.Environ()
+	environ, err := normalizeEnv(envx.Build().FromEnviron(old...)).Environ()
+	if err != nil {
+		return errorsx.Wrap(err, "unable to normalize environment")
+	}
 	sort.Strings(environ)
 
 	digest := md5.New()
@@ -160,10 +208,28 @@ func EnsureEnv(ctx context.Context, op eg.Op) error {
 	}
 
 	if d := hex.EncodeToString(digest.Sum(nil)); d != expected {
-		return fmt.Errorf("unexpected environment digest: %s != %s:\n%s", d, expected, strings.Join(environ, "\n"))
+		return fmt.Errorf("unexpected environment digest: %s != %s:\n%s\n-----------------------------------------\n%s", d, expected, strings.Join(old, "\n"), strings.Join(environ, "\n"))
 	}
 
 	return nil
+}
+
+func EnsureEnv(expected string, keys ...string) eg.OpFn {
+	return func(ctx context.Context, op eg.Op) error {
+		vars := errorsx.Zero(normalizeEnv(envx.Build().FromEnv(keys...)).Environ())
+		digest := md5.New()
+		for _, v := range vars {
+			if _, err := digest.Write([]byte(v)); err != nil {
+				return err
+			}
+		}
+
+		if d := hex.EncodeToString(digest.Sum(nil)); d != expected {
+			return fmt.Errorf("unexpected environment digest: %s != %s:\n%s\n-----------------------------------------\n%s", d, expected, strings.Join(keys, "\n"), strings.Join(vars, "\n"))
+		}
+
+		return nil
+	}
 }
 
 func NewCounter() *counter {
@@ -204,4 +270,12 @@ func Log(m ...any) eg.OpFn {
 		log.Println(m...)
 		return nil
 	}
+}
+
+func Zero[T any](v T, err error) T {
+	return errorsx.Zero(v, err)
+}
+
+func Must[T any](v T, err error) T {
+	return errorsx.Zero(v, err)
 }

@@ -53,6 +53,6 @@ func DistroBuilds(ctx context.Context, op eg.Op) error {
 }
 
 func DarwinDmg(ctx context.Context, _ eg.Op) error {
-	b := egdmg.New("retrovibe")
+	b := egdmg.New("retrovibe", egdmg.OptionBuildDir(egenv.CacheDirectory(".dist", "retrovibed.darwin")))
 	return eg.Perform(ctx, egdmg.Build(b, os.DirFS(egtarball.Path(tarballs.Retrovibed()))))
 }

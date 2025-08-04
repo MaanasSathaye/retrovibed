@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"os/user"
 	"time"
 
 	"github.com/egdaemon/eg/internal/errorsx"
 	"github.com/egdaemon/eg/internal/stringsx"
+	"github.com/egdaemon/eg/internal/userx"
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egunsafe/ffiexec"
 )
@@ -142,9 +144,10 @@ func (t Command) Newf(cmd string, options ...any) Command {
 //
 //	timeout: 5 minutes.
 func New(cmd string) Command {
+	u := userx.CurrentUserOrDefault(user.User{})
 	return Command{
-		user:     "egd", // default user to execute commands as
-		group:    "egd",
+		user:     stringsx.First(u.Username, "egd"), // default user to execute commands as
+		group:    stringsx.First(defaultgroup(u), "egd"),
 		cmd:      cmd,
 		timeout:  5 * time.Minute,
 		entry:    run,

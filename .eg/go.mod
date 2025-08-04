@@ -2,7 +2,7 @@ module eg/compute
 
 go 1.24.0
 
-require github.com/egdaemon/eg v0.0.0-20250731143834-2d1bc7519403
+require github.com/egdaemon/eg v0.0.0-20250804175537-c73829198c5d
 
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
