@@ -170,18 +170,10 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) {
 
 	var tstore storage.ClientImpl = blockcache.NewTorrentFromVirtualFS(tvfs)
 
-	if t.AutoReclaim {
-		errorsx.Log(AutoReclaim(gctx.Context, db, mediastore, library.NewAsyncWakeup(gctx.Context)))
-	} else {
-		log.Println("automatic disk reclaim is disabled", envx.Boolean(t.AutoReclaim, env.AutoReclaim))
-	}
+	errorsx.Log(AutoReclaim(gctx.Context, db, mediastore, library.NewAsyncWakeup(gctx.Context), t.AutoReclaim))
 
 	if t.AutoArchive {
-		if err := metaapi.Register(gctx.Context); err != nil {
-			return errorsx.Wrap(err, "unable to register with archival service")
-		}
-
-		errorsx.Log(AutoArchival(gctx.Context, db, mediastore, library.NewAsyncWakeup(gctx.Context), t.AutoReclaim))
+		errorsx.Log(AutoArchival(gctx.Context, db, mediastore, library.NewAsyncWakeup(gctx.Context), t.AutoArchive))
 		c, err := metaapi.AutoJWTClient(gctx.Context)
 		if err != nil {
 			return errorsx.Wrap(err, "failed to create oauth2 http client for archival")

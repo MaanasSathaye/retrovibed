@@ -2,6 +2,7 @@ package daemons
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/retrovibed/retrovibed/authn"
@@ -14,7 +15,13 @@ import (
 	"github.com/retrovibed/retrovibed/metaapi"
 )
 
-func AutoArchival(ctx context.Context, q sqlx.Queryer, mediastore fsx.Virtual, async *library.AsyncWakeup, reclaimdisk bool) error {
+func AutoArchival(ctx context.Context, q sqlx.Queryer, mediastore fsx.Virtual, async *library.AsyncWakeup, archive bool) error {
+	if archive {
+		if err := metaapi.Register(ctx); err != nil {
+			return errorsx.Wrap(err, "unable to register with archival service")
+		}
+	}
+
 	c, err := authn.Oauth2HTTPClient(ctx)
 	if err != nil {
 		return errorsx.Wrap(err, "failed to create oauth2 bearer token")
@@ -27,21 +34,25 @@ func AutoArchival(ctx context.Context, q sqlx.Queryer, mediastore fsx.Virtual, a
 
 	go library.PeriodicWakeup(ctx, async, s)
 	contextx.Run(ctx, func() {
-		errorsx.Log(library.NewAutoArchive(ctx, metaapi.JWTClient(c), mediastore, q, async, reclaimdisk))
+		errorsx.Log(library.NewAutoArchive(ctx, metaapi.JWTClient(c), mediastore, q, async, archive))
 	})
 
 	return nil
 }
 
-func AutoReclaim(ctx context.Context, q sqlx.Queryer, mediastore fsx.Virtual, async *library.AsyncWakeup) error {
+func AutoReclaim(ctx context.Context, q sqlx.Queryer, mediastore fsx.Virtual, async *library.AsyncWakeup, reclaimdisk bool) error {
 	s := backoffx.New(
 		backoffx.Constant(time.Hour),
 		backoffx.Jitter(0.1),
 	)
 
+	if !reclaimdisk {
+		log.Println("automatic disk reclaim is disabled - enabling dry-run")
+	}
+
 	go library.PeriodicWakeup(ctx, async, s)
 	contextx.Run(ctx, func() {
-		errorsx.Log(library.NewDiskReclaim(ctx, mediastore, q, async))
+		errorsx.Log(library.NewDiskReclaim(ctx, mediastore, q, async, reclaimdisk))
 	})
 	return nil
 }

@@ -83,7 +83,7 @@ func PeriodicWakeup(ctx context.Context, async *AsyncWakeup, b backoffx.Strategy
 }
 
 // Moves archivable data from disk to cloud storage.
-func NewAutoArchive(ctx context.Context, c *http.Client, dir fsx.Virtual, q sqlx.Queryer, async *AsyncWakeup, reclaimdisk bool) error {
+func NewAutoArchive(ctx context.Context, c *http.Client, dir fsx.Virtual, q sqlx.Queryer, async *AsyncWakeup, archivedisk bool) error {
 	query := MetadataSearchBuilder().Where(squirrel.And{
 		MetadataQueryArchivable(),
 	})
@@ -91,42 +91,37 @@ func NewAutoArchive(ctx context.Context, c *http.Client, dir fsx.Virtual, q sqlx
 	if usage, err := disk.UsageWithContext(ctx, dir.Path()); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to retrieve disk"))
 	} else if usage.UsedPercent < 0.8 {
-		reclaimdisk = false
+		archivedisk = false
 		log.Println("usage", dir.Path(), usage.UsedPercent, usage.Fstype)
 	} else {
 		log.Println("usage", dir.Path(), usage.UsedPercent, usage.Fstype)
-	}
-
-	if reclaimdisk {
-		log.Println("archive will reclaim disk space")
-	} else {
-		log.Println("archive will not reclaim disk space")
 	}
 
 	archive := func() error {
+		var processed uint64
 		log.Println("archival initiated")
 		defer log.Println("archival completed")
 
 		a := deeppool.NewArchiver(c)
 
-		v := sqlx.Scan(MetadataSearch(ctx, q, query))
+		v := sqlx.Scan(MetadataSearch(ctx, sqlx.Debug(q), query))
 		for md := range v.Iter() {
+			processed++
 			log.Println("------------------------- archivable initiated", md.ID, md.ArchiveID)
-			if err := Archive(ctx, q, md, dir, a); err != nil {
-				errorsx.Log(errorsx.Wrapf(err, "archival upload failed: %s", md.ID))
-				continue
-			}
 
-			if reclaimdisk {
-				if err := Reclaim(ctx, md, dir); err != nil {
-					errorsx.Log(errorsx.Wrapf(err, "disk reclaimation failed: %s", md.ID))
+			if archivedisk {
+				if err := Archive(ctx, q, md, dir, a); err != nil {
+					errorsx.Log(errorsx.Wrapf(err, "archival upload failed: %s", md.ID))
 					continue
 				}
+			} else {
+				log.Println("dry-run - not archiving", md.ID)
 			}
 
 			log.Println("------------------------- archivable completed", md.ID)
 		}
 
+		log.Println("archival processed", processed, "records")
 		return v.Err()
 	}
 
@@ -160,16 +155,17 @@ func NewAutoArchive(ctx context.Context, c *http.Client, dir fsx.Virtual, q sqlx
 }
 
 // Clears archived data from disk.
-func NewDiskReclaim(ctx context.Context, dir fsx.Virtual, q sqlx.Queryer, async *AsyncWakeup) error {
+func NewDiskReclaim(ctx context.Context, dir fsx.Virtual, q sqlx.Queryer, async *AsyncWakeup, reclaimdisk bool) error {
 	query := MetadataSearchBuilder().Where(squirrel.And{
 		MetadataQueryArchived(),
 	}).OrderBy("library_metadata.bytes DESC")
 
 	reclaim := func() error {
+		var processed uint64
 		log.Println("disk reclaim initiated")
 		defer log.Println("disk reclaim completed")
 
-		v := sqlx.Scan(MetadataSearch(ctx, q, query))
+		v := sqlx.Scan(MetadataSearch(ctx, sqlx.Debug(q), query))
 		for md := range v.Iter() {
 			if !fsx.Exists(dir.Path(md.ID)) {
 				continue
@@ -186,13 +182,19 @@ func NewDiskReclaim(ctx context.Context, dir fsx.Virtual, q sqlx.Queryer, async 
 			}
 
 			log.Println("------------------------- reclaim initiated", md.ID, md.ArchiveID)
-			// if err := Reclaim(ctx, md, dir); err != nil {
-			// 	errorsx.Log(errorsx.Wrapf(err, "disk reclaimation failed: %s", md.ID))
-			// 	continue
-			// }
-			log.Println("------------------------- reclaim completed", md.ID)
+			if reclaimdisk {
+				if err := Reclaim(ctx, md, dir); err != nil {
+					errorsx.Log(errorsx.Wrapf(err, "disk reclaimation failed: %s", md.ID))
+					continue
+				}
+			} else {
+				log.Println("dry-run - not reclaim", md.ID)
+			}
+
+			log.Println("------------------------- reclaim completed", md.ID, md.Bytes, md.DiskUsage)
 		}
 
+		log.Println("reclaim processed", processed, "records")
 		return v.Err()
 	}
 
