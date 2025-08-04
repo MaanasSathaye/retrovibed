@@ -7,28 +7,6 @@ on:
   workflow_dispatch: # Allows manual triggering
 
 jobs:
-  # ubuntu:
-  #   name: test
-  #   runs-on: ubuntu-latest
-
-  #   steps:
-  #   - name: Checkout repository
-  #     uses: actions/checkout@v4
-  #   - name: Install EG Tool Dependencies and PPAs on Ubuntu
-  #     run: |
-  #       sudo apt-get update
-  #       sudo apt-get install -y software-properties-common build-essential ca-certificates curl sudo gnupg2 lsb-release iproute2 git apt-file uidmap dbus-user-session fuse-overlayfs rsync vim
-
-  #       # Add PPAs for Go, EG, and DuckDB
-  #       sudo add-apt-repository -y ppa:longsleep/golang-backports
-  #       sudo add-apt-repository -y ppa:egdaemon/eg
-  #       sudo add-apt-repository -y ppa:egdaemon/duckdb
-  #       sudo apt-get update
-  #       sudo apt-get install -y --no-install-recommends ssh podman netavark golang-1.23 eg egbootstrap tree nftables iptables
-  #   - name: run tests
-  #     run: |
-  #       eg compute local
-
   macos:
     name: test
     runs-on: macos-latest
@@ -58,12 +36,7 @@ jobs:
     - uses: tecolicom/actions-use-homebrew-tools@v1
       with:
         tools: 'duckdb gpgme flutter tree'
-        # cache: yes
         verbose: false
-    # - name: eg
-    #   run: |
-    #     CGO_ENABLED=1 CGO_LDFLAGS="-L/opt/homebrew/lib" go install -tags duckdb_use_lib github.com/egdaemon/eg/cmd/...@latest
-    #     # podman machine init --now
 
     - name: Checkout repository
       uses: actions/checkout@v4
