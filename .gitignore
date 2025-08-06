@@ -1,5 +1,5 @@
 .eg.cache
-.eg.runtime
+.eg.workload
 *.archive.d
 .flatpak-builder
 flatpak.build.*

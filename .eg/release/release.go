@@ -3,24 +3,16 @@ package release
 import (
 	"context"
 	"eg/compute/tarballs"
-	"os"
+	"log"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
+	"github.com/egdaemon/eg/runtime/x/wasi/egbug"
 	"github.com/egdaemon/eg/runtime/x/wasi/egdmg"
 	"github.com/egdaemon/eg/runtime/x/wasi/eggithub"
 	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
 )
-
-func Tarball(ctx context.Context, op eg.Op) error {
-	archive := tarballs.Retrovibed()
-	return eg.Perform(
-		ctx,
-		egtarball.Pack(archive),
-		egtarball.SHA256Op(archive),
-	)
-}
 
 func Release(ctx context.Context, op eg.Op) error {
 	return eg.Perform(
@@ -45,14 +37,37 @@ func DistroBuilds(ctx context.Context, op eg.Op) error {
 			// shell.Op(shell.New("podman build -tag retrovibed.flatpak.distro.check.ubuntu.oracular -f .dist/distrobuilds/ubuntu.oracular")),
 		),
 		eg.Parallel(
-			shell.Op(podman.New("tree -a -L 1")),
 			shell.Op(podman.New("podman run --privileged --rm --volume .eg.cache/flatpak.client.yml:/retrovibed.client.yml:ro retrovibed.flatpak.distro.check.ubuntu.noble cat /retrovibed.client.yml").Privileged()),
 			shell.Op(podman.New("podman run --privileged --rm --volume .eg.cache/flatpak.client.yml:/retrovibed.client.yml:ro retrovibed.flatpak.distro.check.ubuntu.noble").Privileged()),
 		),
 	)(ctx, op)
 }
 
-func DarwinDmg(ctx context.Context, _ eg.Op) error {
-	b := egdmg.New("retrovibe", egdmg.OptionBuildDir(egenv.CacheDirectory(".dist", "retrovibed.darwin")))
-	return eg.Perform(ctx, egdmg.Build(b, os.DirFS(egtarball.Path(tarballs.Retrovibed()))))
+func Tarball(ctx context.Context, op eg.Op) error {
+	archive := tarballs.Retrovibed()
+	return eg.Sequential(
+		egbug.Log("foo 0"),
+		egtarball.Pack(archive),
+		egbug.Log("foo 1"),
+		egtarball.SHA256Op(archive),
+		egbug.Log("foo 2"),
+		shell.Op(
+			shell.Newf("mv %s %s", egtarball.Archive(archive), egenv.CacheDirectory("retrovibed.darwin.arm64.tar.gz")),
+		),
+		egbug.Log("foo 3"),
+	)(ctx, op)
+}
+
+func DarwinDmg(ctx context.Context, op eg.Op) error {
+	log.Println("---------------------------------------------------------------------------------")
+	b := egdmg.New(tarballs.Retrovibed(), egdmg.OptionBuildDir(egenv.CacheDirectory(".dist")))
+	return eg.Sequential(
+		egbug.Log("derp 0"),
+		egdmg.Build(b, egtarball.Path(tarballs.Retrovibed())),
+		egbug.Log("derp 1"),
+		shell.Op(
+			shell.Newf("mv %s %s", egdmg.Path(tarballs.Retrovibed()), egenv.CacheDirectory("retrovibed.darwin.arm64.dmg")),
+		),
+		egbug.Log("derp 2"),
+	)(ctx, op)
 }
