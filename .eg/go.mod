@@ -2,12 +2,12 @@ module eg/compute
 
 go 1.24.0
 
-require github.com/egdaemon/eg v0.0.0-20250806183440-86e07bf0c034
+require github.com/egdaemon/eg v0.0.0-20250805224546-a1b440ac29a3
 
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/egdaemon/wasinet/wasinet v0.0.0-20250806175613-49e153bd345a // indirect
-	github.com/gofrs/uuid/v5 v5.3.2 // indirect
+	github.com/gofrs/uuid v4.4.0+incompatible // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/rogpeppe/go-internal v1.14.1 // indirect

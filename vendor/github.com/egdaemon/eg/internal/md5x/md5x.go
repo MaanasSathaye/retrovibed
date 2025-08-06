@@ -6,7 +6,7 @@ import (
 	"encoding/hex"
 	"hash"
 
-	"github.com/gofrs/uuid/v5"
+	"github.com/gofrs/uuid"
 )
 
 // digest the provided contents and return the resulting hash.

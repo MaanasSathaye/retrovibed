@@ -12,7 +12,7 @@ import (
 	"github.com/egdaemon/eg/internal/slicesx"
 	"github.com/egdaemon/eg/internal/stringsx"
 	"github.com/egdaemon/eg/internal/tracex"
-	"github.com/gofrs/uuid/v5"
+	"github.com/gofrs/uuid"
 )
 
 var (
@@ -109,7 +109,6 @@ const (
 	WorkingDirectory = "eg"
 	CacheDirectory   = ".eg.cache"
 	RuntimeDirectory = ".eg.runtime"
-	ModuleDir        = "main.wasm.d"
 	ModuleBin        = ".eg.module.wasm"
 	BinaryBin        = "egbin"
 	EnvironFile      = "environ.env"
