@@ -11,7 +11,7 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
-	"github.com/egdaemon/eg/runtime/x/wasi/egbug"
+	"github.com/egdaemon/eg/runtime/x/wasi/eggolang"
 	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
 )
 
@@ -22,10 +22,9 @@ func main() {
 	defer done()
 
 	runtime := shell.Runtime().
-		User(egenv.User().Username).Group("staff").
-		Environ("GOCACHE", egenv.CacheDirectory(".eg.cache", ".eg", "golang", "build")).
-		Environ("GOMODCACHE", egenv.CacheDirectory(".eg.cache", ".eg", "golang", "mod")).
-		Environ("PUB_CACHE", egenv.CacheDirectory(".eg.cache", ".eg", "dart"))
+		// User(egenv.User().Username).Group("staff").
+		EnvironFrom(eggolang.Env()...).
+		Environ("PUB_CACHE", egenv.CacheDirectory(".eg", "dart"))
 
 	dstdir := filepath.Join(egtarball.Path(tarballs.Retrovibed()), "retrovibed.app", "Contents", "MacOS")
 	flutter := runtime.Directory(egenv.WorkingDirectory("console"))
@@ -49,7 +48,7 @@ func main() {
 			runtime.Newf("mv %s/{retrovibed.dylib,retrovibed.app/Contents/Frameworks}", egtarball.Path(tarballs.Retrovibed())),
 			runtime.Newf("mv %s/{retrovibed.h,retrovibed.app/Contents/Frameworks}", egtarball.Path(tarballs.Retrovibed())),
 			runtime.Newf("tree -L 3 %s", egtarball.Path(tarballs.Retrovibed())),
-			runtime.Newf("ln -sf /Applications %s", filepath.Join(egtarball.Path(tarballs.Retrovibed()), "Applications")),
+			// runtime.Newf("ln -sf /Applications %s", filepath.Join(egtarball.Path(tarballs.Retrovibed()), "Applications")),
 			// runtime.Newf("create-dmg '%s' '%s'", egenv.CacheDirectory("retrovibed.arm64.dmg"), filepath.Join(egtarball.Path(tarballs.Retrovibed()), "retrovibed.app")),
 			runtime.Newf("tar -czvf %s -C %s .", egenv.CacheDirectory("retrovibed.darwin.arm64.tar.gz"), egtarball.Path(tarballs.Retrovibed())),
 			// runtime.Newf("mkisofs -V retrovibed.app -D -R -apple -no-pad -o retrovibed.arm64.dmg %s", filepath.Join(egtarball.Path(tarballs.Retrovibed()), "retrovibed.app")),
@@ -58,8 +57,6 @@ func main() {
 			ctx,
 			eg.DefaultModule(),
 			eg.Sequential(
-				egbug.FileTree,
-				shell.Op(shell.New("env | sort")),
 				release.Tarball,
 				release.DarwinDmg,
 			),

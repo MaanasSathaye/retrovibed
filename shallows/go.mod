@@ -34,7 +34,7 @@ require (
 	github.com/pkg/profile v1.7.0
 	github.com/porfirion/trie v1.0.0
 	github.com/pressly/goose/v3 v3.24.3
-	github.com/shirou/gopsutil/v4 v4.25.6
+	github.com/shirou/gopsutil/v4 v4.25.7
 	github.com/stretchr/testify v1.10.0
 	github.com/willabides/kongplete v0.4.0
 	golang.org/x/crypto v0.40.0

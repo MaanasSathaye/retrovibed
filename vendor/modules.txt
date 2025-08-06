@@ -186,7 +186,7 @@ github.com/ebitengine/purego/internal/strings
 # github.com/edsrzf/mmap-go v1.2.0
 ## explicit; go 1.17
 github.com/edsrzf/mmap-go
-# github.com/egdaemon/eg v0.0.0-20250804175537-c73829198c5d
+# github.com/egdaemon/eg v0.0.0-20250805224546-a1b440ac29a3
 ## explicit; go 1.24.0
 github.com/egdaemon/eg
 github.com/egdaemon/eg/backoff
@@ -639,8 +639,8 @@ github.com/serenize/snaker
 # github.com/sethvargo/go-retry v0.3.0
 ## explicit; go 1.21
 github.com/sethvargo/go-retry
-# github.com/shirou/gopsutil/v4 v4.25.6
-## explicit; go 1.23
+# github.com/shirou/gopsutil/v4 v4.25.7
+## explicit; go 1.23.0
 github.com/shirou/gopsutil/v4/common
 github.com/shirou/gopsutil/v4/disk
 github.com/shirou/gopsutil/v4/internal/common
