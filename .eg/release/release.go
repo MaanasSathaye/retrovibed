@@ -3,12 +3,10 @@ package release
 import (
 	"context"
 	"eg/compute/tarballs"
-	"log"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
-	"github.com/egdaemon/eg/runtime/x/wasi/egbug"
 	"github.com/egdaemon/eg/runtime/x/wasi/egdmg"
 	"github.com/egdaemon/eg/runtime/x/wasi/eggithub"
 	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
@@ -46,28 +44,23 @@ func DistroBuilds(ctx context.Context, op eg.Op) error {
 func Tarball(ctx context.Context, op eg.Op) error {
 	archive := tarballs.Retrovibed()
 	return eg.Sequential(
-		egbug.Log("foo 0"),
 		egtarball.Pack(archive),
-		egbug.Log("foo 1"),
 		egtarball.SHA256Op(archive),
-		egbug.Log("foo 2"),
 		shell.Op(
 			shell.Newf("mv %s %s", egtarball.Archive(archive), egenv.CacheDirectory("retrovibed.darwin.arm64.tar.gz")),
 		),
-		egbug.Log("foo 3"),
 	)(ctx, op)
 }
 
 func DarwinDmg(ctx context.Context, op eg.Op) error {
-	log.Println("---------------------------------------------------------------------------------")
-	b := egdmg.New(tarballs.Retrovibed(), egdmg.OptionBuildDir(egenv.CacheDirectory(".dist")))
+	b := egdmg.New(tarballs.Retrovibed(), egdmg.OptionBuildDir(egenv.CacheDirectory()))
 	return eg.Sequential(
-		egbug.Log("derp 0"),
+		shell.Op(
+			shell.Newf("tree -L 2 %s", egenv.CacheDirectory()),
+		),
 		egdmg.Build(b, egtarball.Path(tarballs.Retrovibed())),
-		egbug.Log("derp 1"),
 		shell.Op(
 			shell.Newf("mv %s %s", egdmg.Path(tarballs.Retrovibed()), egenv.CacheDirectory("retrovibed.darwin.arm64.dmg")),
 		),
-		egbug.Log("derp 2"),
 	)(ctx, op)
 }

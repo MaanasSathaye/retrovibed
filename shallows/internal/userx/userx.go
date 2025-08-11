@@ -22,12 +22,6 @@ func Zero() user.User {
 	return user.User{}
 }
 
-// returns the relative root that should be used for all well known directories.
-func DefaultRelRoot() string {
-	const DefaultDir = "retrovibed"
-	return DefaultDir
-}
-
 // CurrentUserOrDefault returns the current user or the default configured user.
 func CurrentUserOrDefault(d user.User) (result *user.User) {
 	var (
@@ -45,37 +39,16 @@ func CurrentUserOrDefault(d user.User) (result *user.User) {
 
 // DefaultConfigDir returns the user config directory.
 func DefaultConfigDir(rel ...string) string {
-	user := CurrentUserOrDefault(Root())
-	defaultdir := filepath.Join(user.HomeDir, ".config")
-	return filepath.Join(envx.String(defaultdir, "XDG_CONFIG_HOME"), filepath.Join(rel...))
-}
-
-// DefaultDirLocation looks for a directory one of the default directory locations.
-func DefaultDirLocation(rel string) string {
-	user := CurrentUserOrDefault(Root())
-
-	env := filepath.Join(os.Getenv("XDG_CONFIG_HOME"))
-	home := filepath.Join(user.HomeDir, ".config")
-	system := filepath.Join("/etc")
-
-	return DefaultDirectory(rel, env, home, system)
+	return _configDir(rel...)
 }
 
 // DefaultCacheDirectory cache directory for storing data.
 func DefaultCacheDirectory(rel ...string) string {
-	user := CurrentUserOrDefault(Root())
-	if user.Uid == Root().Uid {
-		return envx.String(filepath.Join("/", "var", "cache"), "CACHE_DIRECTORY")
-	}
-
-	defaultdir := filepath.Join(user.HomeDir, ".cache")
-	return filepath.Join(envx.String(defaultdir, "CACHE_DIRECTORY", "XDG_CACHE_HOME"), filepath.Join(rel...))
+	return _cacheDir(rel...)
 }
 
 func DefaultDataDirectory(rel ...string) string {
-	user := CurrentUserOrDefault(Root())
-	defaultdir := filepath.Join(user.HomeDir, ".local", "share")
-	return filepath.Join(envx.String(defaultdir, "XDG_DATA_HOME"), filepath.Join(rel...))
+	return _dataDir(rel...)
 }
 
 // DefaultDownloadDirectory returns the user config directory.

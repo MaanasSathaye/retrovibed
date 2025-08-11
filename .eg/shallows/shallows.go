@@ -4,7 +4,6 @@ import (
 	"context"
 	"eg/compute/flatpakmods"
 	"eg/compute/tarballs"
-	"log"
 	"strings"
 	"time"
 
@@ -76,7 +75,6 @@ func Install(ctx context.Context, _ eg.Op) error {
 }
 
 func Compile() eg.OpFn {
-	log.Println("DERP DERP", rootdir())
 	return eggolang.AutoCompile(
 		eggolang.CompileOption.BuildOptions(
 			eggolang.Build(

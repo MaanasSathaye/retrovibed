@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"eg/compute/console"
 	"eg/compute/release"
 	"eg/compute/tarballs"
 	"log"
@@ -12,6 +13,7 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
 	"github.com/egdaemon/eg/runtime/x/wasi/egbug"
+	"github.com/egdaemon/eg/runtime/x/wasi/eggithub"
 	"github.com/egdaemon/eg/runtime/x/wasi/eggolang"
 	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
 )
@@ -34,33 +36,31 @@ func main() {
 		ctx,
 		eg.Build(eg.DefaultModule()),
 		eg.Sequential(
+			console.GenerateFlutter,
 			egbug.DebugFailure(
 				shell.Op(
 					flutter.New("rm -rf build/macos/{x64,arm64}/debug").Lenient(true),
 					flutter.New("flutter build macos --release lib/main.dart").Timeout(10*time.Minute),
-					flutter.Newf("go -C retrovibedbind build -buildmode=c-shared --tags localdev -o %s/retrovibed.dylib ./...", egtarball.Path(tarballs.Retrovibed())),
+					flutter.Newf("go -C retrovibedbind build -buildmode=c-shared --tags localdev -o build/macos/Build/Products/Release/retrovibed.app/Contents/Frameworks/retrovibed.dylib ./..."),
 				),
-				shell.Op(shell.New("DERP DERP!!!!!!!!!!!!!!!!!!!!!!!!")),
+				shell.Op(shell.New("flutter failed to build app")),
 			),
 			shell.Op(
 				shallows.Newf("go install ./cmd/...").Environ("GOBIN", dstdir),
 			),
-		),
-		shell.Op(
-			runtime.New("echo zorp 0"),
-			flutter.Newf("rsync -av build/macos/Build/Products/Release/retrovibed.app %s", egtarball.Path(tarballs.Retrovibed())),
-			runtime.New("echo zorp 1"),
-			runtime.Newf("mv %s/{retrovibed.dylib,retrovibed.app/Contents/Frameworks}", egtarball.Path(tarballs.Retrovibed())),
-			runtime.New("echo zorp 2"),
-			runtime.Newf("mv %s/{retrovibed.h,retrovibed.app/Contents/Frameworks}", egtarball.Path(tarballs.Retrovibed())),
-			runtime.New("echo zorp 3"),
-		),
-		eg.Module(
-			ctx,
-			eg.DefaultModule(),
-			eg.Sequential(
-				release.Tarball,
-				release.DarwinDmg,
+			shell.Op(
+				flutter.New("tree build/macos/Build/Products/Release/retrovibed.app"),
+				flutter.Newf("cp -R build/macos/Build/Products/Release/retrovibed.app %s", egenv.CacheDirectory()),
+			),
+			release.DarwinDmg,
+			eg.Module(
+				ctx,
+				eg.DefaultModule(),
+				eg.Sequential(
+					eggithub.Release(
+						egenv.CacheDirectory("retrovibed.darwin.arm64.dmg"),
+					),
+				),
 			),
 		),
 	)

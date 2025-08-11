@@ -4,18 +4,30 @@ import 'dart:io';
 import 'package:ffi/ffi.dart' as ffi;
 import 'package:retrovibed/retrovibed/gen.dart' as lib;
 
+File _defaultlib() {
+  if (Platform.isMacOS) {
+    return File("retrovibed.dylib");
+  }
+
+  return File("/app/lib/retrovibed.so");
+}
+
 String _path() {
-  final files = [File("/app/lib/retrovibed.so"), File("/app/bin/lib/retrovibed.so"), File("build/nativelib/retrovibed.so"), File("../Frameworks/retrovibed.dylib")];
-  final found = files.firstWhere(
-    (v) {
-      try {
-        return v.existsSync();
-      } catch (_) {
-        return false;
-      }
-    },
-    orElse: () => File("/app/lib/retrovibed.so"),
-  );
+  final files = [
+    File("retrovibed.dylib"),
+    File("/app/lib/retrovibed.so"),
+    File("/app/bin/lib/retrovibed.so"),
+    File("build/nativelib/retrovibed.so"),
+    File("/Users/maanas/retrovibed/console/build/nativelib/retrovibed.dylib"),
+  ];
+
+  final found = files.firstWhere((v) {
+    try {
+      return v.existsSync();
+    } catch (_) {
+      return false;
+    }
+  }, orElse: _defaultlib);
   return found.path;
 }
 

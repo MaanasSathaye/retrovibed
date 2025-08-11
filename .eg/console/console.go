@@ -15,16 +15,10 @@ import (
 )
 
 func flutterRuntime() shell.Command {
-
-	user := egenv.User().Username
-	if user == "" {
-		user = "egd"
-	}
 	return shell.Runtime().
 		Directory(egenv.WorkingDirectory("console")).
 		EnvironFrom(eggolang.Env()...).
-		Environ("PUB_CACHE", egenv.CacheDirectory(".eg", "dart")).
-		As(user)
+		Environ("PUB_CACHE", egenv.CacheDirectory(".eg", "dart"))
 }
 
 func Tests(ctx context.Context, _ eg.Op) error {
@@ -64,7 +58,7 @@ func GenerateFlutter(ctx context.Context, _ eg.Op) error {
 	return shell.Run(
 		ctx,
 		// runtime.New("flutter clean"),
-		runtime.New("flutter create --platforms=linux,macos ."),
+		runtime.New("flutter create --org space.retrovibe --platforms=linux,macos ."),
 		runtime.New("flutter pub get"),
 	)
 }

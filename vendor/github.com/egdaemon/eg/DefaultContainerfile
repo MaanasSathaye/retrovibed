@@ -31,9 +31,9 @@ RUN ln -s /usr/lib/go-1.24/bin/go /usr/local/bin/go
 RUN ssh-keyscan -H github.com >> /etc/ssh/ssh_known_hosts
 RUN ssh-keyscan -H gitlab.com >> /etc/ssh/ssh_known_hosts
 
-# temporary while we deal with launchpad slowness...
-RUN apt-get install -y --no-install-recommends libbtrfs-dev libassuan-dev libc6-dev libdevmapper-dev libglib2.0-dev libgpgme-dev libgpg-error-dev libprotobuf-dev libprotobuf-c-dev libseccomp-dev libselinux1-dev libsystemd-dev
-RUN GOPROXY=direct go install github.com/egdaemon/eg/cmd/...@james.lawrence/archlinux-improve-ccache
+# # temporary while we deal with launchpad slowness...
+# RUN apt-get install -y --no-install-recommends libbtrfs-dev libassuan-dev libc6-dev libdevmapper-dev libglib2.0-dev libgpgme-dev libgpg-error-dev libprotobuf-dev libprotobuf-c-dev libseccomp-dev libselinux1-dev libsystemd-dev
+# RUN GOPROXY=direct go install github.com/egdaemon/eg/...@latest
 
 RUN systemd-sysusers
 RUN systemd-tmpfiles --create
@@ -42,7 +42,19 @@ RUN systemd-tmpfiles --clean
 RUN rm -rf /tmp/gomod /tmp/gocache
 
 RUN usermod --add-subuids 100000-165535 --add-subgids 100000-165535 egd
-RUN echo "cache buster 574ba506-2797-505a-ae80-b41535886d78"
+RUN echo "cache buster 474ba506-2797-505a-ae80-b41535886d78"
 
 RUN systemctl enable podman.socket
+RUN systemctl disable systemd-resolved.service
 RUN podman version
+
+# BEGIN HACKS
+# systemd-resolved.service causes the container to delay its startup significantly causing issues.
+RUN systemctl disable systemd-resolved.service
+# the standard dbus service doesn't work with plucky.
+RUN apt-get install -y --no-install-recommends dbus-broker
+RUN systemctl disable dbus.service
+RUN echo "cache buster 585ca506-2797-505a-ae80-b41535886d78"
+RUN systemctl enable dbus-broker.service
+RUN rm -rf /run/containers/storage /run/libpod
+# END HACKS
