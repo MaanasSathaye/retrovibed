@@ -2,7 +2,7 @@
 # github.com/Masterminds/squirrel v1.5.4
 ## explicit; go 1.14
 github.com/Masterminds/squirrel
-# github.com/RoaringBitmap/roaring/v2 v2.8.0
+# github.com/RoaringBitmap/roaring/v2 v2.9.0
 ## explicit; go 1.15
 github.com/RoaringBitmap/roaring/v2
 github.com/RoaringBitmap/roaring/v2/internal
@@ -36,10 +36,9 @@ github.com/anacrolix/missinggo/slices
 # github.com/anacrolix/missinggo/perf v1.0.0
 ## explicit; go 1.12
 github.com/anacrolix/missinggo/perf
-# github.com/anacrolix/missinggo/v2 v2.8.0
-## explicit; go 1.18
+# github.com/anacrolix/missinggo/v2 v2.10.0
+## explicit; go 1.20
 github.com/anacrolix/missinggo/v2
-github.com/anacrolix/missinggo/v2/iter
 # github.com/anacrolix/mmsg v1.0.1
 ## explicit
 github.com/anacrolix/mmsg
@@ -93,7 +92,7 @@ github.com/aymanbagabas/go-osc52/v2
 # github.com/benbjohnson/immutable v0.4.3
 ## explicit; go 1.18
 github.com/benbjohnson/immutable
-# github.com/bits-and-blooms/bitset v1.22.0
+# github.com/bits-and-blooms/bitset v1.24.0
 ## explicit; go 1.16
 github.com/bits-and-blooms/bitset
 # github.com/bits-and-blooms/bloom/v3 v3.7.0
@@ -428,8 +427,8 @@ github.com/james-lawrence/genieql/internal/userx
 github.com/james-lawrence/genieql/internal/wasidialect
 github.com/james-lawrence/genieql/internal/wasix/ffierrors
 github.com/james-lawrence/genieql/internal/wasix/ffiguest
-# github.com/james-lawrence/torrent v0.0.0-20250729012551-3207b3d0675f
-## explicit; go 1.24
+# github.com/james-lawrence/torrent v0.0.0-20250813205954-52225760038c
+## explicit; go 1.24.0
 github.com/james-lawrence/torrent
 github.com/james-lawrence/torrent/autobind
 github.com/james-lawrence/torrent/bencode
@@ -455,7 +454,9 @@ github.com/james-lawrence/torrent/internal/backoffx
 github.com/james-lawrence/torrent/internal/bytesx
 github.com/james-lawrence/torrent/internal/envx
 github.com/james-lawrence/torrent/internal/errorsx
+github.com/james-lawrence/torrent/internal/iterx
 github.com/james-lawrence/torrent/internal/langx
+github.com/james-lawrence/torrent/internal/multiless
 github.com/james-lawrence/torrent/internal/netx
 github.com/james-lawrence/torrent/internal/slicesx
 github.com/james-lawrence/torrent/internal/stmutil
@@ -691,8 +692,8 @@ golang.org/x/crypto/pbkdf2
 golang.org/x/crypto/poly1305
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
-# golang.org/x/exp v0.0.0-20250718183923-645b1fa84792
-## explicit; go 1.23.0
+# golang.org/x/exp v0.0.0-20250813145105-42675adae3e6
+## explicit; go 1.24.0
 golang.org/x/exp/constraints
 # golang.org/x/mod v0.27.0
 ## explicit; go 1.23.0

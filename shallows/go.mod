@@ -1,8 +1,8 @@
 module github.com/retrovibed/retrovibed
 
-go 1.24
+go 1.24.0
 
-toolchain go1.24.1
+toolchain go1.24.6
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
@@ -23,7 +23,7 @@ require (
 	github.com/grindlemire/go-lucene v0.0.21
 	github.com/hashicorp/mdns v1.0.6
 	github.com/james-lawrence/genieql v0.0.0-20250605152251-dee4282e5e2a
-	github.com/james-lawrence/torrent v0.0.0-20250729012551-3207b3d0675f
+	github.com/james-lawrence/torrent v0.0.0-20250813205954-52225760038c
 	github.com/justinas/alice v1.2.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/marcboeker/go-duckdb/v2 v2.3.4
@@ -38,7 +38,7 @@ require (
 	github.com/stretchr/testify v1.10.0
 	github.com/willabides/kongplete v0.4.0
 	golang.org/x/crypto v0.41.0
-	golang.org/x/exp v0.0.0-20250718183923-645b1fa84792
+	golang.org/x/exp v0.0.0-20250813145105-42675adae3e6
 	golang.org/x/oauth2 v0.30.0
 	golang.org/x/text v0.28.0
 	golang.org/x/time v0.12.0
@@ -47,14 +47,14 @@ require (
 )
 
 require (
-	github.com/RoaringBitmap/roaring/v2 v2.8.0 // indirect
+	github.com/RoaringBitmap/roaring/v2 v2.9.0 // indirect
 	github.com/alecthomas/atomic v0.1.0-alpha2 // indirect
 	github.com/anacrolix/chansync v0.6.0 // indirect
 	github.com/anacrolix/generics v0.0.3 // indirect
 	github.com/anacrolix/go-libutp v1.3.2 // indirect
 	github.com/anacrolix/log v0.16.0 // indirect
 	github.com/anacrolix/missinggo/perf v1.0.0 // indirect
-	github.com/anacrolix/missinggo/v2 v2.8.0 // indirect
+	github.com/anacrolix/missinggo/v2 v2.10.0 // indirect
 	github.com/anacrolix/mmsg v1.0.1 // indirect
 	github.com/anacrolix/multiless v0.4.0 // indirect
 	github.com/anacrolix/stm v0.5.0 // indirect
@@ -63,7 +63,7 @@ require (
 	github.com/apache/arrow-go/v18 v18.4.0 // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
-	github.com/bits-and-blooms/bitset v1.22.0 // indirect
+	github.com/bits-and-blooms/bitset v1.24.0 // indirect
 	github.com/bits-and-blooms/bloom/v3 v3.7.0 // indirect
 	github.com/bradfitz/iter v0.0.0-20191230175014-e8f45d346db8 // indirect
 	github.com/catppuccin/go v0.3.0 // indirect
