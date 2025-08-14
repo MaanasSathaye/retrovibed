@@ -97,6 +97,7 @@ class DaemonBridge {
 typedef ptrdiff_t = ffi.Long;
 typedef Dartptrdiff_t = int;
 
+/// Define 'max_align_t' to match the GCC definition.
 final class max_align_t extends ffi.Opaque {}
 
 final class _GoString_ extends ffi.Struct {

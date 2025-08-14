@@ -29,7 +29,7 @@ func main() {
 				console.Generate,
 			),
 			eg.Parallel(
-				eg.Sequential(console.GenerateBinding, console.Build),
+				eg.Sequential(console.GenerateBinding, console.BuildLinux),
 				shallows.Compile(),
 			),
 			eg.Parallel(
