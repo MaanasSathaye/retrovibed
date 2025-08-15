@@ -12,6 +12,7 @@ import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/retrovibed.dart' as retro;
 import 'package:retrovibed/design.kit/theme.defaults.dart' as theming;
 import 'package:retrovibed/design.kit/modals.dart' as modals;
+import 'package:retrovibed/subscribe.dart' as subscribe;
 
 TextScaler autoscaling(BuildContext context) {
   final width = MediaQuery.of(context).size.width;
@@ -59,14 +60,15 @@ class MyApp extends StatelessWidget {
                   authn.AuthzCache(
                     media.Playlist(
                       DefaultTabController(
-                        length: 3,
+                        length: 4,
                         child: Scaffold(
                           appBar: TabBar(
                             tabs: [
                               Tab(icon: Icon(Icons.movie)),
                               Tab(icon: Icon(Icons.download)),
                               Tab(icon: Icon(Icons.settings)),
-                            ],
+                              Tab(icon: Icon(Icons.qr_code)),
+                          ],
                           ),
                           body: ds.ErrorBoundary(
                             TabBarView(
@@ -92,6 +94,7 @@ class MyApp extends StatelessWidget {
                                 ),
                                 modals.Node(downloads.Display()),
                                 modals.Node(settings.Display()),
+                                modals.Node(subscribe.SubscribeQRDisplay()),
                               ],
                             ),
                           ),
