@@ -295,9 +295,9 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) {
 	go PrintStatistics(dctx, db)
 
 	// block for first refresh
-	errorsx.Log(cmdmeta.RefreshFTS(gctx.Context, db))
+	errorsx.Log(cmdmeta.Checkpoint(gctx.Context, db))
 	go timex.Every(10*time.Minute, func() {
-		errorsx.Log(cmdmeta.RefreshFTS(gctx.Context, db))
+		errorsx.Log(cmdmeta.Checkpoint(gctx.Context, db))
 	})
 
 	go timex.NowAndEveryVoid(gctx.Context, 10*time.Minute, func(ctx context.Context) {

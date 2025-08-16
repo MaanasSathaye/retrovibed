@@ -65,9 +65,9 @@ func InitializeDatabase(ctx context.Context, db *sql.DB) (err error) {
 	return nil
 }
 
-func RefreshFTS(ctx context.Context, db *sql.DB) (err error) {
-	log.Println("------------------------------------------------ FTS refresh initiated ------------------------------------------------")
-	defer log.Println("------------------------------------------------ FTS refresh completed ------------------------------------------------")
+func Checkpoint(ctx context.Context, db *sql.DB) (err error) {
+	log.Println("------------------------------------------------ database checkpoint initiated ------------------------------------------------")
+	defer log.Println("------------------------------------------------ database checkpoint completed ------------------------------------------------")
 
 	if _, err := db.ExecContext(ctx, "PRAGMA create_fts_index('library_metadata', 'id', 'description', overwrite = 1);"); err != nil {
 		return errorsx.Wrap(err, "failed to refresh library_metadata fts index")
@@ -79,6 +79,10 @@ func RefreshFTS(ctx context.Context, db *sql.DB) (err error) {
 
 	if _, err := db.ExecContext(ctx, "PRAGMA create_fts_index('library_known_media', 'md5_lower', 'title', overwrite = 1);"); err != nil {
 		return errorsx.Wrap(err, "failed to refresh library_known_media fts index")
+	}
+
+	if _, err := db.ExecContext(ctx, "CHECKPOINT;"); err != nil {
+		return errorsx.Wrap(err, "failed to checkpoint database")
 	}
 
 	return nil
