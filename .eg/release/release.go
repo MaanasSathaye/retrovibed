@@ -46,9 +46,6 @@ func Tarball(ctx context.Context, op eg.Op) error {
 	return eg.Sequential(
 		egtarball.Pack(archive),
 		egtarball.SHA256Op(archive),
-		shell.Op(
-			shell.Newf("mv %s %s", egtarball.Archive(archive), egenv.CacheDirectory("retrovibed.darwin.arm64.tar.gz")),
-		),
 	)(ctx, op)
 }
 

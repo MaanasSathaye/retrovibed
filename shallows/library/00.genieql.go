@@ -110,7 +110,7 @@ func MetadataSyncKnownMediaIDFromTorrent(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, tid string) NewMetadataScannerStatic,
 ) {
-	gql = gql.Query(`UPDATE library_metadata SET updated_at = NOW(), known_media_id = torrents_metadata.known_media_id FROM torrents_metadata WHERE "torrents_metadata.id" = {tid} RETURNING ` + MetadataScannerStaticColumns)
+	gql = gql.Query(`UPDATE library_metadata SET updated_at = NOW(), known_media_id = torrents_metadata.known_media_id FROM torrents_metadata WHERE torrents_metadata."id" = {tid} AND torrents_metadata."id" = library_metadata.torrent_id RETURNING ` + MetadataScannerStaticColumns)
 }
 
 func MetadataForTorrentArchiveRetrieval(

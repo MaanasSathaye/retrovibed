@@ -19,6 +19,7 @@ func BuildLinux(ctx context.Context, _ eg.Op) error {
 	return shell.Run(
 		ctx,
 		runtime.New("rm -rf build/linux/x64/debug").Lenient(true),
+		runtime.New("mkdir -p build/native_assets/linux"),
 		runtime.New("flutter build linux --release lib/main.dart"),
 	)
 }

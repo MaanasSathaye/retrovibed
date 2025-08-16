@@ -26,11 +26,15 @@ func TestParse(t *testing.T) {
 		_, parsed, err := rss.Parse(ctx, testx.Read(testx.Fixture("parsing", "example.2.xml")))
 		require.NoError(t, err)
 		require.Equal(t, len(parsed), 3)
-		require.Equal(t, rss.FindEnclosureURLByMimetype(mimex.Bittorrent, parsed...), []string{
-			"https://archlinux.org//releng/releases/2025.04.01/torrent/",
-			"https://archlinux.org//releng/releases/2025.03.01/torrent/",
-			"https://archlinux.org//releng/releases/2025.02.01/torrent/",
-		})
+		require.Equal(
+			t,
+			[]rss.Enclosure{
+				{URL: "https://archlinux.org//releng/releases/2025.04.01/torrent/", Mimetype: "application/x-bittorrent", Length: 0x49b08000},
+				{URL: "https://archlinux.org//releng/releases/2025.03.01/torrent/", Mimetype: "application/x-bittorrent", Length: 0x4a608000},
+				{URL: "https://archlinux.org//releng/releases/2025.02.01/torrent/", Mimetype: "application/x-bittorrent", Length: 0x49b08000},
+			},
+			rss.FindEnclosureURLByMimetype(mimex.Bittorrent, parsed...),
+		)
 	})
 
 	t.Run("example 3 - retrovibed extensions", func(t *testing.T) {
@@ -43,8 +47,8 @@ func TestParse(t *testing.T) {
 		require.Equal(t, "Retrovibed Media Database", channel.Title)
 		require.Equal(t, "57869e82c2684ac4881bd32581f969db", channel.Retrovibed.Entropy)
 		require.Equal(t, "application/vnd.retrovibed.media.archive", channel.Retrovibed.Mimetype)
-		require.Equal(t, rss.FindEnclosureURLByMimetype(mimex.Bittorrent, parsed...), []string{
-			"magnet:?xt=urn:btih:8665727372B28B0263690B82928399516641A1B4&dn=retrovibed.media.metadata.00.gz",
+		require.Equal(t, rss.FindEnclosureURLByMimetype(mimex.Bittorrent, parsed...), []rss.Enclosure{
+			{URL: "magnet:?xt=urn:btih:8665727372B28B0263690B82928399516641A1B4&dn=retrovibed.media.metadata.00.gz", Mimetype: "application/x-bittorrent", Length: 0x4a208000},
 		})
 	})
 }

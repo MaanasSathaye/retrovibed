@@ -65,12 +65,12 @@ func GenerateProtocol(ctx context.Context, op eg.Op) error {
 }
 
 func Install(ctx context.Context, _ eg.Op) error {
-	// go install -ldflags=\"-extldflags=-static\" -tags no_duckdb_arrow ./cmd/shallows/...
+	// go install -ldflags=\"-extldflags=-static\" ./cmd/shallows/...
 	dstdir := egtarball.Path(tarballs.Retrovibed())
 	gruntime := shellruntime()
 	return shell.Run(
 		ctx,
-		gruntime.Newf("go install -ldflags=\"-extldflags=-static\" -tags %s ./cmd/...", strings.Join(buildTags, ",")).Environ("GOBIN", dstdir),
+		gruntime.Newf("go install -tags %s ./cmd/...", strings.Join(buildTags, ",")).Environ("GOBIN", dstdir),
 	)
 }
 
