@@ -1,7 +1,6 @@
 package httpx
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -9,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/retrovibed/retrovibed/internal/errorsx"
-	"github.com/retrovibed/retrovibed/internal/iox"
 )
 
 func escapeQuotes(s string) string {
@@ -31,15 +29,9 @@ func Multipart(do func(*multipart.Writer) error) (contentType string, _ io.ReadC
 
 	mw := multipart.NewWriter(w)
 
-	ctx, done := context.WithCancelCause(context.Background())
 	go func() {
-		if err = errorsx.Compact(do(mw), mw.Close()); err != nil {
-			w.CloseWithError(err)
-		}
-		done(nil)
+		errorsx.Log(w.CloseWithError(errorsx.Compact(do(mw), mw.Close())))
 	}()
 
-	return mw.FormDataContentType(), iox.ReaderCompositeCloser(r, func() error {
-		return errorsx.Ignore(context.Cause(ctx), context.Canceled)
-	}, r.Close), nil
+	return mw.FormDataContentType(), r, nil
 }
