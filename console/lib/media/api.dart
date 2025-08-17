@@ -64,6 +64,16 @@ abstract class media {
         });
   }
 
+  static Future<http.StreamedResponse> download(String id, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
+        .send(
+          Uri.https(httpx.host(), "/m/${id}"),
+          options: options,
+        );
+  }
+
   static String download_uri(String id) {
     return Uri.https(httpx.host(), "/m/${id}").toString();
   }

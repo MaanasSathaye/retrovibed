@@ -80,8 +80,6 @@ class _ByteInputWidgetState extends State<ByteWidget> {
   void initState() {
     super.initState();
     _controller.addListener(_updateBytes);
-    // final v = _bytes * _magnitude;
-    // widget.onChange?.call(v);
   }
 
   @override

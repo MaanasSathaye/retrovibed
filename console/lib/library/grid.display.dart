@@ -238,6 +238,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                             ),
                         onDoubleTap: media.PlayAction(context, _media, _res),
                         onSettings: onSettings,
+                        media: _media,
                         key: ValueKey(_media.id)
                       );
                   }

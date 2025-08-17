@@ -18,6 +18,10 @@ const movie = Icons.movie;
 const audio = Icons.music_note_outlined;
 const binary = Icons.file_open_outlined;
 
+String ext(String mime) {
+  return mimetype.extensionFromMime(mime) ?? ".bin";
+}
+
 List<String> of(IconData v) {
   if (v == movie) {
     return [

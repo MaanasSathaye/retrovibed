@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/library/known.media.card.dart';
 import 'package:retrovibed/media/media.pb.dart';
+import 'package:retrovibed/media.dart' as _media;
 import './api.dart' as api;
 
 class KnownMediaDisplay extends StatefulWidget {
   final Future<api.Known> pending;
+  final _media.Media media;
   final GestureTapCallback? onDoubleTap;
   final void Function()? onSettings;
   final Widget? trailing;
@@ -16,6 +18,7 @@ class KnownMediaDisplay extends StatefulWidget {
     this.onDoubleTap,
     this.onSettings,
     this.trailing,
+    required this.media,
   });
 
   static KnownMediaDisplay missing(
@@ -33,6 +36,7 @@ class KnownMediaDisplay extends StatefulWidget {
           image: "",
         ),
       ),
+      media: m,
       key: ValueKey(m.id),
       onDoubleTap: onDoubleTap,
       onSettings: onSettings,
@@ -86,6 +90,7 @@ class _KnownMediaDisplayState extends State<KnownMediaDisplay> {
             ),
           ),
           Spacer(flex: 9),
+          ds.LoadingIconButton(onPressed: _media.DownloadAction(context, widget.media), icon: Icon(Icons.download)),
           IconButton(onPressed: widget.onSettings, icon: Icon(Icons.tune)),
         ],
       ),

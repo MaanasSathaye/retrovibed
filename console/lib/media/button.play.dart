@@ -1,9 +1,13 @@
 import 'dart:math';
+import 'dart:async';
+import 'dart:io';
 import 'package:retrovibed/media.dart';
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart' as mediakit;
 import 'package:retrovibed/mimex.dart' as mimex;
+import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/httpx.dart' as httpx;
+import 'package:path_provider/path_provider.dart';
 import './api.dart' as api;
 
 mediakit.Media PlayableMedia(Media current) {
@@ -18,7 +22,9 @@ mediakit.Media PlayableMedia(Media current) {
 }
 
 Stream<mediakit.Media> range(MediaSearchResponse i, Media pos) async* {
-  final initial = i.items.sublist(max(i.items.indexWhere((m) => m.id == pos.id), 0));
+  final initial = i.items.sublist(
+    max(i.items.indexWhere((m) => m.id == pos.id), 0),
+  );
   for (var m in initial) {
     yield await PlayableMedia(m);
   }
@@ -32,17 +38,34 @@ Stream<mediakit.Media> range(MediaSearchResponse i, Media pos) async* {
   }
 }
 
-Future<void> Function()? PlayAction(BuildContext context, Media current, MediaSearchResponse s) {
+Future<void> Function()? PlayAction(
+  BuildContext context,
+  Media current,
+  MediaSearchResponse s,
+) {
   switch (mimex.icon(current.mimetype)) {
     case mimex.movie:
     case mimex.audio:
       final playlist = Playlist.of(context);
-      return playlist == null ? null : () {
-        return Future.sync(() => playlist.setPlaylist(range(s, current)));
-      };
+      return playlist == null
+          ? null
+          : () {
+            return Future.sync(() => playlist.setPlaylist(range(s, current)));
+          };
     default:
       return null;
   }
+}
+
+Future<void> Function() DownloadAction(BuildContext context, Media current) {
+  return () {
+    return getDownloadsDirectory().then((downloads) {
+      final sink = File('${downloads!.path}/${current.description.replaceAll(" ", ".")}').openWrite();
+      return api.media
+          .download(current.id, options: [authn.AuthzCache.bearer(context)])
+          .then((resp) => resp.stream.pipe(sink));
+    });
+  };
 }
 
 class ButtonPlay extends StatelessWidget {

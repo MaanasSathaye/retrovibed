@@ -85,7 +85,7 @@ Future<http.MultipartFile> uploadable(
   );
 }
 
-Future<http.Response> auto_error(http.Response v) {
+Future<T> auto_error<T extends http.BaseResponse>(T v) {
   if (v.statusCode >= 300) {
     print("failed ${v.request?.url.toString()} ${v.statusCode}");
   }
@@ -201,6 +201,19 @@ Future<http.Response> get(
 }) {
   return request(options).then((r) {
     return http.Client().get(path, headers: r.headers).then(auto_error);
+  });
+}
+
+Future<http.StreamedResponse> send(
+  Uri path, {
+  List<Option> options = const [],
+  dynamic query = const {},
+}) {
+  return request(options).then((r) {
+    final req = http.Request("GET", path);
+    req.headers.addAll(r.headers);
+
+    return http.Client().send(req).then(auto_error);
   });
 }
 
