@@ -274,10 +274,11 @@ func DiscoverFromRSSFeedsOnce(ctx context.Context, q sqlx.Queryer, rootstore fsx
 		}
 
 		for _, item := range items {
-			if item.PublishDate.Before(feed.LastBuiltAt) || item.PublishDate.Equal(feed.LastBuiltAt) {
-				log.Println("item before last built date", item.PublishDate, "<=", feed.LastBuiltAt)
-				continue
-			}
+			// this doesnt work as expected. its not the addition to the channel its the date it was published.
+			// if item.PublishDate.Before(feed.LastBuiltAt) || item.PublishDate.Equal(feed.LastBuiltAt) {
+			// 	log.Println("item before last built date", item.PublishDate, "<=", feed.LastBuiltAt)
+			// 	continue
+			// }
 
 			uri := slicesx.FirstOrDefault(rss.ItemToEnclosure(item, mimex.Bittorrent), rss.FindEnclosureURLByMimetype(mimex.Bittorrent, item)...)
 
