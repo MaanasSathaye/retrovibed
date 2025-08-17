@@ -6,11 +6,14 @@ import (
 	"eg/compute/maintainer"
 	"eg/compute/release"
 	"eg/compute/shallows"
+	"eg/compute/tarballs"
 	"log"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/eggit"
+	"github.com/egdaemon/eg/runtime/wasi/shell"
+	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
 )
 
 func main() {
@@ -41,10 +44,9 @@ func main() {
 				eg.Parallel(
 					console.Install,
 					shallows.Install,
-					// shell.Op(
-					// 	shell.Newf("cp --verbose -R .dist/linux/* %s", egtarball.Path(tarballs.Retrovibed())),
-					// 	shell.Newf("tree -L 3 %s", egtarball.Path(tarballs.Retrovibed())),
-					// ),
+					shell.Op(
+						shell.Newf("cp --verbose -R .dist/linux/* %s", egtarball.Path(tarballs.Retrovibed())),
+					),
 				),
 				release.Tarball,
 				eg.Parallel(
@@ -54,12 +56,6 @@ func main() {
 			),
 		),
 		release.Release,
-		// eg.Module(
-		// 	ctx, deb.OptionLiteral("--privileged"),
-		// 	eg.Parallel(
-		// 		console.FlatpakBuild,
-		// 	),
-		// ),
 	)
 
 	if err != nil {
