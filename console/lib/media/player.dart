@@ -20,6 +20,7 @@ class VideoScreen extends StatefulWidget {
 
 class _VideoState extends State<VideoScreen> {
   bool _playing = false;
+  FocusNode _focus = FocusNode();
 
   // Create a [VideoController] to handle video output from [Player].
   late final controller = VideoController(widget.player);
@@ -49,7 +50,10 @@ class _VideoState extends State<VideoScreen> {
     sub1 = widget.player.stream.playing.listen((state) {
       // prevents flashing to the search screen which switching tracks.
       // if (_playing && widget.player.state.playlist.medias.length == 0) return;
-
+      if (state) {
+        print("requesting player focus");
+        _focus.requestFocus();
+      }
       setState(() {
         _playing = state;
       });
@@ -117,6 +121,7 @@ class _VideoState extends State<VideoScreen> {
         icon: Icon(Icons.skip_previous_rounded),
       ),
       MaterialPlayOrPauseButton(),
+      MaterialDesktopVolumeButton(),
       IconButton(
         onPressed: () {
           internal.Playlist.of(context)?.next();
@@ -143,12 +148,14 @@ class _VideoState extends State<VideoScreen> {
       children: [
         MaterialDesktopVideoControlsTheme(
           normal: MaterialDesktopVideoControlsThemeData(
+            modifyVolumeOnScroll: false,
             bottomButtonBar: controls,
           ),
           fullscreen: MaterialDesktopVideoControlsThemeData(
+            modifyVolumeOnScroll: false,
             bottomButtonBar: controls,
           ),
-          child: Video(controller: controller),
+          child: Video(controller: controller, focusNode: _focus),
         ),
         m,
       ],

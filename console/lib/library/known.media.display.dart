@@ -89,7 +89,7 @@ class _KnownMediaDisplayState extends State<KnownMediaDisplay> {
               child: Center(child: ds.Rating(rating: current.rating)),
             ),
           ),
-          Spacer(flex: 9),
+          Spacer(flex: 8),
           ds.LoadingIconButton(onPressed: _media.DownloadAction(context, widget.media), icon: Icon(Icons.download)),
           IconButton(onPressed: widget.onSettings, icon: Icon(Icons.tune)),
         ],
