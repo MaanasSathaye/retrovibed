@@ -86,6 +86,6 @@ class RegisteredState extends State<Registered> {
 
   @override
   Widget build(BuildContext context) {
-    return ds.Loading(loading: _loading, cause: _cause, widget.child);
+    return ds.Loading(key: ValueKey(current.customerId), loading: _loading, cause: _cause, widget.child);
   }
 }

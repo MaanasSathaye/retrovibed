@@ -104,7 +104,7 @@ func NewAutoArchive(ctx context.Context, c *http.Client, dir fsx.Virtual, q sqlx
 
 		a := deeppool.NewArchiver(c)
 
-		v := sqlx.Scan(MetadataSearch(ctx, sqlx.Debug(q), query))
+		v := sqlx.Scan(MetadataSearch(ctx, q, query))
 		for md := range v.Iter() {
 			processed++
 			log.Println("------------------------- archivable initiated", md.ID, md.ArchiveID)
@@ -165,7 +165,7 @@ func NewDiskReclaim(ctx context.Context, dir fsx.Virtual, q sqlx.Queryer, async 
 		log.Println("disk reclaim initiated")
 		defer log.Println("disk reclaim completed")
 
-		v := sqlx.Scan(MetadataSearch(ctx, sqlx.Debug(q), query))
+		v := sqlx.Scan(MetadataSearch(ctx, q, query))
 		for md := range v.Iter() {
 			if !fsx.Exists(dir.Path(md.ID)) {
 				continue
