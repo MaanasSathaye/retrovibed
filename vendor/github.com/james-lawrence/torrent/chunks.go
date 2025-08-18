@@ -2,6 +2,7 @@ package torrent
 
 import (
 	"fmt"
+	"log"
 	"math"
 	"sync"
 	"sync/atomic"
@@ -742,8 +743,17 @@ func (t *chunks) Complete(pid uint64) (changed bool) {
 		cidx := t.requestCID(r)
 		delete(t.outstanding, r.Digest)
 
-		tmp := t.missing.CheckedRemove(uint32(cidx))
-		tmp = t.unverified.CheckedRemove(uint32(cidx)) || tmp
+		tmp := func() (r bool) {
+			defer func() {
+				if err := recover(); err != nil {
+					log.Println("FAILED TO REMOVE", cidx, t.unverified.GetCardinality(), t.missing.GetCardinality(), t.cmaximum)
+					r = r || true
+				}
+			}()
+			tmp := t.missing.CheckedRemove(uint32(cidx))
+			tmp = t.unverified.CheckedRemove(uint32(cidx)) || tmp
+			return tmp
+		}()
 		changed = changed || tmp
 	}
 
