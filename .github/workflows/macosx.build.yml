@@ -40,7 +40,8 @@ jobs:
       uses: actions/checkout@v4
     - name: build
       run: |
-        brew install --cask podman-desktop podman
+        brew install --cask podman-desktop
+        brew install podman
         podman machine init --now
         podman version
         # which eg
