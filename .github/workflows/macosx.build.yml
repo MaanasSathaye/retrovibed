@@ -1,4 +1,4 @@
-name: tests
+name: macos build
 on:
   # push:
   #   branches:
@@ -34,7 +34,7 @@ jobs:
           ${{ runner.os }}-go-${{ steps.setup-go-macos.outputs.go-version }}-installed- # Fallback keys
     - uses: tecolicom/actions-use-homebrew-tools@v1
       with:
-        tools: 'duckdb gpgme flutter tree podman'
+        tools: 'duckdb gpgme flutter tree'
         verbose: false
 
     - name: eg
@@ -44,10 +44,10 @@ jobs:
       uses: actions/checkout@v4
     - name: build
       run: |
-        podman machine init --now
-        podman version
+        # podman machine init --now
+        # podman version
         which eg
-        eg compute baremetal release/darwin
+        eg compute baremetal --no-podman release/darwin
         # CGO_ENABLED=1 CGO_LDFLAGS="-L/opt/homebrew/lib" go -C console/retrovibedbind build -buildmode=c-shared --tags duckdb_use_lib -o ../build/nativelib/retrovibed.so ./...
         # pushd console && flutter build macos --release lib/main.dart && popd
         # tree build
