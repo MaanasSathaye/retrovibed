@@ -4,6 +4,7 @@ import 'package:media_kit/media_kit.dart'; // Provides [Player], [Media], [Playl
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import './playlist.dart' as internal;
+import './player.settings.dart';
 
 class VideoScreen extends StatefulWidget {
   final Widget child;
@@ -41,7 +42,7 @@ class _VideoState extends State<VideoScreen> {
   @override
   void initState() {
     super.initState();
-  
+
     _playing = widget.player.state.playing;
     sub0 = widget.player.stream.tracks.listen((state) {
       setState(() {});
@@ -141,6 +142,25 @@ class _VideoState extends State<VideoScreen> {
       ),
       SizedBox.square(dimension: themex.spacing),
       MaterialPositionIndicator(),
+      SizedBox.square(dimension: themex.spacing),
+      IconButton(
+        onPressed: () {
+          ds.modals
+              .of(context)
+              ?.push(
+                ds.Full(
+                  Center(
+                    child: SizedBox(
+                      width: 1024,
+                      child: PlayerSettings(current: widget.player),
+                    ),
+                  ),
+                ),
+              );
+        },
+        icon: Icon(Icons.tune),
+      ),
+      SizedBox.square(dimension: themex.spacing),
       MaterialFullscreenButton(),
     ];
 

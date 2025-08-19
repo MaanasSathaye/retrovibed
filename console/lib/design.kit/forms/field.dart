@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:retrovibed/designkit.dart' as ds;
+
 class Field extends StatelessWidget {
   final Widget? label;
   final Widget input;
@@ -16,11 +18,13 @@ class Field extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final defaults = ds.Defaults.of(context);
     return Container(
       margin: margin,
       child: ConstrainedBox(
         constraints: constraints,
         child: Row(
+          spacing: defaults.spacing ?? 0.0,
           children: [
             if (label != null) Expanded(child: label!),
             Expanded(child: input, flex: 9),

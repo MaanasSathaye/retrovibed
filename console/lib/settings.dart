@@ -7,6 +7,7 @@ import 'package:retrovibed/profiles.dart' as profiles;
 import 'package:retrovibed/billing.dart' as billing;
 import 'package:retrovibed/wireguard.dart' as wg;
 import 'package:retrovibed/storage.dart' as storage;
+
 class Display extends StatelessWidget {
   const Display({super.key});
 
@@ -36,7 +37,14 @@ class Display extends StatelessWidget {
             ),
           ),
           ds.Accordion(
-            description: Row(children: [Text("VPN - wireguard")]),
+            description: Row(
+              children: [
+                Text("VPN - wireguard"),
+                // requires we implement the protocol negotiation feature.
+                // Spacer(),
+                // Text("make your library reachable from anywhere"),
+              ],
+            ),
             content: Container(
               constraints: BoxConstraints(maxHeight: 512),
               child: wg.ListDisplay(),
@@ -53,17 +61,23 @@ class Display extends StatelessWidget {
             content: billing.Registered(billing.Settings()),
           ),
           ds.Accordion(
-            disabled: Text("manage local and archive storage usage - currently in private alpha"),
+            disabled: Text(
+              "manage local and archive storage usage - currently in private alpha",
+            ),
             description: Text("storage"),
             content: storage.Settings(),
           ),
           ds.Accordion(
-            disabled: Text("manage torrent settings - currently in private alpha"),
+            disabled: Text(
+              "manage torrent settings - currently in private alpha",
+            ),
             description: Row(children: [Text("torrents")]),
             content: Column(children: [torrents.SettingsLeech()]),
           ),
           ds.Accordion(
-            disabled: Text("manage permissions and access controls - currently in private alpha"),
+            disabled: Text(
+              "manage permissions and access controls - currently in private alpha",
+            ),
             description: Row(children: [Text("user management")]),
             content: Column(children: [torrents.SettingsLeech()]),
           ),
