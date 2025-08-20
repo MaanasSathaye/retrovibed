@@ -40,6 +40,14 @@ func CheckStatusCode(actual int, acceptable ...int) bool {
 	return false
 }
 
+func GetRedirect(r *http.Response) (string, bool) {
+	if !CheckStatusCode(r.StatusCode, http.StatusTemporaryRedirect, http.StatusPermanentRedirect) {
+		return "", false
+	}
+
+	return r.Header.Get("LOCATION"), true
+}
+
 // IsSuccess - returns true iff the response code was one of the following:
 // http.StatusOK, http.StatusAccepted, http.StatusCreated. Delegates to CheckStatusCode, http.StatusNoContent.
 func IsSuccess(actual int) bool {

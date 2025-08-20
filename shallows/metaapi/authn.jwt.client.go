@@ -71,3 +71,45 @@ func (t *jwttokensource) Token() (*oauth2.Token, error) {
 
 	return &oauth2.Token{AccessToken: authed.Profiles[0].Token}, err
 }
+
+func AuthzClient(oauth2c *http.Client) *http.Client {
+	cc := authn.HTTPClientDefaults()
+	return oauth2.NewClient(
+		context.WithValue(context.Background(), oauth2.HTTPClient, cc),
+		&metatokensource{
+			oauth2c:  oauth2c,
+			endpoint: fmt.Sprintf("https://%s", deeppool.Deeppool()),
+		},
+	)
+}
+
+type metatokensource struct {
+	oauth2c  *http.Client
+	endpoint string
+}
+
+func (t *metatokensource) Token() (*oauth2.Token, error) {
+	var (
+		authed AuthzResponse
+	)
+
+	ctx, done := context.WithTimeout(context.Background(), 3*time.Second)
+	defer done()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("%s/m/authz/", t.endpoint), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := httpx.AsError(t.oauth2c.Do(req))
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if err = json.NewDecoder(resp.Body).Decode(&authed); err != nil {
+		return nil, err
+	}
+
+	return &oauth2.Token{AccessToken: authed.Bearer}, err
+}

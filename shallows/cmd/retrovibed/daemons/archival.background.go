@@ -34,7 +34,7 @@ func AutoArchival(ctx context.Context, q sqlx.Queryer, mediastore fsx.Virtual, a
 
 	go library.PeriodicWakeup(ctx, async, s)
 	contextx.Run(ctx, func() {
-		errorsx.Log(library.NewAutoArchive(ctx, metaapi.JWTClient(c), mediastore, q, async, archive))
+		errorsx.Log(library.NewAutoArchive(ctx, metaapi.AuthzClient(metaapi.JWTClient(c)), mediastore, q, async, archive))
 	})
 
 	return nil

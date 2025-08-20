@@ -35,6 +35,13 @@ func DeeppoolEndpoint() oauth2.Endpoint {
 	return EndpointSSHAuth(fmt.Sprintf("https://%s", deeppool.Deeppool()))
 }
 
+func NoRedirectFn(req *http.Request, via []*http.Request) error {
+	if req.Method == "ENDPOINT" {
+		return http.ErrUseLastResponse
+	}
+	return nil
+}
+
 func HTTPClientDefaults() *http.Client {
 	return &http.Client{
 		Transport: &http.Transport{
@@ -44,8 +51,9 @@ func HTTPClientDefaults() *http.Client {
 			IdleConnTimeout:       90 * time.Second,
 			TLSHandshakeTimeout:   10 * time.Second,
 			ExpectContinueTimeout: 1 * time.Second,
-			TLSClientConfig:       &tls.Config{InsecureSkipVerify: true},
+			TLSClientConfig:       &tls.Config{ServerName: deeppool.Deeppool()},
 		},
+		CheckRedirect: NoRedirectFn,
 	}
 }
 

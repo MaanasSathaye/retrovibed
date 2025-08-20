@@ -10,6 +10,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 
+	"github.com/retrovibed/retrovibed/internal/langx"
 	"golang.org/x/time/rate"
 )
 
@@ -29,11 +30,21 @@ func DTORoundTripper(rt http.RoundTripper) DebugTransportOption {
 	}
 }
 
+func DTONoReqBody(dt *DebugTransport) {
+	dt.dumpreqbody = false
+}
+
+func DTONoRespBody(dt *DebugTransport) {
+	dt.dumprespbody = false
+}
+
 // NewDebugTransport builds a http.RoundTripper that prints the request
 // to the standard logger.
 func NewDebugTransport(options ...DebugTransportOption) DebugTransport {
 	t := DebugTransport{
-		delegate: http.DefaultTransport,
+		dumpreqbody:  true,
+		dumprespbody: true,
+		delegate:     http.DefaultTransport,
 	}
 
 	for _, opt := range options {
@@ -45,7 +56,9 @@ func NewDebugTransport(options ...DebugTransportOption) DebugTransport {
 
 // DebugTransport - prints the request and response of an http request.
 type DebugTransport struct {
-	delegate http.RoundTripper
+	dumpreqbody  bool
+	dumprespbody bool
+	delegate     http.RoundTripper
 }
 
 // RoundTrip - implements http.RoundTripper
@@ -56,7 +69,7 @@ func (t DebugTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 		resp *http.Response
 	)
 
-	if raw, err = httputil.DumpRequest(req, true); err == nil {
+	if raw, err = httputil.DumpRequest(req, t.dumpreqbody); err == nil {
 		log.Println("RAW REQUEST")
 		log.Println("Scheme:", req.URL.Scheme)
 		log.Println(string(raw))
@@ -65,7 +78,7 @@ func (t DebugTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	resp, err = t.delegate.RoundTrip(req)
 
 	if resp != nil && resp.Body != nil {
-		if raw, err = httputil.DumpResponse(resp, true); err != nil {
+		if raw, err = httputil.DumpResponse(resp, t.dumprespbody); err != nil {
 			return resp, err
 		}
 		log.Println("RAW RESPONSE")
@@ -76,8 +89,8 @@ func (t DebugTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 }
 
 // DebugClient wraps the client's transport with in a debugger.
-func DebugClient(c *http.Client) *http.Client {
-	c.Transport = NewDebugTransport(DTORoundTripper(c.Transport))
+func DebugClient(c *http.Client, options ...DebugTransportOption) *http.Client {
+	c.Transport = NewDebugTransport(DTORoundTripper(c.Transport), langx.Compose(options...))
 	return c
 }
 

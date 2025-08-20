@@ -117,18 +117,21 @@ func (x *Bearer) GetNotBefore() int64 {
 type Token struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// START OF STANDARD FIELDS
-	Id             string `protobuf:"bytes,1,opt,name=id,json=jti,proto3" json:"id,omitempty"`
-	Issuer         string `protobuf:"bytes,2,opt,name=issuer,json=iss,proto3" json:"issuer,omitempty"`
-	ProfileId      string `protobuf:"bytes,3,opt,name=profile_id,json=sub,proto3" json:"profile_id,omitempty"`
-	SessionId      string `protobuf:"bytes,4,opt,name=session_id,json=sid,proto3" json:"session_id,omitempty"`
-	Issued         int64  `protobuf:"varint,5,opt,name=issued,json=iat,proto3" json:"issued,omitempty"`
-	Expires        int64  `protobuf:"varint,6,opt,name=expires,json=exp,proto3" json:"expires,omitempty"`
-	NotBefore      int64  `protobuf:"varint,7,opt,name=not_before,json=nbf,proto3" json:"not_before,omitempty"`
-	Usermanagement bool   `protobuf:"varint,1000,opt,name=usermanagement,proto3" json:"usermanagement,omitempty"`
-	BillingRead    bool   `protobuf:"varint,1002,opt,name=billing_read,proto3" json:"billing_read,omitempty"`
-	BillingModify  bool   `protobuf:"varint,1003,opt,name=billing_modify,proto3" json:"billing_modify,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	Id              string `protobuf:"bytes,1,opt,name=id,json=jti,proto3" json:"id,omitempty"`
+	Issuer          string `protobuf:"bytes,2,opt,name=issuer,json=iss,proto3" json:"issuer,omitempty"`
+	ProfileId       string `protobuf:"bytes,3,opt,name=profile_id,json=sub,proto3" json:"profile_id,omitempty"`
+	SessionId       string `protobuf:"bytes,4,opt,name=session_id,json=sid,proto3" json:"session_id,omitempty"`
+	Issued          int64  `protobuf:"varint,5,opt,name=issued,json=iat,proto3" json:"issued,omitempty"`
+	Expires         int64  `protobuf:"varint,6,opt,name=expires,json=exp,proto3" json:"expires,omitempty"`
+	NotBefore       int64  `protobuf:"varint,7,opt,name=not_before,json=nbf,proto3" json:"not_before,omitempty"`
+	Usermanagement  bool   `protobuf:"varint,1000,opt,name=usermanagement,proto3" json:"usermanagement,omitempty"`
+	BillingRead     bool   `protobuf:"varint,1002,opt,name=billing_read,proto3" json:"billing_read,omitempty"`
+	BillingModify   bool   `protobuf:"varint,1003,opt,name=billing_modify,proto3" json:"billing_modify,omitempty"`
+	CommunityModify bool   `protobuf:"varint,1004,opt,name=community_modify,proto3" json:"community_modify,omitempty"`
+	ArchiveUpload   uint64 `protobuf:"varint,1005,opt,name=archive_upload,proto3" json:"archive_upload,omitempty"`
+	ArchiveDownload uint64 `protobuf:"varint,1006,opt,name=archive_download,proto3" json:"archive_download,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *Token) Reset() {
@@ -229,6 +232,27 @@ func (x *Token) GetBillingModify() bool {
 		return x.BillingModify
 	}
 	return false
+}
+
+func (x *Token) GetCommunityModify() bool {
+	if x != nil {
+		return x.CommunityModify
+	}
+	return false
+}
+
+func (x *Token) GetArchiveUpload() uint64 {
+	if x != nil {
+		return x.ArchiveUpload
+	}
+	return 0
+}
+
+func (x *Token) GetArchiveDownload() uint64 {
+	if x != nil {
+		return x.ArchiveDownload
+	}
+	return 0
 }
 
 type AuthzRequest struct {
@@ -598,7 +622,7 @@ const file_meta_authz_proto_rawDesc = "" +
 	"\x06issued\x18\x05 \x01(\x03R\x03iat\x12\x14\n" +
 	"\aexpires\x18\x06 \x01(\x03R\x03exp\x12\x17\n" +
 	"\n" +
-	"not_before\x18\a \x01(\x03R\x03nbf\"\xa1\x02\n" +
+	"not_before\x18\a \x01(\x03R\x03nbf\"\xa4\x03\n" +
 	"\x05Token\x12\x0f\n" +
 	"\x02id\x18\x01 \x01(\tR\x03jti\x12\x13\n" +
 	"\x06issuer\x18\x02 \x01(\tR\x03iss\x12\x17\n" +
@@ -612,7 +636,10 @@ const file_meta_authz_proto_rawDesc = "" +
 	"not_before\x18\a \x01(\x03R\x03nbf\x12'\n" +
 	"\x0eusermanagement\x18\xe8\a \x01(\bR\x0eusermanagement\x12#\n" +
 	"\fbilling_read\x18\xea\a \x01(\bR\fbilling_read\x12'\n" +
-	"\x0ebilling_modify\x18\xeb\a \x01(\bR\x0ebilling_modifyJ\x05\b\t\x10\xe8\a\"\x0e\n" +
+	"\x0ebilling_modify\x18\xeb\a \x01(\bR\x0ebilling_modify\x12+\n" +
+	"\x10community_modify\x18\xec\a \x01(\bR\x10community_modify\x12'\n" +
+	"\x0earchive_upload\x18\xed\a \x01(\x04R\x0earchive_upload\x12+\n" +
+	"\x10archive_download\x18\xee\a \x01(\x04R\x10archive_downloadJ\x05\b\t\x10\xe8\a\"\x0e\n" +
 	"\fAuthzRequest\"J\n" +
 	"\rAuthzResponse\x12\x16\n" +
 	"\x06bearer\x18\x01 \x01(\tR\x06bearer\x12!\n" +

@@ -57,7 +57,7 @@ List<String> ips() {
 }
 
 void daemon() {
-  String args = jsonEncode(["daemon", "--no-mdns"]);
+  String args = jsonEncode(["daemon", "--no-mdns", "--auto-archive"]);
   bridge.egdaemon(args.toNativeUtf8().cast<Char>());
 }
 

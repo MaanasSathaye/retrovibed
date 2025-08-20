@@ -28,6 +28,23 @@ func (t Archiver) Upload(ctx context.Context, mimetype string, r io.Reader) (m *
 	var (
 		mur MediaUploadResponse
 	)
+
+	dst := fmt.Sprintf("https://%s/m/", t.endpoint)
+	redirectreq, err := http.NewRequestWithContext(ctx, "ENDPOINT", dst, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := httpx.AsError(t.c.Do(redirectreq))
+	if err != nil {
+		return nil, err
+	}
+	httpx.TryClose(resp)
+
+	if uri, ok := httpx.GetRedirect(resp); ok {
+		dst = uri
+	}
+
 	contenttype, data, err := httpx.Multipart(func(w *multipart.Writer) error {
 		part, lerr := w.CreatePart(httpx.NewMultipartHeader(mimetype, "content", "bin"))
 		if lerr != nil {
@@ -45,7 +62,7 @@ func (t Archiver) Upload(ctx context.Context, mimetype string, r io.Reader) (m *
 	}
 	defer data.Close()
 
-	resp, err := httpx.AsError(t.c.Post(fmt.Sprintf("https://%s/m/", t.endpoint), contenttype, data))
+	resp, err = httpx.AsError(t.c.Post(dst, contenttype, data))
 	if err != nil {
 		return nil, err
 	}

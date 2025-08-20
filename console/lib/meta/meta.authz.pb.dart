@@ -156,6 +156,9 @@ class Token extends $pb.GeneratedMessage {
     $core.bool? usermanagement,
     $core.bool? billingRead,
     $core.bool? billingModify,
+    $core.bool? communityModify,
+    $fixnum.Int64? archiveUpload,
+    $fixnum.Int64? archiveDownload,
   }) {
     final result = create();
     if (id != null) result.id = id;
@@ -168,6 +171,9 @@ class Token extends $pb.GeneratedMessage {
     if (usermanagement != null) result.usermanagement = usermanagement;
     if (billingRead != null) result.billingRead = billingRead;
     if (billingModify != null) result.billingModify = billingModify;
+    if (communityModify != null) result.communityModify = communityModify;
+    if (archiveUpload != null) result.archiveUpload = archiveUpload;
+    if (archiveDownload != null) result.archiveDownload = archiveDownload;
     return result;
   }
 
@@ -194,6 +200,13 @@ class Token extends $pb.GeneratedMessage {
     ..aOB(1000, _omitFieldNames ? '' : 'usermanagement')
     ..aOB(1002, _omitFieldNames ? '' : 'billing_read')
     ..aOB(1003, _omitFieldNames ? '' : 'billing_modify')
+    ..aOB(1004, _omitFieldNames ? '' : 'community_modify')
+    ..a<$fixnum.Int64>(
+        1005, _omitFieldNames ? '' : 'archive_upload', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(
+        1006, _omitFieldNames ? '' : 'archive_download', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -305,6 +318,33 @@ class Token extends $pb.GeneratedMessage {
   $core.bool hasBillingModify() => $_has(9);
   @$pb.TagNumber(1003)
   void clearBillingModify() => $_clearField(1003);
+
+  @$pb.TagNumber(1004)
+  $core.bool get communityModify => $_getBF(10);
+  @$pb.TagNumber(1004)
+  set communityModify($core.bool value) => $_setBool(10, value);
+  @$pb.TagNumber(1004)
+  $core.bool hasCommunityModify() => $_has(10);
+  @$pb.TagNumber(1004)
+  void clearCommunityModify() => $_clearField(1004);
+
+  @$pb.TagNumber(1005)
+  $fixnum.Int64 get archiveUpload => $_getI64(11);
+  @$pb.TagNumber(1005)
+  set archiveUpload($fixnum.Int64 value) => $_setInt64(11, value);
+  @$pb.TagNumber(1005)
+  $core.bool hasArchiveUpload() => $_has(11);
+  @$pb.TagNumber(1005)
+  void clearArchiveUpload() => $_clearField(1005);
+
+  @$pb.TagNumber(1006)
+  $fixnum.Int64 get archiveDownload => $_getI64(12);
+  @$pb.TagNumber(1006)
+  set archiveDownload($fixnum.Int64 value) => $_setInt64(12, value);
+  @$pb.TagNumber(1006)
+  $core.bool hasArchiveDownload() => $_has(12);
+  @$pb.TagNumber(1006)
+  void clearArchiveDownload() => $_clearField(1006);
 }
 
 class AuthzRequest extends $pb.GeneratedMessage {

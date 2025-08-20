@@ -28,6 +28,9 @@ message Token {
   bool usermanagement = 1000 [ json_name = "usermanagement" ];
   bool billing_read = 1002 [ json_name = "billing_read" ];
   bool billing_modify = 1003 [ json_name = "billing_modify" ];
+  bool community_modify = 1004 [ json_name = "community_modify" ];
+  uint64 archive_upload = 1005 [ json_name = "archive_upload" ];
+  uint64 archive_download = 1006 [ json_name = "archive_download" ];
 }
 
 message AuthzRequest {}
