@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/media.dart' as media;
+import './metadata.typography.dart' as typography;
 
 class MediaEdit extends StatelessWidget {
   final media.Media current;
@@ -30,6 +31,14 @@ class MediaEdit extends StatelessWidget {
               onChanged:
                   (v) => onChange(Future.value(current..description = v)),
             ),
+          ),
+          forms.Field(
+            label: Text("sharing"),
+            input: typography.sharing(current.torrentId),
+          ),
+          forms.Field(
+            label: Text("archived"),
+            input: typography.archived(current.archiveId),
           ),
         ],
       ),
