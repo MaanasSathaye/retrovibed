@@ -13,12 +13,13 @@ to and donate your storage towards enabling distribution and resist censorship, 
 
 #### features
 see the [site](https://retrovibe.space) for more details
-- [x] a builtin userspace wireguard vpn. bring any wireguard vpn provider. anonymize your sharing without any complicated or system wide changes.
-- [x] builtin media player, watch your personal music,video,images anywhere.
+- [x] a builtin userspace wireguard vpn. bring any wireguard vpn provider. allowing you to access your library from anywhere.
+- [x] builtin media player, watch your personal music, video, images.
 - [x] builtin bittorrent, share your personal media with whoever you want.
 - [x] rss feeds for subscribing to content.
 - [x] build a community to reduce costs for sharable content.
 - [x] integrated at cost archival service available that encrypts and offloads data from your devices.
+- [x] monetarily support your favorite artists and communities by archiving their content.
 
 #### community sharing
 
