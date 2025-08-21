@@ -258,14 +258,17 @@ func TuneVerifyAsync(t *torrent) {
 // but since there will also be a smaller amount of data on disk this is a fair trade off.
 func TuneVerifySample(n uint64) Tuner {
 	return func(t *torrent) {
-		t.digests.EnqueueBitmap(bitmapx.Random(t.chunks.pieces, min(n, t.chunks.pieces)))
-		t.digests.Enqueue(0)
-		t.digests.Enqueue(min(t.chunks.pieces-1, t.chunks.pieces)) // min to handle 0 case which causes a uint wrap around.
+		cp := t.chunks.pieces
+		m := bitmapx.Random(cp, min(n, cp))
+		m.Add(0)
+		m.AddInt(int(min(cp-1, cp))) // min to handle 0 case which causes a uint wrap around.
+		log.Println("verify sample", n, "->", 0, cp, min(cp-1, cp), m.ToArray())
+		t.digests.EnqueueBitmap(m)
 		t.digests.Wait()
 
 		// if everything validated assume the torrent is good and mark it as fully complete.
 		if t.chunks.failed.IsEmpty() {
-			t.chunks.fill(t.chunks.completed, t.chunks.pieces)
+			t.chunks.fill(t.chunks.completed, cp)
 			t.chunks.zero(t.chunks.unverified)
 			t.chunks.zero(t.chunks.missing)
 			return
@@ -665,7 +668,14 @@ func (t *torrent) setChunkSize(size uint64) {
 	t.md.ChunkSize = size
 	// potential bug here use to be '*t.chunks = *newChunks(...)' change to straight assignment to deal with
 	// Unlock called on a non-locked mutex.
-	*t.chunks = *newChunks(size, langx.DefaultIfZero(metainfo.NewInfo(), t.info), chunkoptMutex(t.chunks.mu), chunkoptCond(t.chunks.cond), chunkoptCompleted(t.chunks.completed))
+	log.Println("DERP DERP X", t.chunks.completed.GetCardinality())
+	t.chunks = newChunks(
+		size,
+		langx.DefaultIfZero(metainfo.NewInfo(), t.info),
+		chunkoptMutex(t.chunks.mu),
+		chunkoptCond(t.chunks.cond),
+		chunkoptCompleted(t.chunks.completed),
+	)
 }
 
 // There's a connection to that address already.

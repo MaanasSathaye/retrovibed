@@ -325,6 +325,7 @@ func (t *chunks) MergeInto(d, m *roaring.Bitmap) {
 func (t *chunks) Locked(fn func()) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
+	log.Printf("DERP 0 %p\n", t.mu)
 	fn()
 }
 
@@ -746,10 +747,12 @@ func (t *chunks) Complete(pid uint64) (changed bool) {
 		tmp := func() (r bool) {
 			defer func() {
 				if err := recover(); err != nil {
-					log.Println("FAILED TO REMOVE", cidx, t.unverified.GetCardinality(), t.missing.GetCardinality(), t.cmaximum)
+					log.Printf("DERP 1 %p\n", t.mu)
+					log.Println("FAILED TO REMOVE", cidx, t.unverified.GetCardinality(), t.missing.GetCardinality(), t.cmaximum, err)
 					r = r || true
 				}
 			}()
+			// log.Println("DERP", cidx)
 			tmp := t.missing.CheckedRemove(uint32(cidx))
 			tmp = t.unverified.CheckedRemove(uint32(cidx)) || tmp
 			return tmp
