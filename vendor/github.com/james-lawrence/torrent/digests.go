@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+	"log"
 	"runtime"
 	"sync"
 	"sync/atomic"
@@ -22,8 +23,8 @@ func newDigestsFromTorrent(t *torrent) digests {
 		t.piece,
 		func(idx int, cause error) func() {
 			// log.Printf("hashed %d - %v\n", idx, cause)
-			// log.Printf("hashed %p %d / %d - %v", t.chunks, idx+1, t.numPieces(), cause)
-			t.chunks.Hashed(uint64(idx), cause)
+			log.Printf("hashed %s %p %d / %d - %T %v", t.md.ID, t.chunks, idx, t.chunks.pieces, cause, cause)
+			t.chunks.Hashed(t.md.ID.String(), uint64(idx), errorsx.Wrap(cause, t.md.ID.String()))
 
 			t.event.Broadcast()
 			t.cln.event.Broadcast() // cause the client to detect completed torrents.
@@ -116,7 +117,7 @@ func (t *digests) check(idx int) {
 	)
 
 	if p = t.retrieve(idx); p == nil {
-		t.complete(idx, fmt.Errorf("piece %d not found during digest", idx))
+		t.complete(idx, fmt.Errorf("%s piece %d not found during digest", idx))
 		return
 	}
 

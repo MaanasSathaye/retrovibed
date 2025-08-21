@@ -262,7 +262,7 @@ func TuneVerifySample(n uint64) Tuner {
 		m := bitmapx.Random(cp, min(n, cp))
 		m.Add(0)
 		m.AddInt(int(min(cp-1, cp))) // min to handle 0 case which causes a uint wrap around.
-		log.Println("verify sample", t.md.ID, n, "->", 0, cp, min(cp-1, cp), m.ToArray())
+		log.Println("verify sample", t.md.ID, fmt.Sprintf("%p", t.chunks), n, "->", 0, cp, min(cp-1, cp), m.ToArray())
 		t.digests.EnqueueBitmap(m)
 		t.digests.Wait()
 
@@ -373,7 +373,8 @@ func VerifyStored(ctx context.Context, md *metainfo.MetaInfo, t io.ReaderAt) (mi
 	digests := newDigests(t, func(i int) *metainfo.Piece {
 		return langx.Autoptr(info.Piece(i))
 	}, func(idx int, cause error) func() {
-		chunks.Hashed(uint64(idx), cause)
+		log.Println("WAAAAAAT 1")
+		chunks.Hashed(md.ID().String(), uint64(idx), cause)
 		return func() {}
 	})
 
@@ -668,7 +669,6 @@ func (t *torrent) setChunkSize(size uint64) {
 	t.md.ChunkSize = size
 	// potential bug here use to be '*t.chunks = *newChunks(...)' change to straight assignment to deal with
 	// Unlock called on a non-locked mutex.
-	log.Println("DERP DERP X", t.chunks.completed.GetCardinality())
 	t.chunks = newChunks(
 		size,
 		langx.DefaultIfZero(metainfo.NewInfo(), t.info),

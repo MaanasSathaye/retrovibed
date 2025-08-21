@@ -325,7 +325,6 @@ func (t *chunks) MergeInto(d, m *roaring.Bitmap) {
 func (t *chunks) Locked(fn func()) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
-	log.Printf("DERP 0 %p\n", t.mu)
 	fn()
 }
 
@@ -717,12 +716,13 @@ func (t *chunks) Validate(pid uint64) {
 	t.unverified.AddRange(t.Range(pid))
 }
 
-func (t *chunks) Hashed(pid uint64, cause error) {
+func (t *chunks) Hashed(id string, pid uint64, cause error) {
 	if t == nil {
 		panic("chunks should never be nil for hashed function call")
 	}
 
 	if cause == nil {
+		defer log.Println("SIGH", id, pid)
 		t.Complete(pid)
 		return
 	}
@@ -740,24 +740,14 @@ func (t *chunks) Complete(pid uint64) (changed bool) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
-	for _, r := range t.chunksRequests(pid) {
-		cidx := t.requestCID(r)
-		delete(t.outstanding, r.Digest)
+	b := bitmapx.Range(t.Range(pid))
+	changed = t.missing.Intersects(b) || t.unverified.Intersects(b)
 
-		tmp := func() (r bool) {
-			defer func() {
-				if err := recover(); err != nil {
-					log.Printf("DERP 1 %p\n", t.mu)
-					log.Println("FAILED TO REMOVE", cidx, t.unverified.GetCardinality(), t.missing.GetCardinality(), t.cmaximum, err)
-					r = r || true
-				}
-			}()
-			// log.Println("DERP", cidx)
-			tmp := t.missing.CheckedRemove(uint32(cidx))
-			tmp = t.unverified.CheckedRemove(uint32(cidx)) || tmp
-			return tmp
-		}()
-		changed = changed || tmp
+	t.missing.AndNot(b)
+	t.unverified.AndNot(b)
+
+	for _, r := range t.chunksRequests(pid) {
+		delete(t.outstanding, r.Digest)
 	}
 
 	t.completed.AddInt(int(pid))
