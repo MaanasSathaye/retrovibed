@@ -432,7 +432,7 @@ func (t _connwriterRequests) determineInterest(msg messageWriter) *roaring.Bitma
 		return t.requestable
 	}
 
-	if t.connection.t.chunks.missing.GetCardinality() == 0 && t.connection.t.chunks.Cardinality(t.connection.t.chunks.unverified) > 0 {
+	if t.connection.t.chunks.missing.GetCardinality() == 0 && t.connection.t.chunks.unverified.GetCardinality() > 0 {
 		t.connection.t.digests.EnqueueBitmap(bitmapx.Fill(t.connection.t.chunks.pieces))
 	}
 

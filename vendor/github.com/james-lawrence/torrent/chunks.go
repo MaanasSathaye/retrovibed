@@ -2,7 +2,6 @@ package torrent
 
 import (
 	"fmt"
-	"log"
 	"math"
 	"sync"
 	"sync/atomic"
@@ -716,13 +715,12 @@ func (t *chunks) Validate(pid uint64) {
 	t.unverified.AddRange(t.Range(pid))
 }
 
-func (t *chunks) Hashed(id string, pid uint64, cause error) {
+func (t *chunks) Hashed(pid uint64, cause error) {
 	if t == nil {
 		panic("chunks should never be nil for hashed function call")
 	}
 
 	if cause == nil {
-		defer log.Println("SIGH", id, pid)
 		t.Complete(pid)
 		return
 	}
@@ -740,14 +738,13 @@ func (t *chunks) Complete(pid uint64) (changed bool) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
-	b := bitmapx.Range(t.Range(pid))
-	changed = t.missing.Intersects(b) || t.unverified.Intersects(b)
-
-	t.missing.AndNot(b)
-	t.unverified.AndNot(b)
-
 	for _, r := range t.chunksRequests(pid) {
+		cidx := t.requestCID(r)
 		delete(t.outstanding, r.Digest)
+
+		tmp := t.missing.CheckedRemove(uint32(cidx))
+		tmp = t.unverified.CheckedRemove(uint32(cidx)) || tmp
+		changed = changed || tmp
 	}
 
 	t.completed.AddInt(int(pid))
