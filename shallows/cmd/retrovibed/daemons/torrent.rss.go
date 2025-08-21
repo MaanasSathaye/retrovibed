@@ -214,7 +214,7 @@ func DiscoverFromRSSFeedsOnce(ctx context.Context, q sqlx.Queryer, rootstore fsx
 
 			if feed.Autodownload {
 				// log.Println("marking torrent to be automatically downloaded", meta.Description, feed.Autodownload)
-				if err = tracking.MetadataDownloadByID(ctx, q, meta.ID).Scan(&meta); err != nil {
+				if err = tracking.MetadataAutoDownloadByID(ctx, q, meta.ID).Scan(&meta); err != nil {
 					return errorsx.Wrapf(err, "unable to mark torrent for automatic download: %s", feed.ID)
 				}
 			}
@@ -265,7 +265,7 @@ func DiscoverFromRSSFeedsOnce(ctx context.Context, q sqlx.Queryer, rootstore fsx
 
 			if feed.Autodownload {
 				// log.Println("marking torrent to be automatically downloaded", meta.Description, feed.Autodownload)
-				if err = tracking.MetadataDownloadByID(ctx, q, meta.ID).Scan(&meta); err != nil {
+				if err = tracking.MetadataAutoDownloadByID(ctx, q, meta.ID).Scan(&meta); err != nil {
 					return errorsx.Wrapf(err, "unable to mark torrent for automatic download: %s", feed.ID)
 				}
 			}

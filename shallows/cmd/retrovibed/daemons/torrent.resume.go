@@ -198,6 +198,7 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, 
 
 		query := tracking.MetadataSearchBuilder().Where(
 			squirrel.And{
+				tracking.MetadataQueryNotPaused(),
 				tracking.MetadataQuerySeeding(),
 				tracking.MetadataQueryNeedsAnnounce(),
 			},
@@ -226,6 +227,7 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, 
 
 			query, args, err := tracking.MetadataSearchBuilder().RemoveColumns().Columns("next_announce_at").Where(
 				squirrel.And{
+					tracking.MetadataQueryNotPaused(),
 					tracking.MetadataQuerySeeding(),
 					tracking.MetadataQueryAnnounceable(),
 				},

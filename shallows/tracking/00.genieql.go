@@ -64,6 +64,13 @@ func MetadataDownloadByID(
 	gql = gql.Query(`UPDATE torrents_metadata SET paused_at = 'infinity', initiated_at = NOW() WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
 }
 
+func MetadataAutoDownloadByID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewMetadataScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE torrents_metadata SET initiated_at = NOW() WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
+}
+
 func MetadataProgressByID(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, id string, peers uint16, downloaded uint64) NewMetadataScannerStaticRow,
