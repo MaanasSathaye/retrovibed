@@ -1,6 +1,7 @@
 package sqlx
 
 import (
+	"database/sql"
 	"iter"
 
 	"github.com/retrovibed/retrovibed/internal/errorsx"
@@ -53,6 +54,16 @@ func Scan[T any](s scanner[T]) Iter[T] {
 	return &scanningiter[T]{
 		s: s,
 	}
+}
+
+func ScanOne[T any](s scanner[T]) (_zero T, _ error) {
+	i := Scan(s)
+
+	for v := range i.Iter() {
+		return v, i.Err()
+	}
+
+	return _zero, errorsx.Compact(i.Err(), sql.ErrNoRows)
 }
 
 // ScanInto a slice, automatically closes the scanner once done.

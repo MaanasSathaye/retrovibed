@@ -22,6 +22,10 @@ func Between(c string, a, b interface{}) squirrel.Sqlizer {
 
 // In predicate.
 func In[T any](expr string, values ...T) squirrel.Sqlizer {
+	if len(values) == 0 {
+		return Noop{}
+	}
+
 	r := make([]interface{}, 0, len(values))
 	for _, v := range values {
 		r = append(r, v)

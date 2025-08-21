@@ -64,6 +64,27 @@ abstract class media {
         });
   }
 
+  static Future<MediaFindResponse> random(
+    MediaSearchRequest req, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
+        .get(
+          Uri.https(
+            httpx.host(),
+            "/m/random",
+            jsonDecode(jsonEncode(req.toProto3Json())),
+          ),
+          options: options,
+        )
+        .then((v) {
+          return Future.value(
+            MediaFindResponse.create()
+              ..mergeFromProto3Json(jsonDecode(v.body)),
+          );
+        });
+  }
+
   static Future<http.StreamedResponse> download(String id, {
     List<httpx.Option> options = const [],
   }) async {

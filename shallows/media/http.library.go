@@ -3,6 +3,7 @@ package media
 import (
 	"context"
 	"crypto/md5"
+	"database/sql"
 	"encoding/json"
 	"io"
 	"log"
@@ -14,6 +15,7 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/go-playground/form/v4"
+	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/httpauth"
@@ -31,7 +33,6 @@ import (
 	"github.com/retrovibed/retrovibed/internal/md5x"
 	"github.com/retrovibed/retrovibed/internal/numericx"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
-	"github.com/retrovibed/retrovibed/internal/sqlxx"
 	"github.com/retrovibed/retrovibed/internal/stringsx"
 	"github.com/retrovibed/retrovibed/library"
 )
@@ -82,6 +83,13 @@ func (t *HTTPLibrary) Bind(r *mux.Router) {
 		httpauth.AuthenticateWithToken(t.jwtsecret),
 		httpx.TimeoutRollingRead(3*time.Second),
 	).ThenFunc(t.upload))
+
+	r.Path("/random").Methods(http.MethodGet).Handler(alice.New(
+		httpx.ContextBufferPool512(),
+		httpx.ParseForm,
+		httpauth.AuthenticateWithToken(t.jwtsecret),
+		httpx.Timeout2s(),
+	).ThenFunc(t.random))
 
 	r.Path("/{id}/metadatasync").Methods(http.MethodPost).Handler(alice.New(
 		httpx.ContextBufferPool512(),
@@ -258,6 +266,58 @@ func (t *HTTPLibrary) upload(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (t *HTTPLibrary) random(w http.ResponseWriter, r *http.Request) {
+	var (
+		err error
+		req MediaSearchRequest = MediaSearchRequest{
+			Limit: 1,
+		}
+		result MediaFindResponse
+	)
+
+	if err = t.decoder.Decode(&req, r.Form); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to decode request"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
+	req.Limit = numericx.Min(req.Limit, 1)
+
+	perform := func(id string) (library.Metadata, error) {
+		q := library.MetadataSearchBuilder().Where(squirrel.And{
+			library.MetadataQueryVisible(),
+			library.MetadataQueryMimetypes(req.Mimetypes...),
+		}).Limit(req.Limit)
+
+		if tmp, err := sqlx.ScanOne(library.MetadataSearch(r.Context(), t.q, q.Where(library.MetadataQueryRandomAfter(id)))); err == nil {
+			return tmp, nil
+		}
+
+		return sqlx.ScanOne(library.MetadataSearch(r.Context(), t.q, q.Where(library.MetadataQueryRandomBefore(id))))
+	}
+
+	tmp, err := perform(uuid.Must(uuid.NewV4()).String())
+	if errorsx.Is(err, sql.ErrNoRows) {
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+		return
+	} else if err != nil {
+		log.Println(errorsx.Wrap(err, "retrieval failure"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	result.Media = langx.Autoptr(
+		langx.Clone(
+			Media{},
+			MediaOptionFromLibraryMetadata(langx.Clone(tmp, library.MetadataOptionJSONSafeEncode)),
+		),
+	)
+
+	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &result); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to write response"))
+		return
+	}
+}
+
 func (t *HTTPLibrary) search(w http.ResponseWriter, r *http.Request) {
 	var (
 		err error
@@ -282,16 +342,17 @@ func (t *HTTPLibrary) search(w http.ResponseWriter, r *http.Request) {
 
 	q := library.MetadataSearchBuilder().Where(squirrel.And{
 		library.MetadataQueryVisible(),
+		library.MetadataQueryMimetypes(msg.Next.Mimetypes...),
 		lucenex.Query(t.fts, msg.Next.Query, lucenex.WithDefaultField("auto_description")),
 	}).OrderBy(ordering).Offset(msg.Next.Offset * msg.Next.Limit).Limit(msg.Next.Limit)
 
-	err = sqlxx.ScanEach(library.MetadataSearch(r.Context(), t.q, q), func(p *library.Metadata) error {
-		tmp := langx.Clone(Media{}, MediaOptionFromLibraryMetadata(langx.Clone(*p, library.MetadataOptionJSONSafeEncode)))
+	qi := sqlx.Scan(library.MetadataSearch(r.Context(), t.q, q))
+	for v := range qi.Iter() {
+		tmp := langx.Clone(Media{}, MediaOptionFromLibraryMetadata(langx.Clone(v, library.MetadataOptionJSONSafeEncode)))
 		msg.Items = append(msg.Items, &tmp)
-		return nil
-	})
+	}
 
-	if err != nil {
+	if err = qi.Err(); err != nil {
 		log.Println(errorsx.Wrap(err, "encoding failed"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return

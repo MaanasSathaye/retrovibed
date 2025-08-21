@@ -2,12 +2,14 @@ package library
 
 import (
 	"context"
+	"errors"
 	"io"
 	"io/fs"
 	"log"
 	"math/rand/v2"
 	"net/http"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
@@ -60,9 +62,10 @@ func (t *TorrentCacheStorage) Close() error {
 type fallback struct {
 	dl downloader
 	storage.TorrentImpl
-	id metainfo.Hash
-	q  sqlx.Queryer
-	m  *sync.Mutex
+	id           metainfo.Hash
+	q            sqlx.Queryer
+	m            *sync.Mutex
+	cacheblocked atomic.Bool
 }
 
 func (t *fallback) downloadChunk(prng *rand.ChaCha8, id string, offset uint64, length uint64) error {
@@ -100,6 +103,10 @@ func (t *fallback) ReadAt(p []byte, off int64) (n int, err error) {
 		return n, err
 	}
 
+	if t.cacheblocked.Load() {
+		return n, errorsx.NewUnrecoverable(errorsx.String("cache layer blocked due to previous error"))
+	}
+
 	ctx, done := context.WithTimeout(context.Background(), 3*time.Second)
 	defer done()
 	q := sqlx.Scan(MetadataForTorrentArchiveRetrieval(ctx, t.q, t.id.Bytes(), uint64(off), uint64(len(p))))
@@ -115,8 +122,17 @@ func (t *fallback) ReadAt(p []byte, off int64) (n int, err error) {
 
 		prng := cryptox.NewChaCha8(uuidx.FirstNonNil(uuid.FromStringOrNil(v.EncryptionSeed), uuid.FromStringOrNil(v.ID)).Bytes())
 		if cerr := t.downloadChunk(prng, v.ArchiveID, v.DiskOffset, v.Bytes); cerr != nil {
+			var (
+				unrecoverable errorsx.Unrecoverable
+			)
+
+			if errors.As(cerr, &unrecoverable) {
+				// TODO update database to prevent attempts in the future
+				t.cacheblocked.Store(true)
+			}
+
 			log.Println("failed to download from archive", cerr)
-			return
+			return n, cerr
 		}
 	}
 

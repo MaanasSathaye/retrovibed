@@ -21,20 +21,30 @@ mediakit.Media PlayableMedia(Media current) {
   );
 }
 
-Stream<mediakit.Media> range(MediaSearchResponse i, Media pos) async* {
+Stream<mediakit.Media> range(BuildContext context, MediaSearchResponse i, Media pos) async* {
   final initial = i.items.sublist(
     max(i.items.indexWhere((m) => m.id == pos.id), 0),
   );
+
   for (var m in initial) {
     yield await PlayableMedia(m);
   }
 
   while (i.items.length == i.next.limit.toInt()) {
-    i = await api.media.get(i.next);
+    i = await api.media.get(i.next, options: []);
     for (var m in i.items) {
       yield await PlayableMedia(m);
     }
     i.next..offset += 1;
+  }
+
+  // at this point we've run out of content from the provided search.
+  // lets play random content. using things like the mimetypes from
+  // from the initial request. we'll eventually add in more coherent
+  // results to keep a trend going.
+  while (true) {
+    final v = await api.media.random(i.next,options: [authn.Authenticated.devicebearer(context)]);
+    yield await PlayableMedia(v.media);
   }
 }
 
@@ -50,7 +60,7 @@ Future<void> Function()? PlayAction(
       return playlist == null
           ? null
           : () {
-            return Future.sync(() => playlist.setPlaylist(range(s, current)));
+            return Future.sync(() => playlist.setPlaylist(range(context, s, current)));
           };
     default:
       return null;

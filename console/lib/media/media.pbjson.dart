@@ -80,6 +80,19 @@ final $typed_data.Uint8List mediaSearchResponseDescriptor = $convert.base64Decod
     'ChNNZWRpYVNlYXJjaFJlc3BvbnNlEi0KBG5leHQYASABKAsyGS5tZWRpYS5NZWRpYVNlYXJjaF'
     'JlcXVlc3RSBG5leHQSIgoFaXRlbXMYAiADKAsyDC5tZWRpYS5NZWRpYVIFaXRlbXM=');
 
+@$core.Deprecated('Use mediaFindResponseDescriptor instead')
+const MediaFindResponse$json = {
+  '1': 'MediaFindResponse',
+  '2': [
+    {'1': 'media', '3': 1, '4': 1, '5': 11, '6': '.media.Media', '10': 'media'},
+  ],
+};
+
+/// Descriptor for `MediaFindResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List mediaFindResponseDescriptor = $convert.base64Decode(
+    'ChFNZWRpYUZpbmRSZXNwb25zZRIiCgVtZWRpYRgBIAEoCzIMLm1lZGlhLk1lZGlhUgVtZWRpYQ'
+    '==');
+
 @$core.Deprecated('Use mediaUpdateRequestDescriptor instead')
 const MediaUpdateRequest$json = {
   '1': 'MediaUpdateRequest',

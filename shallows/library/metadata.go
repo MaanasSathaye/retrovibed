@@ -102,6 +102,10 @@ func MetadataOptionTestID(id string) MetadataOption {
 	}
 }
 
+func MetadataOptionTestRandomID(p *Metadata) {
+	p.ID = uuid.Must(uuid.NewV4()).String()
+}
+
 func NewMetadata(id string, options ...func(*Metadata)) (m Metadata) {
 	r := langx.Clone(Metadata{
 		ID:             id,
@@ -112,6 +116,18 @@ func NewMetadata(id string, options ...func(*Metadata)) (m Metadata) {
 	}, options...)
 
 	return r
+}
+
+func MetadataQueryRandomAfter(id string) squirrel.Sqlizer {
+	return squirrel.Expr("library_metadata.id >= ?", id)
+}
+
+func MetadataQueryRandomBefore(id string) squirrel.Sqlizer {
+	return squirrel.Expr("library_metadata.id < ?", id)
+}
+
+func MetadataQueryMimetypes(mimes ...string) squirrel.Sqlizer {
+	return squirrelx.In("library_metadata.mimetype", mimes...)
 }
 
 func MetadataQueryVisible() squirrel.Sqlizer {
@@ -139,6 +155,10 @@ func MetadataQueryNotIndexed() squirrel.Sqlizer {
 }
 
 func MetadataSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) MetadataScanner {
+	return NewMetadataScannerStatic(b.RunWith(q).QueryContext(ctx))
+}
+
+func MetadataSearchOne(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) MetadataScanner {
 	return NewMetadataScannerStatic(b.RunWith(q).QueryContext(ctx))
 }
 

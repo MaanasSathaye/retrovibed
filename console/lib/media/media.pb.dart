@@ -322,6 +322,64 @@ class MediaSearchResponse extends $pb.GeneratedMessage {
   $pb.PbList<Media> get items => $_getList(1);
 }
 
+class MediaFindResponse extends $pb.GeneratedMessage {
+  factory MediaFindResponse({
+    Media? media,
+  }) {
+    final result = create();
+    if (media != null) result.media = media;
+    return result;
+  }
+
+  MediaFindResponse._();
+
+  factory MediaFindResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory MediaFindResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'MediaFindResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
+      createEmptyInstance: create)
+    ..aOM<Media>(1, _omitFieldNames ? '' : 'media', subBuilder: Media.create)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  MediaFindResponse clone() => MediaFindResponse()..mergeFromMessage(this);
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  MediaFindResponse copyWith(void Function(MediaFindResponse) updates) =>
+      super.copyWith((message) => updates(message as MediaFindResponse))
+          as MediaFindResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static MediaFindResponse create() => MediaFindResponse._();
+  @$core.override
+  MediaFindResponse createEmptyInstance() => create();
+  static $pb.PbList<MediaFindResponse> createRepeated() =>
+      $pb.PbList<MediaFindResponse>();
+  @$core.pragma('dart2js:noInline')
+  static MediaFindResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<MediaFindResponse>(create);
+  static MediaFindResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Media get media => $_getN(0);
+  @$pb.TagNumber(1)
+  set media(Media value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasMedia() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearMedia() => $_clearField(1);
+  @$pb.TagNumber(1)
+  Media ensureMedia() => $_ensure(0);
+}
+
 class MediaUpdateRequest extends $pb.GeneratedMessage {
   factory MediaUpdateRequest({
     Media? media,

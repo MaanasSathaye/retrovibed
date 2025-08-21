@@ -121,6 +121,10 @@ func (t Ranger) Download(ctx context.Context, id string, start, end uint64, into
 	httpx.RangeHeaders(req, start, end-1)
 
 	resp, err := httpx.AsError(t.c.Do(req))
+	if httpx.CheckStatusCode(resp.StatusCode, http.StatusInternalServerError, http.StatusForbidden, http.StatusUnauthorized) {
+		err = errorsx.NewUnrecoverable(err)
+	}
+
 	if err != nil {
 		return err
 	}

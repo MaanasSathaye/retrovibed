@@ -28,6 +28,10 @@ message MediaSearchResponse {
   repeated Media items = 2 [ json_name = "items" ];
 }
 
+message MediaFindResponse {
+  Media media = 1 [ json_name = "media" ];
+}
+
 message MediaUpdateRequest { Media media = 1 [ json_name = "media" ];}
 message MediaUpdateResponse { Media media = 1 [ json_name = "media" ]; }
 

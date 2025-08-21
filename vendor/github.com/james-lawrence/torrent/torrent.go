@@ -262,7 +262,7 @@ func TuneVerifySample(n uint64) Tuner {
 		m := bitmapx.Random(cp, min(n, cp))
 		m.Add(0)
 		m.AddInt(int(min(cp-1, cp))) // min to handle 0 case which causes a uint wrap around.
-		log.Println("verify sample", n, "->", 0, cp, min(cp-1, cp), m.ToArray())
+		log.Println("verify sample", t.md.ID, n, "->", 0, cp, min(cp-1, cp), m.ToArray())
 		t.digests.EnqueueBitmap(m)
 		t.digests.Wait()
 
