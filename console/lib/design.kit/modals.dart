@@ -23,7 +23,7 @@ class Node extends StatefulWidget {
 
 class NodeState extends State<Node> {
   static const zeromodal = const SizedBox();
-  final FocusNode _selffocus = FocusNode();
+  final FocusNode _selffocus = FocusNode(debugLabel: "modal.node");
   Widget current = zeromodal;
   List<Widget> stack = [];
 
@@ -77,7 +77,6 @@ class NodeState extends State<Node> {
           if (event is KeyDownEvent) {
             return KeyEventResult.ignored;
           }
-
           if (event.logicalKey != LogicalKeyboardKey.escape || (stack.isEmpty && current == NodeState.zeromodal)) {
             return KeyEventResult.ignored;
           }

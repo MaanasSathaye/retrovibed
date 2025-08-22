@@ -140,7 +140,6 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                   _res.next.query = v;
                   _res.next.offset = fixnum.Int64(0);
                 });
-                ds.textediting.refocus(widget.controller);
                 return refresh(_res.next);
               },
               next: (i) {

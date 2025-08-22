@@ -82,8 +82,8 @@ class Playlist extends StatefulWidget {
 
 class _PlaylistState extends State<Playlist> {
   final TextEditingController controller = TextEditingController();
-  final FocusNode searchfocus = FocusNode();
-  final FocusNode _selffocus = FocusNode();
+  final FocusNode searchfocus = FocusNode(debugLabel: 'playlist.search.focus');
+  final FocusNode _selffocus = FocusNode(debugLabel: 'playlist.focus');
   final player = Player();
 
   StreamIterator<Media> upcoming = StreamIterator(Stream.empty());

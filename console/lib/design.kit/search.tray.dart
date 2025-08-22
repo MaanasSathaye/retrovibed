@@ -3,6 +3,17 @@ import 'package:fixnum/fixnum.dart' as fixnum;
 import './theme.defaults.dart';
 import './buttons.dart';
 
+abstract class textediting {
+  static void refocus(TextEditingController? controller) {
+    if (controller == null) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.selection = TextSelection.fromPosition(
+        TextPosition(offset: controller.text.length),
+      );
+    });
+  }
+}
+
 class SearchTray extends StatefulWidget {
   static fixnum.Int64 Zero = fixnum.Int64.ZERO;
 
@@ -52,7 +63,7 @@ class _SearchTrayState extends State<SearchTray> {
   @override
   void initState() {
     super.initState();
-    if (widget.autofocus) _focusNode.requestFocus();
+    if (widget.autofocus) (widget.focus ?? _focusNode).requestFocus();
   }
 
   @override
@@ -82,14 +93,17 @@ class _SearchTrayState extends State<SearchTray> {
                     horizontal: theming.spacing ?? 0.0,
                   ),
                   child: TextField(
+                    enabled: !widget.disabled,
+                    autofocus: widget.autofocus,
+                    focusNode: widget.focus ?? _focusNode,
                     controller: widget.controller ?? _defaultController,
                     decoration:
                         widget.inputDecoration ??
                         const InputDecoration(hintText: "search"),
-                    autofocus: widget.autofocus,
-                    focusNode: _focusNode,
-                    onSubmitted: widget.onSubmitted,
-                    enabled: !widget.disabled,
+                    onSubmitted: (v) => widget.onSubmitted(v).whenComplete(() {
+                      textediting.refocus(widget.controller);
+                      (widget.focus ?? _focusNode).requestFocus();
+                    }),
                   ),
                 ),
               ),

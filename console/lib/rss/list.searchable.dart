@@ -31,9 +31,9 @@ class SearchableView extends State<ListSearchable> {
     super.setState(fn);
   }
 
-  Future<api.FeedSearchResponse> refresh() {
+  Future<api.FeedSearchResponse> refresh(api.FeedSearchRequest next) {
     return widget
-        .search(_res.next)
+        .search(next)
         .then((r) {
           setState(() {
             _res = r;
@@ -50,7 +50,7 @@ class SearchableView extends State<ListSearchable> {
   @override
   void initState() {
     super.initState();
-    refresh().catchError((e) {
+    refresh(_res.next).catchError((e) {
       setState(() {
         _cause = ds.Error.unknown(e);
       });
@@ -79,7 +79,7 @@ class SearchableView extends State<ListSearchable> {
     api
         .create(api.FeedCreateRequest(feed: n))
         .then((v) {
-          refresh();
+          refresh(_res.next);
           return v;
         })
         .then((v) => resetleading())
@@ -103,52 +103,36 @@ class SearchableView extends State<ListSearchable> {
     return ds.Table(
       loading: _loading,
       cause: _cause,
-      leading: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          IconButton(
-            onPressed: () {
-              setState(() {
-                _overlay = _overlay == zerooverlay ? feedproto : zerooverlay;
-              });
-            },
-            icon: Icon(_overlay == zerooverlay ? Icons.add : Icons.remove),
-          ),
-          Expanded(
-            child: TextField(
-              decoration: InputDecoration(hintText: "search feeds"),
-              onChanged:
-                  (v) => setState(() {
-                    _res.next.query = v;
-                  }),
-              onSubmitted: (v) => refresh(),
+      leading: ds.SearchTray(
+        inputDecoration: InputDecoration(hintText: "search feeds"),
+        onSubmitted: (v) {
+          setState(() {
+            _res.next.query = v;
+            _res.next.offset = Int64(0);
+          });
+          return refresh(_res.next);
+        },
+        next: (i) {
+          setState(() {
+            _res.next.offset = i;
+          });
+          refresh(_res.next);
+        },
+        current: _res.next.offset,
+        empty: Int64(_res.items.length) < _res.next.limit,
+        leading: Row(
+          children: [
+            IconButton(
+              onPressed: () {
+                setState(() {
+                  _overlay = _overlay == zerooverlay ? feedproto : zerooverlay;
+                });
+              },
+              icon: Icon(_overlay == zerooverlay ? Icons.add : Icons.remove),
             ),
-          ),
-          IconButton(
-            onPressed:
-                _res.next.offset.toInt() > 0
-                    ? () {
-                      setState(() {
-                        _res.next.offset -= 1;
-                      });
-                      refresh();
-                    }
-                    : null,
-            icon: Icon(Icons.arrow_left),
-          ),
-          IconButton(
-            onPressed:
-                _res.items.length == _res.next.limit
-                    ? () {
-                      setState(() {
-                        _res.next.offset += 1;
-                      });
-                      refresh();
-                    }
-                    : null,
-            icon: Icon(Icons.arrow_right),
-          ),
-        ],
+          ],
+        ),
+        autofocus: true,
       ),
       children: _res.items,
       (items) => Column(
@@ -198,28 +182,28 @@ class _FeedCreate extends StatelessWidget {
     final theming = Theme.of(context);
     final themex = ds.Defaults.of(context);
     return Card(
-        color: theming.scaffoldBackgroundColor,
-        child: Column(
-          spacing: themex.spacing ?? 0.0,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            FeedNew(current: current, onChange: onChange),
-            Row(
-              spacing: themex.spacing ?? 0.0,
-              children: [
-                Spacer(),
-                TextButton(onPressed: onCancel, child: Text("cancel")),
-                TextButton(
-                  onPressed: () {
-                    onSubmit?.call(current);
-                  },
-                  child: Text("create"),
-                ),
-                Spacer(),
-              ],
-            ),
-          ],
-        ),
+      color: theming.scaffoldBackgroundColor,
+      child: Column(
+        spacing: themex.spacing ?? 0.0,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FeedNew(current: current, onChange: onChange),
+          Row(
+            spacing: themex.spacing ?? 0.0,
+            children: [
+              Spacer(),
+              TextButton(onPressed: onCancel, child: Text("cancel")),
+              TextButton(
+                onPressed: () {
+                  onSubmit?.call(current);
+                },
+                child: Text("create"),
+              ),
+              Spacer(),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

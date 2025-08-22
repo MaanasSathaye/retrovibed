@@ -4,6 +4,7 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/design.kit/forms.dart' as forms;
 
 class MagnetDownloads extends StatelessWidget {
+  final FocusNode _focus = FocusNode();
   final TextEditingController controller;
   final Future<void> Function(List<String>) onSubmitted;
   final StreamController<String> stream = StreamController<String>();
@@ -13,7 +14,6 @@ class MagnetDownloads extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final focus = FocusNode();
     final defaults = ds.Defaults.of(context);
     return Container(
       padding: defaults.padding ?? EdgeInsets.zero,
@@ -23,7 +23,7 @@ class MagnetDownloads extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
-            focusNode: focus,
+            focusNode: _focus,
             controller: controller,
             decoration: const InputDecoration(
               labelText: 'Enter an magnet link(s)',
@@ -33,7 +33,7 @@ class MagnetDownloads extends StatelessWidget {
               stream.add(v);
               controller.clear();
               ds.textediting.refocus(controller);
-              focus.requestFocus();
+              _focus.requestFocus();
             },
           ),
           ds.ErrorBoundary(
