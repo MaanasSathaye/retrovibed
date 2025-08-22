@@ -22,7 +22,7 @@ class Display extends StatelessWidget {
           ),
           ds.Accordion(description: Text("RSS"), content: rss.ListSearchable()),
           ds.Accordion(
-            description: Text("Devices"),
+            description: Text("Libraries"),
             content: meta.DaemonList(
               onTap: (d) {
                 return meta.EndpointAuto.of(
