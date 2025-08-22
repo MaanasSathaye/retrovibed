@@ -52,9 +52,9 @@ func Tarball(ctx context.Context, op eg.Op) error {
 func DarwinDmg(ctx context.Context, op eg.Op) error {
 	b := egdmg.New(tarballs.Retrovibed(), egdmg.OptionBuildDir(egenv.CacheDirectory()))
 	return eg.Sequential(
-		shell.Op(
-			shell.Newf("tree -L 2 %s", egenv.CacheDirectory()),
-		),
+		// shell.Op(
+		// 	shell.Newf("tree -L 2 %s", egenv.CacheDirectory()),
+		// ),
 		egdmg.Build(b, egtarball.Path(tarballs.Retrovibed())),
 		shell.Op(
 			shell.Newf("mv %s %s", egdmg.Path(tarballs.Retrovibed()), egenv.CacheDirectory("retrovibed.darwin.arm64.dmg")),

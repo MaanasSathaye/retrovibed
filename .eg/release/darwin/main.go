@@ -34,7 +34,6 @@ func main() {
 
 	err := eg.Perform(
 		ctx,
-		eg.Build(eg.DefaultModule()),
 		eg.Sequential(
 			console.GenerateFlutter,
 			egbug.DebugFailure(
@@ -53,14 +52,8 @@ func main() {
 				flutter.Newf("cp -R build/macos/Build/Products/Release/retrovibed.app %s", egenv.CacheDirectory()),
 			),
 			release.DarwinDmg,
-			eg.Module(
-				ctx,
-				eg.DefaultModule(),
-				eg.Sequential(
-					eggithub.Release(
-						egenv.CacheDirectory("retrovibed.darwin.arm64.dmg"),
-					),
-				),
+			eggithub.Release(
+				egenv.CacheDirectory("retrovibed.darwin.arm64.dmg"),
 			),
 		),
 	)
