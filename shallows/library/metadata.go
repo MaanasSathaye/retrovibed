@@ -53,6 +53,12 @@ func MetadataOptionArchivable(b bool) MetadataOption {
 	}
 }
 
+func MetadataOptionArchiveID(id string) MetadataOption {
+	return func(m *Metadata) {
+		m.ArchiveID = id
+	}
+}
+
 func MetadataOptionBytes(d uint64) MetadataOption {
 	return func(m *Metadata) {
 		m.Bytes = d

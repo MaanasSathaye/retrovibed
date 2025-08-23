@@ -1,6 +1,7 @@
 package cryptox_test
 
 import (
+	"bytes"
 	"crypto/cipher"
 	"crypto/md5"
 	"io"
@@ -9,6 +10,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/internal/bytesx"
 	"github.com/retrovibed/retrovibed/internal/cryptox"
+	"github.com/retrovibed/retrovibed/internal/testx"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/chacha20"
 )
@@ -58,5 +60,53 @@ func TestNewReaderChaCha20(t *testing.T) {
 
 	t.Run("returned cipher should be functional for encryption/decryption", func(t *testing.T) {
 		EncryptionTest(t, uuid.Must(uuid.NewV4()).Bytes(), bytesx.MiB, cryptox.NewReaderChaCha20, cryptox.NewWriterChaCha20)
+	})
+}
+
+func TestChaCha20Offset(t *testing.T) {
+	t.Run("return ciphers should allow for random indexing into data", func(t *testing.T) {
+		var (
+			encrypted bytes.Buffer
+			decrypted bytes.Buffer
+		)
+
+		original := testx.IOBytes(io.LimitReader(cryptox.NewChaCha8(t.Name()), 129))
+
+		w, err := cryptox.NewWriterChaCha20(cryptox.NewChaCha8(t.Name()), &encrypted)
+		require.NoError(t, err)
+		n, err := io.Copy(w, bytes.NewBuffer(original))
+		require.NoError(t, err)
+		require.EqualValues(t, len(original), n)
+
+		r, err := cryptox.NewOffsetReaderChaCha20(cryptox.NewChaCha8(t.Name()), io.NewSectionReader(bytes.NewReader(encrypted.Bytes()), 64, int64(len(original))), 64)
+		require.NoError(t, err)
+
+		n, err = io.Copy(&decrypted, r)
+		require.NoError(t, err)
+		require.EqualValues(t, len(original)-64, n)
+		require.Equal(t, original[64:], decrypted.Bytes())
+	})
+
+	t.Run("encrypt/decrypt using just an writer", func(t *testing.T) {
+		var (
+			encrypted bytes.Buffer
+			decrypted bytes.Buffer
+		)
+
+		original := testx.IOBytes(io.LimitReader(cryptox.NewChaCha8(t.Name()), 129))
+
+		w, err := cryptox.NewWriterChaCha20(cryptox.NewChaCha8(t.Name()), &encrypted)
+		require.NoError(t, err)
+		n, err := io.Copy(w, bytes.NewBuffer(original))
+		require.NoError(t, err)
+		require.EqualValues(t, len(original), n)
+
+		w, err = cryptox.NewOffsetWriterChaCha20(cryptox.NewChaCha8(t.Name()), &decrypted, 64)
+		require.NoError(t, err)
+
+		n, err = io.Copy(w, io.NewSectionReader(bytes.NewReader(encrypted.Bytes()), 64, int64(len(original))))
+		require.NoError(t, err)
+		require.EqualValues(t, len(original)-64, n)
+		require.Equal(t, original[64:], decrypted.Bytes())
 	})
 }

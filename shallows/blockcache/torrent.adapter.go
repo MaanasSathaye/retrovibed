@@ -7,22 +7,32 @@ import (
 	"github.com/james-lawrence/torrent/storage"
 
 	"github.com/retrovibed/retrovibed/internal/fsx"
+	"github.com/retrovibed/retrovibed/internal/langx"
 )
 
-func NewTorrentFromVirtualFS(v fsx.Virtual) *TorrentCacheStorage {
-	return &TorrentCacheStorage{v: v}
+type OptionTorrentCacheStorage func(*TorrentCacheStorage)
+
+func OptionTorrentCacheStorageBlockLength(n uint64) OptionTorrentCacheStorage {
+	return func(tcs *TorrentCacheStorage) {
+		tcs.blength = n
+	}
+}
+
+func NewTorrentFromVirtualFS(v fsx.Virtual, options ...OptionTorrentCacheStorage) *TorrentCacheStorage {
+	return langx.Autoptr(langx.Clone(TorrentCacheStorage{v: v, blength: DefaultBlockLength}, options...))
 }
 
 var _ storage.ClientImpl = &TorrentCacheStorage{}
 
 type TorrentCacheStorage struct {
-	v fsx.Virtual
+	v       fsx.Virtual
+	blength uint64
 }
 
 func (t *TorrentCacheStorage) OpenTorrent(info *metainfo.Info, infoHash metainfo.Hash) (storage.TorrentImpl, error) {
 	dir := storage.InfoHashPathMaker(t.v.Path(), infoHash, info, nil)
 
-	cache, err := NewDirectoryCache(dir)
+	cache, err := NewDirectoryCache(dir, OptionDirCacheBlockLength(int64(t.blength)))
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +55,9 @@ func (t *fileTorrentImpl) ReadAt(p []byte, off int64) (n int, err error) {
 	if t.closed.Load() {
 		return 0, storage.ErrClosed()
 	}
-
+	// defer func() {
+	// 	log.Printf("WAAAAAT %T: %d -> %d %d %v", t.cache, off, len(p), n, err)
+	// }()
 	return t.cache.ReadAt(p, off)
 }
 

@@ -179,7 +179,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) {
 			return errorsx.Wrap(err, "failed to create oauth2 http client for archival")
 		}
 		deepjwt = c
-		tstore = library.NewTorrentStorage(deepjwt, db, tstore)
+		tstore = library.NewTorrentStorageFromHTTP(deepjwt, db, tstore)
 	} else {
 		log.Println("automatic media archival is disabled")
 	}

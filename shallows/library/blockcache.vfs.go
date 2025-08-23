@@ -10,6 +10,13 @@ import (
 	"github.com/retrovibed/retrovibed/internal/fsx"
 )
 
+func calculateBlockRange(blocklength uint64, offset uint64, length uint64) (doffset, dlength uint64) {
+	doffset = (offset / blocklength) * blocklength
+	end := min(doffset+blocklength, length)
+	dlength = end - doffset
+	return doffset, dlength
+}
+
 func New(c *http.Client, v fsx.Virtual, lookup func(ctx context.Context, s string) (md *Metadata, err error)) fs.FS {
 	return vstoragefs{Virtual: v, metadata: lookup, c: c}
 }
@@ -28,7 +35,6 @@ func (t vstoragefs) Open(name string) (fs.File, error) {
 	if err != nil {
 		return nil, err
 	}
-	// log.Println("opening", name, "as", t.Virtual.Path(md.ID), md.DiskOffset, md.Bytes)
 
 	dcache, err := blockcache.NewDirectoryCache(t.Virtual.Path(md.ID))
 	if err != nil {

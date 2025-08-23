@@ -59,7 +59,7 @@ func (t DirCache) offset(off int64) (int64, int64) {
 
 func (t DirCache) ReadAt(p []byte, off int64) (n int, err error) {
 	// defer func() {
-	// 	log.Println("finished read", n, err)
+	// 	log.Println("finished read", off, len(p), n, err)
 	// 	debug.PrintStack()
 	// }()
 	readchunk := func(p []byte, off int64) (n int, err error) {

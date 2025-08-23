@@ -25,7 +25,7 @@ type localstorage interface {
 }
 
 type downloader interface {
-	Download(context.Context, string, uint64, uint64, io.Writer) error
+	Download(ctx context.Context, id string, offset uint64, length uint64, dst io.Writer) error
 }
 
 func NewDeeppoolReaderAt(c *http.Client, md Metadata, l localstorage) *DeeppoolReaderAtCache {
@@ -41,14 +41,7 @@ type DeeppoolReaderAtCache struct {
 
 func (t *DeeppoolReaderAtCache) downloadChunk(prng *rand.ChaCha8, id string, offset uint64, length uint64) error {
 	// download a block length at a time.
-	doffset := (offset / blockcache.DefaultBlockLength) * blockcache.DefaultBlockLength
-	dlength := min(doffset+blockcache.DefaultBlockLength, length) % blockcache.DefaultBlockLength
-	if dlength == 0 {
-		dlength = blockcache.DefaultBlockLength
-	}
-
-	// log.Println("------------------------------ 0 download initiated", id, offset, length, "->", doffset, dlength)
-	// defer log.Println("------------------------------ 0 download completed", id, doffset, dlength)
+	doffset, dlength := calculateBlockRange(blockcache.DefaultBlockLength, offset, length)
 
 	w, err := cryptox.NewOffsetWriterChaCha20(prng, io.NewOffsetWriter(t.localstorage, int64(doffset)), uint32(doffset))
 	if err != nil {
@@ -74,8 +67,7 @@ func (t *DeeppoolReaderAtCache) ReadAt(p []byte, off int64) (n int, err error) {
 		return n, err
 	}
 
-	prng := MetadataChaCha8(t.md)
-	if cerr := t.downloadChunk(prng, t.md.ArchiveID, t.md.DiskOffset+uint64(off), t.md.DiskOffset+t.md.Bytes); cerr != nil {
+	if cerr := t.downloadChunk(MetadataChaCha8(t.md), t.md.ArchiveID, t.md.DiskOffset+uint64(off), t.md.DiskOffset+t.md.Bytes); cerr != nil {
 		log.Println("failed to download from archive", cerr)
 		return
 	}

@@ -5,7 +5,6 @@ import (
 	"errors"
 	"io"
 	"io/fs"
-	"log"
 	"math/rand/v2"
 	"net/http"
 	"sync"
@@ -21,23 +20,37 @@ import (
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/iox"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
-	"github.com/retrovibed/retrovibed/internal/uuidx"
 )
 
-func NewTorrentStorage(c *http.Client, q sqlx.Queryer, d storage.ClientImpl) *TorrentCacheStorage {
+const (
+	ErrCacheUnrecoverable = errorsx.String("cache layer blocked due to previous error")
+)
+
+func NewTorrentStorageFromHTTP(c *http.Client, q sqlx.Queryer, d storage.ClientImpl) *TorrentCacheStorage {
+	return NewTorrentStorage(deeppool.NewRanger(c), q, d, blockcache.DefaultBlockLength)
+}
+
+func NewTorrentStorage(dl downloader, q sqlx.Queryer, d storage.ClientImpl, bsize uint64) *TorrentCacheStorage {
+	if (bsize % 64) != 0 {
+		// need to ensure out block size is a multiple of 64 for chacha encryption random access to work correctly.
+		panic("attempted to create storage with a block size that is not a multiple of 64")
+	}
+
 	return &TorrentCacheStorage{
-		d:  d,
-		q:  q,
-		dl: deeppool.NewRanger(c),
-		m:  &sync.Mutex{},
+		d:           d,
+		q:           q,
+		dl:          dl,
+		m:           &sync.Mutex{},
+		blocklength: bsize,
 	}
 }
 
 type TorrentCacheStorage struct {
-	d  storage.ClientImpl
-	q  sqlx.Queryer
-	dl downloader
-	m  *sync.Mutex
+	d           storage.ClientImpl
+	q           sqlx.Queryer
+	dl          downloader
+	m           *sync.Mutex
+	blocklength uint64
 }
 
 func (t *TorrentCacheStorage) OpenTorrent(info *metainfo.Info, id metainfo.Hash) (storage.TorrentImpl, error) {
@@ -52,6 +65,7 @@ func (t *TorrentCacheStorage) OpenTorrent(info *metainfo.Info, id metainfo.Hash)
 		q:           t.q,
 		dl:          t.dl,
 		m:           t.m,
+		blocklength: t.blocklength,
 	}, nil
 }
 
@@ -66,18 +80,15 @@ type fallback struct {
 	q            sqlx.Queryer
 	m            *sync.Mutex
 	cacheblocked atomic.Bool
+	blocklength  uint64
 }
 
 func (t *fallback) downloadChunk(prng *rand.ChaCha8, id string, offset uint64, length uint64) error {
 	// download a block length at a time.
-	doffset := (offset / blockcache.DefaultBlockLength) * blockcache.DefaultBlockLength
-	dlength := min(doffset+blockcache.DefaultBlockLength, length) % blockcache.DefaultBlockLength
-	if dlength == 0 {
-		dlength = blockcache.DefaultBlockLength
-	}
+	doffset, dlength := calculateBlockRange(t.blocklength, offset, length)
 
-	// log.Println("------------------------------ 1 download initiated", id, offset, length, "->", doffset, dlength)
-	// defer log.Println("------------------------------ 1 download completed", id, doffset, dlength)
+	// log.Println("------------------------------ download initiated", id, t.blocklength, offset, length, offset%64, offset%t.blocklength, "->", doffset, doffset+dlength)
+	// defer log.Println("------------------------------ download completed", id, doffset, doffset+dlength)
 
 	w, err := cryptox.NewOffsetWriterChaCha20(prng, io.NewOffsetWriter(t.TorrentImpl, int64(doffset)), uint32(doffset))
 	if err != nil {
@@ -90,10 +101,17 @@ func (t *fallback) downloadChunk(prng *rand.ChaCha8, id string, offset uint64, l
 }
 
 func (t *fallback) ReadAt(p []byte, off int64) (n int, err error) {
+	// defer log.Printf("ReadAt completed %3d %3d", off, off+int64(len(p)))
+	// defer log.Printf("ReadAt completed %3d %3d %v", off, off+int64(len(p)), p)
+
 	if n, err = t.TorrentImpl.ReadAt(p, off); err == nil {
-		return n, err
+		return n, nil
 	} else if errorsx.Ignore(err, fs.ErrNotExist) != nil {
 		return n, err
+	}
+
+	if t.cacheblocked.Load() {
+		return n, errorsx.NewUnrecoverable(ErrCacheUnrecoverable)
 	}
 
 	t.m.Lock()
@@ -103,12 +121,9 @@ func (t *fallback) ReadAt(p []byte, off int64) (n int, err error) {
 		return n, err
 	}
 
-	if t.cacheblocked.Load() {
-		return n, errorsx.NewUnrecoverable(errorsx.String("cache layer blocked due to previous error"))
-	}
-
 	ctx, done := context.WithTimeout(context.Background(), 3*time.Second)
 	defer done()
+
 	q := sqlx.Scan(MetadataForTorrentArchiveRetrieval(ctx, t.q, t.id.Bytes(), uint64(off), uint64(len(p))))
 	for v := range q.Iter() {
 		switch v.ArchiveID {
@@ -120,18 +135,15 @@ func (t *fallback) ReadAt(p []byte, off int64) (n int, err error) {
 			// non min/max uuid.
 		}
 
-		prng := cryptox.NewChaCha8(uuidx.FirstNonNil(uuid.FromStringOrNil(v.EncryptionSeed), uuid.FromStringOrNil(v.ID)).Bytes())
-		if cerr := t.downloadChunk(prng, v.ArchiveID, v.DiskOffset, v.Bytes); cerr != nil {
+		if cerr := t.downloadChunk(MetadataChaCha8(v), v.ArchiveID, uint64(off), v.Bytes); cerr != nil {
 			var (
 				unrecoverable errorsx.Unrecoverable
 			)
 
 			if errors.As(cerr, &unrecoverable) {
-				// TODO update database to prevent attempts in the future
 				t.cacheblocked.Store(true)
 			}
 
-			log.Println("failed to download from archive", cerr)
 			return n, cerr
 		}
 	}

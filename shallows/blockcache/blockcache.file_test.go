@@ -186,6 +186,23 @@ func TestFile(t *testing.T) {
 			require.Contains(t, err.Error(), "negative offset")
 			require.Zero(t, n)
 		})
+
+		t.Run("Read an offset twice", func(t *testing.T) {
+			bCache := NewByteArrayCache(uint16(fileLength))
+			_, err := bCache.WriteAt(initialContent, 0)
+			require.NoError(t, err)
+			f := blockcache.NewFile(bCache, time.Now(), "testfile.txt", fileLength, 0)
+			buf := make([]byte, 20)
+			n, err := f.ReadAt(buf, 20)
+			require.ErrorIs(t, err, io.EOF)
+			require.Equal(t, int(fileLength-20), n)
+			require.Equal(t, initialContent[20:], buf[:n])
+
+			n, err = f.ReadAt(buf, 20)
+			require.ErrorIs(t, err, io.EOF)
+			require.Equal(t, int(fileLength-20), n)
+			require.Equal(t, initialContent[20:], buf[:n])
+		})
 	})
 
 	t.Run("WriteAt", func(t *testing.T) {
