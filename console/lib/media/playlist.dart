@@ -123,9 +123,6 @@ class _PlaylistState extends State<Playlist> {
       //   "subtitles: ${subtitles.id} ${subtitles.language} ${subtitles.title} -- ${subtitles}",
       // );
     });
-    // player.stream.playlist.listen((list) {
-    //   print("playlist: ${list.index} - ${list}");
-    // });
 
     player.stream.error.listen((err) {
       print("error: ${err}");
