@@ -95,13 +95,14 @@ class _PlaylistState extends State<Playlist> {
   void initState() {
     super.initState();
     player.stream.tracks.listen((track) {
+      final none = () => LanguageCodes.aa;
+      final check = (String? c) => LanguageCodes.fromCode(
+        (c ?? "").replaceAll("-", "_"), // normalize the symbols used in langauges.
+        orElse: none,
+      );
       final current = LanguageCode.code;
       final matches = track.audio.where((t) {
-        final code = LanguageCodes.fromCode(
-          t.language ?? "",
-          orElse: () => LanguageCodes.aa,
-        );
-        return current.englishName.startsWith(code.englishName);
+        return current.englishName.startsWith(check(t.language).englishName);
       });
 
       final audio = matches.firstOrNull ?? AudioTrack.auto();
@@ -109,13 +110,8 @@ class _PlaylistState extends State<Playlist> {
           audio.id != AudioTrack.auto().id
               ? SubtitleTrack.no()
               : track.subtitle.where((t) {
-                    final code = LanguageCodes.fromCode(
-                      t.language ?? "",
-                      orElse: () => LanguageCodes.aa,
-                    );
-                    return current.englishName.startsWith(code.englishName);
-                  }).firstOrNull ??
-                  SubtitleTrack.no();
+                  return current.englishName.startsWith(check(t.language).englishName);
+                }).firstOrNull ?? SubtitleTrack.auto();
       player.setAudioTrack(audio);
       player.setSubtitleTrack(subtitles);
 
