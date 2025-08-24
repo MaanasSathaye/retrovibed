@@ -41,7 +41,13 @@ type DeeppoolReaderAtCache struct {
 
 func (t *DeeppoolReaderAtCache) downloadChunk(prng *rand.ChaCha8, id string, offset uint64, length uint64) error {
 	// download a block length at a time.
-	doffset, dlength := calculateBlockRange(blockcache.DefaultBlockLength, offset, length)
+	doffset := (offset / blockcache.DefaultBlockLength) * blockcache.DefaultBlockLength
+	dlength := min(doffset+blockcache.DefaultBlockLength, length) % blockcache.DefaultBlockLength
+	if dlength == 0 {
+		dlength = blockcache.DefaultBlockLength
+	}
+
+	// doffset, dlength := calculateBlockRange(blockcache.DefaultBlockLength, offset, length)
 
 	w, err := cryptox.NewOffsetWriterChaCha20(prng, io.NewOffsetWriter(t.localstorage, int64(doffset)), uint32(doffset))
 	if err != nil {

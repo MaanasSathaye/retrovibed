@@ -52,7 +52,7 @@ func PrepareDefaultFeeds(ctx context.Context, q sqlx.Queryer) error {
 				Contributing: true,
 			},
 			{
-				Description:  "Retrovibed - test data (enable autoarchive to provide a small bonus to the developers)",
+				Description:  "Retrovibed - test data",
 				URL:          "https://vibed.community.retrovibe.space",
 				Contributing: true,
 				Autodownload: true,

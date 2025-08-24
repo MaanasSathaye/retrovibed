@@ -122,13 +122,13 @@ class _VideoState extends State<VideoScreen> {
         icon: Icon(Icons.skip_previous_rounded),
       ),
       MaterialPlayOrPauseButton(),
-      MaterialDesktopVolumeButton(),
       IconButton(
         onPressed: () {
           internal.Playlist.of(context)?.next();
         },
         icon: Icon(Icons.skip_next_rounded),
       ),
+      MaterialDesktopVolumeButton(),
       SizedBox.square(dimension: themex.spacing),
       Expanded(
         child: StreamBuilder(
