@@ -20,11 +20,11 @@ see the [site](https://retrovibe.space) for more details
 - [x] build a community to reduce costs for sharable content.
 - [x] integrated at cost archival service available that encrypts and offloads data from your devices.
 - [x] monetarily support your favorite artists and communities by archiving their content.
+- [ ] distributed scraping for content discovery and exchange.
 
 #### community sharing
 
 build a community around content. great for AI datasets. library archives. each member reduces the cost for everyone.
-
 
 #### install deb daemon
 
