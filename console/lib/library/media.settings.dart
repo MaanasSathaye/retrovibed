@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/media.dart' as media;
+import 'package:retrovibed/uuidx.dart' as uuidx;
 import './known.media.dropdown.dart';
 import './metadata.edit.dart';
 
@@ -40,10 +41,12 @@ class _MediaSettingsState extends State<MediaSettings> {
 
   @override
   Widget build(BuildContext context) {
+    final theming = Theme.of(context);
     final themex = ds.Defaults.of(context);
     return SelectionArea(
       child: Container(
         padding: themex.padding,
+        color: theming.scaffoldBackgroundColor,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -58,6 +61,11 @@ class _MediaSettingsState extends State<MediaSettings> {
                   });
                 });
               },
+            ),
+            if (!uuidx.isMinMax(uuidx.fromString(_modified.torrentId))) ds.Accordion(
+              expanded: true,
+              description: Text("source details"),
+              content: media.DownloadDisplay.fromID(_modified.torrentId),
             ),
             ds.Accordion(
               expanded: true,

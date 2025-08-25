@@ -28,6 +28,7 @@ class Media extends $pb.GeneratedMessage {
     $core.String? createdAt,
     $core.String? updatedAt,
     $core.String? knownMediaId,
+    $core.String? encryptionSeed,
   }) {
     final result = create();
     if (id != null) result.id = id;
@@ -39,6 +40,7 @@ class Media extends $pb.GeneratedMessage {
     if (createdAt != null) result.createdAt = createdAt;
     if (updatedAt != null) result.updatedAt = updatedAt;
     if (knownMediaId != null) result.knownMediaId = knownMediaId;
+    if (encryptionSeed != null) result.encryptionSeed = encryptionSeed;
     return result;
   }
 
@@ -64,6 +66,7 @@ class Media extends $pb.GeneratedMessage {
     ..aOS(7, _omitFieldNames ? '' : 'created_at')
     ..aOS(8, _omitFieldNames ? '' : 'updated_at')
     ..aOS(9, _omitFieldNames ? '' : 'known_media_id')
+    ..aOS(10, _omitFieldNames ? '' : 'encryption_seed')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -165,6 +168,15 @@ class Media extends $pb.GeneratedMessage {
   $core.bool hasKnownMediaId() => $_has(8);
   @$pb.TagNumber(9)
   void clearKnownMediaId() => $_clearField(9);
+
+  @$pb.TagNumber(10)
+  $core.String get encryptionSeed => $_getSZ(9);
+  @$pb.TagNumber(10)
+  set encryptionSeed($core.String value) => $_setString(9, value);
+  @$pb.TagNumber(10)
+  $core.bool hasEncryptionSeed() => $_has(9);
+  @$pb.TagNumber(10)
+  void clearEncryptionSeed() => $_clearField(10);
 }
 
 class MediaSearchRequest extends $pb.GeneratedMessage {
@@ -660,6 +672,8 @@ class Download extends $pb.GeneratedMessage {
     $core.String? initiatedAt,
     $core.String? pausedAt,
     $core.int? peers,
+    $core.bool? distributing,
+    $core.String? path,
   }) {
     final result = create();
     if (media != null) result.media = media;
@@ -668,6 +682,8 @@ class Download extends $pb.GeneratedMessage {
     if (initiatedAt != null) result.initiatedAt = initiatedAt;
     if (pausedAt != null) result.pausedAt = pausedAt;
     if (peers != null) result.peers = peers;
+    if (distributing != null) result.distributing = distributing;
+    if (path != null) result.path = path;
     return result;
   }
 
@@ -693,6 +709,8 @@ class Download extends $pb.GeneratedMessage {
     ..aOS(4, _omitFieldNames ? '' : 'initiated_at')
     ..aOS(5, _omitFieldNames ? '' : 'paused_at')
     ..a<$core.int>(6, _omitFieldNames ? '' : 'peers', $pb.PbFieldType.OU3)
+    ..aOB(7, _omitFieldNames ? '' : 'distributing')
+    ..aOS(8, _omitFieldNames ? '' : 'path')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -769,6 +787,24 @@ class Download extends $pb.GeneratedMessage {
   $core.bool hasPeers() => $_has(5);
   @$pb.TagNumber(6)
   void clearPeers() => $_clearField(6);
+
+  @$pb.TagNumber(7)
+  $core.bool get distributing => $_getBF(6);
+  @$pb.TagNumber(7)
+  set distributing($core.bool value) => $_setBool(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasDistributing() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearDistributing() => $_clearField(7);
+
+  @$pb.TagNumber(8)
+  $core.String get path => $_getSZ(7);
+  @$pb.TagNumber(8)
+  set path($core.String value) => $_setString(7, value);
+  @$pb.TagNumber(8)
+  $core.bool hasPath() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearPath() => $_clearField(8);
 }
 
 class MagnetCreateRequest extends $pb.GeneratedMessage {

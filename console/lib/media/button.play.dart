@@ -31,7 +31,7 @@ Stream<mediakit.Media> range(BuildContext context, MediaSearchResponse i, Media 
   }
 
   while (i.items.length == i.next.limit.toInt()) {
-    i = await api.media.get(i.next, options: []);
+    i = await api.media.search(i.next, options: []);
     for (var m in i.items) {
       yield await PlayableMedia(m);
     }

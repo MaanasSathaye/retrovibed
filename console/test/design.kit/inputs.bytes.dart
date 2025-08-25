@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:retrovibed/design.kit/inputs.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 
 void main() {
@@ -85,7 +84,7 @@ void main() {
       await tester.enterText(find.byType(TextField), '100');
       await tester.pumpAndSettle();
 
-      expect(capturedBytes, 100 * bytesx.GiB); // 100 bytes
+      expect(capturedBytes, 100 * ds.bytesx.GiB); // 100 bytes
 
       // Change magnitude to KiB
       await tester.tap(find.text('GiB'));
@@ -97,7 +96,7 @@ void main() {
       await tester.enterText(find.byType(TextField), '2');
       await tester.pumpAndSettle();
 
-      expect(capturedBytes, 2 * bytesx.KiB); // 2 KiB = 2048 bytes
+      expect(capturedBytes, 2 * ds.bytesx.KiB); // 2 KiB = 2048 bytes
     });
 
     testWidgets('triggers onBytesChanged callback when magnitude changes', (WidgetTester tester) async {
@@ -118,7 +117,7 @@ void main() {
 
       expect(find.text('1'), findsOneWidget); // 1 KiB
       expect(find.text('KiB'), findsOneWidget);
-      expect(capturedBytes, bytesx.KiB);
+      expect(capturedBytes, ds.bytesx.KiB);
 
       // Tap on the dropdown
       await tester.tap(find.text('KiB'));
@@ -132,7 +131,7 @@ void main() {
       // The callback should reflect the underlying bytes value.
       expect(find.text('1'), findsOneWidget); // 1 KiB is 0.00 MiB (rounded to 2 decimal places)
       expect(find.text('MiB'), findsOneWidget);
-      expect(capturedBytes, bytesx.MiB);
+      expect(capturedBytes, ds.bytesx.MiB);
     });
 
     testWidgets('handles non-numeric input gracefully', (WidgetTester tester) async {

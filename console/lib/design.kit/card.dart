@@ -33,7 +33,7 @@ class Card extends material.StatelessWidget {
         margin: margin ?? defaults.margin,
         child: material.Container(
           alignment: material.Alignment.center,
-          padding: defaults.padding ?? material.EdgeInsets.zero,
+          padding: defaults.padding,
           child: material.Column(
             children: [
               material.Container(

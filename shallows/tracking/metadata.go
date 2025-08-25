@@ -120,11 +120,6 @@ func MetadataOptionTestDefaults(m *Metadata) {
 	)
 }
 
-func MetadataOptionJSONSafeEncode(m *Metadata) {
-	m.CreatedAt = timex.RFC3339NanoEncode(m.CreatedAt)
-	m.UpdatedAt = timex.RFC3339NanoEncode(m.UpdatedAt)
-}
-
 func MetadataOptionAutoDescription(m *Metadata) {
 	m.AutoDescription = NormalizedDescription(m.Description)
 }

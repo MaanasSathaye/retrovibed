@@ -33,6 +33,10 @@ class MediaEdit extends StatelessWidget {
             ),
           ),
           forms.Field(
+            label: Text("mimetype"),
+            input: Text(current.mimetype),
+          ),
+          forms.Field(
             label: Text("sharing"),
             input: typography.sharing(current.torrentId),
           ),

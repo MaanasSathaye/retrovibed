@@ -17,6 +17,7 @@ export 'design.kit/rating.dart';
 export 'design.kit/buttons.dart';
 export 'design.kit/buttons.loading.dart';
 export 'design.kit/typography.dart';
+export 'design.kit/bytesx.dart';
 
 abstract class modals {
   static _modals.NodeState? of(BuildContext context) {

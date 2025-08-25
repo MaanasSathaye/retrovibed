@@ -10,8 +10,6 @@ class ArchiveStorageSettings extends StatefulWidget {
 }
 
 class _ArchiveStorageSettings extends State<ArchiveStorageSettings> {
-  // int _maximum = 0 * ds.bytesx.GiB;
-
   @override
   void setState(VoidCallback fn) {
     if (!mounted) return;

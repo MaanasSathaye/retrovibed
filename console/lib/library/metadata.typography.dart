@@ -14,12 +14,16 @@ Widget archived(String uid, {ds.Defaults? defaults, double size = 24.0}) {
 }
 
 Widget sharing(String uid, {ds.Defaults? defaults, double  size = 24.0, Color? color}) {
+  return toggled(uid, Text("personal"), Text("shared"));
+}
+
+Widget toggled(String uid, Widget minmax, Widget o) {
   switch (uid) {
     case "":
     case "00000000-0000-0000-0000-000000000000":
     case "ffffffff-ffff-ffff-ffff-ffffffffffff":
-      return Text("personal");
+      return minmax;
     default:
-      return Text("shared");
+      return o;
   }
 }

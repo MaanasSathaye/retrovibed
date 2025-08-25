@@ -12,6 +12,7 @@ message Media {
   string created_at = 7 [ json_name = "created_at" ];
   string updated_at = 8 [ json_name = "updated_at" ];
   string known_media_id = 9 [ json_name = "known_media_id" ];
+  string encryption_seed = 10 [ json_name = "encryption_seed" ];
 }
 
 message MediaSearchRequest {
@@ -46,6 +47,8 @@ message Download {
   string initiated_at = 4 [ json_name = "initiated_at" ];
   string paused_at = 5 [ json_name = "paused_at" ];
   uint32 peers = 6 [ json_name = "peers" ];
+  bool distributing = 7 [json_name = "distributing" ];
+  string path = 8 [json_name = "path" ];
 }
 
 message MagnetCreateRequest {

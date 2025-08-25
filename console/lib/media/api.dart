@@ -43,7 +43,7 @@ abstract class media {
   static MediaSearchResponse response({MediaSearchRequest? next}) =>
       MediaSearchResponse(next: next ?? request(limit: 100), items: []);
 
-  static Future<MediaSearchResponse> get(
+  static Future<MediaSearchResponse> search(
     MediaSearchRequest req, {
     List<httpx.Option> options = const [],
   }) async {
@@ -287,7 +287,6 @@ abstract class discovered {
   }) async {
     return httpx
         .get(Uri.https(httpx.host(), "/d/${id}", null), options: options)
-        .then(httpx.auto_error)
         .then((v) {
           return DownloadMetadataResponse.create()
             ..mergeFromProto3Json(jsonDecode(v.body));

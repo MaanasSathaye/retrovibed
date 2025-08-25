@@ -27,6 +27,7 @@ const Media$json = {
     {'1': 'created_at', '3': 7, '4': 1, '5': 9, '10': 'created_at'},
     {'1': 'updated_at', '3': 8, '4': 1, '5': 9, '10': 'updated_at'},
     {'1': 'known_media_id', '3': 9, '4': 1, '5': 9, '10': 'known_media_id'},
+    {'1': 'encryption_seed', '3': 10, '4': 1, '5': 9, '10': 'encryption_seed'},
   ],
 };
 
@@ -36,7 +37,8 @@ final $typed_data.Uint8List mediaDescriptor = $convert.base64Decode(
     '9uEhoKCG1pbWV0eXBlGAMgASgJUghtaW1ldHlwZRIUCgVpbWFnZRgEIAEoCVIFaW1hZ2USHgoK'
     'YXJjaGl2ZV9pZBgFIAEoCVIKYXJjaGl2ZV9pZBIeCgp0b3JyZW50X2lkGAYgASgJUgp0b3JyZW'
     '50X2lkEh4KCmNyZWF0ZWRfYXQYByABKAlSCmNyZWF0ZWRfYXQSHgoKdXBkYXRlZF9hdBgIIAEo'
-    'CVIKdXBkYXRlZF9hdBImCg5rbm93bl9tZWRpYV9pZBgJIAEoCVIOa25vd25fbWVkaWFfaWQ=');
+    'CVIKdXBkYXRlZF9hdBImCg5rbm93bl9tZWRpYV9pZBgJIAEoCVIOa25vd25fbWVkaWFfaWQSKA'
+    'oPZW5jcnlwdGlvbl9zZWVkGAogASgJUg9lbmNyeXB0aW9uX3NlZWQ=');
 
 @$core.Deprecated('Use mediaSearchRequestDescriptor instead')
 const MediaSearchRequest$json = {
@@ -164,6 +166,8 @@ const Download$json = {
     {'1': 'initiated_at', '3': 4, '4': 1, '5': 9, '10': 'initiated_at'},
     {'1': 'paused_at', '3': 5, '4': 1, '5': 9, '10': 'paused_at'},
     {'1': 'peers', '3': 6, '4': 1, '5': 13, '10': 'peers'},
+    {'1': 'distributing', '3': 7, '4': 1, '5': 8, '10': 'distributing'},
+    {'1': 'path', '3': 8, '4': 1, '5': 9, '10': 'path'},
   ],
 };
 
@@ -172,7 +176,8 @@ final $typed_data.Uint8List downloadDescriptor = $convert.base64Decode(
     'CghEb3dubG9hZBIiCgVtZWRpYRgBIAEoCzIMLm1lZGlhLk1lZGlhUgVtZWRpYRIUCgVieXRlcx'
     'gCIAEoBFIFYnl0ZXMSHgoKZG93bmxvYWRlZBgDIAEoBFIKZG93bmxvYWRlZBIiCgxpbml0aWF0'
     'ZWRfYXQYBCABKAlSDGluaXRpYXRlZF9hdBIcCglwYXVzZWRfYXQYBSABKAlSCXBhdXNlZF9hdB'
-    'IUCgVwZWVycxgGIAEoDVIFcGVlcnM=');
+    'IUCgVwZWVycxgGIAEoDVIFcGVlcnMSIgoMZGlzdHJpYnV0aW5nGAcgASgIUgxkaXN0cmlidXRp'
+    'bmcSEgoEcGF0aBgIIAEoCVIEcGF0aA==');
 
 @$core.Deprecated('Use magnetCreateRequestDescriptor instead')
 const MagnetCreateRequest$json = {

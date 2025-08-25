@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import './bytesx.dart';
 
 void _notimplemented(String s) {
   return print(s);
@@ -14,24 +15,6 @@ Future<T> defaulttapfn<T>(T v) {
 
 Future<void> defaulttapv() =>
     Future.sync(() => _notimplemented("tap not implemented"));
-
-class bytesx {
-  static const int KiB = 1024;
-  static const int MiB = 1048576;
-  static const int GiB = 1073741824;
-  static const int TiB = 1099511627776;
-
-  static const Map<int, String> _valueToStringMap = {
-    KiB: 'KiB',
-    MiB: 'MiB',
-    GiB: 'GiB',
-    TiB: 'TiB',
-  };
-
-  static String getName(int value) {
-    return _valueToStringMap[value] ?? "";
-  }
-}
 
 class ByteWidget extends StatefulWidget {
   final ValueChanged<int>? onChange;

@@ -37,6 +37,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/slicesx"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
 	"github.com/retrovibed/retrovibed/internal/sqlxx"
+	"github.com/retrovibed/retrovibed/internal/timex"
 	"github.com/retrovibed/retrovibed/internal/torrentx"
 	"github.com/retrovibed/retrovibed/library"
 	"github.com/retrovibed/retrovibed/tracking"
@@ -210,7 +211,7 @@ func (t *HTTPDiscovered) magnet(w http.ResponseWriter, r *http.Request) {
 		Download: langx.Autoptr(
 			langx.Clone(
 				Download{},
-				DownloadOptionFromTorrentMetadata(lmd),
+				DownloadOptionFromTorrentMetadata(langx.Clone(lmd, timex.JSONSafeEncodeOption)),
 			),
 		),
 	}); err != nil {
@@ -490,7 +491,7 @@ func (t *HTTPDiscovered) pause(w http.ResponseWriter, r *http.Request) {
 		Download: langx.Autoptr(
 			langx.Clone(
 				Download{},
-				DownloadOptionFromTorrentMetadata(langx.Clone(md, tracking.MetadataOptionJSONSafeEncode))),
+				DownloadOptionFromTorrentMetadata(langx.Clone(md, timex.JSONSafeEncodeOption))),
 		),
 	}); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
@@ -550,7 +551,7 @@ func (t *HTTPDiscovered) download(w http.ResponseWriter, r *http.Request) {
 		Download: langx.Autoptr(
 			langx.Clone(
 				Download{},
-				DownloadOptionFromTorrentMetadata(langx.Clone(meta, tracking.MetadataOptionJSONSafeEncode))),
+				DownloadOptionFromTorrentMetadata(langx.Clone(meta, timex.JSONSafeEncodeOption))),
 		),
 	}); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
@@ -578,7 +579,7 @@ func (t *HTTPDiscovered) metadata(w http.ResponseWriter, r *http.Request) {
 		Download: langx.Autoptr(
 			langx.Clone(
 				Download{},
-				DownloadOptionFromTorrentMetadata(langx.Clone(meta, tracking.MetadataOptionJSONSafeEncode))),
+				DownloadOptionFromTorrentMetadata(langx.Clone(meta, timex.JSONSafeEncodeOption))),
 		),
 	}); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
@@ -615,7 +616,7 @@ func (t *HTTPDiscovered) metadatasync(w http.ResponseWriter, r *http.Request) {
 		Media: langx.Autoptr(
 			langx.Clone(
 				Media{},
-				MediaOptionFromTorrentMetadata(langx.Clone(tmd, tracking.MetadataOptionJSONSafeEncode))),
+				MediaOptionFromTorrentMetadata(langx.Clone(tmd, timex.JSONSafeEncodeOption))),
 		),
 	}); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
@@ -649,7 +650,7 @@ func (t *HTTPDiscovered) downloading(w http.ResponseWriter, r *http.Request) {
 
 	qq := sqlx.Scan(tracking.MetadataSearch(r.Context(), t.q, q))
 	for p := range qq.Iter() {
-		tmp := langx.Clone(Download{}, DownloadOptionFromTorrentMetadata(langx.Clone(p, tracking.MetadataOptionJSONSafeEncode)))
+		tmp := langx.Clone(Download{}, DownloadOptionFromTorrentMetadata(langx.Clone(p, timex.JSONSafeEncodeOption)))
 		msg.Items = append(msg.Items, &tmp)
 	}
 
@@ -688,7 +689,7 @@ func (t *HTTPDiscovered) search(w http.ResponseWriter, r *http.Request) {
 	}).OrderBy("created_at DESC").Offset(msg.Next.Offset * msg.Next.Limit).Limit(msg.Next.Limit)
 
 	err = sqlxx.ScanEach(tracking.MetadataSearch(r.Context(), t.q, q), func(p *tracking.Metadata) error {
-		tmp := langx.Clone(Download{}, DownloadOptionFromTorrentMetadata(langx.Clone(*p, tracking.MetadataOptionJSONSafeEncode)))
+		tmp := langx.Clone(Download{}, DownloadOptionFromTorrentMetadata(langx.Clone(*p, timex.JSONSafeEncodeOption)))
 		msg.Items = append(msg.Items, &tmp)
 		return nil
 	})

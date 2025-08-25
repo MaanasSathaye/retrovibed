@@ -5,7 +5,7 @@ import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:retrovibed/media/media.known.pb.dart';
 import 'package:http/http.dart' as http;
 import 'package:retrovibed/httpx.dart' as httpx;
-import 'package:retrovibed/design.kit/inputs.dart' as inputs;
+import 'package:retrovibed/design.kit/bytesx.dart';
 
 export 'package:retrovibed/media/media.known.pb.dart';
 
@@ -16,7 +16,7 @@ abstract class known {
   static LruTypedDataCache<String, Uint8List> cache =
       LruTypedDataCache<String, Uint8List>(
         capacity: 256,
-        capacityInBytes: inputs.bytesx.MiB,
+        capacityInBytes: bytesx.MiB,
       );
   static KnownSearchRequest request({int limit = 0, String query = ""}) =>
       KnownSearchRequest(limit: fixnum.Int64(limit));

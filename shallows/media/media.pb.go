@@ -22,18 +22,19 @@ const (
 )
 
 type Media struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	Mimetype      string                 `protobuf:"bytes,3,opt,name=mimetype,proto3" json:"mimetype,omitempty"`
-	Image         string                 `protobuf:"bytes,4,opt,name=image,proto3" json:"image,omitempty"`
-	ArchiveId     string                 `protobuf:"bytes,5,opt,name=archive_id,proto3" json:"archive_id,omitempty"`
-	TorrentId     string                 `protobuf:"bytes,6,opt,name=torrent_id,proto3" json:"torrent_id,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,7,opt,name=created_at,proto3" json:"created_at,omitempty"`
-	UpdatedAt     string                 `protobuf:"bytes,8,opt,name=updated_at,proto3" json:"updated_at,omitempty"`
-	KnownMediaId  string                 `protobuf:"bytes,9,opt,name=known_media_id,proto3" json:"known_media_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Id             string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Description    string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	Mimetype       string                 `protobuf:"bytes,3,opt,name=mimetype,proto3" json:"mimetype,omitempty"`
+	Image          string                 `protobuf:"bytes,4,opt,name=image,proto3" json:"image,omitempty"`
+	ArchiveId      string                 `protobuf:"bytes,5,opt,name=archive_id,proto3" json:"archive_id,omitempty"`
+	TorrentId      string                 `protobuf:"bytes,6,opt,name=torrent_id,proto3" json:"torrent_id,omitempty"`
+	CreatedAt      string                 `protobuf:"bytes,7,opt,name=created_at,proto3" json:"created_at,omitempty"`
+	UpdatedAt      string                 `protobuf:"bytes,8,opt,name=updated_at,proto3" json:"updated_at,omitempty"`
+	KnownMediaId   string                 `protobuf:"bytes,9,opt,name=known_media_id,proto3" json:"known_media_id,omitempty"`
+	EncryptionSeed string                 `protobuf:"bytes,10,opt,name=encryption_seed,proto3" json:"encryption_seed,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *Media) Reset() {
@@ -125,6 +126,13 @@ func (x *Media) GetUpdatedAt() string {
 func (x *Media) GetKnownMediaId() string {
 	if x != nil {
 		return x.KnownMediaId
+	}
+	return ""
+}
+
+func (x *Media) GetEncryptionSeed() string {
+	if x != nil {
+		return x.EncryptionSeed
 	}
 	return ""
 }
@@ -513,6 +521,8 @@ type Download struct {
 	InitiatedAt   string                 `protobuf:"bytes,4,opt,name=initiated_at,proto3" json:"initiated_at,omitempty"`
 	PausedAt      string                 `protobuf:"bytes,5,opt,name=paused_at,proto3" json:"paused_at,omitempty"`
 	Peers         uint32                 `protobuf:"varint,6,opt,name=peers,proto3" json:"peers,omitempty"`
+	Distributing  bool                   `protobuf:"varint,7,opt,name=distributing,proto3" json:"distributing,omitempty"`
+	Path          string                 `protobuf:"bytes,8,opt,name=path,proto3" json:"path,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -587,6 +597,20 @@ func (x *Download) GetPeers() uint32 {
 		return x.Peers
 	}
 	return 0
+}
+
+func (x *Download) GetDistributing() bool {
+	if x != nil {
+		return x.Distributing
+	}
+	return false
+}
+
+func (x *Download) GetPath() string {
+	if x != nil {
+		return x.Path
+	}
+	return ""
 }
 
 type MagnetCreateRequest struct {
@@ -1309,7 +1333,7 @@ var File_media_proto protoreflect.FileDescriptor
 
 const file_media_proto_rawDesc = "" +
 	"\n" +
-	"\vmedia.proto\x12\x05media\"\x93\x02\n" +
+	"\vmedia.proto\x12\x05media\"\xbd\x02\n" +
 	"\x05Media\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x1a\n" +
@@ -1327,7 +1351,9 @@ const file_media_proto_rawDesc = "" +
 	"\n" +
 	"updated_at\x18\b \x01(\tR\n" +
 	"updated_at\x12&\n" +
-	"\x0eknown_media_id\x18\t \x01(\tR\x0eknown_media_id\"\x87\x01\n" +
+	"\x0eknown_media_id\x18\t \x01(\tR\x0eknown_media_id\x12(\n" +
+	"\x0fencryption_seed\x18\n" +
+	" \x01(\tR\x0fencryption_seed\"\x87\x01\n" +
 	"\x12MediaSearchRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12\x1c\n" +
 	"\tmimetypes\x18\x02 \x03(\tR\tmimetypes\x12\x17\n" +
@@ -1346,7 +1372,7 @@ const file_media_proto_rawDesc = "" +
 	"\x13MediaDeleteResponse\x12\"\n" +
 	"\x05media\x18\x01 \x01(\v2\f.media.MediaR\x05media\"9\n" +
 	"\x13MediaUploadResponse\x12\"\n" +
-	"\x05media\x18\x01 \x01(\v2\f.media.MediaR\x05media\"\xbc\x01\n" +
+	"\x05media\x18\x01 \x01(\v2\f.media.MediaR\x05media\"\xf4\x01\n" +
 	"\bDownload\x12\"\n" +
 	"\x05media\x18\x01 \x01(\v2\f.media.MediaR\x05media\x12\x14\n" +
 	"\x05bytes\x18\x02 \x01(\x04R\x05bytes\x12\x1e\n" +
@@ -1355,7 +1381,9 @@ const file_media_proto_rawDesc = "" +
 	"downloaded\x12\"\n" +
 	"\finitiated_at\x18\x04 \x01(\tR\finitiated_at\x12\x1c\n" +
 	"\tpaused_at\x18\x05 \x01(\tR\tpaused_at\x12\x14\n" +
-	"\x05peers\x18\x06 \x01(\rR\x05peers\"'\n" +
+	"\x05peers\x18\x06 \x01(\rR\x05peers\x12\"\n" +
+	"\fdistributing\x18\a \x01(\bR\fdistributing\x12\x12\n" +
+	"\x04path\x18\b \x01(\tR\x04path\"'\n" +
 	"\x13MagnetCreateRequest\x12\x10\n" +
 	"\x03uri\x18\x01 \x01(\tR\x03uri\"C\n" +
 	"\x14MagnetCreateResponse\x12+\n" +

@@ -17,7 +17,7 @@ class AvailableGridDisplay extends StatefulWidget {
   final FocusNode? focus;
   const AvailableGridDisplay({
     super.key,
-    this.search = media.media.get,
+    this.search = media.media.search,
     this.upload = media.media.upload,
     this.controller,
     this.focus,
@@ -28,6 +28,7 @@ class AvailableGridDisplay extends StatefulWidget {
 }
 
 class _AvailableGridDisplay extends State<AvailableGridDisplay> {
+  Key _dirty = UniqueKey();
   bool _loading = true;
   Widget _cause = const SizedBox();
   media.MediaSearchResponse _res = media.media.response(
@@ -166,14 +167,15 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
             ),
             Expanded(
               child: GridView.builder(
+                key: _dirty,
                 padding: defaults.padding,
                 itemCount: _res.items.length,
                 gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                   maxCrossAxisExtent: 512,
                   crossAxisSpacing:
-                      (defaults.spacing ?? 0.0) / 2, // Spacing between columns
+                      defaults.spacing! / 2, // Spacing between columns
                   mainAxisSpacing:
-                      (defaults.spacing ?? 0.0) / 2, // Spacing between rows
+                      defaults.spacing! / 2, // Spacing between rows
                   childAspectRatio: 2 / 3,
                 ),
                 itemBuilder: (context, index) {
@@ -192,6 +194,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                                     );
 
                                     setState(() {
+                                      _dirty = UniqueKey();
                                       _res = media.MediaSearchResponse(
                                         items: replaced,
                                         next: _res.next,

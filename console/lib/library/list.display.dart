@@ -13,7 +13,7 @@ class AvailableListDisplay extends StatefulWidget {
   final FocusNode? focus;
   const AvailableListDisplay({
     super.key,
-    this.search = media.media.get,
+    this.search = media.media.search,
     this.upload = media.media.upload,
     this.controller,
     this.focus,
