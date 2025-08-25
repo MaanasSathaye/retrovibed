@@ -95,7 +95,7 @@ func MetadataUpdate(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, id string, md Metadata) NewMetadataScannerStaticRow,
 ) {
-	gql = gql.Query(`UPDATE library_metadata SET description = {md.Description}, known_media_id = {md.KnownMediaID} WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
+	gql = gql.Query(`UPDATE library_metadata SET description = {md.Description}, known_media_id = {md.KnownMediaID}, archive_id = {md.ArchiveID} WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
 }
 
 func MetadataTransferKnownMediaIDFromTorrent(

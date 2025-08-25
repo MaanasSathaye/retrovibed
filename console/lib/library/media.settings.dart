@@ -56,6 +56,7 @@ class _MediaSettingsState extends State<MediaSettings> {
               padding: themex.padding,
               onChange: (Future<media.Media> p) {
                 p.then((v) {
+                  print("DERP DERP ${v}");
                   setState(() {
                     _modified = v;
                   });

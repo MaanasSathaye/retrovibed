@@ -14,11 +14,8 @@ File _defaultlib() {
 
 String _path() {
   final files = [
-    File("retrovibed.dylib"),
-    File("/app/lib/retrovibed.so"),
-    File("/app/bin/lib/retrovibed.so"),
     File("build/nativelib/retrovibed.so"),
-    File("/Users/maanas/retrovibed/console/build/nativelib/retrovibed.dylib"),
+    File("build/nativelib/retrovibed.dylib"),
   ];
 
   final found = files.firstWhere((v) {

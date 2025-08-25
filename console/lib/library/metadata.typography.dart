@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:retrovibed/designkit.dart' as ds;
 
-Widget archived(String uid, {ds.Defaults? defaults, double size = 24.0}) {
+Widget archived(String uid) {
   switch (uid) {
     case "":
     case "00000000-0000-0000-0000-000000000000":
@@ -13,7 +12,7 @@ Widget archived(String uid, {ds.Defaults? defaults, double size = 24.0}) {
   }
 }
 
-Widget sharing(String uid, {ds.Defaults? defaults, double  size = 24.0, Color? color}) {
+Widget sharing(String uid) {
   return toggled(uid, Text("personal"), Text("shared"));
 }
 

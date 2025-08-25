@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/media.dart' as media;
+import 'package:retrovibed/uuidx.dart' as uuidx;
+import 'package:retrovibed/authn.dart' as authn;
 import './metadata.typography.dart' as typography;
+import './metadata.icons.dart' as icons;
 
 class MediaEdit extends StatelessWidget {
   final media.Media current;
@@ -42,7 +46,18 @@ class MediaEdit extends StatelessWidget {
           ),
           forms.Field(
             label: Text("archived"),
-            input: typography.archived(current.archiveId),
+            input: Row(children: [
+              typography.archived(current.archiveId),
+              Spacer(),
+              ds.LoadingIconButton(
+                onPressed: () => media.media.update(
+                  current.id,
+                  current..archiveId = uuidx.max(),
+                  options: [authn.Authenticated.devicebearer(context)],
+                ).then((v) => onChange(Future.value(v.media))),
+                icon: icons.archived(current.archiveId),
+              ),
+            ]),
           ),
         ],
       ),
