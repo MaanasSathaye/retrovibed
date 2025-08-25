@@ -22,7 +22,9 @@ type archiver interface {
 
 func Archive(ctx context.Context, q sqlx.Queryer, md Metadata, vfs fsx.Virtual, dst archiver) error {
 	log.Println("archive initiated", md.ID)
-	defer log.Println("archive completed", md.ID)
+	defer func() {
+		log.Println("archive completed", md.ID, md.ArchiveID)
+	}()
 	seed := cryptox.NewChaCha8(uuidx.FirstNonNil(uuid.FromStringOrNil(md.EncryptionSeed), uuid.FromStringOrNil(md.ID)).Bytes())
 
 	cache, err := blockcache.NewDirectoryCache(vfs.Path(md.ID))

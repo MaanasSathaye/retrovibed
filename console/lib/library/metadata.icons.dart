@@ -10,6 +10,15 @@ Icon archived(String uid, {ds.Defaults? defaults, double size = 24.0}) {
   );
 }
 
+Icon archived_trash(String uid, {ds.Defaults? defaults, double size = 24.0}) {
+  return toggled<Icon>(
+    uid,
+    Icon(Icons.upload, size: size),
+    Icon(Icons.pending_actions_outlined, size: size, color: defaults?.opaque),
+    Icon(Icons.delete_forever_rounded, size: size),
+  );
+}
+
 Widget sharing(String uid, {ds.Defaults? defaults, double  size = 24.0, Color? color}) {
   final minmax = Icon(Icons.share_outlined, size: size, color: defaults?.opaque);
   final v = Icon(Icons.archive_outlined, size: size);

@@ -194,16 +194,6 @@ Map<String, String> params(Object? m) {
   });
 }
 
-Future<http.Response> get(
-  Uri path, {
-  List<Option> options = const [],
-  dynamic query = const {},
-}) {
-  return request(options).then((r) {
-    return http.Client().get(path, headers: r.headers).then(auto_error);
-  });
-}
-
 Future<http.StreamedResponse> send(
   Uri path, {
   List<Option> options = const [],
@@ -217,8 +207,24 @@ Future<http.StreamedResponse> send(
   });
 }
 
+Future<http.Response> get(
+  Uri path, {
+  List<Option> options = const [],
+  dynamic query = const {},
+}) {
+  return request(options).then((r) {
+    return http.Client().get(path, headers: r.headers).then(auto_error);
+  });
+}
+
 Future<http.Response> post(Uri path, {List<Option> options = const [], Object? body}) {
   return request(options).then((r) {
     return http.Client().post(path, headers: r.headers, body: body).then(auto_error);
+  });
+}
+
+Future<http.Response> delete(Uri path, {List<Option> options = const [], Object? body}) {
+  return request(options).then((r) {
+    return http.Client().delete(path, headers: r.headers, body: body).then(auto_error);
   });
 }

@@ -30,7 +30,8 @@ type Media struct {
 	UpdatedAt     string                 `protobuf:"bytes,5,opt,name=updated_at,proto3" json:"updated_at,omitempty"`
 	Mimetype      string                 `protobuf:"bytes,6,opt,name=mimetype,proto3" json:"mimetype,omitempty"`
 	Bytes         uint64                 `protobuf:"varint,7,opt,name=bytes,proto3" json:"bytes,omitempty"`
-	Usage         uint64                 `protobuf:"varint,8,opt,name=usage,proto3" json:"usage,omitempty"` // represents the actual storage being charged.
+	Usage         uint64                 `protobuf:"varint,8,opt,name=usage,proto3" json:"usage,omitempty"`                // represents the actual storage being charged.
+	TombstonedAt  string                 `protobuf:"bytes,9,opt,name=tombstoned_at,proto3" json:"tombstoned_at,omitempty"` // when the media was tombstoned.
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -119,6 +120,13 @@ func (x *Media) GetUsage() uint64 {
 		return x.Usage
 	}
 	return 0
+}
+
+func (x *Media) GetTombstonedAt() string {
+	if x != nil {
+		return x.TombstonedAt
+	}
+	return ""
 }
 
 type MediaSearchRequest struct {
@@ -605,11 +613,91 @@ func (x *MediaFindResponse) GetMedia() *Media {
 	return nil
 }
 
+type MediaDeleteRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MediaDeleteRequest) Reset() {
+	*x = MediaDeleteRequest{}
+	mi := &file_content_addressable_storage_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MediaDeleteRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MediaDeleteRequest) ProtoMessage() {}
+
+func (x *MediaDeleteRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_content_addressable_storage_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MediaDeleteRequest.ProtoReflect.Descriptor instead.
+func (*MediaDeleteRequest) Descriptor() ([]byte, []int) {
+	return file_content_addressable_storage_proto_rawDescGZIP(), []int{12}
+}
+
+type MediaDeleteResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Media         *Media                 `protobuf:"bytes,1,opt,name=media,proto3" json:"media,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MediaDeleteResponse) Reset() {
+	*x = MediaDeleteResponse{}
+	mi := &file_content_addressable_storage_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MediaDeleteResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MediaDeleteResponse) ProtoMessage() {}
+
+func (x *MediaDeleteResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_content_addressable_storage_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MediaDeleteResponse.ProtoReflect.Descriptor instead.
+func (*MediaDeleteResponse) Descriptor() ([]byte, []int) {
+	return file_content_addressable_storage_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *MediaDeleteResponse) GetMedia() *Media {
+	if x != nil {
+		return x.Media
+	}
+	return nil
+}
+
 var File_content_addressable_storage_proto protoreflect.FileDescriptor
 
 const file_content_addressable_storage_proto_rawDesc = "" +
 	"\n" +
-	"!content.addressable.storage.proto\x12\x0eretrovibed.cas\"\xe8\x01\n" +
+	"!content.addressable.storage.proto\x12\x0eretrovibed.cas\"\x8e\x02\n" +
 	"\x05Media\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1e\n" +
 	"\n" +
@@ -624,7 +712,8 @@ const file_content_addressable_storage_proto_rawDesc = "" +
 	"updated_at\x12\x1a\n" +
 	"\bmimetype\x18\x06 \x01(\tR\bmimetype\x12\x14\n" +
 	"\x05bytes\x18\a \x01(\x04R\x05bytes\x12\x14\n" +
-	"\x05usage\x18\b \x01(\x04R\x05usageJ\x05\b\x14\x10\xe8\a\"_\n" +
+	"\x05usage\x18\b \x01(\x04R\x05usage\x12$\n" +
+	"\rtombstoned_at\x18\t \x01(\tR\rtombstoned_atJ\x05\b\x14\x10\xe8\a\"_\n" +
 	"\x12MediaSearchRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12\x16\n" +
 	"\x06offset\x18\x02 \x01(\x04R\x06offset\x12\x14\n" +
@@ -646,6 +735,9 @@ const file_content_addressable_storage_proto_rawDesc = "" +
 	"\x05media\x18\x01 \x01(\v2\x15.retrovibed.cas.MediaR\x05media\"\x12\n" +
 	"\x10MediaFindRequest\"@\n" +
 	"\x11MediaFindResponse\x12+\n" +
+	"\x05media\x18\x01 \x01(\v2\x15.retrovibed.cas.MediaR\x05media\"\x14\n" +
+	"\x12MediaDeleteRequest\"B\n" +
+	"\x13MediaDeleteResponse\x12+\n" +
 	"\x05media\x18\x01 \x01(\v2\x15.retrovibed.cas.MediaR\x05mediab\x06proto3"
 
 var (
@@ -660,7 +752,7 @@ func file_content_addressable_storage_proto_rawDescGZIP() []byte {
 	return file_content_addressable_storage_proto_rawDescData
 }
 
-var file_content_addressable_storage_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_content_addressable_storage_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_content_addressable_storage_proto_goTypes = []any{
 	(*Media)(nil),                  // 0: retrovibed.cas.Media
 	(*MediaSearchRequest)(nil),     // 1: retrovibed.cas.MediaSearchRequest
@@ -674,6 +766,8 @@ var file_content_addressable_storage_proto_goTypes = []any{
 	(*MediaCompletedResponse)(nil), // 9: retrovibed.cas.MediaCompletedResponse
 	(*MediaFindRequest)(nil),       // 10: retrovibed.cas.MediaFindRequest
 	(*MediaFindResponse)(nil),      // 11: retrovibed.cas.MediaFindResponse
+	(*MediaDeleteRequest)(nil),     // 12: retrovibed.cas.MediaDeleteRequest
+	(*MediaDeleteResponse)(nil),    // 13: retrovibed.cas.MediaDeleteResponse
 }
 var file_content_addressable_storage_proto_depIdxs = []int32{
 	1, // 0: retrovibed.cas.MediaSearchResponse.next:type_name -> retrovibed.cas.MediaSearchRequest
@@ -684,11 +778,12 @@ var file_content_addressable_storage_proto_depIdxs = []int32{
 	0, // 5: retrovibed.cas.MediaUploadResponse.media:type_name -> retrovibed.cas.Media
 	0, // 6: retrovibed.cas.MediaCompletedResponse.media:type_name -> retrovibed.cas.Media
 	0, // 7: retrovibed.cas.MediaFindResponse.media:type_name -> retrovibed.cas.Media
-	8, // [8:8] is the sub-list for method output_type
-	8, // [8:8] is the sub-list for method input_type
-	8, // [8:8] is the sub-list for extension type_name
-	8, // [8:8] is the sub-list for extension extendee
-	0, // [0:8] is the sub-list for field type_name
+	0, // 8: retrovibed.cas.MediaDeleteResponse.media:type_name -> retrovibed.cas.Media
+	9, // [9:9] is the sub-list for method output_type
+	9, // [9:9] is the sub-list for method input_type
+	9, // [9:9] is the sub-list for extension type_name
+	9, // [9:9] is the sub-list for extension extendee
+	0, // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_content_addressable_storage_proto_init() }
@@ -702,7 +797,7 @@ func file_content_addressable_storage_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_content_addressable_storage_proto_rawDesc), len(file_content_addressable_storage_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   12,
+			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

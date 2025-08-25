@@ -88,15 +88,6 @@ func NewAutoArchive(ctx context.Context, c *http.Client, dir fsx.Virtual, q sqlx
 		MetadataQueryArchivable(),
 	})
 
-	if usage, err := disk.UsageWithContext(ctx, dir.Path()); err != nil {
-		log.Println(errorsx.Wrap(err, "unable to retrieve disk"))
-	} else if usage.UsedPercent < 0.8 {
-		archivedisk = false
-		log.Println("usage", dir.Path(), usage.UsedPercent, usage.Fstype)
-	} else {
-		log.Println("usage", dir.Path(), usage.UsedPercent, usage.Fstype)
-	}
-
 	archive := func() error {
 		var processed uint64
 		log.Println("archival initiated")

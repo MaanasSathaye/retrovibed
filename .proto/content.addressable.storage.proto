@@ -11,6 +11,7 @@ message Media {
   string mimetype = 6 [ json_name = "mimetype" ];
   uint64 bytes = 7 [ json_name = "bytes" ];
   uint64 usage = 8 [ json_name = "usage" ]; // represents the actual storage being charged.
+  string tombstoned_at = 9 [ json_name = "tombstoned_at" ]; // when the media was tombstoned.
   reserved 20 to 999;
 }
 
@@ -49,5 +50,10 @@ message MediaCompletedResponse {
 
 message MediaFindRequest { }
 message MediaFindResponse {
+  Media media = 1 [ json_name = "media" ];
+}
+
+message MediaDeleteRequest { }
+message MediaDeleteResponse {
   Media media = 1 [ json_name = "media" ];
 }

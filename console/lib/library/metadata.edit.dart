@@ -18,6 +18,61 @@ class MediaEdit extends StatelessWidget {
     this.padding,
   });
 
+  Widget archive(BuildContext context, String uid) {
+    final display = typography.archived(uid);
+    final icon = icons.archived_trash(uid);
+
+    if (uuidx.isMax(uuidx.fromString(uid))) {
+      return Row(children: [
+        display,
+        Spacer(),
+        ds.LoadingIconButton(
+          onPressed: () {
+            return media.media.update(
+              current.id,
+              current..archiveId = uuidx.min(),
+              options: [authn.Authenticated.devicebearer(context)],
+            ).then((v) => onChange(Future.value(v.media)));
+          },
+          icon: icon,
+        ),
+      ]);
+    }
+
+    if (uuidx.isMin(uuidx.fromString(uid))) {
+      return Row(children: [
+        display,
+        Spacer(),
+        ds.LoadingIconButton(
+          onPressed: () {
+            return media.media.update(
+              current.id,
+              current..archiveId = uuidx.max(),
+              options: [authn.Authenticated.devicebearer(context)],
+            ).then((v) => onChange(Future.value(v.media)));
+          },
+          icon: icon,
+        ),
+      ]);
+    }
+
+    return Row(children: [
+        display,
+        Spacer(),
+        ds.LoadingIconButton(
+          onPressed: () => media.media.unarchive(
+            current.archiveId,
+            options: [authn.Authenticated.bearer(context)],
+          ).then((v) => media.media.update(
+            current.id,
+            current..archiveId = uuidx.min(),
+            options: [authn.Authenticated.devicebearer(context)],
+          )).then((v) => onChange(Future.value(v.media))),
+          icon: icon,
+        ),
+      ]);
+  }
+
   @override
   Widget build(BuildContext context) {
     final theming = Theme.of(context);
@@ -28,6 +83,10 @@ class MediaEdit extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          forms.Field(
+            label: Text("id"),
+            input: Text(current.id),
+          ),
           forms.Field(
             label: Text("description"),
             input: TextFormField(
@@ -46,18 +105,7 @@ class MediaEdit extends StatelessWidget {
           ),
           forms.Field(
             label: Text("archived"),
-            input: Row(children: [
-              typography.archived(current.archiveId),
-              Spacer(),
-              ds.LoadingIconButton(
-                onPressed: () => media.media.update(
-                  current.id,
-                  current..archiveId = uuidx.max(),
-                  options: [authn.Authenticated.devicebearer(context)],
-                ).then((v) => onChange(Future.value(v.media))),
-                icon: icons.archived(current.archiveId),
-              ),
-            ]),
+            input: archive(context, current.archiveId),
           ),
         ],
       ),

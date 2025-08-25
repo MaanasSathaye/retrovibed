@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:retrovibed/media/media.pb.dart';
+import 'package:retrovibed/media/content.addressable.storage.pb.dart' as cas;
 import 'package:http/http.dart' as http;
 import 'package:retrovibed/httpx.dart' as httpx;
 
@@ -129,6 +130,23 @@ abstract class media {
         .then((v) {
           return Future.value(
             MediaUpdateResponse.create()
+              ..mergeFromProto3Json(jsonDecode(v.body)),
+          );
+        });
+  }
+
+  static Future<cas.MediaDeleteResponse> unarchive(
+    String id, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
+        .delete(
+          Uri.https(httpx.metaendpoint(), "/m/${id}"),
+          options: options,
+        )
+        .then((v) {
+          return Future.value(
+            cas.MediaDeleteResponse.create()
               ..mergeFromProto3Json(jsonDecode(v.body)),
           );
         });

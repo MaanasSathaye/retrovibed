@@ -21,21 +21,24 @@ class MediaSettings extends StatefulWidget {
 }
 
 class _MediaSettingsState extends State<MediaSettings> {
+  bool _dirty = false;
   media.Media _modified;
 
   _MediaSettingsState(this._modified);
 
   @override
   void dispose() {
-    widget.onChange(
-      media.media
-          .update(
-            _modified.id,
-            _modified,
-            options: [authn.Authenticated.devicebearer(context)],
-          )
-          .then((v) => v.media),
-    );
+    if (_dirty) {
+      widget.onChange(
+        media.media
+            .update(
+              _modified.id,
+              _modified,
+              options: [authn.Authenticated.devicebearer(context)],
+            )
+            .then((v) => v.media),
+      );
+    }
     super.dispose();
   }
 
@@ -56,8 +59,8 @@ class _MediaSettingsState extends State<MediaSettings> {
               padding: themex.padding,
               onChange: (Future<media.Media> p) {
                 p.then((v) {
-                  print("DERP DERP ${v}");
                   setState(() {
+                    _dirty = true;
                     _modified = v;
                   });
                 });
