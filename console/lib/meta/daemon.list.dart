@@ -174,7 +174,7 @@ class _RowDisplay extends StatelessWidget {
                       );
                 },
         child: Row(
-          spacing: themex.spacing!,
+          spacing: themex.spacing,
           children: [
             Opacity(
               opacity: current.hostname == hostname ? 1.0 : 0.0,
