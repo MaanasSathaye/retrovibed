@@ -6,9 +6,10 @@ import 'package:retrovibed/library/known.media.display.dart';
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/httpx.dart' as httpx;
+import 'package:retrovibed/mimex.dart' as mimex;
 import './api.dart' as api;
-import './search.tuning.dart';
 import './media.settings.dart';
+import './search.mimetype.dropdown.dart';
 
 class AvailableGridDisplay extends StatefulWidget {
   final media.FnMediaSearch search;
@@ -32,7 +33,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
   bool _loading = true;
   Widget _cause = const SizedBox();
   media.MediaSearchResponse _res = media.media.response(
-    next: media.media.request(limit: 32),
+    next: media.media.request(limit: 32, mimetypes: mimex.of(mimex.movie)),
   );
 
   void setState(VoidCallback fn) {
@@ -151,19 +152,21 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
               },
               current: _res.next.offset,
               empty: fixnum.Int64(_res.items.length) < _res.next.limit,
-              leading: Row(children: [ds.FileDropWell.icon(upload)]),
-              autofocus: true,
-              tuning: LimitedBox(
-                maxHeight: 128.0,
-                child: SearchTuning(
-                  _res.next,
-                  onChange: (media.MediaSearchRequest n) {
-                    setState(() {
-                      _res.next = n;
-                    });
-                  },
-                ),
+              leading: Row(
+                children: [
+                  SearchMimetypeDropdown(
+                    _res.next,
+                    onChange: (upd) {
+                      setState(() {
+                        _res.next = upd;
+                      });
+                      refresh(_res.next);
+                    },
+                  ),
+                  ds.FileDropWell.icon(upload),
+                ],
               ),
+              autofocus: true,
             ),
             Expanded(
               child: GridView.builder(
@@ -174,8 +177,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                   maxCrossAxisExtent: 512,
                   crossAxisSpacing:
                       defaults.spacing / 2, // Spacing between columns
-                  mainAxisSpacing:
-                      defaults.spacing / 2, // Spacing between rows
+                  mainAxisSpacing: defaults.spacing / 2, // Spacing between rows
                   childAspectRatio: 2 / 3,
                 ),
                 itemBuilder: (context, index) {
@@ -242,7 +244,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                         onDoubleTap: media.PlayAction(context, _media, _res),
                         onSettings: onSettings,
                         media: _media,
-                        key: ValueKey(_media.id)
+                        key: ValueKey(_media.id),
                       );
                   }
                 },

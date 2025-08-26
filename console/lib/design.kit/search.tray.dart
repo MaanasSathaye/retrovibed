@@ -17,7 +17,7 @@ abstract class textediting {
 class SearchTray extends StatefulWidget {
   static fixnum.Int64 Zero = fixnum.Int64.ZERO;
 
-  static Widget zerobox = const SizedBox();
+  static const Widget zerobox = const SizedBox();
 
   final Widget leading;
   final Widget trailing;
@@ -46,7 +46,7 @@ class SearchTray extends StatefulWidget {
     this.inputDecoration,
     Widget? tuning,
     this.controller,
-  }) : tuning = tuning ?? const SizedBox();
+  }) : tuning = tuning ?? SearchTray.zerobox;
 
   @override
   State<SearchTray> createState() => _SearchTrayState();
@@ -125,7 +125,7 @@ class _SearchTrayState extends State<SearchTray> {
                       (widget.controller ?? _defaultController).text,
                     ),
               ),
-              buttons.settings(
+              if (widget.tuning != SearchTray.zerobox) buttons.settings(
                 onPressed:
                     () =>
                         _tuningwidget.value =
