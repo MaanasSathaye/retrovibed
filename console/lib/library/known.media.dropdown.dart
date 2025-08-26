@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
+import 'package:retrovibed/uuidx.dart' as uuidx;
+import 'package:retrovibed/authn.dart' as authn;
 import 'known.media.card.dart';
+import 'known.media.typography.dart';
 import './api.dart' as api;
 
 class KnownMediaDropdown extends StatefulWidget {
@@ -10,7 +13,7 @@ class KnownMediaDropdown extends StatefulWidget {
   final TextEditingController? controller;
   final FocusNode? focus;
   final String current;
-  final void Function(api.Known k)? onChange;
+  final void Function(api.Known? k)? onChange;
   const KnownMediaDropdown({
     super.key,
     this.search = api.known.search,
@@ -72,12 +75,56 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
   @override
   void initState() {
     super.initState();
-    refresh(_res.next);
+    if (uuidx.isMinMax(uuidx.fromString(widget.current))) {
+      refresh(_res.next);
+      return;
+    }
+
+    api.known
+        .cached(
+          widget.current,
+          () => api.known.get(
+            widget.current,
+            options: [authn.Authenticated.devicebearer(context)],
+          ),
+        )
+        .then(
+          (w) => setState(() {
+            current = w.known;
+          }),
+        )
+        .whenComplete(() => refresh(_res.next));
+  }
+
+  @override
+  void dispose() {
+    if (current == null) {
+      widget.onChange?.call(current);
+    }
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
+
+    if (current != null) {
+      return KnownMediaTypography(
+        current!,
+        trailing: [
+          Spacer(),
+          KnownMediaTypography.removebtn(
+            context,
+            widget.current,
+            onPressed:
+                () => setState(() {
+                  current = null;
+                }),
+          ),
+        ],
+      );
+    }
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -113,10 +160,8 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
             itemCount: _res.items.length,
             gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
               maxCrossAxisExtent: 512, // Maximum width of each item
-              crossAxisSpacing:
-                  (defaults.spacing) / 2, // Spacing between columns
-              mainAxisSpacing:
-                  (defaults.spacing) / 2, // Spacing between rows
+              crossAxisSpacing: defaults.spacing / 2, // Spacing between columns
+              mainAxisSpacing: defaults.spacing / 2, // Spacing between rows
               childAspectRatio: 2 / 3,
             ),
             itemBuilder: (context, index) {
@@ -124,7 +169,14 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
               return KnownMediaCard(
                 v,
                 onDoubleTap:
-                    widget.onChange == null ? null : () => widget.onChange!(v),
+                    widget.onChange == null
+                        ? null
+                        : () {
+                          setState(() {
+                            current = v;
+                          });
+                          widget.onChange!(v);
+                        },
               );
             },
           ),

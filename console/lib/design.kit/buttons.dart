@@ -12,4 +12,8 @@ abstract class buttons {
   static IconButton link({required VoidCallback? onPressed}) {
     return IconButton(onPressed: onPressed, icon: Icon(Icons.link));
   }
+
+  static IconButton remove({required VoidCallback? onPressed}) {
+    return IconButton(onPressed: onPressed, icon: Icon(Icons.remove));
+  }
 }

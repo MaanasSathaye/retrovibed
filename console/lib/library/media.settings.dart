@@ -65,6 +65,24 @@ class _MediaSettingsState extends State<MediaSettings> {
                 });
               },
             ),
+            Padding(
+              padding: themex.padding,
+              child: KnownMediaDropdown(
+                current: _modified.knownMediaId,
+                onChange: (known) {
+                  widget.onChange(
+                    media.discovered
+                        .metadatasync(
+                          _modified.torrentId,
+                          _modified..knownMediaId = known?.id ?? uuidx.min(),
+                          options: [authn.Authenticated.devicebearer(context)],
+                        )
+                        .then((v) => v.media),
+                    forced: true,
+                  );
+                },
+              ),
+            ),
             if (!uuidx.isMinMax(uuidx.fromString(_modified.torrentId)))
               ds.Accordion(
                 expanded: true,
@@ -94,25 +112,6 @@ class _MediaSettingsState extends State<MediaSettings> {
                   ],
                 ),
               ),
-            ds.Accordion(
-              expanded: true,
-              description: Text("metadata"),
-              content: KnownMediaDropdown(
-                current: _modified.knownMediaId,
-                onChange: (known) {
-                  widget.onChange(
-                    media.discovered
-                        .metadatasync(
-                          _modified.torrentId,
-                          _modified..knownMediaId = known.id,
-                          options: [authn.Authenticated.devicebearer(context)],
-                        )
-                        .then((v) => v.media),
-                    forced: true,
-                  );
-                },
-              ),
-            ),
           ],
         ),
       ),
