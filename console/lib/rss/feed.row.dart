@@ -13,7 +13,7 @@ class FeedRow extends StatelessWidget {
     final themex = ds.Defaults.of(context);
 
     return Row(
-      spacing: themex.spacing ?? 0.0,
+      spacing: themex.spacing,
       children: [
         if (current.hasDescription()) Expanded(
             child: Text(

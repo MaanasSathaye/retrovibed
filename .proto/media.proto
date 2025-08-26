@@ -89,6 +89,11 @@ message DownloadPauseResponse {
   Download download = 1 [ json_name = "download" ];
 }
 
+message DownloadDeleteRequest {}
+message DownloadDeleteResponse {
+  Download download = 1 [ json_name = "download" ];
+}
+
 message Published {
   string id = 1 [ json_name = "id" ];
   string mimetype = 2 [ json_name = "mimetype" ];

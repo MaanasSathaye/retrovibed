@@ -156,6 +156,14 @@ func (t *HTTPDiscovered) Bind(r *mux.Router) {
 		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
 		httpx.Timeout2s(),
 	).ThenFunc(t.pause))
+
+	r.Path("/{id}/delete").Methods(http.MethodDelete).Handler(alice.New(
+		httpx.ContextBufferPool512(),
+		httpx.ParseForm,
+		httpauth.AuthenticateWithToken(t.jwtsecret),
+		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
+		httpx.Timeout2s(),
+	).ThenFunc(t.delete))
 }
 
 func (t *HTTPDiscovered) magnet(w http.ResponseWriter, r *http.Request) {
@@ -487,7 +495,54 @@ func (t *HTTPDiscovered) pause(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &DownloadBeginResponse{
+	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &DownloadPauseResponse{
+		Download: langx.Autoptr(
+			langx.Clone(
+				Download{},
+				DownloadOptionFromTorrentMetadata(langx.Clone(md, timex.JSONSafeEncodeOption))),
+		),
+	}); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to write response"))
+		return
+	}
+}
+
+func (t *HTTPDiscovered) delete(w http.ResponseWriter, r *http.Request) {
+	var (
+		md tracking.Metadata
+		id = mux.Vars(r)["id"]
+	)
+
+	if err := tracking.MetadataFindByID(r.Context(), t.q, id).Scan(&md); sqlx.ErrNoRows(err) != nil {
+		log.Println(errorsx.Wrap(err, "unable to find metadata"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+		return
+	} else if err != nil {
+		log.Println(errorsx.Wrap(err, "unable to find metadata"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	metadata, err := torrent.New(metainfo.Hash(md.Infohash), torrent.OptionStorage(t.c))
+	if err != nil {
+		log.Println(errorsx.Wrapf(err, "unable to create metadata from metadata %s", md.ID))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err = t.d.Stop(metadata); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to stop download"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err = tracking.Delete(r.Context(), t.q, t.rootstorage, &md); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to stop download"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &DownloadDeleteResponse{
 		Download: langx.Autoptr(
 			langx.Clone(
 				Download{},

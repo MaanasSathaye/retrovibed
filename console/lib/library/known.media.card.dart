@@ -31,7 +31,7 @@ class KnownMediaCard extends StatelessWidget {
               poster,
               overlay: Container(
                 alignment: Alignment.topLeft,
-                padding: defaults.padding ?? EdgeInsets.zero,
+                padding: defaults.padding,
                 child: Column(
                   children: [
                     Text(

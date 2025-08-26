@@ -96,6 +96,10 @@ class MediaEdit extends StatelessWidget {
             ),
           ),
           forms.Field(
+            label: Text("created"),
+            input: ds.Timestamp.iso8601(current.createdAt),
+          ),
+          forms.Field(
             label: Text("mimetype"),
             input: Text(current.mimetype),
           ),

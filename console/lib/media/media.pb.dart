@@ -1401,6 +1401,109 @@ class DownloadPauseResponse extends $pb.GeneratedMessage {
   Download ensureDownload() => $_ensure(0);
 }
 
+class DownloadDeleteRequest extends $pb.GeneratedMessage {
+  factory DownloadDeleteRequest() => create();
+
+  DownloadDeleteRequest._();
+
+  factory DownloadDeleteRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory DownloadDeleteRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'DownloadDeleteRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
+      createEmptyInstance: create)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DownloadDeleteRequest clone() =>
+      DownloadDeleteRequest()..mergeFromMessage(this);
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DownloadDeleteRequest copyWith(
+          void Function(DownloadDeleteRequest) updates) =>
+      super.copyWith((message) => updates(message as DownloadDeleteRequest))
+          as DownloadDeleteRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static DownloadDeleteRequest create() => DownloadDeleteRequest._();
+  @$core.override
+  DownloadDeleteRequest createEmptyInstance() => create();
+  static $pb.PbList<DownloadDeleteRequest> createRepeated() =>
+      $pb.PbList<DownloadDeleteRequest>();
+  @$core.pragma('dart2js:noInline')
+  static DownloadDeleteRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<DownloadDeleteRequest>(create);
+  static DownloadDeleteRequest? _defaultInstance;
+}
+
+class DownloadDeleteResponse extends $pb.GeneratedMessage {
+  factory DownloadDeleteResponse({
+    Download? download,
+  }) {
+    final result = create();
+    if (download != null) result.download = download;
+    return result;
+  }
+
+  DownloadDeleteResponse._();
+
+  factory DownloadDeleteResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory DownloadDeleteResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'DownloadDeleteResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
+      createEmptyInstance: create)
+    ..aOM<Download>(1, _omitFieldNames ? '' : 'download',
+        subBuilder: Download.create)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DownloadDeleteResponse clone() =>
+      DownloadDeleteResponse()..mergeFromMessage(this);
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DownloadDeleteResponse copyWith(
+          void Function(DownloadDeleteResponse) updates) =>
+      super.copyWith((message) => updates(message as DownloadDeleteResponse))
+          as DownloadDeleteResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static DownloadDeleteResponse create() => DownloadDeleteResponse._();
+  @$core.override
+  DownloadDeleteResponse createEmptyInstance() => create();
+  static $pb.PbList<DownloadDeleteResponse> createRepeated() =>
+      $pb.PbList<DownloadDeleteResponse>();
+  @$core.pragma('dart2js:noInline')
+  static DownloadDeleteResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<DownloadDeleteResponse>(create);
+  static DownloadDeleteResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Download get download => $_getN(0);
+  @$pb.TagNumber(1)
+  set download(Download value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasDownload() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearDownload() => $_clearField(1);
+  @$pb.TagNumber(1)
+  Download ensureDownload() => $_ensure(0);
+}
+
 class Published extends $pb.GeneratedMessage {
   factory Published({
     $core.String? id,

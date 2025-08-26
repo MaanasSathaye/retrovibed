@@ -351,6 +351,36 @@ final $typed_data.Uint8List downloadPauseResponseDescriptor = $convert.base64Dec
     'ChVEb3dubG9hZFBhdXNlUmVzcG9uc2USKwoIZG93bmxvYWQYASABKAsyDy5tZWRpYS5Eb3dubG'
     '9hZFIIZG93bmxvYWQ=');
 
+@$core.Deprecated('Use downloadDeleteRequestDescriptor instead')
+const DownloadDeleteRequest$json = {
+  '1': 'DownloadDeleteRequest',
+};
+
+/// Descriptor for `DownloadDeleteRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List downloadDeleteRequestDescriptor =
+    $convert.base64Decode('ChVEb3dubG9hZERlbGV0ZVJlcXVlc3Q=');
+
+@$core.Deprecated('Use downloadDeleteResponseDescriptor instead')
+const DownloadDeleteResponse$json = {
+  '1': 'DownloadDeleteResponse',
+  '2': [
+    {
+      '1': 'download',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.media.Download',
+      '10': 'download'
+    },
+  ],
+};
+
+/// Descriptor for `DownloadDeleteResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List downloadDeleteResponseDescriptor =
+    $convert.base64Decode(
+        'ChZEb3dubG9hZERlbGV0ZVJlc3BvbnNlEisKCGRvd25sb2FkGAEgASgLMg8ubWVkaWEuRG93bm'
+        'xvYWRSCGRvd25sb2Fk');
+
 @$core.Deprecated('Use publishedDescriptor instead')
 const Published$json = {
   '1': 'Published',

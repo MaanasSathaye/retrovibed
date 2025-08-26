@@ -85,7 +85,7 @@ class _VideoState extends State<VideoScreen> {
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       color: theme.scaffoldBackgroundColor.withValues(
-                        alpha: themex.opaque?.a ?? 0.0,
+                        alpha: themex.opaque.a,
                       ),
                     ),
                     child: widget.child,

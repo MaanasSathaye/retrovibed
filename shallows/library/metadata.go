@@ -140,6 +140,14 @@ func MetadataQueryVisible() squirrel.Sqlizer {
 	return squirrel.Expr("library_metadata.hidden_at = 'infinity'")
 }
 
+func MetadataQueryNotTombstoned() squirrel.Sqlizer {
+	return squirrel.Expr("library_metadata.tombstoned_at = 'infinity'")
+}
+
+func MetadataQueryByTorrentID(tid string) squirrel.Sqlizer {
+	return squirrel.Expr("library_metadata.torrent_id = ?", tid)
+}
+
 func MetadataQueryHidden() squirrel.Sqlizer {
 	return squirrel.Expr("library_metadata.hidden_at < NOW()")
 }

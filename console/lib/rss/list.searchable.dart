@@ -184,12 +184,12 @@ class _FeedCreate extends StatelessWidget {
     return Card(
       color: theming.scaffoldBackgroundColor,
       child: Column(
-        spacing: themex.spacing ?? 0.0,
+        spacing: themex.spacing,
         mainAxisSize: MainAxisSize.min,
         children: [
           FeedNew(current: current, onChange: onChange),
           Row(
-            spacing: themex.spacing ?? 0.0,
+            spacing: themex.spacing,
             children: [
               Spacer(),
               TextButton(onPressed: onCancel, child: Text("cancel")),

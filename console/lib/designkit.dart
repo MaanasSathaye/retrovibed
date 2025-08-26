@@ -15,7 +15,8 @@ export 'design.kit/search.tray.dart';
 export 'design.kit/card.dart';
 export 'design.kit/rating.dart';
 export 'design.kit/buttons.dart';
-export 'design.kit/buttons.loading.dart';
+export 'design.kit/buttons.loading.icon.dart';
+export 'design.kit/buttons.loading.widget.dart';
 export 'design.kit/typography.dart';
 export 'design.kit/bytesx.dart';
 

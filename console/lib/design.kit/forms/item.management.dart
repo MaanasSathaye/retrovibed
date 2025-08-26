@@ -73,7 +73,7 @@ class _ItemListManagerState<T> extends State<ItemListManager<T>> {
           ),
         },
         child: Column(
-          spacing: defaults.spacing ?? 0.0,
+          spacing: defaults.spacing,
           mainAxisSize: MainAxisSize.min,
           children: [
             ListView.builder(

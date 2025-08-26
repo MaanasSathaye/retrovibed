@@ -327,4 +327,19 @@ abstract class discovered {
           );
         });
   }
+
+  static Future<DownloadDeleteResponse> delete(String id, {List<httpx.Option> options = const []}) async {
+    return httpx
+        .delete(
+          Uri.https(httpx.host(), "/d/${id}/delete"),
+          body: jsonEncode({}),
+          options: options,
+        )
+        .then((v) {
+          return Future.value(
+            DownloadDeleteResponse.create()
+              ..mergeFromProto3Json(jsonDecode(v.body)),
+          );
+        });
+  }
 }

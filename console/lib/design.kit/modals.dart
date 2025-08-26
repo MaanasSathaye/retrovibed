@@ -91,7 +91,7 @@ class NodeState extends State<Node> {
             width: mq.size.width,
             decoration: BoxDecoration(
               color: theme.scaffoldBackgroundColor.withValues(
-                alpha: themex.opaque?.a ?? 0.0,
+                alpha: themex.opaque.a,
               ),
             ),
             child: SingleChildScrollView(child: current),

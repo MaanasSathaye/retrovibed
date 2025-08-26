@@ -36,6 +36,13 @@ func MetadataBatchInsertWithDefaults(
 	gql.Into("torrents_metadata").Batch(10).Default("created_at", "updated_at", "hidden_at", "initiated_at", "paused_at", "downloaded", "next_announce_at")
 }
 
+func MetadataTombstoneByID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewMetadataScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE torrents_metadata SET tombstoned_at = NOW(), initiated_at = 'infinity', seeding = 'f' WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
+}
+
 func MetadataDeleteByID(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewMetadataScannerStaticRow,

@@ -18,8 +18,8 @@ class TableRow extends StatelessWidget {
         onTap: onTap,
         hoverColor: themex.hoverColor,
         mouseCursor: SystemMouseCursors.click,
-        borderRadius: BorderRadius.circular(defaults.spacing! / 2),
-        child: Row(spacing: defaults.spacing!, children: children),
+        borderRadius: BorderRadius.circular(defaults.spacing / 2),
+        child: Row(spacing: defaults.spacing, children: children),
       ),
     );
   }

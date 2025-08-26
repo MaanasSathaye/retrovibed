@@ -24,7 +24,7 @@ class Field extends StatelessWidget {
       child: ConstrainedBox(
         constraints: constraints,
         child: Row(
-          spacing: defaults.spacing ?? 0.0,
+          spacing: defaults.spacing,
           children: [
             if (label != null) Expanded(child: label!),
             Expanded(child: input, flex: 9),

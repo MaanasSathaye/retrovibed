@@ -173,9 +173,9 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                 gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                   maxCrossAxisExtent: 512,
                   crossAxisSpacing:
-                      defaults.spacing! / 2, // Spacing between columns
+                      defaults.spacing / 2, // Spacing between columns
                   mainAxisSpacing:
-                      defaults.spacing! / 2, // Spacing between rows
+                      defaults.spacing / 2, // Spacing between rows
                   childAspectRatio: 2 / 3,
                 ),
                 itemBuilder: (context, index) {
@@ -186,7 +186,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                         ?.push(
                           MediaSettings(
                             current: _media,
-                            onChange: (pending) {
+                            onChange: (pending, {bool forced = false}) {
                               pending
                                   .then((v) {
                                     final replaced = _res.items.map(
@@ -194,13 +194,14 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                                     );
 
                                     setState(() {
-                                      _dirty = UniqueKey();
                                       _res = media.MediaSearchResponse(
                                         items: replaced,
                                         next: _res.next,
                                       );
                                     });
-
+                                    if (forced) {
+                                      refresh(_res.next);
+                                    }
                                     ds.modals.of(context)?.push(null);
                                   })
                                   .catchError((cause) {

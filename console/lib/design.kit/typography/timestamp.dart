@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:retrovibed/timex.dart' as timex;
 
 class Timestamp extends StatelessWidget {
-  static final DateTime inf = DateTime.fromMillisecondsSinceEpoch(253402300799999, isUtc: true).toUtc();
-  static final DateTime neginf = DateTime.fromMillisecondsSinceEpoch(0, isUtc: true).toUtc(); // todo.
   final DateTime timestamp;
   final String Function(DateTime)? format;
   final Widget _inf = const Text("never");
@@ -11,17 +10,17 @@ class Timestamp extends StatelessWidget {
 
   const Timestamp(this.timestamp, {super.key, this.format});
 
-  factory Timestamp.iso8601(String ts) {
-    return Timestamp(ts.isEmpty ? DateTime.fromMillisecondsSinceEpoch(0, isUtc: true) : DateTime.parse(ts).toUtc());
+  factory Timestamp.iso8601(String ts, {DateTime? empty }) {
+    return Timestamp(timex.iso8601(ts, empty: empty));
   }
 
   @override
   Widget build(BuildContext context) {
-    if (inf.difference(timestamp).inMilliseconds == 0) {
+    if (timex.inf.difference(timestamp).inMilliseconds == 0) {
       return _inf;
     }
 
-    if (neginf.difference(timestamp).inMilliseconds == 0) {
+    if (timex.neginf.difference(timestamp).inMilliseconds == 0) {
       return _neginf;
     }
 

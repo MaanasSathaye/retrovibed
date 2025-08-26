@@ -37,7 +37,7 @@ class Card extends material.StatelessWidget {
           child: material.Column(
             children: [
               material.Container(
-                margin: material.EdgeInsets.only(bottom: defaults.margin?.vertical ?? 0.0),
+                margin: material.EdgeInsets.only(bottom: defaults.margin.vertical),
                 child: leading,
               ),
               material.Expanded(

@@ -16,10 +16,10 @@ class MagnetDownloads extends StatelessWidget {
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
     return Container(
-      padding: defaults.padding ?? EdgeInsets.zero,
-      color: defaults.opaque ?? Colors.transparent,
+      padding: defaults.padding,
+      color: defaults.opaque,
       child: Column(
-        spacing: defaults.spacing ?? 0.0,
+        spacing: defaults.spacing,
         mainAxisSize: MainAxisSize.min,
         children: [
           TextField(

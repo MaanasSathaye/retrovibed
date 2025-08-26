@@ -214,6 +214,47 @@ func Verify(ctx context.Context, t torrent.Torrent) error {
 	return torrent.Verify(ctx, t)
 }
 
+func Delete(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata) (err error) {
+	mediavfs := fsx.DirVirtual(vfs.Path("media"))
+	torrentvfs := fsx.DirVirtual(vfs.Path("torrent"))
+
+	log.Println("removing torrent initiated", md.ID, int160.FromBytes(md.Infohash).String())
+	defer log.Println("removing torrent completed", md.ID, int160.FromBytes(md.Infohash).String())
+
+	if err = sqlx.Discard(sqlx.Scan(library.MetadataTombstoneByTorrentID(ctx, q, md.ID))); err != nil {
+		return err
+	}
+
+	if err = MetadataTombstoneByID(ctx, q, md.ID).Scan(md); err != nil {
+		return err
+	}
+
+	ls := sqlx.Scan(library.MetadataSearch(ctx, q, library.MetadataSearchBuilder().Where(
+		library.MetadataQueryByTorrentID(md.ID),
+	)))
+
+	for lmd := range ls.Iter() {
+		log.Println("removing library content", lmd.ID)
+		if err = os.RemoveAll(mediavfs.Path(lmd.ID)); err != nil {
+			return err
+		}
+	}
+
+	matches, err := fs.Glob(os.DirFS(torrentvfs.Path()), int160.FromBytes(md.Infohash).String()+"*")
+	if err != nil {
+		return err
+	}
+
+	for _, m := range matches {
+		log.Println("removing torrent content", m)
+		if err = os.RemoveAll(m); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func DownloadInto(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata, t torrent.Torrent, dst io.Writer, options ...torrent.Tuner) (err error) {
 	var (
 		downloaded int64

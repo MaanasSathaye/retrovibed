@@ -8,14 +8,16 @@ import './api.dart' as api;
 
 class DownloadDisplay extends StatelessWidget {
   final api.Download current;
+  final List<Widget> trailing;
   final Future<void> Function() onTap;
   const DownloadDisplay(
     this.current, {
     super.key,
     onTap,
+    this.trailing = const [],
   }) : onTap = onTap ?? ds.defaulttapv;
 
-  static Widget fromID(String id) {
+  static Widget fromID(String id, {List<Widget> trailing = const []}) {
     return Builder(
       builder: (context) {
         return FutureBuilder<api.Download>(
@@ -27,7 +29,7 @@ class DownloadDisplay extends StatelessWidget {
             return ds.Loading(
               loading: !(snapshot.hasData || snapshot.hasError),
               cause: ds.Error.maybeErr(snapshot.error),
-              snapshot.data == null ? SizedBox() : DownloadDisplay(snapshot.data!),
+              snapshot.data == null ? SizedBox() : DownloadDisplay(snapshot.data!, trailing: trailing),
             );
           },
         );
@@ -44,7 +46,7 @@ class DownloadDisplay extends StatelessWidget {
         child: InkWell(
           onTap: () => onTap(),
           child: Row(
-            spacing: themex.spacing!,
+            spacing: themex.spacing,
             children: [
               Expanded(child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -82,7 +84,6 @@ class DownloadDisplay extends StatelessWidget {
                       label: Text("distributing"),
                       input: forms.Checkbox(value: current.distributing),
                     ),
-                    
                   ],
                 ),
               ),

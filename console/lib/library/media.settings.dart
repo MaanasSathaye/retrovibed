@@ -8,7 +8,7 @@ import './metadata.edit.dart';
 
 class MediaSettings extends StatefulWidget {
   final media.Media current;
-  final void Function(Future<media.Media> pending) onChange;
+  final void Function(Future<media.Media> pending, {bool forced}) onChange;
 
   const MediaSettings({
     super.key,
@@ -29,16 +29,15 @@ class _MediaSettingsState extends State<MediaSettings> {
   @override
   void dispose() {
     if (_dirty) {
-      widget.onChange(
-        media.media
-            .update(
-              _modified.id,
-              _modified,
-              options: [authn.Authenticated.devicebearer(context)],
-            )
-            .then((v) => v.media),
-      );
+      media.media
+          .update(
+            _modified.id,
+            _modified,
+            options: [authn.Authenticated.devicebearer(context)],
+          )
+          .then((v) => widget.onChange(Future.value(v.media)));
     }
+
     super.dispose();
   }
 
@@ -66,11 +65,35 @@ class _MediaSettingsState extends State<MediaSettings> {
                 });
               },
             ),
-            if (!uuidx.isMinMax(uuidx.fromString(_modified.torrentId))) ds.Accordion(
-              expanded: true,
-              description: Text("source details"),
-              content: media.DownloadDisplay.fromID(_modified.torrentId),
-            ),
+            if (!uuidx.isMinMax(uuidx.fromString(_modified.torrentId)))
+              ds.Accordion(
+                expanded: true,
+                description: Text("source details"),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    media.DownloadDisplay.fromID(_modified.torrentId),
+                    ds.LoadingButton(
+                      Padding(padding: themex.padding, child: Text("Delete")),
+                      onPressed: () {
+                        return media.discovered
+                            .delete(
+                              _modified.torrentId,
+                              options: [
+                                authn.Authenticated.devicebearer(context),
+                              ],
+                            )
+                            .then((v) {
+                              widget.onChange(
+                                Future.value(_modified),
+                                forced: true,
+                              );
+                            });
+                      },
+                    ),
+                  ],
+                ),
+              ),
             ds.Accordion(
               expanded: true,
               description: Text("metadata"),
@@ -85,6 +108,7 @@ class _MediaSettingsState extends State<MediaSettings> {
                           options: [authn.Authenticated.devicebearer(context)],
                         )
                         .then((v) => v.media),
+                    forced: true,
                   );
                 },
               ),

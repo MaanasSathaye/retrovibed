@@ -114,9 +114,9 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
             gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
               maxCrossAxisExtent: 512, // Maximum width of each item
               crossAxisSpacing:
-                  (defaults.spacing ?? 0.0) / 2, // Spacing between columns
+                  (defaults.spacing) / 2, // Spacing between columns
               mainAxisSpacing:
-                  (defaults.spacing ?? 0.0) / 2, // Spacing between rows
+                  (defaults.spacing) / 2, // Spacing between rows
               childAspectRatio: 2 / 3,
             ),
             itemBuilder: (context, index) {

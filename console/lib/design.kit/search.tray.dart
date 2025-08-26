@@ -90,7 +90,7 @@ class _SearchTrayState extends State<SearchTray> {
               Expanded(
                 child: Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal: theming.spacing!,
+                    horizontal: theming.spacing,
                   ),
                   child: TextField(
                     enabled: !widget.disabled,

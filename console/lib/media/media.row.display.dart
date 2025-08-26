@@ -23,7 +23,7 @@ class RowDisplay extends StatelessWidget {
       padding: themex.padding,
       child: InkWell(
         onTap: () => onTap(),
-        child: Row(spacing: themex.spacing!, children: [
+        child: Row(spacing: themex.spacing, children: [
           ...leading,
           Expanded(child: Text(media.description, overflow: TextOverflow.ellipsis)),
           ...trailing

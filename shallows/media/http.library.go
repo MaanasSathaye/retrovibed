@@ -286,6 +286,7 @@ func (t *HTTPLibrary) random(w http.ResponseWriter, r *http.Request) {
 	perform := func(id string) (library.Metadata, error) {
 		q := library.MetadataSearchBuilder().Where(squirrel.And{
 			library.MetadataQueryVisible(),
+			library.MetadataQueryNotTombstoned(),
 			library.MetadataQueryMimetypes(req.Mimetypes...),
 		}).Limit(req.Limit)
 
@@ -343,6 +344,7 @@ func (t *HTTPLibrary) search(w http.ResponseWriter, r *http.Request) {
 
 	q := library.MetadataSearchBuilder().Where(squirrel.And{
 		library.MetadataQueryVisible(),
+		library.MetadataQueryNotTombstoned(),
 		library.MetadataQueryMimetypes(msg.Next.Mimetypes...),
 		lucenex.Query(t.fts, msg.Next.Query, lucenex.WithDefaultField("auto_description")),
 	}).OrderBy(ordering).Offset(msg.Next.Offset * msg.Next.Limit).Limit(msg.Next.Limit)

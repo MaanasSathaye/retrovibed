@@ -35,13 +35,6 @@ func MetadataDeleteByID(
 	gql = gql.Query(`DELETE FROM library_metadata WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
 }
 
-func MetadataTombstoneByID(
-	gql genieql.Function,
-	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewMetadataScannerStaticRow,
-) {
-	gql = gql.Query(`UPDATE library_metadata SET tombstoned_at = NOW(), initiated_at = 'infinity' WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
-}
-
 func MetadataArchivedByID(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, id, aid string, quota uint64) NewMetadataScannerStaticRow,
@@ -75,6 +68,20 @@ func MetadataFindByID(
 	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewMetadataScannerStaticRow,
 ) {
 	gql = gql.Query(`SELECT ` + MetadataScannerStaticColumns + ` FROM library_metadata WHERE "id" = {id}`)
+}
+
+func MetadataTombstoneByID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewMetadataScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE library_metadata SET tombstoned_at = NOW() WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
+}
+
+func MetadataTombstoneByTorrentID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, tid string) NewMetadataScannerStatic,
+) {
+	gql = gql.Query(`UPDATE library_metadata SET tombstoned_at = NOW() WHERE "torrent_id" = {tid} RETURNING ` + MetadataScannerStaticColumns)
 }
 
 func MetadataFindByDescription(
