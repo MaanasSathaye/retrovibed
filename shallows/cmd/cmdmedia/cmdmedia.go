@@ -9,6 +9,7 @@ type Commands struct {
 
 type Known struct {
 	TMDB    tmdbimport   `cmd:"" help:"import known media from tmdb and writes them to stdout in known media jsonl format for importing"`
+	TVDB    tvdbimport   `cmd:"" help:"import known media from tvdb and writes them to stdout in known media jsonl format for importing"`
 	Query   knownquery   `cmd:"" help:"run a query against known media"`
 	Import  knownimport  `cmd:"" help:"processes a file or stdin to import media metadata records directly into the database"`
 	Archive knownarchive `cmd:"" help:"processes stdin and creates a directory of files of media metadata"`

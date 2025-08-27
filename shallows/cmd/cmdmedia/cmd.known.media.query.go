@@ -16,7 +16,7 @@ import (
 )
 
 type knownquery struct {
-	Query string `arg:"" name:"path" help:"csv file to import" required:"true"`
+	Query string `arg:"" name:"path" help:"query to search for" required:"true"`
 }
 
 func (t knownquery) Run(gctx *cmdopts.Global) (err error) {

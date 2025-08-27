@@ -12,6 +12,7 @@ require (
 	github.com/benbjohnson/immutable v0.4.3
 	github.com/charmbracelet/huh v0.7.0
 	github.com/cyruzin/golang-tmdb v1.8.2-0.20250725073205-7f95ce6079f0
+	github.com/dashotv/tvdb v0.5.2
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/gabriel-vasile/mimetype v1.4.9
 	github.com/go-playground/form/v4 v4.2.2
@@ -35,7 +36,7 @@ require (
 	github.com/porfirion/trie v1.0.0
 	github.com/pressly/goose/v3 v3.24.3
 	github.com/shirou/gopsutil/v4 v4.25.7
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.0
 	github.com/willabides/kongplete v0.4.0
 	golang.org/x/crypto v0.41.0
 	golang.org/x/exp v0.0.0-20250813145105-42675adae3e6
@@ -67,6 +68,7 @@ require (
 	github.com/bits-and-blooms/bloom/v3 v3.7.0 // indirect
 	github.com/bradfitz/iter v0.0.0-20191230175014-e8f45d346db8 // indirect
 	github.com/catppuccin/go v0.3.0 // indirect
+	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/charmbracelet/bubbles v0.21.0 // indirect
 	github.com/charmbracelet/bubbletea v1.3.4 // indirect
 	github.com/charmbracelet/colorprofile v0.2.3-0.20250311203215-f60798e515dc // indirect
@@ -85,6 +87,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/ebitengine/purego v0.8.4 // indirect
 	github.com/edsrzf/mmap-go v1.2.0 // indirect
+	github.com/ericlagergren/decimal v0.0.0-20240411145413-00de7ca16731 // indirect
 	github.com/erikgeiser/coninput v0.0.0-20211004153227-1c3628e74d0f // indirect
 	github.com/fatih/camelcase v1.0.0 // indirect
 	github.com/fatih/gomodifytags v1.17.0 // indirect

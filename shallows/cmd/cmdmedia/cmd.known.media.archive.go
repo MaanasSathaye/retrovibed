@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -23,6 +24,7 @@ import (
 type knownarchive struct {
 	Directory string `flag:"" name:"directory" help:"work directory for the command"`
 	Pattern   string `flag:"" name:"pattern" help:"name of the archive directory to create" default:"retrovibed.media.archive.*.d"`
+	DryRun    bool   `flag:"" name:"dry-run" help:"do not actually write the data into the archive just log" negatable:"" default:"false"`
 }
 
 func (t knownarchive) Run(gctx *cmdopts.Global) (err error) {
@@ -44,6 +46,52 @@ func (t knownarchive) Run(gctx *cmdopts.Global) (err error) {
 		return errorsx.Wrap(err, "unable to create archive directory")
 	}
 
+	w := fsx.Walk(os.DirFS(dir))
+
+	unpack := func(path string) error {
+		archive := filepath.Join(dir, path)
+		dst := strings.TrimPrefix(path, "retrovibed.media.metadata.archive.")
+		dst = strings.TrimSuffix(dst, ".tar.gz")
+		src, err := os.Open(archive)
+		if err != nil {
+			return errorsx.Wrap(err, "failed to open archive")
+		}
+		defer src.Close()
+
+		if err = os.MkdirAll(filepath.Join(dir, dst), 0700); err != nil {
+			return errorsx.Wrapf(err, "failed to prepare archive directory: %s", path)
+		}
+
+		if err = tarx.Unpack(filepath.Join(dir, dst), src); err != nil {
+			return errorsx.Wrapf(err, "failed to unpack archive: %s", path)
+		}
+
+		if err = os.Remove(archive); err != nil {
+			return errorsx.Wrapf(err, "failed to remove extracted archive")
+		}
+
+		return nil
+	}
+
+	for path := range w.Walk() {
+		if path == "." {
+			continue
+		}
+
+		if !strings.HasSuffix(path, ".tar.gz") {
+			log.Println("skipping", path)
+			continue
+		}
+
+		if err = unpack(path); err != nil {
+			return err
+		}
+	}
+
+	if err := w.Err(); err != nil {
+		return errorsx.Wrap(err, "unable to walk directory")
+	}
+
 	for derr = d.Decode(&v); derr == nil; derr = d.Decode(&v) {
 		v.AutoDescription = stringsx.Join("\n", v.Title, v.OriginalTitle, v.Overview)
 		encoded, err := json.Marshal(v)
@@ -57,8 +105,13 @@ func (t knownarchive) Run(gctx *cmdopts.Global) (err error) {
 		}
 
 		path := filepath.Join(adir, fmt.Sprintf("%x", backoffx.DynamicHashWindow(v.UID, 16)))
-		if err := fsx.AppendTo(path, 0600, encoded, []byte("\n")); err != nil {
-			return errorsx.Wrapf(err, "unable to append record %s %s", v.UID, path)
+
+		if t.DryRun {
+			log.Println(string(encoded))
+		} else {
+			if err := fsx.AppendTo(path, 0600, encoded, []byte("\n")); err != nil {
+				return errorsx.Wrapf(err, "unable to append record %s %s", v.UID, path)
+			}
 		}
 	}
 
@@ -81,7 +134,7 @@ func (t knownarchive) Run(gctx *cmdopts.Global) (err error) {
 		return errorsx.Compact(tarx.Pack(out, path), out.Close(), os.RemoveAll(path))
 	})
 
-	w := fsx.Walk(os.DirFS(dir))
+	w = fsx.Walk(os.DirFS(dir))
 
 	for path := range w.Walk() {
 		if path == "." {

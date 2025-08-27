@@ -70,3 +70,19 @@ func Compose[T any, Y ~func(*T)](options ...Y) Y {
 		}
 	}
 }
+
+func FirstNonZero[T comparable](s ...T) T {
+	var (
+		x T
+	)
+
+	for _, v := range s {
+		if v == x {
+			continue
+		}
+
+		return v
+	}
+
+	return x
+}
