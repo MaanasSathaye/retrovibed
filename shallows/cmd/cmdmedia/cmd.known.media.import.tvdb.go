@@ -48,7 +48,7 @@ func (t *tvdbimport) records(c *tvdb.Client) iter.Seq[library.Known] {
 				t.cause = errorsx.Wrap(err, "failed to discover records")
 				return
 			}
-			log.Println("DERP DERP 0", langx.Autoderef(page.Links.Next), langx.Autoderef(page.Data[0].Name), langx.Autoderef(page.Data[0].FirstAired))
+
 			for _, mr := range page.Data {
 				if stringsx.Blank(langx.Autoderef(mr.Image)) {
 					log.Println("skipping", langx.Autoderef(mr.Name), "missing poster")
