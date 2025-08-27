@@ -7,8 +7,7 @@ export 'package:retrovibed/meta/meta.account.pb.dart';
 export 'package:retrovibed/meta/meta.authn.pb.dart';
 
 String bearer(String token) {
-  if (token.isEmpty) return "";
-  return "bearer ${token}";
+  return token.isNotEmpty ? "bearer ${token}" : "";
 }
 
 Future<Session> current(String token) async {

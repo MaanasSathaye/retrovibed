@@ -55,41 +55,45 @@ class MyApp extends StatelessWidget {
           child: ds.Full(
             meta.EndpointAuto(
               authn.Authenticated(
-                authn.AuthzCache(
-                  media.Playlist(
-                    DefaultTabController(
-                      length: 3,
-                      child: Scaffold(
-                        appBar: TabBar(
-                          tabs: [
-                            Tab(icon: Icon(Icons.movie)),
-                            Tab(icon: Icon(Icons.download)),
-                            Tab(icon: Icon(Icons.settings)),
-                          ],
-                        ),
-                        body: ds.ErrorBoundary(
+                authn.DeeppoolAuthzCache(
+                  authn.AuthzCache(
+                    media.Playlist(
+                      DefaultTabController(
+                        length: 3,
+                        child: Scaffold(
+                          appBar: TabBar(
+                            tabs: [
+                              Tab(icon: Icon(Icons.movie)),
+                              Tab(icon: Icon(Icons.download)),
+                              Tab(icon: Icon(Icons.settings)),
+                            ],
+                          ),
+                          body: ds.ErrorBoundary(
                             TabBarView(
                               children: [
-                                modals.Node(media.Playlist.wrap((ctx, s) {
-                                  return media.VideoScreen(
-                                    env.Boolean(
-                                          env.vars.AutoIdentifyMedia,
-                                          fallback: true,
-                                        )
-                                        ? medialib.AvailableGridDisplay(
-                                          focus: s.searchfocus,
-                                          controller: s.controller,
-                                        )
-                                        : medialib.AvailableListDisplay(
-                                          focus: s.searchfocus,
-                                          controller: s.controller,
-                                        ),
-                                    s.player,
-                                  );
-                                })),
+                                modals.Node(
+                                  media.Playlist.wrap((ctx, s) {
+                                    return media.VideoScreen(
+                                      env.Boolean(
+                                            env.vars.AutoIdentifyMedia,
+                                            fallback: true,
+                                          )
+                                          ? medialib.AvailableGridDisplay(
+                                            focus: s.searchfocus,
+                                            controller: s.controller,
+                                          )
+                                          : medialib.AvailableListDisplay(
+                                            focus: s.searchfocus,
+                                            controller: s.controller,
+                                          ),
+                                      s.player,
+                                    );
+                                  }),
+                                ),
                                 modals.Node(downloads.Display()),
                                 modals.Node(settings.Display()),
                               ],
+                            ),
                           ),
                         ),
                       ),
