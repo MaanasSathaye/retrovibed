@@ -13,7 +13,7 @@ Future<CommunitySearchResponse> search({List<httpx.Option> options = const [], S
     limit: fixnum.Int64(limit)
   );
   return httpx
-      .post(Uri.https(httpx.metaendpoint(), "/c/search"), options: options, body: jsonEncode(searchReq.toProto3Json()))
+      .post(Uri.https(httpx.localhost(), "/c/search"), options: options, body: jsonEncode(searchReq.toProto3Json()))
       .then((v) {
         return CommunitySearchResponse.create()
           ..mergeFromProto3Json(jsonDecode(v.body));
@@ -24,7 +24,7 @@ Future<CommunityCreateResponse> create(String domain, String description, String
   final community = Community(domain: domain, description: description, mimetype: mimetype);
   final createReq = CommunityCreateRequest(community: community);
   return httpx
-      .post(Uri.https(httpx.metaendpoint(), "/c/"), options: options, body: jsonEncode(createReq.toProto3Json()))
+      .post(Uri.https(httpx.localhost(), "/c/"), options: options, body: jsonEncode(createReq.toProto3Json()))
       .then((v) {
         return CommunityCreateResponse.create()
           ..mergeFromProto3Json(jsonDecode(v.body));
@@ -33,7 +33,7 @@ Future<CommunityCreateResponse> create(String domain, String description, String
 
 Future<Community> find(String id, {List<httpx.Option> options = const []}) {
   return httpx
-      .get(Uri.https(httpx.metaendpoint(), "/c/$id"), options: options)
+      .get(Uri.https(httpx.localhost(), "/c/$id"), options: options)
       .then((v) {
         final response = CommunityFindResponse.create()
           ..mergeFromProto3Json(jsonDecode(v.body));

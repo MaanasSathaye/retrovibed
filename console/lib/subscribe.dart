@@ -43,7 +43,7 @@ class _SubscribeQRDisplayState extends State<SubscribeQRDisplay> {
 
     // Fetches the list of communities for the current user using the community API.
     void fetchCommunities(BuildContext context) {
-        final authOptions = [authn.AuthzCache.bearer(context)];
+        final authOptions = [authn.DeeppoolAuthzCache.bearer(context)];
         
         community_api.search(
             options: [httpx.Accept.json, ...authOptions],
