@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:retrovibed/meta.dart' as _meta;
 import 'package:retrovibed/httpx.dart' as httpx;
@@ -14,7 +15,10 @@ class AuthzCache extends StatefulWidget {
 
   static httpx.Option bearer(BuildContext context) {
     return httpx.Request.bearer(
-      of(context)!.meta.token().then((v) => v.bearer),
+      of(context)!.meta.token().then((v) {
+        print("DERP DERP ${jsonDecode(jsonEncode(v.toProto3Json()))}");
+        return v.bearer;
+        }),
     );
   }
 
