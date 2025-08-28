@@ -448,7 +448,13 @@ class CommunityCreateResponse extends $pb.GeneratedMessage {
 }
 
 class CommunityFindRequest extends $pb.GeneratedMessage {
-  factory CommunityFindRequest() => create();
+  factory CommunityFindRequest({
+    $core.String? id,
+  }) {
+    final result = create();
+    if (id != null) result.id = id;
+    return result;
+  }
 
   CommunityFindRequest._();
 
@@ -464,6 +470,7 @@ class CommunityFindRequest extends $pb.GeneratedMessage {
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
       createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'id')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -487,6 +494,15 @@ class CommunityFindRequest extends $pb.GeneratedMessage {
   static CommunityFindRequest getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<CommunityFindRequest>(create);
   static CommunityFindRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get id => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set id($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearId() => $_clearField(1);
 }
 
 class CommunityFindResponse extends $pb.GeneratedMessage {

@@ -34,7 +34,9 @@ message CommunityCreateResponse {
   Community community = 1 [ json_name = "community" ];
 }
 
-message CommunityFindRequest {}
+message CommunityFindRequest {
+  string id = 1 [ json_name = "id" ];
+}
 message CommunityFindResponse {
   Community community = 1 [ json_name = "community" ];
 }

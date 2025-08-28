@@ -4,21 +4,6 @@ class Bearer<T> {
   T metadata;
   String bearer;
   Bearer(this.metadata, this.bearer);
-
-  /// Serializes the metadata to Proto3 JSON if it's a protobuf object
-  dynamic toProto3Json() {
-    if (metadata is dynamic) {
-      final dynamic obj = metadata;
-      if (obj != null && obj is Object && obj.runtimeType.toString().contains('GeneratedMessage')) {
-        try {
-          return obj.toString();
-        } catch (e) {
-          return obj.toString();
-        }
-      }
-    }
-    return metadata.toString();
-  }
 }
 
 class Cached<T> {

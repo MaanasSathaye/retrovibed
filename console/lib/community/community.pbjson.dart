@@ -134,11 +134,14 @@ final $typed_data.Uint8List communityCreateResponseDescriptor =
 @$core.Deprecated('Use communityFindRequestDescriptor instead')
 const CommunityFindRequest$json = {
   '1': 'CommunityFindRequest',
+  '2': [
+    {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
+  ],
 };
 
 /// Descriptor for `CommunityFindRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List communityFindRequestDescriptor =
-    $convert.base64Decode('ChRDb21tdW5pdHlGaW5kUmVxdWVzdA==');
+final $typed_data.Uint8List communityFindRequestDescriptor = $convert
+    .base64Decode('ChRDb21tdW5pdHlGaW5kUmVxdWVzdBIOCgJpZBgBIAEoCVICaWQ=');
 
 @$core.Deprecated('Use communityFindResponseDescriptor instead')
 const CommunityFindResponse$json = {
