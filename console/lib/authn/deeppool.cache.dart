@@ -37,7 +37,7 @@ class _AuthzCache extends State<DeeppoolAuthzCache> {
         (c) => deeppool
             .authz(options: [Authenticated.bearer(context)])
             .then((v) {
-              // print("DERP DERP ${jsonDecode(jsonEncode(v.toProto3Json()))}");
+              print("DERP DERP ${jsonDecode(jsonEncode(v.toProto3Json()))}");
               return authz.Bearer(v.token, v.bearer);
             })
             .catchError((e) {
