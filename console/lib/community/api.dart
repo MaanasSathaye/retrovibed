@@ -10,31 +10,20 @@ class CommunityAPI {
     CommunitySearchRequest req, {
     List<httpx.Option> options = const [],
   }) async {
-    final rawParams = jsonDecode(jsonEncode(req.toProto3Json()));
-    final params = (rawParams as Map<String, dynamic>)
-        .map((k, v) => MapEntry(k, v.toString()))
-        ..removeWhere((key, value) => value.isEmpty);
-    print("DEBUG: Community API params before Uri: $params");
-    final uri = Uri.https(httpx.metaendpoint(), "/c", params);
-    print("DEBUG: Community API final URI: $uri");
     return httpx
         .get(
-          uri,
+          Uri.https(
+            httpx.metaendpoint(),
+            "/c/",
+            jsonDecode(jsonEncode(req.toProto3Json())),
+          ),
           options: options,
         )
         .then((v) {
-          print("DEBUG: Community API Success Response - Status: ${v.statusCode}, Body: ${v.body}");
           return Future.value(
             CommunitySearchResponse.create()
               ..mergeFromProto3Json(jsonDecode(v.body)),
           );
-        })
-        .catchError((error) {
-          print("DEBUG: Community API Error caught: $error");
-          if (error is http.Response) {
-            print("DEBUG: Error response - Status: ${error.statusCode}, Body: ${error.body}");
-          }
-          throw error;
         });
   }
 
