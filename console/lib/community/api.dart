@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:retrovibed/httpx.dart' as httpx;
 import './community.pb.dart';
 
@@ -9,20 +10,31 @@ class CommunityAPI {
     CommunitySearchRequest req, {
     List<httpx.Option> options = const [],
   }) async {
+    final rawParams = jsonDecode(jsonEncode(req.toProto3Json()));
+    final params = (rawParams as Map<String, dynamic>)
+        .map((k, v) => MapEntry(k, v.toString()))
+        ..removeWhere((key, value) => value.isEmpty);
+    print("DEBUG: Community API params before Uri: $params");
+    final uri = Uri.https(httpx.metaendpoint(), "/c", params);
+    print("DEBUG: Community API final URI: $uri");
     return httpx
-        .post(
-          Uri.https(
-            httpx.host(),
-            "/meta/c/search",
-          ),
+        .get(
+          uri,
           options: options,
-          body: jsonEncode(req.toProto3Json()),
         )
         .then((v) {
+          print("DEBUG: Community API Success Response - Status: ${v.statusCode}, Body: ${v.body}");
           return Future.value(
             CommunitySearchResponse.create()
               ..mergeFromProto3Json(jsonDecode(v.body)),
           );
+        })
+        .catchError((error) {
+          print("DEBUG: Community API Error caught: $error");
+          if (error is http.Response) {
+            print("DEBUG: Error response - Status: ${error.statusCode}, Body: ${error.body}");
+          }
+          throw error;
         });
   }
 
@@ -33,8 +45,8 @@ class CommunityAPI {
     return httpx
         .post(
           Uri.https(
-            httpx.host(),
-            "/meta/c/",
+            httpx.metaendpoint(),
+            "/c/",
           ),
           options: options,
           body: jsonEncode(req.toProto3Json()),
@@ -48,14 +60,14 @@ class CommunityAPI {
   }
 
   static Future<CommunityFindResponse> find(
-    CommunityFindRequest req, {
+    String id, {
     List<httpx.Option> options = const [],
   }) async {
     return httpx
         .get(
           Uri.https(
-            httpx.host(),
-            "/meta/c/${req.id}",
+            httpx.metaendpoint(),
+            "/c/$id",
           ),
           options: options,
         )

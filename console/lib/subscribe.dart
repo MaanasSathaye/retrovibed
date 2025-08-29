@@ -91,7 +91,7 @@ class _SubscribeQRDisplayState extends State<SubscribeQRDisplay> {
     Widget build(BuildContext context) {
         final theme = Theme.of(context);
         return ds.Loading(
-            key: ValueKey(communities.isNotEmpty ? communities.first.id : ''),
+            key: ValueKey(communities.firstOrNull?.id ?? ''),
             loading: loading,
             cause: _cause ?? const SizedBox(),
             ds.Full(

@@ -379,7 +379,6 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) {
 	metaapi.NewHTTPUsermanagement(db).Bind(metamux.PathPrefix("/u12t").Subrouter())
 	metaapi.NewHTTPDaemons(db).Bind(metamux.PathPrefix("/d").Subrouter())
 	metaapi.NewHTTPAuthz(db).Bind(metamux.PathPrefix("/authz").Subrouter())
-	metaapi.NewHTTPCommunity(db).Bind(metamux.PathPrefix("/c").Subrouter())
 	media.NewHTTPLibrary(db, mediastore, deepjwt).Bind(httpmux.PathPrefix("/m").Subrouter())
 	media.NewHTTPDiscovered(db, tclient, tstore, media.HTTPDiscoveredOptionRootStorage(rootstore)).Bind(httpmux.PathPrefix("/d").Subrouter())
 	media.NewHTTPRSSFeed(db).Bind(httpmux.PathPrefix("/rss").Subrouter())
